@@ -29,9 +29,13 @@ validate_glycan_graph <- function(glycan) {
     abort_unknown_mono(unknown_monos)
   }
   # Check if graph has an edge attribute "linkage"
-  # This is the linkage position, e.g. "a1-2", "b1-3", etc.
   if (is.null(igraph::E(glycan)$linkage)) {
     rlang::abort("Glycan graph must have an edge attribute 'linkage'.")
+  }
+  # Check if all linkages are valid
+  if (!all(is_valid_linkage(igraph::E(glycan)$linkage))) {
+    invalid_linkages <- unique(igraph::E(glycan)$linkage[!is_valid_linkage(igraph::E(glycan)$linkage)])
+    abort_invalid_linkage(invalid_linkages)
   }
 }
 
@@ -46,4 +50,16 @@ abort_unknown_mono <- function(monos) {
 is_known_mono <- function(monos) {
   known_monos <- c(unique(monosaccharides$generic), monosaccharides$concrete)
   monos %in% known_monos
+}
+
+
+abort_invalid_linkage <- function(linkages) {
+  linkages_str <- paste0(linkages, collapse = ", ")
+  msg <- glue::glue("Invalid linkage: {linkages_str}")
+  rlang::abort("error_bad_linkage", message = msg, linkages = linkages)
+}
+
+
+is_valid_linkage <- function(linkage) {
+  stringr::str_detect(linkage, "^[ab]\\d+-\\d+$")
 }

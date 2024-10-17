@@ -99,3 +99,19 @@ test_that("validating duplicated non-existing monosaccharide", {
   expect_equal(err$message, "Unknown monosaccharide: Bad")
   expect_equal(err$monos, "Bad")
 })
+
+
+patrick::with_parameters_test_that("validating bad linkage", {
+    graph <- igraph::make_graph(~ 1-+2, 2-+3)
+    igraph::V(graph)$mono <- c("Hex", "Fuc", "Hex")
+    igraph::E(graph)$linkage <- bad_linkage
+
+    glycan <- new_glycan_graph(graph)
+
+    expect_error(validate_glycan_graph(glycan))
+    err <- rlang::catch_cnd(validate_glycan_graph(glycan))
+    expect_s3_class(err, "error_bad_linkage")
+  },
+  bad_linkage = c("1-4", "c1-4", "b1", "abc", ""),
+  .test_name = bad_linkage
+)
