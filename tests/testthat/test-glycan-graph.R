@@ -113,3 +113,14 @@ patrick::with_parameters_test_that("validating bad linkage", {
   bad_linkage = c("1-4", "c1-4", "b1", "abc", ""),
   .test_name = bad_linkage
 )
+
+
+test_that("validating mixed generic and concrete monosaccharides", {
+  graph <- igraph::make_tree(3, children = 2, mode = "out")
+  igraph::V(graph)$mono <- c("Hex", "GlcNAc", "Hex")
+  igraph::E(graph)$linkage <- "b1-4"
+
+  glycan <- new_glycan_graph(graph)
+
+  expect_error(validate_glycan_graph(glycan), "Monosaccharides must be either all generic or all concrete")
+})

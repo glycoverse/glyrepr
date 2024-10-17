@@ -29,6 +29,10 @@ validate_glycan_graph <- function(glycan) {
     msg <- glue::glue("Unknown monosaccharide: {stringr::str_c(unknown_monos, collapse = ', ')}")
     rlang::abort(msg, monos = unknown_monos)
   }
+  # Check if mixed use of generic and concrete monosaccharides
+  if (mix_generic_concrete(igraph::V(glycan)$mono)) {
+    rlang::abort("Monosaccharides must be either all generic or all concrete.")
+  }
   # Check if graph has an edge attribute "linkage"
   if (!has_edge_attribute(glycan, "linkage")) {
     rlang::abort("Glycan graph must have an edge attribute 'linkage'.")
@@ -70,6 +74,13 @@ has_edge_attribute <- function(graph, attr) {
 is_known_mono <- function(monos) {
   known_monos <- c(unique(monosaccharides$generic), monosaccharides$concrete)
   monos %in% known_monos
+}
+
+
+mix_generic_concrete <- function(monos) {
+  generic <- unique(monosaccharides$generic)
+  concrete <- monosaccharides$concrete
+  any(monos %in% generic) && any(monos %in% concrete)
 }
 
 
