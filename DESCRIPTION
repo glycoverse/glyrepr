@@ -17,5 +17,6 @@ URL: https://fubin1999.github.io/glyrepr/
 Imports: 
     glue,
     igraph,
+    purrr,
     rlang,
     stringr
