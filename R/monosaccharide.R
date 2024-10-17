@@ -5,7 +5,8 @@ monosaccharides <- tidyr::unnest(cols = concrete, tibble::enframe(name = "generi
   "HexA" = c("GlcA", "ManA", "GalA", "GulA", "AltA", "AllA", "TalA", "IdoA"),
   "dHex" = c("Qui", "Rha", "6dGul", "6dAlt", "6dTal", "Fuc"),
   "dHexNAc" = c("QuiNAc", "RhaNAc", "6dAltNAc", "6dTalNAc", "FucNAc"),
-  "di-dHex" = c("Oli", "Tyv", "Abe", "Par", "Dig", "Col"),
+  "ddHex" = c("Oli", "Tyv", "Abe", "Par", "Dig", "Col"),
   "Pent" = c("Ara", "Lyx", "Xyl", "Rib"),
-  "Acids" = c("Neu5Ac", "Neu5Gc", "Kdn", "Neu", "Sia")
+  "NeuAc" = "Neu5Ac",
+  "NeuGc" = "Neu5Gc"
 )))
