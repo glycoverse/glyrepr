@@ -58,3 +58,44 @@ test_that("validating graph without linkage attribute", {
 
   expect_error(validate_glycan_graph(glycan), "Glycan graph must have an edge attribute 'linkage'")
 })
+
+
+test_that("validating one non-existing monosaccharide", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Hex", "Fuc", "Bad")
+  igraph::E(graph)$linkage <- "b1-4"
+
+  glycan <- new_glycan_graph(graph)
+
+  expect_error(validate_glycan_graph(glycan))
+  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
+  expect_s3_class(err, "error_bad_mono")
+  expect_equal(err$message, "Unknown monosaccharide: Bad")
+  expect_equal(err$monos, "Bad")
+})
+
+
+test_that("validating two non-existing monosaccharide", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Hex", "Bad1", "Bad2")
+  igraph::E(graph)$linkage <- "b1-4"
+
+  glycan <- new_glycan_graph(graph)
+
+  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
+  expect_equal(err$message, "Unknown monosaccharide: Bad1, Bad2")
+  expect_equal(err$monos, c("Bad1", "Bad2"))
+})
+
+
+test_that("validating duplicated non-existing monosaccharide", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Hex", "Bad", "Bad")
+  igraph::E(graph)$linkage <- "b1-4"
+
+  glycan <- new_glycan_graph(graph)
+
+  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
+  expect_equal(err$message, "Unknown monosaccharide: Bad")
+  expect_equal(err$monos, "Bad")
+})

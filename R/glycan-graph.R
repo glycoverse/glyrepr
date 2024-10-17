@@ -23,9 +23,27 @@ validate_glycan_graph <- function(glycan) {
   if (any(is.na(igraph::V(glycan)$mono))) {
     rlang::abort("Glycan graph must have no NA in vertex attribute 'mono'.")
   }
+  # Check if all monosaccharides are known
+  if (!all(is_known_mono(igraph::V(glycan)$mono))) {
+    unknown_monos <- unique(igraph::V(glycan)$mono[!is_known_mono(igraph::V(glycan)$mono)])
+    abort_unknown_mono(unknown_monos)
+  }
   # Check if graph has an edge attribute "linkage"
   # This is the linkage position, e.g. "a1-2", "b1-3", etc.
   if (is.null(igraph::E(glycan)$linkage)) {
     rlang::abort("Glycan graph must have an edge attribute 'linkage'.")
   }
+}
+
+
+abort_unknown_mono <- function(monos) {
+  monos_str <- paste0(monos, collapse = ", ")
+  msg <- glue::glue("Unknown monosaccharide: {monos_str}")
+  rlang::abort("error_bad_mono", message = msg, monos = monos)
+}
+
+
+is_known_mono <- function(monos) {
+  known_monos <- c(unique(monosaccharides$generic), monosaccharides$concrete)
+  monos %in% known_monos
 }
