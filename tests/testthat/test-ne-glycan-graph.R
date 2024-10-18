@@ -115,6 +115,17 @@ patrick::with_parameters_test_that("validating bad linkage", {
 )
 
 
+test_that("validating bad linkages ignoring NA", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
+  igraph::E(graph)$linkage <- c("b1-4", NA)
+
+  glycan <- new_ne_glycan_graph(graph)
+
+  expect_no_error(validate_ne_glycan_graph(glycan))
+})
+
+
 test_that("validating mixed generic and concrete monosaccharides", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("Hex", "GlcNAc", "Hex")

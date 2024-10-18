@@ -40,8 +40,10 @@ validate_ne_glycan_graph <- function(glycan) {
     rlang::abort("Glycan graph must have an edge attribute 'linkage'.")
   }
   # Check if all linkages are valid
-  if (!all(valid_linkages(igraph::edge_attr(glycan, "linkage")))) {
-    invalid_linkages <- unique(igraph::E(glycan)$linkage[!valid_linkages(igraph::E(glycan)$linkage)])
+  linkages <- igraph::edge_attr(glycan, "linkage")
+  linkages <- linkages[!is.na(linkages)]
+  if (!all(valid_linkages(linkages))) {
+    invalid_linkages <- unique(linkages[!valid_linkages(linkages)])
     msg <- glue::glue("Invalid linkage: {stringr::str_c(invalid_linkages, collapse = ', ')}")
     rlang::abort(msg, linkages = invalid_linkages)
   }
