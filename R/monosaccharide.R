@@ -1,4 +1,5 @@
-monosaccharides <- tidyr::unnest(cols = concrete, tibble::enframe(name = "generic", value = "concrete", list(
+#' @importFrom tidyr unnest
+monosaccharides <- unnest(cols = concrete, tibble::enframe(name = "generic", value = "concrete", list(
   "Hex" = c("Glc", "Man", "Gal", "Gul", "Alt", "All", "Tal", "Ido"),
   "HexNAc" = c("GlcNAc", "ManNAc", "GalNAc", "GulNAc",  "AltNAc", "AllNAc", "TalNAc", "IdoNAc"),
   "HexN" = c("GlcN", "ManN", "GalN", "GulN", "AltN", "AllN", "TalN", "IdoN"),
