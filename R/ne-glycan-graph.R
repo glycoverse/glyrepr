@@ -1,11 +1,12 @@
-new_glycan_graph <- function(graph) {
+# New Node-Edge Glycan Graph
+new_ne_glycan_graph <- function(graph) {
   stopifnot(igraph::is_igraph(graph))
-  structure(graph, class = c("glycan_graph", "igraph"))
+  structure(graph, class = c("ne_glycan_graph", "glycan_graph", "igraph"))
 }
 
 
-validate_glycan_graph <- function(glycan) {
-  stopifnot(inherits(glycan, "glycan_graph"))
+validate_ne_glycan_graph <- function(glycan) {
+  stopifnot(inherits(glycan, "ne_glycan_graph"))
   # Check if it is a directed graph
   if (!is_directed_graph(glycan)) {
     rlang::abort("Glycan graph must be directed.")

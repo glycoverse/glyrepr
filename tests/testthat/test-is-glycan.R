@@ -1,5 +1,5 @@
 test_that("is_glycan works for glycan graphs", {
-  x <- new_glycan_graph(igraph::make_empty_graph())
+  x <- new_ne_glycan_graph(igraph::make_empty_graph())
   expect_true(is_glycan(x))
 })
 
