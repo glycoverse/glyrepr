@@ -17,7 +17,7 @@ validate_ne_glycan_graph <- function(glycan) {
   }
   # Check if graph has a vertex attribute "mono"
   # This is the monosaccharide name, e.g. "GlcNAc", "Man", etc.
-  if (!has_vertex_attribute(glycan, "mono")) {
+  if (!has_vertex_attrs(glycan, "mono")) {
     rlang::abort("Glycan graph must have a vertex attribute 'mono'.")
   }
   # Check if no NA in vertex attribute "mono"
@@ -35,56 +35,13 @@ validate_ne_glycan_graph <- function(glycan) {
     rlang::abort("Monosaccharides must be either all generic or all concrete.")
   }
   # Check if graph has an edge attribute "linkage"
-  if (!has_edge_attribute(glycan, "linkage")) {
+  if (!has_edge_attrs(glycan, "linkage")) {
     rlang::abort("Glycan graph must have an edge attribute 'linkage'.")
   }
   # Check if all linkages are valid
-  if (!all(is_valid_linkage(igraph::edge_attr(glycan, "linkage")))) {
-    invalid_linkages <- unique(igraph::E(glycan)$linkage[!is_valid_linkage(igraph::E(glycan)$linkage)])
+  if (!all(valid_linkages(igraph::edge_attr(glycan, "linkage")))) {
+    invalid_linkages <- unique(igraph::E(glycan)$linkage[!valid_linkages(igraph::E(glycan)$linkage)])
     msg <- glue::glue("Invalid linkage: {stringr::str_c(invalid_linkages, collapse = ', ')}")
     rlang::abort(msg, linkages = invalid_linkages)
   }
-}
-
-
-is_directed_graph <- function(graph) {
-  igraph::is_directed(graph)
-}
-
-
-is_out_tree <- function(graph) {
-  igraph::is_tree(graph, mode = "out")
-}
-
-
-has_vertex_attribute <- function(graph, attr) {
-  attr %in% igraph::vertex_attr_names(graph)
-}
-
-
-na_in_vertex_attribute <- function(graph, attr) {
-  any(is.na(igraph::vertex_attr(graph, attr)))
-}
-
-
-has_edge_attribute <- function(graph, attr) {
-  attr %in% igraph::edge_attr_names(graph)
-}
-
-
-is_known_mono <- function(monos) {
-  known_monos <- c(unique(monosaccharides$generic), monosaccharides$concrete)
-  monos %in% known_monos
-}
-
-
-mix_generic_concrete <- function(monos) {
-  generic <- unique(monosaccharides$generic)
-  concrete <- monosaccharides$concrete
-  any(monos %in% generic) && any(monos %in% concrete)
-}
-
-
-is_valid_linkage <- function(linkage) {
-  stringr::str_detect(linkage, "^[ab]\\d+-\\d+$")
 }
