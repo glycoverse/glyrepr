@@ -21,17 +21,18 @@ validate_ne_glycan_graph <- function(glycan) {
     rlang::abort("Glycan graph must have a vertex attribute 'mono'.")
   }
   # Check if no NA in vertex attribute "mono"
-  if (na_in_vertex_attribute(glycan, "mono")) {
+  mono_names <- igraph::vertex_attr(glycan, "mono")
+  if (any(is.na(mono_names))) {
     rlang::abort("Glycan graph must have no NA in vertex attribute 'mono'.")
   }
   # Check if all monosaccharides are known
-  if (!all(is_known_mono(igraph::vertex_attr(glycan, "mono")))) {
+  if (!all(is_known_mono(mono_names))) {
     unknown_monos <- unique(igraph::V(glycan)$mono[!is_known_mono(igraph::V(glycan)$mono)])
     msg <- glue::glue("Unknown monosaccharide: {stringr::str_c(unknown_monos, collapse = ', ')}")
     rlang::abort(msg, monos = unknown_monos)
   }
   # Check if mixed use of generic and concrete monosaccharides
-  if (mix_generic_concrete(igraph::V(glycan)$mono)) {
+  if (mix_generic_concrete(mono_names)) {
     rlang::abort("Monosaccharides must be either all generic or all concrete.")
   }
   # Check if graph has an edge attribute "linkage"

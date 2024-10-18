@@ -22,12 +22,6 @@ has_edge_attrs <- function(graph, attrs) {
 }
 
 
-# Are there any NA in the vertex attribute?
-na_in_vertex_attribute <- function(graph, attr) {
-  any(is.na(igraph::vertex_attr(graph, attr)))
-}
-
-
 # Are all monosaaccharides known?
 is_known_mono <- function(monos) {
   known_monos <- c(unique(monosaccharides$generic), monosaccharides$concrete)
