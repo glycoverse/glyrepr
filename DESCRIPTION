@@ -19,5 +19,4 @@ Imports:
     igraph,
     purrr,
     rlang,
-    stringr,
-    tidyr
+    stringr

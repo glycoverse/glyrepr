@@ -1,13 +1,68 @@
-#' @importFrom tidyr unnest
-monosaccharides <- unnest(cols = concrete, tibble::enframe(name = "generic", value = "concrete", list(
-  "Hex" = c("Glc", "Man", "Gal", "Gul", "Alt", "All", "Tal", "Ido"),
-  "HexNAc" = c("GlcNAc", "ManNAc", "GalNAc", "GulNAc",  "AltNAc", "AllNAc", "TalNAc", "IdoNAc"),
-  "HexN" = c("GlcN", "ManN", "GalN", "GulN", "AltN", "AllN", "TalN", "IdoN"),
-  "HexA" = c("GlcA", "ManA", "GalA", "GulA", "AltA", "AllA", "TalA", "IdoA"),
-  "dHex" = c("Qui", "Rha", "6dGul", "6dAlt", "6dTal", "Fuc"),
-  "dHexNAc" = c("QuiNAc", "RhaNAc", "6dAltNAc", "6dTalNAc", "FucNAc"),
-  "ddHex" = c("Oli", "Tyv", "Abe", "Par", "Dig", "Col"),
-  "Pent" = c("Ara", "Lyx", "Xyl", "Rib"),
-  "NeuAc" = "Neu5Ac",
-  "NeuGc" = "Neu5Gc"
-)))
+monosaccharides <- tibble::tribble(
+  ~simple, ~generic, ~concrete,
+  # Hexoses
+  "H", "Hex", "Glc",
+  "H", "Hex", "Man",
+  "H", "Hex", "Gal",
+  NA, "Hex", "Gul",
+  NA, "Hex", "Alt",
+  NA, "Hex", "All",
+  NA, "Hex", "Tal",
+  NA, "Hex", "Ido",
+  # HexNAcs
+  "N", "HexNAc", "GlcNAc",
+  "N", "HexNAc", "GalNAc",
+  NA, "HexNAc", "ManNAc",
+  NA, "HexNAc", "GulNAc",
+  NA, "HexNAc", "AltNAc",
+  NA, "HexNAc", "AllNAc",
+  NA, "HexNAc", "TalNAc",
+  NA, "HexNAc", "IdoNAc",
+  # Hexosamines
+  NA, "HexN", "GlcN",
+  NA, "HexN", "ManN",
+  NA, "HexN", "GalN",
+  NA, "HexN", "GulN",
+  NA, "HexN", "AltN",
+  NA, "HexN", "AllN",
+  NA, "HexN", "TalN",
+  NA, "HexN", "IdoN",
+  # Hexuronates
+  NA, "HexA", "GlcA",
+  NA, "HexA", "ManA",
+  NA, "HexA", "GalA",
+  NA, "HexA", "GulA",
+  NA, "HexA", "AltA",
+  NA, "HexA", "AllA",
+  NA, "HexA", "TalA",
+  NA, "HexA", "IdoA",
+  # Deoxyhexoses
+  NA, "dHex", "Qui",
+  NA, "dHex", "Rha",
+  NA, "dHex", "6dGul",
+  NA, "dHex", "6dAlt",
+  NA, "dHex", "6dTal",
+  "F", "dHex", "Fuc",
+  # DeoxyhexNAcs
+  NA, "dHexNAc", "QuiNAc",
+  NA, "dHexNAc", "RhaNAc",
+  NA, "dHexNAc", "6dAltNAc",
+  NA, "dHexNAc", "6dTalNAc",
+  NA, "dHexNAc", "FucNAc",
+  # Dideoxyhexoses
+  NA, "ddHex", "Oli",
+  NA, "ddHex", "Tyv",
+  NA, "ddHex", "Abe",
+  NA, "ddHex", "Par",
+  NA, "ddHex", "Dig",
+  NA, "ddHex", "Col",
+  # Pentoses
+  NA, "Pent", "Ara",
+  NA, "Pent", "Lyx",
+  NA, "Pent", "Xyl",
+  NA, "Pent", "Rib",
+  # Sialic acids
+  "S", "NeuAc", "Neu5Ac",
+  "S", "NeuGc", "Neu5Gc",
+  NA, "Kdn", "Kdn"
+)
