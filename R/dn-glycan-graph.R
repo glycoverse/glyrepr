@@ -60,6 +60,8 @@ validate_dn_glycan_graph <- function(glycan) {
   if (any(out_degrees == 0)) {
     rlang::abort("Linkage nodes must not have an out-degree of zero (no exposed linkages)")
   }
+
+  glycan
 }
 
 

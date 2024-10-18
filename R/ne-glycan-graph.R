@@ -47,4 +47,6 @@ validate_ne_glycan_graph <- function(glycan) {
     msg <- glue::glue("Invalid linkage: {stringr::str_c(invalid_linkages, collapse = ', ')}")
     rlang::abort(msg, linkages = invalid_linkages)
   }
+
+  glycan
 }
