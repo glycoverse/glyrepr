@@ -4,6 +4,7 @@
 #' The composition is a named integer vector.
 #'
 #' @param glycan A glycan graph.
+#' @param glycans A list of glycan graphs.
 #' @return A named integer vector.
 #'
 #' @export

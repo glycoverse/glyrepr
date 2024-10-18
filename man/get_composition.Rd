@@ -11,6 +11,8 @@ get_compositions(glycans)
 }
 \arguments{
 \item{glycan}{A glycan graph.}
+
+\item{glycans}{A list of glycan graphs.}
 }
 \value{
 A named integer vector.
