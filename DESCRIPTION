@@ -15,6 +15,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 URL: https://fubin1999.github.io/glyrepr/
 Imports: 
+    cli,
     glue,
     igraph,
     purrr,
