@@ -36,7 +36,7 @@ n_glycan_core_ne <- function(linkage = TRUE) {
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
   linkages <- c("b1-4", "b1-4", "a1-3", "a1-6")
-  igraph::E(graph)$linkage <- ifelse(linkage, linkages, NA_character_)
+  igraph::E(graph)$linkage <- if (linkage) linkages else NA_character_
   new_ne_glycan_graph(graph)
 }
 
@@ -51,6 +51,6 @@ n_glycan_core_dn <- function(linkage = TRUE) {
   igraph::V(graph)$type <- c("mono", rep(c("linkage", "mono"), 4))
   igraph::V(graph)$mono <- c("GlcNAc", NA, "GlcNAc", NA, "Man", NA, "Man", NA, "Man")
   linkages <- c(NA, "b1-4", NA, "b1-4", NA, "a1-3", NA, "a1-6", NA)
-  igraph::V(graph)$linkage <- ifelse(linkage, linkages, NA_character_)
+  igraph::V(graph)$linkage <- if (linkage) linkages else NA_character_
   new_dn_glycan_graph(graph)
 }
