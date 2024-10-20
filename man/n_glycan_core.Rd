@@ -31,3 +31,8 @@ Create a N-glycan core graph, either in NE or DN mode.
     Man
 }\if{html}{\out{</div>}}
 }
+\examples{
+print(n_glycan_core(mode = "ne"), verbose = TRUE)
+print(n_glycan_core(mode = "dn"), verbose = TRUE)
+
+}

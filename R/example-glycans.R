@@ -16,6 +16,11 @@
 #'   Default is `TRUE`.
 #'
 #' @return A glycan graph object.
+#'
+#' @examples
+#' print(n_glycan_core(mode = "ne"), verbose = TRUE)
+#' print(n_glycan_core(mode = "dn"), verbose = TRUE)
+#'
 #' @export
 n_glycan_core <- function(mode = "ne", linkage = TRUE) {
   if (!mode %in% c("ne", "dn")) rlang::abort("Mode must be 'ne' or 'dn'.")
