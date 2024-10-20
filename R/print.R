@@ -55,9 +55,6 @@ print_composition <- function(graph) {
 
 
 print_structure <- function(graph, label_getter) {
-  # This ensures UTF-8 encoding for Windows
-  withr::local_locale(c(LC_CTYPE = "en_US.UTF-8"))
-
   root <- igraph::V(graph)[igraph::degree(graph, mode = "in") == 0]
   labels <- label_getter(graph)
 

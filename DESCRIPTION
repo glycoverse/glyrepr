@@ -21,5 +21,4 @@ Imports:
     igraph,
     purrr,
     rlang,
-    stringr,
-    withr
+    stringr
