@@ -2,15 +2,9 @@
 % Please edit documentation in R/example-glycans.R
 \name{n_glycan_core}
 \alias{n_glycan_core}
-\alias{n_glycan_core_ne}
-\alias{n_glycan_core_dn}
 \title{N-glycan Core}
 \usage{
 n_glycan_core(mode = "ne", linkage = TRUE, mono_type = "concrete")
-
-n_glycan_core_ne(linkage = TRUE, mono_type = "concrete")
-
-n_glycan_core_dn(linkage = TRUE, mono_type = "concrete")
 }
 \arguments{
 \item{mode}{A character string, either "ne" or "dn".}

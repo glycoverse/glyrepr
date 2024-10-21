@@ -40,8 +40,6 @@ n_glycan_core <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
 }
 
 
-#' @rdname n_glycan_core
-#' @export
 n_glycan_core_ne <- function(linkage = TRUE, mono_type = "concrete") {
   if (!is.logical(linkage) && length(linkage) != 1) {
     rlang::abort("Linkage must be a single logical.")
@@ -59,8 +57,6 @@ n_glycan_core_ne <- function(linkage = TRUE, mono_type = "concrete") {
 }
 
 
-#' @rdname n_glycan_core
-#' @export
 n_glycan_core_dn <- function(linkage = TRUE, mono_type = "concrete") {
   if (!is.logical(linkage) && length(linkage) != 1) {
     rlang::abort("Linkage must be a single logical.")
