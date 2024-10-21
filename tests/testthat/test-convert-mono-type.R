@@ -109,3 +109,23 @@ patrick::with_parameters_test_that("convert bad mono fails", {
   before = c("H", "Hex"),
   to = c("concrete", "Hex")
 )
+
+
+patrick::with_parameters_test_that("deciding glycan mono type works", {
+    expect_equal(decide_glycan_mono_type(glycan), type)
+  },
+  glycan = list(
+    n_glycan_core(mono_type = "concrete"),
+    n_glycan_core(mono_type = "generic"),
+    n_glycan_core(mono_type = "simple")
+  ),
+  type = c("concrete", "generic", "simple")
+)
+
+
+patrick::with_parameters_test_that("deciding mono type works", {
+    expect_equal(decide_mono_type(mono), type)
+  },
+  mono = c("H", "Hex", "Man"),
+  type = c("simple", "generic", "concrete")
+)
