@@ -46,3 +46,35 @@
               └─a1-6
                 └─Man
 
+# verbose print works for NE glycan graphs without linkages
+
+    Code
+      print(x, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      GlcNAc: 2, Man: 3
+      ------------------
+      GlcNAc
+      └─GlcNAc
+        └─Man
+          ├─Man
+          └─Man
+
+# verbose print works for DN glycan graphs without linkages
+
+    Code
+      print(x, verbose = TRUE)
+    Output
+      Glycan Graph (DN)
+      GlcNAc: 2, Man: 3
+      ------------------
+      GlcNAc
+      └─NA
+        └─GlcNAc
+          └─NA
+            └─Man
+              ├─NA
+              │ └─Man
+              └─NA
+                └─Man
+

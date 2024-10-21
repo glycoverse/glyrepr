@@ -20,6 +20,7 @@ print.ne_glycan_graph <- function(x, ..., verbose = FALSE) {
         ~ igraph::incident(graph, .x, mode = "in")$linkage
       )
       linkages_str <- stringr::str_c(" (", linkages, ")", sep = "")
+      linkages_str <- dplyr::if_else(is.na(linkages_str), "", linkages_str)
       linkages_str <- c("", linkages_str)
       stringr::str_c(monos, linkages_str)
     }
