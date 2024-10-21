@@ -6,17 +6,21 @@
 \alias{n_glycan_core_dn}
 \title{N-glycan Core}
 \usage{
-n_glycan_core(mode = "ne", linkage = TRUE)
+n_glycan_core(mode = "ne", linkage = TRUE, mono_type = "concrete")
 
-n_glycan_core_ne(linkage = TRUE)
+n_glycan_core_ne(linkage = TRUE, mono_type = "concrete")
 
-n_glycan_core_dn(linkage = TRUE)
+n_glycan_core_dn(linkage = TRUE, mono_type = "concrete")
 }
 \arguments{
 \item{mode}{A character string, either "ne" or "dn".}
 
 \item{linkage}{A logical indicating whether to include linkages.
 Default is \code{TRUE}.}
+
+\item{mono_type}{A character string specifying the type of monosaccharides.
+Can be "simple" (H, N, F, S), "generic" (Hex, HexNAc, dHex, NeuAc, etc.),
+or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".}
 }
 \value{
 A glycan graph object.

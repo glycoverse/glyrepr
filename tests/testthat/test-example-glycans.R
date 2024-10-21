@@ -21,3 +21,21 @@ test_that("N-glycan core graph without linkages", {
   expect_true(all(is.na(igraph::E(ne_glycan)$linkage)))
   expect_true(all(is.na(igraph::V(dn_glycan)$linkage)))
 })
+
+
+test_that("N-glycan core graph with simple monosaccharides", {
+  ne_glycan <- n_glycan_core(mode = "ne", mono_type = "simple")
+  dn_glycan <- n_glycan_core(mode = "dn", mono_type = "simple")
+
+  expect_equal(igraph::V(ne_glycan)$mono, c("N", "N", "H", "H", "H"))
+  expect_equal(igraph::V(dn_glycan)$mono, c("N", NA, "N", NA, "H", NA, "H", NA, "H"))
+})
+
+
+test_that("N-glycan core graph with generic monosaccharides", {
+  ne_glycan <- n_glycan_core(mode = "ne", mono_type = "generic")
+  dn_glycan <- n_glycan_core(mode = "dn", mono_type = "generic")
+
+  expect_equal(igraph::V(ne_glycan)$mono, c("HexNAc", "HexNAc", "Hex", "Hex", "Hex"))
+  expect_equal(igraph::V(dn_glycan)$mono, c("HexNAc", NA, "HexNAc", NA, "Hex", NA, "Hex", NA, "Hex"))
+})
