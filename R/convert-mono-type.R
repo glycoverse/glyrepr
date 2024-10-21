@@ -18,13 +18,13 @@
 #'
 #' @examples
 #' concrete_glycan <- n_glycan_core(mono_type = "concrete")
-#' convert_mono_type(concrete_glycan, to = "generic")
-#' convert_mono_type(concrete_glycan, to = "simple")
+#' convert_glycan_mono_type(concrete_glycan, to = "generic")
+#' convert_glycan_mono_type(concrete_glycan, to = "simple")
 #' generic_glycan <- n_glycan_core(mono_type = "generic")
-#' convert_mono_type(generic_glycan, to = "simple")
+#' convert_glycan_mono_type(generic_glycan, to = "simple")
 #'
 #' @export
-convert_mono_type <- function(glycan, to) {
+convert_glycan_mono_type <- function(glycan, to) {
   if (!(to %in% c("concrete", "generic", "simple"))) {
     rlang::abort("Must be one of: concrete, generic, simple.")
   }
