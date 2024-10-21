@@ -1,38 +1,38 @@
 test_that("print works for NE glycan graphs", {
-  x <- new_ne_glycan_graph(n_glycan_core_ne())
+  x <- new_ne_glycan_graph(n_glycan_core(mode = "ne"))
   expect_snapshot(print(x))
 })
 
 
 test_that("print works for DN glycan graphs", {
-  x <- new_dn_glycan_graph(n_glycan_core_dn())
+  x <- new_dn_glycan_graph(n_glycan_core(mode = "dn"))
   expect_snapshot(print(x))
 })
 
 
 test_that("verbose print works for NE glycan graphs", {
   skip_on_old_win()
-  x <- new_ne_glycan_graph(n_glycan_core_ne())
+  x <- new_ne_glycan_graph(n_glycan_core(mode = "ne"))
   expect_snapshot(print(x, verbose = TRUE))
 })
 
 
 test_that("verbose print works for DN glycan graphs", {
   skip_on_old_win()
-  x <- new_dn_glycan_graph(n_glycan_core_dn())
+  x <- new_dn_glycan_graph(n_glycan_core(mode = "dn"))
   expect_snapshot(print(x, verbose = TRUE))
 })
 
 
 test_that("verbose print works for NE glycan graphs without linkages", {
   skip_on_old_win()
-  x <- new_ne_glycan_graph(n_glycan_core_ne(linkage = FALSE))
+  x <- new_ne_glycan_graph(n_glycan_core(mode = "ne", linkage = FALSE))
   expect_snapshot(print(x, verbose = TRUE))
 })
 
 
 test_that("verbose print works for DN glycan graphs without linkages", {
   skip_on_old_win()
-  x <- new_dn_glycan_graph(n_glycan_core_dn(linkage = FALSE))
+  x <- new_dn_glycan_graph(n_glycan_core(mode = "dn", linkage = FALSE))
   expect_snapshot(print(x, verbose = TRUE))
 })

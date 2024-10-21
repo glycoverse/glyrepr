@@ -32,6 +32,9 @@ n_glycan_core <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
   if (!mono_type %in% c("simple", "generic", "concrete")) {
     rlang::abort("Mono type must be 'simple', 'generic', or 'concrete'.")
   }
+  if (!is.logical(linkage) && length(linkage) != 1) {
+    rlang::abort("Linkage must be a single logical.")
+  }
   switch(
     mode,
     ne = n_glycan_core_ne(linkage, mono_type),
@@ -40,10 +43,7 @@ n_glycan_core <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
 }
 
 
-n_glycan_core_ne <- function(linkage = TRUE, mono_type = "concrete") {
-  if (!is.logical(linkage) && length(linkage) != 1) {
-    rlang::abort("Linkage must be a single logical.")
-  }
+n_glycan_core_ne <- function(linkage, mono_type) {
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)
   igraph::V(graph)$mono <- switch(
     mono_type,
@@ -57,10 +57,7 @@ n_glycan_core_ne <- function(linkage = TRUE, mono_type = "concrete") {
 }
 
 
-n_glycan_core_dn <- function(linkage = TRUE, mono_type = "concrete") {
-  if (!is.logical(linkage) && length(linkage) != 1) {
-    rlang::abort("Linkage must be a single logical.")
-  }
+n_glycan_core_dn <- function(linkage, mono_type) {
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 4-+5, 5-+6, 6-+7, 5-+8, 8-+9)
   igraph::V(graph)$type <- c("mono", rep(c("linkage", "mono"), 4))
   igraph::V(graph)$mono <- switch(
