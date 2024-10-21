@@ -103,6 +103,9 @@ valid_from_to <- function(from, to) {
       "i" = "Can only convert in this order: concrete -> generic -> simple."
     ), call = rlang::caller_call())
   }
+  if (from == to) {
+    cli::cli_abort("It is already {.val {to}}.", call = rlang::caller_call())
+  }
 }
 
 

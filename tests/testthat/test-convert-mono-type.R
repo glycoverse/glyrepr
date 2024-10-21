@@ -60,21 +60,35 @@ test_that("convert from concrete to simple for DN graph", {
 
 test_that("converting from simple to generic fails", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "simple")
-
   expect_snapshot(convert_glycan_mono_type(glycan, to = "generic"), error = TRUE)
 })
 
 
 test_that("converting from simple to concrete fails", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "simple")
-
   expect_snapshot(convert_glycan_mono_type(glycan, to = "concrete"), error = TRUE)
 })
 
 
 test_that("converting from generic to concrete fails", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "generic")
-
   expect_snapshot(convert_glycan_mono_type(glycan, to = "concrete"), error = TRUE)
 })
 
+
+test_that("converting from generic to generic fails", {
+  glycan <- n_glycan_core(mode = "ne", mono_type = "generic")
+  expect_snapshot(convert_glycan_mono_type(glycan, to = "generic"), error = TRUE)
+})
+
+
+test_that("converting from simple to simple fails", {
+  glycan <- n_glycan_core(mode = "ne", mono_type = "simple")
+  expect_snapshot(convert_glycan_mono_type(glycan, to = "simple"), error = TRUE)
+})
+
+
+test_that("converting from concrete to concrete fails", {
+  glycan <- n_glycan_core(mode = "ne", mono_type = "concrete")
+  expect_snapshot(convert_glycan_mono_type(glycan, to = "concrete"), error = TRUE)
+})
