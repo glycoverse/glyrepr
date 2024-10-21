@@ -58,37 +58,54 @@ test_that("convert from concrete to simple for DN graph", {
 })
 
 
-test_that("converting from simple to generic fails", {
+test_that("converting glycan from simple to generic fails", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "simple")
   expect_snapshot(convert_glycan_mono_type(glycan, to = "generic"), error = TRUE)
 })
 
 
-test_that("converting from simple to concrete fails", {
+test_that("converting glycan from simple to concrete fails", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "simple")
   expect_snapshot(convert_glycan_mono_type(glycan, to = "concrete"), error = TRUE)
 })
 
 
-test_that("converting from generic to concrete fails", {
+test_that("converting glycan from generic to concrete fails", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "generic")
   expect_snapshot(convert_glycan_mono_type(glycan, to = "concrete"), error = TRUE)
 })
 
 
-test_that("converting from generic to generic fails", {
+test_that("converting glycan from generic to generic fails", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "generic")
   expect_snapshot(convert_glycan_mono_type(glycan, to = "generic"), error = TRUE)
 })
 
 
-test_that("converting from simple to simple fails", {
+test_that("converting glycan from simple to simple fails", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "simple")
   expect_snapshot(convert_glycan_mono_type(glycan, to = "simple"), error = TRUE)
 })
 
 
-test_that("converting from concrete to concrete fails", {
+test_that("converting glycan from concrete to concrete fails", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "concrete")
   expect_snapshot(convert_glycan_mono_type(glycan, to = "concrete"), error = TRUE)
 })
+
+
+patrick::with_parameters_test_that("convert mono", {
+    expect_equal(convert_mono_type(before, to), after)
+  },
+  before = c("Man", "Man", "Hex"),
+  to = c("generic", "simple", "simple"),
+  after = c("Hex", "H", "H")
+)
+
+
+patrick::with_parameters_test_that("convert bad mono fails", {
+    expect_error(convert_mono_type(before, to))
+  },
+  before = c("H", "Hex"),
+  to = c("concrete", "Hex")
+)

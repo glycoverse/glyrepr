@@ -1,4 +1,4 @@
-# converting from simple to generic fails
+# converting glycan from simple to generic fails
 
     Code
       convert_glycan_mono_type(glycan, to = "generic")
@@ -7,7 +7,7 @@
       ! Cannot convert from "simple" to "generic".
       i Can only convert in this order: concrete -> generic -> simple.
 
-# converting from simple to concrete fails
+# converting glycan from simple to concrete fails
 
     Code
       convert_glycan_mono_type(glycan, to = "concrete")
@@ -16,7 +16,7 @@
       ! Cannot convert from "simple" to "concrete".
       i Can only convert in this order: concrete -> generic -> simple.
 
-# converting from generic to concrete fails
+# converting glycan from generic to concrete fails
 
     Code
       convert_glycan_mono_type(glycan, to = "concrete")
@@ -25,7 +25,7 @@
       ! Cannot convert from "generic" to "concrete".
       i Can only convert in this order: concrete -> generic -> simple.
 
-# converting from generic to generic fails
+# converting glycan from generic to generic fails
 
     Code
       convert_glycan_mono_type(glycan, to = "generic")
@@ -33,7 +33,7 @@
       Error in `convert_glycan_mono_type()`:
       ! It is already "generic".
 
-# converting from simple to simple fails
+# converting glycan from simple to simple fails
 
     Code
       convert_glycan_mono_type(glycan, to = "simple")
@@ -41,7 +41,7 @@
       Error in `convert_glycan_mono_type()`:
       ! It is already "simple".
 
-# converting from concrete to concrete fails
+# converting glycan from concrete to concrete fails
 
     Code
       convert_glycan_mono_type(glycan, to = "concrete")

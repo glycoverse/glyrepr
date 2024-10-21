@@ -23,18 +23,46 @@
 #' generic_glycan <- n_glycan_core(mono_type = "generic")
 #' convert_glycan_mono_type(generic_glycan, to = "simple")
 #'
+#' @seealso [convert_mono_type()], [decide_glycan_mono_type()], [decide_mono_type()]
+#'
 #' @export
 convert_glycan_mono_type <- function(glycan, to) {
-  if (!(to %in% c("concrete", "generic", "simple"))) {
-    rlang::abort("Must be one of: concrete, generic, simple.")
-  }
+  check_to_arg(to)
   from <- decide_glycan_mono_type(glycan)
   valid_from_to(from, to)
   if (inherits(glycan, "ne_glycan_graph")) {
-    convert_mono_type_ne(glycan, from, to)
+    convert_glycan_mono_type_ne(glycan, from, to)
   } else {  # "dn_glycan_graph"
-    convert_mono_type_dn(glycan, from, to)
+    convert_glycan_mono_type_dn(glycan, from, to)
   }
+}
+
+
+#' Convert a Monosaacharide to a Different Type
+#'
+#' @description
+#' This function converts a monosaccharide to a different type.
+#' The types are: concrete, generic, and simple.
+#' The conversion can only be done from "concrete" to "generic" or "simple",
+#' and from "generic" to "simple".
+#' Conversion in other orders is not allowed.
+#'
+#' @inheritSection decide_mono_type Three types of monosaccharides
+#'
+#' @param mono A character string specifying a monosaccharide name.
+#' @param to A character string specifying the target monosaccharide type.
+#'  It can be "concrete", "generic", or "simple".
+#'
+#' @return A character string specifying the monosaccharide name in the target type.
+#'
+#' @seealso [convert_glycan_mono_type()], [decide_glycan_mono_type()], [decide_mono_type()]
+#'
+#' @export
+convert_mono_type <- function(mono, to) {
+  check_to_arg(to)
+  from <- decide_mono_type(mono)
+  valid_from_to(from, to)
+  convert_mono_type_(mono, from, to)
 }
 
 
@@ -54,6 +82,9 @@ convert_glycan_mono_type <- function(glycan, to) {
 #' @param glycan A glycan graph.
 #'
 #' @return A character string specifying the monosaccharide type.
+#'
+#' @seealso [convert_glycan_mono_type()], [convert_mono_type()], [decide_mono_type()]
+#'
 #' @export
 decide_glycan_mono_type <- function(glycan) {
   stopifnot(is_glycan(glycan))
@@ -81,6 +112,9 @@ decide_glycan_mono_type <- function(glycan) {
 #' @param mono A character string specifying a monosaccharide name.
 #'
 #' @return A character string specifying the monosaccharide type.
+#'
+#' @seealso [convert_glycan_mono_type()], [convert_mono_type()], [decide_glycan_mono_type()]
+#'
 #' @export
 decide_mono_type <- function(mono) {
   stopifnot(is.character(mono))
@@ -92,6 +126,13 @@ decide_mono_type <- function(mono) {
     "simple"
   } else {
     rlang::abort("Unknown monosaccharide: {mono}")
+  }
+}
+
+
+check_to_arg <- function(to) {
+  if (!(to %in% c("concrete", "generic", "simple"))) {
+    rlang::abort("Must be one of: concrete, generic, simple.")
   }
 }
 
@@ -123,19 +164,22 @@ decide_glycan_mono_type_dn <- function(glycan) {
 }
 
 
-convert_mono_type_ne <- function(glycan, from, to) {
+convert_mono_type_ <- function(mono, from, to) {
   from_ <- monosaccharides[[from]]
   to_ <- monosaccharides[[to]]
-  new_names <- to_[match(igraph::V(glycan)$mono, from_)]
+  to_[match(mono, from_)]
+}
+
+
+convert_glycan_mono_type_ne <- function(glycan, from, to) {
+  new_names <- convert_mono_type_(igraph::V(glycan)$mono, from, to)
   igraph::set_vertex_attr(glycan, "mono", value = new_names)
 }
 
 
-convert_mono_type_dn <- function(glycan, from, to) {
-  from_ <- monosaccharides[[from]]
-  to_ <- monosaccharides[[to]]
+convert_glycan_mono_type_dn <- function(glycan, from, to) {
   mono_nodes <- which(igraph::V(glycan)$type == "mono")
   old_names <- igraph::vertex_attr(glycan, "mono")[mono_nodes]
-  new_names <- to_[match(old_names, from_)]
+  new_names <- convert_mono_type_(old_names, from, to)
   igraph::set_vertex_attr(glycan, "mono", value = new_names, index = mono_nodes)
 }
