@@ -16,6 +16,7 @@ example_dn_glycan_graph <- function() {
 
 
 test_that("converting NE to DN graph works on simple example", {
+  skip_on_old_win()
   glycan <- example_ne_glycan_graph()
   dn_graph <- convert_ne_to_dn(glycan)
   expect_snapshot(print(dn_graph, verbose = TRUE))
@@ -23,6 +24,7 @@ test_that("converting NE to DN graph works on simple example", {
 
 
 test_that("converting NE to DN graph works on complex example", {
+  skip_on_old_win()
   glycan <- n_glycan_core("ne")
   dn_graph <- convert_ne_to_dn(glycan)
   expect_snapshot(print(dn_graph, verbose = TRUE))
@@ -36,6 +38,7 @@ test_that("converting to DN graph fails for DN graphs", {
 
 
 test_that("converting one-node graph to DN graph works", {
+  skip_on_old_win()
   graph <- igraph::make_graph(~ 1)
   igraph::V(graph)$mono <- "N"
   igraph::V(graph)$type <- "mono"
@@ -48,6 +51,7 @@ test_that("converting one-node graph to DN graph works", {
 
 
 test_that("converting DN to EN graph works on simple example", {
+  skip_on_old_win()
   glycan <- example_dn_glycan_graph()
   ne_graph <- convert_dn_to_ne(glycan)
   expect_snapshot(print(ne_graph, verbose = TRUE))
@@ -55,6 +59,7 @@ test_that("converting DN to EN graph works on simple example", {
 
 
 test_that("converting DN to EN graph works on complex example", {
+  skip_on_old_win()
   glycan <- n_glycan_core("dn")
   ne_graph <- convert_dn_to_ne(glycan)
   expect_snapshot(print(ne_graph, verbose = TRUE))
@@ -68,6 +73,7 @@ test_that("converting to NE graph fails for NE graphs", {
 
 
 test_that("converting one-node graph to NE graph works", {
+  skip_on_old_win()
   graph <- igraph::make_graph(~ 1)
   igraph::V(graph)$mono <- "N"
   igraph::V(graph)$type <- "mono"
