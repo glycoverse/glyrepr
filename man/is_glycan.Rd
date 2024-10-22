@@ -2,9 +2,15 @@
 % Please edit documentation in R/is-glycan.R
 \name{is_glycan}
 \alias{is_glycan}
+\alias{is_ne_glycan}
+\alias{is_dn_glycan}
 \title{Check if an Object is a Glycan Graph}
 \usage{
 is_glycan(x)
+
+is_ne_glycan(x)
+
+is_dn_glycan(x)
 }
 \arguments{
 \item{x}{An object to be checked.}
@@ -13,6 +19,9 @@ is_glycan(x)
 A logical value.
 }
 \description{
-This function checks if an object is a glycan graph.
-That is an object of class \code{glycan_graph}.
+These functions check if an object is a glycan graph
+(an object of class \code{glycan_graph}),
+a node-edge glycan graph (an object of class \code{ne_glycan_graph}),
+or a dual-node glycan graph (an object of class \code{dn_glycan_graph}).
+See docs for \code{\link[=as_glycan_graph]{as_glycan_graph()}} for more details.
 }
