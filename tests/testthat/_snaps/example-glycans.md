@@ -1,35 +1,60 @@
 # N-glycan core NE graph
 
     Code
-      str(igraph::edge_attr(glycan))
+      print(glycan, verbose = TRUE)
     Output
-      List of 1
-       $ linkage: chr [1:4] "b1-4" "b1-4" "a1-3" "a1-6"
-
----
-
-    Code
-      str(igraph::vertex_attr(glycan))
-    Output
-      List of 2
-       $ name: chr [1:5] "1" "2" "3" "4" ...
-       $ mono: chr [1:5] "GlcNAc" "GlcNAc" "Man" "Man" ...
+      Glycan Graph (NE)
+      GlcNAc: 2, Man: 3
+      ------------------
+      GlcNAc
+      └─GlcNAc (b1-4)
+        └─Man (b1-4)
+          ├─Man (a1-3)
+          └─Man (a1-6)
 
 # N-glycan core DN graph
 
     Code
-      str(igraph::edge_attr(glycan))
+      print(glycan, verbose = TRUE)
     Output
-       Named list()
+      Glycan Graph (DN)
+      GlcNAc: 2, Man: 3
+      ------------------
+      GlcNAc
+      └─b1-4
+        └─GlcNAc
+          └─b1-4
+            └─Man
+              ├─a1-3
+              │ └─Man
+              └─a1-6
+                └─Man
 
----
+# N-glycan core NE graph without linkages
 
     Code
-      str(igraph::vertex_attr(glycan))
+      print(glycan, verbose = TRUE)
     Output
-      List of 4
-       $ name   : chr [1:9] "1" "2" "3" "4" ...
-       $ type   : chr [1:9] "mono" "linkage" "mono" "linkage" ...
-       $ mono   : chr [1:9] "GlcNAc" NA "GlcNAc" NA ...
-       $ linkage: chr [1:9] NA "b1-4" NA "b1-4" ...
+      Glycan Graph (NE)
+      GlcNAc: 2, Man: 3
+      ------------------
+      GlcNAc
+      └─GlcNAc
+        └─Man
+          ├─Man
+          └─Man
+
+# N-glycan core NE graph with simple monosaccharides
+
+    Code
+      print(glycan, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      H: 3, N: 2
+      ------------------
+      N
+      └─N (b1-4)
+        └─H (b1-4)
+          ├─H (a1-3)
+          └─H (a1-6)
 
