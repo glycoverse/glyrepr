@@ -58,3 +58,40 @@
           ├─H (a1-3)
           └─H (a1-6)
 
+# N-glycan core NE graph with generic monosaccharides
+
+    Code
+      print(glycan, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      Hex: 3, HexNAc: 2
+      ------------------
+      HexNAc
+      └─HexNAc (b1-4)
+        └─Hex (b1-4)
+          ├─Hex (a1-3)
+          └─Hex (a1-6)
+
+# O-glycan core 1
+
+    Code
+      print(glycan, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      Gal: 1, GalNAc: 1
+      ------------------
+      GalNAc
+      └─Gal (b1-3)
+
+# O-glycan core 2
+
+    Code
+      print(glycan, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      Gal: 1, GalNAc: 1, GlcNAc: 1
+      ------------------
+      GalNAc
+      ├─Gal (b1-3)
+      └─GlcNAc (b1-6)
+

@@ -2,14 +2,21 @@
 % Please edit documentation in R/example-glycans.R
 \name{n_glycan_core}
 \alias{n_glycan_core}
-\title{N-glycan Core}
+\alias{o_glycan_core_1}
+\alias{o_glycan_core_2}
+\title{Example Glycan Graphs}
 \usage{
 n_glycan_core(mode = "ne", linkage = TRUE, mono_type = "concrete")
+
+o_glycan_core_1(mode = "ne", linkage = TRUE, mono_type = "concrete")
+
+o_glycan_core_2(mode = "ne", linkage = TRUE, mono_type = "concrete")
 }
 \arguments{
-\item{mode}{A character string, either "ne" or "dn".}
+\item{mode}{A character string, either "ne" or "dn".
+See \code{\link[=as_glycan_graph]{as_glycan_graph()}} for details.}
 
-\item{linkage}{A logical indicating whether to include linkages.
+\item{linkage}{A logical indicating whether to include linkages (e.g. "b1-4").
 Default is \code{TRUE}.}
 
 \item{mono_type}{A character string specifying the type of monosaccharides.
@@ -20,7 +27,17 @@ or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".}
 A glycan graph object.
 }
 \description{
-Create a N-glycan core graph, either in NE or DN mode.
+Create example glycan graphs for testing and demonstration.
+Includes \strong{N-glycan core} and \strong{O-glycan core 1} and \strong{core 2}.
+}
+\section{N-Glycan Core}{
+\strong{N-Glycans} are branched oligosaccharides that are bound, most commonly,
+via GlcNAc to an Asn residue of the protein backbone.
+A common motif of all N-glycans is the \strong{chitobiose core},
+composed of three mannose and two GlcNAc moieties,
+which is commonly attached to the protein backbone via GlcNAc.
+The mannose residue is branched and connected via α1,3- and α1,6-glycosidic
+linkages to the two other mannose building blocks.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{    Man
   a1-6 \\   b1-4      b1-4
@@ -29,8 +46,33 @@ Create a N-glycan core graph, either in NE or DN mode.
     Man
 }\if{html}{\out{</div>}}
 }
+
+\section{O-Glycan Core}{
+\strong{O-Glycans} are highly abundant in extracellular proteins.
+Generally, O-glycans are extended following four major core structures:
+\strong{core 1}, \strong{core 2}, core 3, and core 4.
+The first two are by far the most common core structures in O-glycosylation
+and are found throughout the body.
+
+\strong{core 1}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{    GalNAc
+   / b1-3
+Gal
+}\if{html}{\out{</div>}}
+
+\strong{core 2}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{GlcNAc
+      \\ b1-6
+       GalNAc
+      / b1-3
+   Gal
+}\if{html}{\out{</div>}}
+}
+
 \examples{
 print(n_glycan_core(mode = "ne"), verbose = TRUE)
-print(n_glycan_core(mode = "dn"), verbose = TRUE)
+print(o_glycan_core_1(mode = "dn"), verbose = TRUE)
 
 }
