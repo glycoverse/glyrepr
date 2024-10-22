@@ -30,6 +30,20 @@
               └─a1-6
                 └─Man
 
+# converting NE to DN graph works with missing linkages
+
+    Code
+      print(dn_graph, verbose = TRUE)
+    Output
+      Glycan Graph (DN)
+      H: 1, N: 2
+      ------------------
+      N
+      ├─NA
+      │ └─N
+      └─NA
+        └─H
+
 # converting one-node graph to DN graph works
 
     Code
@@ -65,6 +79,18 @@
         └─Man (b1-4)
           ├─Man (a1-3)
           └─Man (a1-6)
+
+# converting DN to EN graph works with missing linkages
+
+    Code
+      print(ne_graph, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      H: 2, N: 1
+      ------------------
+      N
+      ├─H
+      └─H
 
 # converting one-node graph to NE graph works
 
