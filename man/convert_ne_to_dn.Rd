@@ -2,9 +2,12 @@
 % Please edit documentation in R/convert-graph-mode.R
 \name{convert_ne_to_dn}
 \alias{convert_ne_to_dn}
+\alias{convert_dn_to_ne}
 \title{Convert between NE and DN glycan graphs}
 \usage{
 convert_ne_to_dn(glycan)
+
+convert_dn_to_ne(glycan)
 }
 \arguments{
 \item{glycan}{A glycan graph object of class \code{glycan_graph}.}
@@ -31,6 +34,6 @@ ne_glycan <- as_glycan_graph(ne_graph)
 dn_glycan <- convert_ne_to_dn(ne_glycan)
 
 # Inspect the DN glycan graph
-print(dn_glycan)
+print(dn_glycan, verbose = TRUE)
 
 }

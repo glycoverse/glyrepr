@@ -23,7 +23,7 @@
 #' dn_glycan <- convert_ne_to_dn(ne_glycan)
 #'
 #' # Inspect the DN glycan graph
-#' print(dn_glycan)
+#' print(dn_glycan, verbose = TRUE)
 #'
 #' @export
 convert_ne_to_dn <- function(glycan) {
@@ -70,4 +70,44 @@ convert_ne_to_dn <- function(glycan) {
   }
 
   new_dn_glycan_graph(new_graph)
+}
+
+
+#' @rdname convert_ne_to_dn
+#' @export
+convert_dn_to_ne <- function(glycan) {
+  if (!inherits(glycan, "dn_glycan_graph")) {
+    rlang::abort("Input must be a DN glycan graph.")
+  }
+
+  # Deal with edge case that only one monosaccharide exists
+  if (igraph::vcount(glycan) == 1) {
+    new_graph <- igraph::make_graph(~ 1)
+    igraph::V(new_graph)$mono <- igraph::V(glycan)$mono
+    return(new_ne_glycan_graph(new_graph))
+  }
+
+  # Get edge list and vertex list
+  edge_list <- igraph::as_data_frame(glycan, what = "edges")
+  vertex_list <- igraph::as_data_frame(glycan, what = "vertices")
+  linkage_vertices <- vertex_list[vertex_list$type == "linkage", c("name", "linkage")]
+
+  # Initiate new graph
+  new_graph <- glycan
+  class(new_graph) <- "igraph"
+  new_graph <- igraph::delete_vertices(new_graph, which(igraph::V(new_graph)$type == "linkage"))
+  new_graph <- igraph::delete_vertex_attr(new_graph, "linkage")
+  new_graph <- igraph::delete_vertex_attr(new_graph, "type")
+
+  # Iteratively add new edges
+  for (i in 1:nrow(linkage_vertices)) {
+    name <- as.character(linkage_vertices$name[i])
+    linkage <- linkage_vertices$linkage[i]
+    from <- edge_list$from[edge_list$to == name]
+    to <- edge_list$to[edge_list$from == name]
+    new_graph <- igraph::add_edges(new_graph, c(from, to), linkage = linkage)
+  }
+  igraph::V(new_graph)$name <- as.integer(1:igraph::vcount(new_graph))
+
+  new_ne_glycan_graph(new_graph)
 }

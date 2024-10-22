@@ -40,3 +40,39 @@
       ------------------
       N
 
+# converting DN to EN graph works on simple example
+
+    Code
+      print(ne_graph, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      H: 2, N: 1
+      ------------------
+      N
+      ├─H (b1-4)
+      └─H (a1-3)
+
+# converting DN to EN graph works on complex example
+
+    Code
+      print(ne_graph, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      GlcNAc: 2, Man: 3
+      ------------------
+      GlcNAc
+      └─GlcNAc (b1-4)
+        └─Man (b1-4)
+          ├─Man (a1-3)
+          └─Man (a1-6)
+
+# converting one-node graph to NE graph works
+
+    Code
+      print(ne_graph, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      N: 1
+      ------------------
+      N
+
