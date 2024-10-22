@@ -14,6 +14,7 @@ print.ne_glycan_graph <- function(x, ..., verbose = FALSE) {
   if (verbose) {
     cli::cat_line(stringr::str_dup("-", 18))
     label_getter <- function(graph) {
+      if (igraph::vcount(graph) == 1) return(igraph::V(graph)$mono)
       monos <- igraph::V(graph)$mono
       linkages <- purrr::map_chr(
         igraph::V(graph)[2:igraph::vcount(graph)],

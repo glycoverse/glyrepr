@@ -78,3 +78,23 @@
               └─NA
                 └─Man
 
+# verbose print works for one-mono NE glycan graphs
+
+    Code
+      print(glycan, verbose = TRUE)
+    Output
+      Glycan Graph (NE)
+      N: 1
+      ------------------
+      N
+
+# verbose print works for one-mono DN glycan graphs
+
+    Code
+      print(glycan, verbose = TRUE)
+    Output
+      Glycan Graph (DN)
+      N: 1
+      ------------------
+      N
+

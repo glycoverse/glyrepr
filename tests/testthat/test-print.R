@@ -36,3 +36,23 @@ test_that("verbose print works for DN glycan graphs without linkages", {
   x <- new_dn_glycan_graph(n_glycan_core(mode = "dn", linkage = FALSE))
   expect_snapshot(print(x, verbose = TRUE))
 })
+
+
+test_that("verbose print works for one-mono NE glycan graphs", {
+  skip_on_old_win()
+  graph <- igraph::make_graph(~ 1)
+  igraph::V(graph)$mono <- "N"
+  glycan <- new_ne_glycan_graph(graph)
+  expect_snapshot(print(glycan, verbose = TRUE))
+})
+
+
+test_that("verbose print works for one-mono DN glycan graphs", {
+  skip_on_old_win()
+  graph <- igraph::make_graph(~ 1)
+  igraph::V(graph)$type <- "mono"
+  igraph::V(graph)$mono <- "N"
+  igraph::V(graph)$linkage <- NA_character_
+  glycan <- new_dn_glycan_graph(graph)
+  expect_snapshot(print(glycan, verbose = TRUE))
+})
