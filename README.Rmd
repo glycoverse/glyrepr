@@ -37,9 +37,10 @@ pak::pak("fubin1999/glyrepr")
 
 ## Example
 
-```r
+```{r}
 library(glyrepr)
 
 glycan <- n_glycan_core()
 print(glycan, verbose = TRUE)
 ```
+
