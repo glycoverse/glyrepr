@@ -14,7 +14,9 @@ status](https://www.r-pkg.org/badges/version/glyrepr)](https://CRAN.R-project.or
 coverage](https://codecov.io/gh/fubin1999/glyrepr/graph/badge.svg)](https://app.codecov.io/gh/fubin1999/glyrepr)
 <!-- badges: end -->
 
-The goal of glyrepr is to …
+This package is a wrapper of ‘igraph’ for representing glycan structures
+in R. It provides a set of functions to create and manipulate glycan
+structures, and to visualize them in a graph format.
 
 ## Installation
 
@@ -28,4 +30,9 @@ pak::pak("fubin1999/glyrepr")
 
 ## Example
 
-Coming soon…
+``` r
+library(glyrepr)
+
+glycan <- n_glycan_core()
+print(glycan, verbose = TRUE)
+```
