@@ -47,5 +47,5 @@ mix_generic_concrete <- function(monos) {
 
 # Returns a logical vector indicating whether the linkages are valid
 valid_linkages <- function(linkages) {
-  stringr::str_detect(linkages, "^[ab]\\d+-\\d+$")
+  stringr::str_detect(linkages, "^[ab\\?][\\d\\?]-[\\d\\?]$")
 }
