@@ -116,11 +116,12 @@ as_glycan_graph <- function(graph, type = "auto") {
     )
   } else if (type == "ne") {
     glycan <- new_ne_glycan_graph(graph)
-    validate_ne_glycan_graph(glycan)
+    glycan <- validate_ne_glycan_graph(glycan)
   } else {  # type == "dn"
     glycan <- new_dn_glycan_graph(graph)
-    validate_dn_glycan_graph(glycan)
+    glycan <- validate_dn_glycan_graph(glycan)
   }
+  ensure_name_vertex_attr(glycan)
 }
 
 
@@ -129,7 +130,7 @@ as_glycan_graph <- function(graph, type = "auto") {
 as_dn_glycan_graph <- function(graph) {
   stopifnot(igraph::is_igraph(graph))
   glycan <- new_dn_glycan_graph(graph)
-  validate_dn_glycan_graph(glycan)
+  ensure_name_vertex_attr(validate_dn_glycan_graph(glycan))
 }
 
 
@@ -138,5 +139,14 @@ as_dn_glycan_graph <- function(graph) {
 as_ne_glycan_graph <- function(graph) {
   stopifnot(igraph::is_igraph(graph))
   glycan <- new_ne_glycan_graph(graph)
-  validate_ne_glycan_graph(glycan)
+  ensure_name_vertex_attr(validate_ne_glycan_graph(glycan))
+}
+
+
+ensure_name_vertex_attr <- function(glycan) {
+  if (!("name" %in% igraph::vertex_attr_names(glycan))) {
+    names <- as.character(seq_len(igraph::vcount(glycan)))
+    glycan <- igraph::set_vertex_attr(glycan, "name", value = names)
+  }
+  glycan
 }

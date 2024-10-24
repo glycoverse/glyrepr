@@ -55,3 +55,13 @@ test_that("as_glycan_graph fails for invalid graphs", {
   bad_graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+1)
   expect_error(as_glycan_graph(bad_graph), "Could not infer glycan graph type")
 })
+
+
+test_that("vertex names are added if missing", {
+  graph <- good_ne_graph()
+  graph <- igraph::delete_vertex_attr(graph, "name")
+
+  glycan <- as_ne_glycan_graph(graph)
+
+  expect_true("name" %in% igraph::vertex_attr_names(glycan))
+})
