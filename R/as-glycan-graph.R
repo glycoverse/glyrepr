@@ -115,13 +115,10 @@ as_glycan_graph <- function(graph, type = "auto") {
       }
     )
   } else if (type == "ne") {
-    glycan <- new_ne_glycan_graph(graph)
-    glycan <- validate_ne_glycan_graph(glycan)
+    as_ne_glycan_graph(graph)
   } else {  # type == "dn"
-    glycan <- new_dn_glycan_graph(graph)
-    glycan <- validate_dn_glycan_graph(glycan)
+    as_dn_glycan_graph(graph)
   }
-  ensure_name_vertex_attr(glycan)
 }
 
 
@@ -129,8 +126,7 @@ as_glycan_graph <- function(graph, type = "auto") {
 #' @export
 as_dn_glycan_graph <- function(graph) {
   stopifnot(igraph::is_igraph(graph))
-  glycan <- new_dn_glycan_graph(graph)
-  ensure_name_vertex_attr(validate_dn_glycan_graph(glycan))
+  ensure_name_vertex_attr(validate_dn_glycan_graph(new_dn_glycan_graph(graph)))
 }
 
 
@@ -138,8 +134,7 @@ as_dn_glycan_graph <- function(graph) {
 #' @export
 as_ne_glycan_graph <- function(graph) {
   stopifnot(igraph::is_igraph(graph))
-  glycan <- new_ne_glycan_graph(graph)
-  ensure_name_vertex_attr(validate_ne_glycan_graph(glycan))
+  ensure_name_vertex_attr(validate_ne_glycan_graph(new_ne_glycan_graph(graph)))
 }
 
 
