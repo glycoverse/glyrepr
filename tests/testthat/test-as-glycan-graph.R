@@ -65,3 +65,23 @@ test_that("vertex names are added if missing", {
 
   expect_true("name" %in% igraph::vertex_attr_names(glycan))
 })
+
+
+test_that("clean linkages for NE graphs", {
+  graph <- good_ne_graph()
+  graph <- igraph::set_edge_attr(graph, "linkage", value = c("?1-?", "??-?"))
+
+  glycan <- as_ne_glycan_graph(graph)
+
+  expect_equal(igraph::E(glycan)$linkage, c("?1-?", NA))
+})
+
+
+test_that("clean linkages for DN graph", {
+  graph <- good_dn_graph()
+  graph <- igraph::set_vertex_attr(graph, "linkage", value = c(NA, "??-?", NA))
+
+  glycan <- as_dn_glycan_graph(graph)
+
+  expect_equal(igraph::V(glycan)$linkage, rep(NA_character_, 3))
+})

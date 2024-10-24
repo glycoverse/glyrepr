@@ -123,25 +123,51 @@ as_glycan_graph <- function(graph, type = "auto") {
 
 
 #' @rdname as_glycan_graph
+#' @importFrom magrittr %>%
 #' @export
 as_dn_glycan_graph <- function(graph) {
   stopifnot(igraph::is_igraph(graph))
-  ensure_name_vertex_attr(validate_dn_glycan_graph(new_dn_glycan_graph(graph)))
+  graph %>%
+    new_dn_glycan_graph() %>%
+    validate_dn_glycan_graph() %>%
+    ensure_name_vertex_attr() %>%
+    clean_dn_linkages()
 }
 
 
 #' @rdname as_glycan_graph
+#' @importFrom magrittr %>%
 #' @export
 as_ne_glycan_graph <- function(graph) {
   stopifnot(igraph::is_igraph(graph))
-  ensure_name_vertex_attr(validate_ne_glycan_graph(new_ne_glycan_graph(graph)))
+  graph %>%
+    new_ne_glycan_graph() %>%
+    validate_ne_glycan_graph() %>%
+    ensure_name_vertex_attr() %>%
+    clean_ne_linkages()
 }
 
 
+# Add "name" vertex attributes if missing.
 ensure_name_vertex_attr <- function(glycan) {
   if (!("name" %in% igraph::vertex_attr_names(glycan))) {
     names <- as.character(seq_len(igraph::vcount(glycan)))
     glycan <- igraph::set_vertex_attr(glycan, "name", value = names)
   }
   glycan
+}
+
+
+# Replace "??-?" linkages into NA_character_.
+clean_ne_linkages <- function(glycan) {
+  linkages <- igraph::edge_attr(glycan, "linkage")
+  linkages[linkages == "??-?"] <- NA_character_
+  igraph::set_edge_attr(glycan, "linkage", value = linkages)
+}
+
+
+clean_dn_linkages <- function(glycan) {
+  linkages <- igraph::vertex_attr(glycan, "linkage")
+  linkages[linkages == "??-?"] <- NA_character_
+  igraph::set_vertex_attr(glycan, "linkage", value = linkages)
 }
