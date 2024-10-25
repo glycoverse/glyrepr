@@ -1,6 +1,6 @@
 Package: glyrepr
 Title: Representation for Glycan Structures in R
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Authors@R: 
     person("Bin", "Fu", , "23110220018@m.fudan.edu.cn", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8567-2997"))
@@ -21,6 +21,7 @@ Imports:
     dplyr,
     glue,
     igraph,
+    magrittr,
     purrr,
     rlang,
     stringr
