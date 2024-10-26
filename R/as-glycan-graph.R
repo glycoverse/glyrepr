@@ -13,6 +13,9 @@
 #' Monosaccharides and linkages alternate in a DN glycan graph.
 #' For more details, see "details" section.
 #'
+#' Unknown linkages could either be assigned as NA or "??-?".
+#' NA will be converted to "??-?" internally.
+#'
 #' `as_dn_glycan_graph()` is the same as `as_glycan_graph()` with `type = "dn"`.
 #' `as_ne_glycan_graph()` is the same as `as_glycan_graph()` with `type = "ne"`.
 #'
@@ -158,16 +161,17 @@ ensure_name_vertex_attr <- function(glycan) {
 }
 
 
-# Replace "??-?" linkages into NA_character_.
+# Replace NA in linkages to "??-?".
 clean_ne_linkages <- function(glycan) {
   linkages <- igraph::edge_attr(glycan, "linkage")
-  linkages[linkages == "??-?"] <- NA_character_
+  linkages[is.na(linkages)] <- "??-?"
   igraph::set_edge_attr(glycan, "linkage", value = linkages)
 }
 
 
 clean_dn_linkages <- function(glycan) {
+  types <- igraph::vertex_attr(glycan, "type")
   linkages <- igraph::vertex_attr(glycan, "linkage")
-  linkages[linkages == "??-?"] <- NA_character_
+  linkages[(types == "linkage") & is.na(linkages)] <- "??-?"
   igraph::set_vertex_attr(glycan, "linkage", value = linkages)
 }

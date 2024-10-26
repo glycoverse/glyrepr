@@ -39,10 +39,10 @@
       GlcNAc: 2, Man: 3
       ------------------
       GlcNAc
-      └─GlcNAc
-        └─Man
-          ├─Man
-          └─Man
+      └─GlcNAc (??-?)
+        └─Man (??-?)
+          ├─Man (??-?)
+          └─Man (??-?)
 
 # N-glycan core NE graph with simple monosaccharides
 

@@ -93,7 +93,7 @@ build_example_graph <- function(mode, linkage, mono_type, builder) {
   }
   glycan <- builder()
   if (!linkage) {
-    igraph::E(glycan)$linkage <- NA_character_
+    igraph::E(glycan)$linkage <- "??-?"
   }
   if (mode == "dn") {
     glycan <- convert_ne_to_dn(glycan)

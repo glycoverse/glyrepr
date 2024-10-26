@@ -37,6 +37,9 @@ where both monosaccharides and linkages are nodes.
 Monosaccharides and linkages alternate in a DN glycan graph.
 For more details, see "details" section.
 
+Unknown linkages could either be assigned as NA or "??-?".
+NA will be converted to "??-?" internally.
+
 \code{as_dn_glycan_graph()} is the same as \code{as_glycan_graph()} with \code{type = "dn"}.
 \code{as_ne_glycan_graph()} is the same as \code{as_glycan_graph()} with \code{type = "ne"}.
 }

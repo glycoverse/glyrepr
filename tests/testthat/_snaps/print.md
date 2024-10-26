@@ -55,10 +55,10 @@
       GlcNAc: 2, Man: 3
       ------------------
       GlcNAc
-      └─GlcNAc
-        └─Man
-          ├─Man
-          └─Man
+      └─GlcNAc (??-?)
+        └─Man (??-?)
+          ├─Man (??-?)
+          └─Man (??-?)
 
 # verbose print works for DN glycan graphs without linkages
 
@@ -69,13 +69,13 @@
       GlcNAc: 2, Man: 3
       ------------------
       GlcNAc
-      └─NA
+      └─??-?
         └─GlcNAc
-          └─NA
+          └─??-?
             └─Man
-              ├─NA
+              ├─??-?
               │ └─Man
-              └─NA
+              └─??-?
                 └─Man
 
 # verbose print works for one-mono NE glycan graphs
