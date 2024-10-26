@@ -9,6 +9,8 @@ A DN glycan graph is another way to model a glycan structure,
 where both monosaccharides and linkages are nodes.
 Monosaccharides and linkages alternate in a DN glycan graph.
 For more details, see "details" section.
+Unknown linkages could either be assigned as NA or "??-?".
+NA will be converted to "??-?" internally.
 as_dn_glycan_graph() is the same as as_glycan_graph() with type = "dn".
 as_ne_glycan_graph() is the same as as_glycan_graph() with type = "ne".'><meta property="og:description" content='A glycan graph is a subclass of igraph graph with additional constraints.
 This function checks these constraints and append the S3 class glycan_graph
@@ -20,6 +22,8 @@ A DN glycan graph is another way to model a glycan structure,
 where both monosaccharides and linkages are nodes.
 Monosaccharides and linkages alternate in a DN glycan graph.
 For more details, see "details" section.
+Unknown linkages could either be assigned as NA or "??-?".
+NA will be converted to "??-?" internally.
 as_dn_glycan_graph() is the same as as_glycan_graph() with type = "dn".
 as_ne_glycan_graph() is the same as as_glycan_graph() with type = "ne".'></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -29,7 +33,7 @@ as_ne_glycan_graph() is the same as as_glycan_graph() with type = "ne".'></head>
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +68,8 @@ A DN glycan graph is another way to model a glycan structure,
 where both monosaccharides and linkages are nodes.
 Monosaccharides and linkages alternate in a DN glycan graph.
 For more details, see "details" section.</p>
+<p>Unknown linkages could either be assigned as NA or "??-?".
+NA will be converted to "??-?" internally.</p>
 <p><code>as_dn_glycan_graph()</code> is the same as <code>as_glycan_graph()</code> with <code>type = "dn"</code>.
 <code>as_ne_glycan_graph()</code> is the same as <code>as_glycan_graph()</code> with <code>type = "ne"</code>.</p>
     </div>
@@ -163,6 +169,9 @@ not <code>linkage</code> nodes.</p></li>
 <span class="r-in"><span><span class="fu">as_glycan_graph</span><span class="op">(</span><span class="va">graph</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Glycan Graph (NE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc: 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> └─GlcNAc (b1-4)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># A simple DN glycan graph: GlcNAc(b1-4)GlcNAc</span></span></span>
 <span class="r-in"><span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">make_graph</a></span><span class="op">(</span><span class="op">~</span> <span class="fl">1</span><span class="op">-</span><span class="op">+</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">-</span><span class="op">+</span><span class="fl">3</span><span class="op">)</span>  <span class="co"># 1 and 3 are monosaccharides, 2 is linkage</span></span></span>
@@ -172,6 +181,10 @@ not <code>linkage</code> nodes.</p></li>
 <span class="r-in"><span><span class="fu">as_glycan_graph</span><span class="op">(</span><span class="va">graph</span>, type <span class="op">=</span> <span class="st">"dn"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Glycan Graph (DN)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc: 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> └─b1-4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   └─GlcNAc</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
