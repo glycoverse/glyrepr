@@ -1,24 +1,24 @@
 test_that("print works for NE glycan graphs", {
+  skip_on_old_win()
   x <- new_ne_glycan_graph(n_glycan_core(mode = "ne"))
   expect_snapshot(print(x))
 })
 
 
 test_that("print works for DN glycan graphs", {
+  skip_on_old_win()
   x <- new_dn_glycan_graph(n_glycan_core(mode = "dn"))
   expect_snapshot(print(x))
 })
 
 
 test_that("print works for NE glycan graphs with verbose = FALSE", {
-  skip_on_old_win()
   x <- new_ne_glycan_graph(n_glycan_core(mode = "ne"))
   expect_snapshot(print(x, verbose = FALSE))
 })
 
 
 test_that("print works for DN glycan graphs with verbose = FALSE", {
-  skip_on_old_win()
   x <- new_dn_glycan_graph(n_glycan_core(mode = "dn"))
   expect_snapshot(print(x, verbose = FALSE))
 })
