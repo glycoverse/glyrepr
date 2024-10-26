@@ -62,7 +62,8 @@ monosaccharides <- tibble::tribble(
   NA, "Pent", "Xyl",
   NA, "Pent", "Rib",
   # Sialic acids
-  "S", "NeuAc", "Neu5Ac",
-  "S", "NeuGc", "Neu5Gc",
+  "A", "NeuAc", "Neu5Ac",
+  "G", "NeuGc", "Neu5Gc",
+  "S", "Sia", "Sia",
   NA, "Kdn", "Kdn"
 )
