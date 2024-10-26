@@ -3,12 +3,17 @@
 #' This function prints information about a glycan graph,
 #' including its composition and structure.
 #'
+#' For NE glycan graphs, if all linkages are unknown ("??-?"),
+#' the linkage information will be omitted.
+#'
 #' @param x A glycan graph.
 #' @param ... Ignored.
-#' @param verbose A logical value. If `TRUE`, the structure of the glycan graph will be printed.
+#' @param verbose A logical value.
+#' If `TRUE`, the structure of the glycan graph will be printed.
+#' Default is `TRUE`.
 #'
 #' @export
-print.ne_glycan_graph <- function(x, ..., verbose = FALSE) {
+print.ne_glycan_graph <- function(x, ..., verbose = TRUE) {
   cli::cat_line("Glycan Graph (NE)")
   print_composition(x)
   if (verbose) {
@@ -16,6 +21,7 @@ print.ne_glycan_graph <- function(x, ..., verbose = FALSE) {
     label_getter <- function(graph) {
       if (igraph::vcount(graph) == 1) return(igraph::V(graph)$mono)
       monos <- igraph::V(graph)$mono
+      if (all(igraph::E(graph)$linkage == "??-?")) return(monos)
       linkages <- purrr::map_chr(
         igraph::V(graph)[2:igraph::vcount(graph)],
         ~ igraph::incident(graph, .x, mode = "in")$linkage
@@ -23,7 +29,7 @@ print.ne_glycan_graph <- function(x, ..., verbose = FALSE) {
       linkages_str <- stringr::str_c(" (", linkages, ")", sep = "")
       linkages_str <- dplyr::if_else(is.na(linkages_str), "", linkages_str)
       linkages_str <- c("", linkages_str)
-      stringr::str_c(monos, linkages_str)
+      return(stringr::str_c(monos, linkages_str))
     }
     print_structure(x, label_getter)
   }
@@ -32,7 +38,7 @@ print.ne_glycan_graph <- function(x, ..., verbose = FALSE) {
 
 #' @rdname print.ne_glycan_graph
 #' @export
-print.dn_glycan_graph <- function(x, ..., verbose = FALSE) {
+print.dn_glycan_graph <- function(x, ..., verbose = TRUE) {
   cli::cat_line("Glycan Graph (DN)")
   print_composition(x)
   if (verbose) {

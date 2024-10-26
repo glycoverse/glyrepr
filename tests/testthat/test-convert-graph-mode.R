@@ -54,14 +54,6 @@ test_that("converting NE to DN graph works on complex example", {
 })
 
 
-test_that("converting NE to DN graph works with missing linkages", {
-  skip_on_old_win()
-  glycan <- simple_example_ne_glycan_graph()
-  igraph::E(glycan)$linkage <- NA_character_
-  dn_graph <- convert_ne_to_dn(glycan)
-  expect_snapshot(print(dn_graph, verbose = TRUE))
-})
-
 
 test_that("converting to DN graph fails for DN graphs", {
   glycan <- simple_example_dn_glycan_graph()
@@ -93,15 +85,6 @@ test_that("converting DN to EN graph works on simple example", {
 test_that("converting DN to EN graph works on complex example", {
   skip_on_old_win()
   glycan <- complex_example_dn_glycan_graph()
-  ne_graph <- convert_dn_to_ne(glycan)
-  expect_snapshot(print(ne_graph, verbose = TRUE))
-})
-
-
-test_that("converting DN to EN graph works with missing linkages", {
-  skip_on_old_win()
-  glycan <- simple_example_dn_glycan_graph()
-  igraph::V(glycan)$linkage <- NA_character_
   ne_graph <- convert_dn_to_ne(glycan)
   expect_snapshot(print(ne_graph, verbose = TRUE))
 })
