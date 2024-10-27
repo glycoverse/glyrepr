@@ -21,7 +21,7 @@ print.ne_glycan_graph <- function(x, ..., verbose = TRUE) {
     label_getter <- function(graph) {
       if (igraph::vcount(graph) == 1) return(igraph::V(graph)$mono)
       monos <- igraph::V(graph)$mono
-      if (all(igraph::E(graph)$linkage == "??-?")) return(monos)
+      if (!has_linkages(x)) return(monos)
       linkages <- purrr::map_chr(
         igraph::V(graph)[2:igraph::vcount(graph)],
         ~ igraph::incident(graph, .x, mode = "in")$linkage
