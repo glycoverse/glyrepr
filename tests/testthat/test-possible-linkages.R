@@ -1,0 +1,69 @@
+test_that("a?-2", {
+  result <- possible_linkages("a?-2")
+  expected <- c("a1-2", "a2-2")
+  expect_identical(result, expected)
+})
+
+
+test_that("a1-?", {
+  result <- possible_linkages("a1-?")
+  expected <- paste0("a1-", 1:9)
+  expect_identical(result, expected)
+})
+
+
+test_that("?1-3", {
+  result <- possible_linkages("?1-3")
+  expected <- c("a1-3", "b1-3")
+  expect_identical(result, expected)
+})
+
+
+test_that("b?-?", {
+  result <- possible_linkages("b?-?")
+  df <- expand.grid(1:2, 1:9)
+  expected <- apply(df, 1, function(x) paste0("b", x[1], "-", x[2]))
+  expect_identical(result, expected)
+})
+
+
+test_that("a1-3", {
+  expect_identical(possible_linkages("a1-3"), "a1-3")
+})
+
+
+test_that("wrong format", {
+  expect_error(possible_linkages("a1-3-4"), "Invalid linkage format")
+  expect_error(possible_linkages(""), "Invalid linkage format")
+})
+
+
+test_that("wrong input type", {
+  expect_error(possible_linkages(1), "Linkage must be a character")
+  expect_error(possible_linkages(NA), "Linkage must be a character")
+  expect_error(possible_linkages(NULL), "Linkage must be a character")
+})
+
+
+test_that("multiple linkages", {
+  expect_error(possible_linkages(c("a1-3", "b1-4")), "Linkage must be a single character")
+})
+
+
+test_that("custom ranges", {
+  result <- possible_linkages("??-?", anomer_range = "a", pos1_range = 2, pos2_range = c(3, 6))
+  expected <- c("a2-3", "a2-6")
+  expect_identical(result, expected)
+})
+
+
+test_that("custom ranges wrong types", {
+  expect_error(possible_linkages("??-?", anomer_range = 1), "Anomer range must be a character")
+  expect_error(possible_linkages("??-?", pos1_range = "a"), "Position ranges must be a numeric")
+  expect_error(possible_linkages("??-?", pos2_range = "a"), "Position ranges must be a numeric")
+})
+
+
+test_that("0 range", {
+  expect_equal(possible_linkages("??-?", pos1_range = integer(0)), character(0))
+})
