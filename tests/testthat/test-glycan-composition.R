@@ -59,3 +59,28 @@ test_that("get compositions for a list of DN glycans", {
   expect_equal(comps[[1]], c(Glc = 2L))
   expect_equal(comps[[2]], c(Hex = 1L, HexNac = 1L))
 })
+
+
+test_that("counting monos works for NE glycans", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
+  igraph::E(graph)$linkage <- NA_character_
+  glycan <- new_ne_glycan_graph(graph)
+
+  count <- count_monos(glycan)
+
+  expect_equal(count, 3L)
+})
+
+
+test_that("counting monos works for DN glycans", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$type <- c("mono", "linkage", "mono")
+  igraph::V(graph)$mono <- c("Glc", NA, "Glc")
+  igraph::V(graph)$linkage <- c(NA, "b1-4", NA)
+  glycan <- new_dn_glycan_graph(graph)
+
+  count <- count_monos(glycan)
+
+  expect_equal(count, 2L)
+})

@@ -23,3 +23,18 @@ get_composition <- function(glycan) {
 get_compositions <- function(glycans) {
   purrr::map(glycans, get_composition)
 }
+
+
+#' Count the Number of Monosaccharides
+#'
+#' This function returns the total number of monosaccharides of a
+#' glycan graph.
+#'
+#' @param glycan A glycan graph.
+#'
+#' @return An integer.
+#' @export
+count_monos <- function(glycan) {
+  stopifnot(is_glycan(glycan))
+  sum(get_composition(glycan))
+}
