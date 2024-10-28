@@ -1,3 +1,10 @@
+# !!!!! IMPORTANT !!!!!
+# We don't use `n_glycan_core()` or `o_glycan_core_1()` here because it actually
+# depends on `convert_ne_to_dn()` to create a DN graph.
+# To prevent circular dependency
+# (it will not raise an error but the tests will always pass),
+# we create the graph manually here.
+
 simple_example_ne_glycan_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 1-+3)
   igraph::V(graph)$mono <- c("N", "N", "H")
@@ -15,12 +22,6 @@ simple_example_dn_glycan_graph <- function() {
 }
 
 
-# This is actually an N-glycan core.
-# We don't use `n_glycan_core()` here because it actually depends on
-# `convert_ne_to_dn()` to create a DN graph.
-# To prevent circular dependency
-# (it will not raise an error but the tests will always pass),
-# we create the graph manually here.
 complex_example_ne_glycan_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
@@ -41,7 +42,7 @@ complex_example_dn_glycan_graph <- function() {
 test_that("converting NE to DN graph works on simple example", {
   skip_on_old_win()
   glycan <- simple_example_ne_glycan_graph()
-  dn_graph <- convert_ne_to_dn(glycan)
+  dn_graph <- convert_graph_mode(glycan, "dn")
   expect_snapshot(print(dn_graph, verbose = TRUE))
 })
 
@@ -49,15 +50,21 @@ test_that("converting NE to DN graph works on simple example", {
 test_that("converting NE to DN graph works on complex example", {
   skip_on_old_win()
   glycan <- complex_example_ne_glycan_graph()
-  dn_graph <- convert_ne_to_dn(glycan)
+  dn_graph <- convert_graph_mode(glycan, "dn")
   expect_snapshot(print(dn_graph, verbose = TRUE))
 })
 
 
-
 test_that("converting to DN graph fails for DN graphs", {
   glycan <- simple_example_dn_glycan_graph()
-  expect_error(convert_ne_to_dn(glycan), "Input must be an NE glycan graph.")
+  expect_snapshot(convert_graph_mode(glycan, "dn"), error = TRUE)
+})
+
+
+test_that("converting from DN to DN returns self with `strict` to `FALSE`", {
+  glycan <- simple_example_dn_glycan_graph()
+  dn_graph <- convert_graph_mode(glycan, "dn", strict = FALSE)
+  expect_identical(glycan, dn_graph)
 })
 
 
@@ -68,31 +75,25 @@ test_that("converting one-node graph to DN graph works", {
   igraph::V(graph)$type <- "mono"
   glycan <- new_ne_glycan_graph(graph)
 
-  dn_graph <- convert_ne_to_dn(glycan)
+  dn_graph <- convert_graph_mode(glycan, "dn")
 
   expect_snapshot(print(dn_graph, verbose = TRUE))
 })
 
 
-test_that("converting DN to EN graph works on simple example", {
+test_that("converting DN to NE graph works on simple example", {
   skip_on_old_win()
   glycan <- simple_example_dn_glycan_graph()
-  ne_graph <- convert_dn_to_ne(glycan)
+  ne_graph <- convert_graph_mode(glycan, "ne")
   expect_snapshot(print(ne_graph, verbose = TRUE))
 })
 
 
-test_that("converting DN to EN graph works on complex example", {
+test_that("converting DN to NE graph works on complex example", {
   skip_on_old_win()
   glycan <- complex_example_dn_glycan_graph()
-  ne_graph <- convert_dn_to_ne(glycan)
+  ne_graph <- convert_graph_mode(glycan, "ne")
   expect_snapshot(print(ne_graph, verbose = TRUE))
-})
-
-
-test_that("converting to NE graph fails for NE graphs", {
-  glycan <- simple_example_ne_glycan_graph()
-  expect_error(convert_dn_to_ne(glycan), "Input must be a DN glycan graph.")
 })
 
 
@@ -104,35 +105,7 @@ test_that("converting one-node graph to NE graph works", {
   igraph::V(graph)$linkage <- NA_character_
   glycan <- new_dn_glycan_graph(graph)
 
-  ne_graph <- convert_dn_to_ne(glycan)
+  ne_graph <- convert_graph_mode(glycan, "ne")
 
   expect_snapshot(print(ne_graph, verbose = TRUE))
-})
-
-
-test_that("ensureing NE glycan as NE", {
-  glycan <- simple_example_ne_glycan_graph()
-  glycan <- ensure_graph_mode(glycan, "ne")
-  expect_true(is_ne_glycan(glycan))
-})
-
-
-test_that("ensureing NE glycan as DN", {
-  glycan <- simple_example_ne_glycan_graph()
-  glycan <- ensure_graph_mode(glycan, "dn")
-  expect_true(is_dn_glycan(glycan))
-})
-
-
-test_that("ensureing DN glycan as DN", {
-  glycan <- simple_example_dn_glycan_graph()
-  glycan <- ensure_graph_mode(glycan, "dn")
-  expect_true(is_dn_glycan(glycan))
-})
-
-
-test_that("ensureing DN glycan as NE", {
-  glycan <- simple_example_dn_glycan_graph()
-  glycan <- ensure_graph_mode(glycan, "ne")
-  expect_true(is_ne_glycan(glycan))
 })

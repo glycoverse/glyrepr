@@ -30,6 +30,14 @@
               └─a1-6
                 └─Man
 
+# converting to DN graph fails for DN graphs
+
+    Code
+      convert_graph_mode(glycan, "dn")
+    Condition
+      Error in `convert_graph_mode()`:
+      ! The glycan is already in "DN" mode.
+
 # converting one-node graph to DN graph works
 
     Code
@@ -40,7 +48,7 @@
       ------------------
       N
 
-# converting DN to EN graph works on simple example
+# converting DN to NE graph works on simple example
 
     Code
       print(ne_graph, verbose = TRUE)
@@ -52,7 +60,7 @@
       ├─H (b1-4)
       └─H (a1-3)
 
-# converting DN to EN graph works on complex example
+# converting DN to NE graph works on complex example
 
     Code
       print(ne_graph, verbose = TRUE)

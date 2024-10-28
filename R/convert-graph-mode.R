@@ -7,32 +7,43 @@
 #' In a DN glycan graph, both monosaccharides and linkages are nodes, and they alternate.
 #' See [as_glycan_graph()] for details.
 #'
-#' @param glycan A glycan graph object of class `glycan_graph`.
+#' @param glycan A glycan graph.
+#' @param to The target graph mode, either "ne" or "dn".
+#' @param strict If `TRUE`, an error will be thrown if the glycan is already
+#' in the target mode. If `FALSE`, the glycan will be returned as is.
+#' Default is `TRUE`.
 #'
 #' @return The converted glycan graph object.
 #'
 #' @examples
-#' library(igraph)
-#' # Create a simple NE glycan graph: GlcNAc(b1-4)GlcNAc
-#' ne_graph <- make_graph(~ 1-+2)
-#' V(ne_graph)$mono <- c("GlcNAc", "GlcNAc")
-#' E(ne_graph)$linkage <- "b1-4"
-#' ne_glycan <- as_glycan_graph(ne_graph)
+#' (glycan <- n_glycan_core(mode = "ne"))
 #'
-#' # Convert NE glycan graph to DN glycan graph
-#' dn_glycan <- convert_ne_to_dn(ne_glycan)
+#' # Convert to DN mode
+#' convert_graph_mode(glycan, to = "dn")
 #'
-#' # Inspect the DN glycan graph
-#' print(dn_glycan, verbose = TRUE)
+#' # Converting to NE mode will raise an error
+#' try(convert_graph_mode(glycan, to = "ne"))
 #'
-#' @seealso [ensure_graph_mode()]
+#' # Set `strict` to `FALSE` to return the glycan unchanged
+#' convert_graph_mode(glycan, to = "ne", strict = FALSE)
 #'
 #' @export
-convert_ne_to_dn <- function(glycan) {
-  if (!inherits(glycan, "ne_glycan_graph")) {
-    rlang::abort("Input must be an NE glycan graph.")
+convert_graph_mode <- function(glycan, to, strict = TRUE) {
+  if (to == "ne" && is_dn_glycan(glycan)) {
+    return(convert_dn_to_ne(glycan))
   }
+  if (to == "dn" && is_ne_glycan(glycan)) {
+    return(convert_ne_to_dn(glycan))
+  }
+  if (strict) {
+    cli::cli_abort("The glycan is already in {.val {stringr::str_to_upper(to)}} mode.")
+  } else {
+    return(glycan)
+  }
+}
 
+
+convert_ne_to_dn <- function(glycan) {
   # Deal with edge case that only one monosaccharide exists
   if (igraph::vcount(glycan) == 1) {
     new_graph <- glycan
@@ -75,13 +86,7 @@ convert_ne_to_dn <- function(glycan) {
 }
 
 
-#' @rdname convert_ne_to_dn
-#' @export
 convert_dn_to_ne <- function(glycan) {
-  if (!inherits(glycan, "dn_glycan_graph")) {
-    rlang::abort("Input must be a DN glycan graph.")
-  }
-
   # Deal with edge case that only one monosaccharide exists
   if (igraph::vcount(glycan) == 1) {
     new_graph <- igraph::make_graph(~ 1)
@@ -112,39 +117,4 @@ convert_dn_to_ne <- function(glycan) {
   igraph::V(new_graph)$name <- as.integer(1:igraph::vcount(new_graph))
 
   new_ne_glycan_graph(new_graph)
-}
-
-
-#' Ensure Glycan Graph is in the Correct Mode
-#'
-#' @description
-#' This function ensures that a glycan graph is in the correct mode (NE or DN).
-#' It is a wrapper around [convert_ne_to_dn()] and [convert_dn_to_ne()].
-#' If the glycan graph is already in the correct mode, it is returned as is,
-#' otherwise it is converted to the correct mode.
-#' This function is handy when you are not sure about the mode of the glycan graph.
-#' It eliminates the need to check the mode manually before converting.
-#'
-#' @param glycan A glycan graph.
-#' @param mode A character string specifying the mode of the glycan graph.
-#'  Can be "ne" or "dn". See docs for [as_glycan_graph()] for more details.
-#'
-#' @returns The glycan graph in the correct mode.
-#'
-#' @examples
-#' some_ne_glycan <- n_glycan_core(mode = "ne")
-#' is_ne_glycan(ensure_graph_mode(some_ne_glycan, "ne"))
-#' is_dn_glycan(ensure_graph_mode(some_ne_glycan, "dn"))
-#'
-#' @seealso [convert_ne_to_dn()], [convert_dn_to_ne()]
-#'
-#' @export
-ensure_graph_mode <- function(glycan, mode) {
-  if (mode == "ne" && is_dn_glycan(glycan)) {
-    return(convert_dn_to_ne(glycan))
-  }
-  if (mode == "dn" && is_ne_glycan(glycan)) {
-    return(convert_ne_to_dn(glycan))
-  }
-  return(glycan)
 }
