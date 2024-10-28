@@ -1,6 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+# glyrepr <a href="https://fubin1999.github.io/glyrepr/"><img src="man/figures/logo.png" align="right" height="138" /></a>
+
 # glyrepr
 
 <!-- badges: start -->
