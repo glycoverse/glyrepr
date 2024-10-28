@@ -129,3 +129,23 @@ patrick::with_parameters_test_that("deciding mono type works", {
   mono = c("H", "Hex", "Man"),
   type = c("simple", "generic", "concrete")
 )
+
+
+test_that("ensure_glycan_mono_type works for the same mono type", {
+  glycan <- o_glycan_core_1(mono_type = "concrete")
+  glycan <- ensure_glycan_mono_type(glycan, "concrete")
+  expect_equal(decide_glycan_mono_type(glycan), "concrete")
+})
+
+
+test_that("ensure_glycan_mono_type works for different mono types", {
+  glycan <- o_glycan_core_1(mono_type = "concrete")
+  glycan <- ensure_glycan_mono_type(glycan, "simple")
+  expect_equal(decide_glycan_mono_type(glycan), "simple")
+})
+
+
+test_that("ensure_glycan_mono_type fails for bad conversion", {
+  glycan <- o_glycan_core_1(mono_type = "simple")
+  expect_error(ensure_glycan_mono_type(glycan, "concrete"))
+})

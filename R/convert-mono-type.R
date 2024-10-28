@@ -38,6 +38,33 @@ convert_glycan_mono_type <- function(glycan, to) {
 }
 
 
+#' Ensure the Monosaacharides in a Glycan Graph are of a Specific Type
+#'
+#' This function ensures the glycan has the given type of monosaccharides.
+#' It differs from `convert_glycan_mono_type()` in that it does not raise an error
+#' if you try to "ensure the same mono type", e.g. from "generic" to "generic".
+#' This is more handy in some cases.
+#'
+#' @param glycan A glycan graph.
+#' @param to A character string specifying the target monosaccharide type.
+#'  It can be "concrete", "generic", or "simple".
+#'
+#' @return A glycan graph with monosaccharides converted to the target type.
+#'
+#' @examples
+#' concrete_glycan <- n_glycan_core(mono_type = "concrete")
+#' ensure_glycan_mono_type(concrete_glycan, to = "generic")
+#' ensure_glycan_mono_type(concrete_glycan, to = "concrete")
+#'
+#' @export
+ensure_glycan_mono_type <- function(glycan, to) {
+  tryCatch(
+    convert_glycan_mono_type(glycan, to),
+    error_convert_self = function(e) glycan
+  )
+}
+
+
 #' Convert a Monosaacharide to a Different Type
 #'
 #' @description
@@ -142,10 +169,14 @@ valid_from_to <- function(from, to) {
     cli::cli_abort(c(
       "Cannot convert from {.val {from}} to {.val {to}}.",
       "i" = "Can only convert in this order: concrete -> generic -> simple."
-    ), call = rlang::caller_call())
+    ), call = rlang::caller_call(), class = "error_backward_convert")
   }
   if (from == to) {
-    cli::cli_abort("It is already {.val {to}}.", call = rlang::caller_call())
+    cli::cli_abort(
+      "It is already {.val {to}}.",
+      call = rlang::caller_call(),
+      class = "error_convert_self"
+    )
   }
 }
 
