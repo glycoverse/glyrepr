@@ -50,3 +50,6 @@ possible_linkages("a1-3")
 possible_linkages("a?-?", pos1_range = 2, pos2_range = c(2, 3))
 
 }
+\seealso{
+\code{\link[=has_linkages]{has_linkages()}}, \code{\link[=remove_linkages]{remove_linkages()}}
+}

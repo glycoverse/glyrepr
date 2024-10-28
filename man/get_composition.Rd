@@ -21,3 +21,11 @@ A named integer vector.
 Get the compositions of a glycan graph or a list of glycan graphs.
 The composition is a named integer vector.
 }
+\examples{
+glycan <- n_glycan_core()
+get_composition(glycan)
+
+}
+\seealso{
+\code{\link[=count_monos]{count_monos()}}
+}

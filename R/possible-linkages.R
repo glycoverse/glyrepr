@@ -29,6 +29,8 @@
 #' possible_linkages("a1-3")
 #' possible_linkages("a?-?", pos1_range = 2, pos2_range = c(2, 3))
 #'
+#' @seealso [has_linkages()], [remove_linkages()]
+#'
 #' @export
 possible_linkages <- function(
   linkage,

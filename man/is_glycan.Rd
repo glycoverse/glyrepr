@@ -25,3 +25,6 @@ a node-edge glycan graph (an object of class \code{ne_glycan_graph}),
 or a dual-node glycan graph (an object of class \code{dn_glycan_graph}).
 See docs for \code{\link[=as_glycan_graph]{as_glycan_graph()}} for more details.
 }
+\seealso{
+\code{\link[=as_glycan_graph]{as_glycan_graph()}}, \code{\link[=glycan_graph_mode]{glycan_graph_mode()}}
+}

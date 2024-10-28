@@ -5,7 +5,14 @@
 #'
 #' @param glycan A glycan graph.
 #' @param glycans A list of glycan graphs.
+#'
 #' @return A named integer vector.
+#'
+#' @examples
+#' glycan <- n_glycan_core()
+#' get_composition(glycan)
+#'
+#' @seealso [count_monos()]
 #'
 #' @export
 get_composition <- function(glycan) {
@@ -33,6 +40,13 @@ get_compositions <- function(glycans) {
 #' @param glycan A glycan graph.
 #'
 #' @return An integer.
+#'
+#' @examples
+#' glycan <- n_glycan_core()
+#' count_monos(glycan)
+#'
+#' @seealso [get_composition()], [get_compositions()]
+#'
 #' @export
 count_monos <- function(glycan) {
   stopifnot(is_glycan(glycan))

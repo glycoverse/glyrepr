@@ -26,6 +26,13 @@ There are three types of monosaccharides:
 For the full list of monosaccharides, see \code{glyrepr::monosaccharides}.
 }
 
+\examples{
+decide_mono_type("Gal")
+decide_mono_type("Hex")
+decide_mono_type("H")
+
+}
 \seealso{
-\code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=convert_mono_type]{convert_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}}
+\code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=convert_mono_type]{convert_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}},
+\code{\link[=ensure_glycan_mono_type]{ensure_glycan_mono_type()}}
 }

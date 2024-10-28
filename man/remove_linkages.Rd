@@ -17,3 +17,14 @@ An unkonwn linkage in a glycan graph is represented by "??-?".
 This function replaces all linkages in a glycan graph with "??-?",
 so that \code{has_linkages()} will return \code{FALSE}.
 }
+\examples{
+glycan <- n_glycan_core()
+print(glycan)
+
+glycan <- remove_linkages(glycan)
+print(glycan)
+
+}
+\seealso{
+\code{\link[=has_linkages]{has_linkages()}}, \code{\link[=possible_linkages]{possible_linkages()}}
+}

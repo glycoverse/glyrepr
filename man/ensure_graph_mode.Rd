@@ -29,3 +29,6 @@ is_ne_glycan(ensure_graph_mode(some_ne_glycan, "ne"))
 is_dn_glycan(ensure_graph_mode(some_ne_glycan, "dn"))
 
 }
+\seealso{
+\code{\link[=convert_ne_to_dn]{convert_ne_to_dn()}}, \code{\link[=convert_dn_to_ne]{convert_dn_to_ne()}}
+}

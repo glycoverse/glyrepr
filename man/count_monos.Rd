@@ -16,3 +16,11 @@ An integer.
 This function returns the total number of monosaccharides of a
 glycan graph.
 }
+\examples{
+glycan <- n_glycan_core()
+count_monos(glycan)
+
+}
+\seealso{
+\code{\link[=get_composition]{get_composition()}}, \code{\link[=get_compositions]{get_compositions()}}
+}

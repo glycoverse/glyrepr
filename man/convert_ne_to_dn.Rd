@@ -37,3 +37,6 @@ dn_glycan <- convert_ne_to_dn(ne_glycan)
 print(dn_glycan, verbose = TRUE)
 
 }
+\seealso{
+\code{\link[=ensure_graph_mode]{ensure_graph_mode()}}
+}

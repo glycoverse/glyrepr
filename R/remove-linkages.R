@@ -8,6 +8,16 @@
 #' @param glycan A glycan graph.
 #'
 #' @return A glycan graph with all linkages removed.
+#'
+#' @examples
+#' glycan <- n_glycan_core()
+#' print(glycan)
+#'
+#' glycan <- remove_linkages(glycan)
+#' print(glycan)
+#'
+#' @seealso [has_linkages()], [possible_linkages()]
+#'
 #' @export
 remove_linkages <- function(glycan) {
   if (!is_glycan(glycan)) {

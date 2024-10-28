@@ -17,3 +17,14 @@ These functions determine the mode of a glycan graph.
 The mode can be either "ne" (node-edge) or "dn" (dual-node).
 See docs for \code{\link[=as_glycan_graph]{as_glycan_graph()}} for more details.
 }
+\examples{
+glycan <- o_glycan_core_1(mode = "ne")
+glycan_graph_mode(glycan)
+
+glycan <- o_glycan_core_1(mode = "dn")
+glycan_graph_mode(glycan)
+
+}
+\seealso{
+\code{\link[=as_glycan_graph]{as_glycan_graph()}}, \code{\link[=is_glycan]{is_glycan()}}, \code{\link[=is_ne_glycan]{is_ne_glycan()}}, \code{\link[=is_dn_glycan]{is_dn_glycan()}}
+}

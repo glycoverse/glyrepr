@@ -12,7 +12,7 @@
 #'
 #' @param glycan A glycan graph.
 #' @param to A character string specifying the target monosaccharide type.
-#'  It can be "concrete", "generic", or "simple".
+#' It can be "concrete", "generic", or "simple".
 #'
 #' @return A glycan graph with monosaccharides converted to the target type.
 #'
@@ -23,7 +23,8 @@
 #' generic_glycan <- n_glycan_core(mono_type = "generic")
 #' convert_glycan_mono_type(generic_glycan, to = "simple")
 #'
-#' @seealso [convert_mono_type()], [decide_glycan_mono_type()], [decide_mono_type()]
+#' @seealso [convert_mono_type()], [decide_glycan_mono_type()], [decide_mono_type()],
+#' [ensure_glycan_mono_type()]
 #'
 #' @export
 convert_glycan_mono_type <- function(glycan, to) {
@@ -56,6 +57,9 @@ convert_glycan_mono_type <- function(glycan, to) {
 #' ensure_glycan_mono_type(concrete_glycan, to = "generic")
 #' ensure_glycan_mono_type(concrete_glycan, to = "concrete")
 #'
+#' @seealso [convert_glycan_mono_type()], [decide_glycan_mono_type()], [decide_mono_type()],
+#' [convert_mono_type()]
+#'
 #' @export
 ensure_glycan_mono_type <- function(glycan, to) {
   tryCatch(
@@ -82,7 +86,8 @@ ensure_glycan_mono_type <- function(glycan, to) {
 #'
 #' @return A character string specifying the monosaccharide name in the target type.
 #'
-#' @seealso [convert_glycan_mono_type()], [decide_glycan_mono_type()], [decide_mono_type()]
+#' @seealso [convert_glycan_mono_type()], [decide_glycan_mono_type()], [decide_mono_type()],
+#' [ensure_glycan_mono_type()]
 #'
 #' @export
 convert_mono_type <- function(mono, to) {
@@ -110,7 +115,13 @@ convert_mono_type <- function(mono, to) {
 #'
 #' @return A character string specifying the monosaccharide type.
 #'
-#' @seealso [convert_glycan_mono_type()], [convert_mono_type()], [decide_mono_type()]
+#' @examples
+#' decide_glycan_mono_type(n_glycan_core(mono_type = "concrete"))
+#' decide_glycan_mono_type(n_glycan_core(mono_type = "generic"))
+#' decide_glycan_mono_type(n_glycan_core(mono_type = "simple"))
+#'
+#' @seealso [convert_glycan_mono_type()], [convert_mono_type()], [decide_mono_type()],
+#' [ensure_glycan_mono_type()]
 #'
 #' @export
 decide_glycan_mono_type <- function(glycan) {
@@ -140,7 +151,13 @@ decide_glycan_mono_type <- function(glycan) {
 #'
 #' @return A character string specifying the monosaccharide type.
 #'
-#' @seealso [convert_glycan_mono_type()], [convert_mono_type()], [decide_glycan_mono_type()]
+#' @examples
+#' decide_mono_type("Gal")
+#' decide_mono_type("Hex")
+#' decide_mono_type("H")
+#'
+#' @seealso [convert_glycan_mono_type()], [convert_mono_type()], [decide_glycan_mono_type()],
+#' [ensure_glycan_mono_type()]
 #'
 #' @export
 decide_mono_type <- function(mono) {

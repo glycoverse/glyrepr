@@ -27,3 +27,7 @@ ensure_glycan_mono_type(concrete_glycan, to = "generic")
 ensure_glycan_mono_type(concrete_glycan, to = "concrete")
 
 }
+\seealso{
+\code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}}, \code{\link[=decide_mono_type]{decide_mono_type()}},
+\code{\link[=convert_mono_type]{convert_mono_type()}}
+}

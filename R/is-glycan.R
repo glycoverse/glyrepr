@@ -9,6 +9,9 @@
 #' @param x An object to be checked.
 #'
 #' @return A logical value.
+#'
+#' @seealso [as_glycan_graph()], [glycan_graph_mode()]
+#'
 #' @export
 is_glycan <- function(x) {
   inherits(x, "glycan_graph")
@@ -38,6 +41,16 @@ is_dn_glycan <- function(x) {
 #' @param x A glycan graph.
 #'
 #' @return A character string.
+#'
+#' @examples
+#' glycan <- o_glycan_core_1(mode = "ne")
+#' glycan_graph_mode(glycan)
+#'
+#' glycan <- o_glycan_core_1(mode = "dn")
+#' glycan_graph_mode(glycan)
+#'
+#' @seealso [as_glycan_graph()], [is_glycan()], [is_ne_glycan()], [is_dn_glycan()]
+#'
 #' @export
 glycan_graph_mode <- function(x) {
   if (!is_glycan(x)) {

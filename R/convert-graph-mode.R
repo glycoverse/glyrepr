@@ -25,6 +25,8 @@
 #' # Inspect the DN glycan graph
 #' print(dn_glycan, verbose = TRUE)
 #'
+#' @seealso [ensure_graph_mode()]
+#'
 #' @export
 convert_ne_to_dn <- function(glycan) {
   if (!inherits(glycan, "ne_glycan_graph")) {
@@ -133,6 +135,8 @@ convert_dn_to_ne <- function(glycan) {
 #' some_ne_glycan <- n_glycan_core(mode = "ne")
 #' is_ne_glycan(ensure_graph_mode(some_ne_glycan, "ne"))
 #' is_dn_glycan(ensure_graph_mode(some_ne_glycan, "dn"))
+#'
+#' @seealso [convert_ne_to_dn()], [convert_dn_to_ne()]
 #'
 #' @export
 ensure_graph_mode <- function(glycan, mode) {
