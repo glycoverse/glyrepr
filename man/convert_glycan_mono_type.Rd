@@ -4,13 +4,16 @@
 \alias{convert_glycan_mono_type}
 \title{Convert the Type of Monosaacharides in a Glycan Graph}
 \usage{
-convert_glycan_mono_type(glycan, to)
+convert_glycan_mono_type(glycan, to, strict = TRUE)
 }
 \arguments{
 \item{glycan}{A glycan graph.}
 
 \item{to}{A character string specifying the target monosaccharide type.
 It can be "concrete", "generic", or "simple".}
+
+\item{strict}{If \code{TRUE}, the function will raise an error if the monosaccharides
+are already in the target type. Default is \code{TRUE}.}
 }
 \value{
 A glycan graph with monosaccharides converted to the target type.
@@ -43,6 +46,5 @@ convert_glycan_mono_type(generic_glycan, to = "simple")
 
 }
 \seealso{
-\code{\link[=convert_mono_type]{convert_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}}, \code{\link[=decide_mono_type]{decide_mono_type()}},
-\code{\link[=ensure_glycan_mono_type]{ensure_glycan_mono_type()}}
+\code{\link[=convert_mono_type]{convert_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}}, \code{\link[=decide_mono_type]{decide_mono_type()}}
 }

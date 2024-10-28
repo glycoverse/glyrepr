@@ -82,15 +82,10 @@ test_that("converting glycan from generic to generic fails", {
 })
 
 
-test_that("converting glycan from simple to simple fails", {
+test_that("converting glycan from simple to simple with `strict` FALSE", {
   glycan <- n_glycan_core(mode = "ne", mono_type = "simple")
-  expect_snapshot(convert_glycan_mono_type(glycan, to = "simple"), error = TRUE)
-})
-
-
-test_that("converting glycan from concrete to concrete fails", {
-  glycan <- n_glycan_core(mode = "ne", mono_type = "concrete")
-  expect_snapshot(convert_glycan_mono_type(glycan, to = "concrete"), error = TRUE)
+  result <- convert_glycan_mono_type(glycan, to = "simple", strict = FALSE)
+  expect_equal(igraph::V(result)$mono, c("N", "N", "H", "H", "H"))
 })
 
 
@@ -106,6 +101,14 @@ test_that("convert mono types fails for monos already in simple form", {
   before = c("H", "H", "N", "Hex")
   to = "simple"
   expect_snapshot(convert_mono_type(before, to), error = TRUE)
+})
+
+
+test_that("convert to same mono types passes with `strict` FALSE", {
+  before = c("H", "H", "N", "Hex")
+  to = "simple"
+  after = c("H", "H", "N", "H")
+  expect_equal(convert_mono_type(before, to, strict = FALSE), after)
 })
 
 
@@ -146,24 +149,4 @@ test_that("deciding mono types vectorized", {
 test_that("deciding mono types fails for multiple monos", {
   mono = c("bad1", "bad2", "bad3")
   expect_snapshot(decide_mono_type(mono), error = TRUE)
-})
-
-
-test_that("ensure_glycan_mono_type works for the same mono type", {
-  glycan <- o_glycan_core_1(mono_type = "concrete")
-  glycan <- ensure_glycan_mono_type(glycan, "concrete")
-  expect_equal(decide_glycan_mono_type(glycan), "concrete")
-})
-
-
-test_that("ensure_glycan_mono_type works for different mono types", {
-  glycan <- o_glycan_core_1(mono_type = "concrete")
-  glycan <- ensure_glycan_mono_type(glycan, "simple")
-  expect_equal(decide_glycan_mono_type(glycan), "simple")
-})
-
-
-test_that("ensure_glycan_mono_type fails for bad conversion", {
-  glycan <- o_glycan_core_1(mono_type = "simple")
-  expect_error(ensure_glycan_mono_type(glycan, "concrete"))
 })

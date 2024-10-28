@@ -4,13 +4,16 @@
 \alias{convert_mono_type}
 \title{Convert a Monosaacharide to a Different Type}
 \usage{
-convert_mono_type(mono, to)
+convert_mono_type(mono, to, strict = TRUE)
 }
 \arguments{
 \item{mono}{A character string specifying monosaccharide names.}
 
 \item{to}{A character string specifying the target monosaccharide type.
 It can be "concrete", "generic", or "simple".}
+
+\item{strict}{If \code{TRUE}, the function will raise an error if the monosaccharides
+are already in the target type. Default is \code{TRUE}.}
 }
 \value{
 A character string specifying the monosaccharide name in the target type.
@@ -39,6 +42,5 @@ convert_mono_type(c("Gal", "Man", "GlcNAc"), to = "generic")
 
 }
 \seealso{
-\code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}}, \code{\link[=decide_mono_type]{decide_mono_type()}},
-\code{\link[=ensure_glycan_mono_type]{ensure_glycan_mono_type()}}
+\code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}}, \code{\link[=decide_mono_type]{decide_mono_type()}}
 }

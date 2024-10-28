@@ -31,6 +31,5 @@ decide_mono_type(c("Gal", "Hex", "H"))
 
 }
 \seealso{
-\code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=convert_mono_type]{convert_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}},
-\code{\link[=ensure_glycan_mono_type]{ensure_glycan_mono_type()}}
+\code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=convert_mono_type]{convert_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}}
 }

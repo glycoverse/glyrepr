@@ -40,6 +40,5 @@ decide_glycan_mono_type(n_glycan_core(mono_type = "simple"))
 
 }
 \seealso{
-\code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=convert_mono_type]{convert_mono_type()}}, \code{\link[=decide_mono_type]{decide_mono_type()}},
-\code{\link[=ensure_glycan_mono_type]{ensure_glycan_mono_type()}}
+\code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=convert_mono_type]{convert_mono_type()}}, \code{\link[=decide_mono_type]{decide_mono_type()}}
 }

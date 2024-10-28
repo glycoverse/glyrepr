@@ -33,22 +33,6 @@
       Error in `convert_glycan_mono_type()`:
       ! It is already "generic".
 
-# converting glycan from simple to simple fails
-
-    Code
-      convert_glycan_mono_type(glycan, to = "simple")
-    Condition
-      Error in `convert_glycan_mono_type()`:
-      ! It is already "simple".
-
-# converting glycan from concrete to concrete fails
-
-    Code
-      convert_glycan_mono_type(glycan, to = "concrete")
-    Condition
-      Error in `convert_glycan_mono_type()`:
-      ! It is already "concrete".
-
 # convert mono types fails for monos already in simple form
 
     Code
