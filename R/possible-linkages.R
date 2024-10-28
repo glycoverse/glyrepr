@@ -3,13 +3,7 @@
 #' @description
 #' Given an obscure linkage format (having "?", e.g. "a2-?"),
 #' this function generates all possible linkages based on the format.
-#'
-#' A linkage character string has the following format: `xy-z`.
-#' - `x` is the anomer, either "a" or "b".
-#' - `y` is the first position, an integer from 1 to 2.
-#' - `z` is the second position, an integer from 1 to 9.
-#'
-#' If `include_unknown` is `TRUE`, "?" will also be included.
+#' See [valid_linkages()] for details.
 #'
 #' The ranges of possible anomers, first positions, and second positions
 #' can be specified using `anomer_range`, `pos1_range`, and `pos2_range`.
@@ -34,7 +28,7 @@
 #' possible_linkages("a?-?", pos1_range = 2, pos2_range = c(2, 3))
 #' possible_linkages("?1-6", include_unknown = TRUE)
 #'
-#' @seealso [has_linkages()], [remove_linkages()]
+#' @seealso [has_linkages()], [remove_linkages()], [valid_linkages()]
 #'
 #' @export
 possible_linkages <- function(
@@ -77,11 +71,17 @@ possible_linkages <- function(
   # Possible linkage elements
   current_anomer <- stringr::str_sub(linkage, 1, 1)
   current_pos1 <- stringr::str_sub(linkage, 2, 2)
-  current_pos2 <- stringr::str_sub(linkage, 4, 4)
+  current_pos2 <- stringr::str_sub(linkage, 4, -1)
 
   anomers <- if (current_anomer == "?") anomer_range else current_anomer
   first_positions <- if (current_pos1 == "?") pos1_range else current_pos1
-  second_positions <- if (current_pos2 == "?") pos2_range else current_pos2
+  if (current_pos2 == "?") {
+    second_positions <- pos2_range
+  } else if (stringr::str_detect(current_pos2, "\\|")) {
+    second_positions <- stringr::str_split(current_pos2, "\\|")[[1]]
+  } else {
+    second_positions <- current_pos2
+  }
 
   # Generate possible linkages
   purrr::pmap_chr(

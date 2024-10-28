@@ -27,6 +27,13 @@ test_that("b?-?", {
 })
 
 
+test_that("a2-3|6", {
+  result <- possible_linkages("a2-3|6")
+  expected <- c("a2-3", "a2-6")
+  expect_identical(result, expected)
+})
+
+
 test_that("a1-3", {
   expect_identical(possible_linkages("a1-3"), "a1-3")
 })

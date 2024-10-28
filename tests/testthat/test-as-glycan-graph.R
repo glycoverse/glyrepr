@@ -79,7 +79,7 @@ test_that("clean linkages for NE graphs", {
 
 test_that("clean linkages for DN graph", {
   graph <- good_dn_graph()
-  graph <- igraph::set_vertex_attr(graph, "linkage", value = c(NA, NA, NA))
+  graph <- igraph::set_vertex_attr(graph, "linkage", value = rep(NA_character_, 3))
 
   glycan <- as_dn_glycan_graph(graph)
 

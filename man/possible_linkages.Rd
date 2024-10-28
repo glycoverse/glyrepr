@@ -36,15 +36,7 @@ A character vector of possible linkages.
 \description{
 Given an obscure linkage format (having "?", e.g. "a2-?"),
 this function generates all possible linkages based on the format.
-
-A linkage character string has the following format: \code{xy-z}.
-\itemize{
-\item \code{x} is the anomer, either "a" or "b".
-\item \code{y} is the first position, an integer from 1 to 2.
-\item \code{z} is the second position, an integer from 1 to 9.
-}
-
-If \code{include_unknown} is \code{TRUE}, "?" will also be included.
+See \code{\link[=valid_linkages]{valid_linkages()}} for details.
 
 The ranges of possible anomers, first positions, and second positions
 can be specified using \code{anomer_range}, \code{pos1_range}, and \code{pos2_range}.
@@ -58,5 +50,5 @@ possible_linkages("?1-6", include_unknown = TRUE)
 
 }
 \seealso{
-\code{\link[=has_linkages]{has_linkages()}}, \code{\link[=remove_linkages]{remove_linkages()}}
+\code{\link[=has_linkages]{has_linkages()}}, \code{\link[=remove_linkages]{remove_linkages()}}, \code{\link[=valid_linkages]{valid_linkages()}}
 }
