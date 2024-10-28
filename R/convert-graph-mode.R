@@ -111,3 +111,36 @@ convert_dn_to_ne <- function(glycan) {
 
   new_ne_glycan_graph(new_graph)
 }
+
+
+#' Ensure Glycan Graph is in the Correct Mode
+#'
+#' @description
+#' This function ensures that a glycan graph is in the correct mode (NE or DN).
+#' It is a wrapper around [convert_ne_to_dn()] and [convert_dn_to_ne()].
+#' If the glycan graph is already in the correct mode, it is returned as is,
+#' otherwise it is converted to the correct mode.
+#' This function is handy when you are not sure about the mode of the glycan graph.
+#' It eliminates the need to check the mode manually before converting.
+#'
+#' @param glycan A glycan graph.
+#' @param mode A character string specifying the mode of the glycan graph.
+#'  Can be "ne" or "dn". See docs for [as_glycan_graph()] for more details.
+#'
+#' @returns The glycan graph in the correct mode.
+#'
+#' @examples
+#' some_ne_glycan <- n_glycan_core(mode = "ne")
+#' is_ne_glycan(ensure_graph_mode(some_ne_glycan, "ne"))
+#' is_dn_glycan(ensure_graph_mode(some_ne_glycan, "dn"))
+#'
+#' @export
+ensure_graph_mode <- function(glycan, mode) {
+  if (mode == "ne" && is_dn_glycan(glycan)) {
+    return(convert_dn_to_ne(glycan))
+  }
+  if (mode == "dn" && is_ne_glycan(glycan)) {
+    return(convert_ne_to_dn(glycan))
+  }
+  return(glycan)
+}

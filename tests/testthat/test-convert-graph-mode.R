@@ -108,3 +108,31 @@ test_that("converting one-node graph to NE graph works", {
 
   expect_snapshot(print(ne_graph, verbose = TRUE))
 })
+
+
+test_that("ensureing NE glycan as NE", {
+  glycan <- simple_example_ne_glycan_graph()
+  glycan <- ensure_graph_mode(glycan, "ne")
+  expect_true(is_ne_glycan(glycan))
+})
+
+
+test_that("ensureing NE glycan as DN", {
+  glycan <- simple_example_ne_glycan_graph()
+  glycan <- ensure_graph_mode(glycan, "dn")
+  expect_true(is_dn_glycan(glycan))
+})
+
+
+test_that("ensureing DN glycan as DN", {
+  glycan <- simple_example_dn_glycan_graph()
+  glycan <- ensure_graph_mode(glycan, "dn")
+  expect_true(is_dn_glycan(glycan))
+})
+
+
+test_that("ensureing DN glycan as NE", {
+  glycan <- simple_example_dn_glycan_graph()
+  glycan <- ensure_graph_mode(glycan, "ne")
+  expect_true(is_ne_glycan(glycan))
+})
