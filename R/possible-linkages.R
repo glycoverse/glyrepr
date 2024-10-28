@@ -9,6 +9,8 @@
 #' - `y` is the first position, an integer from 1 to 2.
 #' - `z` is the second position, an integer from 1 to 9.
 #'
+#' If `include_unknown` is `TRUE`, "?" will also be included.
+#'
 #' The ranges of possible anomers, first positions, and second positions
 #' can be specified using `anomer_range`, `pos1_range`, and `pos2_range`.
 #'
@@ -20,6 +22,8 @@
 #' Default is `1:2`.
 #' @param pos2_range A numeric vector of possible second positions.
 #' Default is `1:9`.
+#' @param include_unknown A logical value. If `TRUE`, "?" will be included.
+#' Default is `FALSE`.
 #'
 #' @returns A character vector of possible linkages.
 #'
@@ -28,6 +32,7 @@
 #' possible_linkages("??-2")
 #' possible_linkages("a1-3")
 #' possible_linkages("a?-?", pos1_range = 2, pos2_range = c(2, 3))
+#' possible_linkages("?1-6", include_unknown = TRUE)
 #'
 #' @seealso [has_linkages()], [remove_linkages()]
 #'
@@ -37,7 +42,8 @@ possible_linkages <- function(
   ...,
   anomer_range = c("a", "b"),
   pos1_range = 1:2,
-  pos2_range = 1:9
+  pos2_range = 1:9,
+  include_unknown = FALSE
 ) {
   # Input checks
   if (!is.character(linkage)) {
@@ -52,10 +58,20 @@ possible_linkages <- function(
   if (!is.numeric(pos1_range) || !is.numeric(pos2_range)) {
     rlang::abort("Position ranges must be a numeric vector.")
   }
+  if (!is.logical(include_unknown)) {
+    rlang::abort("Include unknown must be a logical.")
+  }
 
   # Check if the linkage is valid
   if (!valid_linkages(linkage)) {
     rlang::abort("Invalid linkage format.")
+  }
+
+  # Add unknown elements
+  if (include_unknown) {
+    anomer_range <- c(anomer_range, "?")
+    pos1_range <- c(pos1_range, "?")
+    pos2_range <- c(pos2_range, "?")
   }
 
   # Possible linkage elements

@@ -9,7 +9,8 @@ possible_linkages(
   ...,
   anomer_range = c("a", "b"),
   pos1_range = 1:2,
-  pos2_range = 1:9
+  pos2_range = 1:9,
+  include_unknown = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,9 @@ Default is \code{1:2}.}
 
 \item{pos2_range}{A numeric vector of possible second positions.
 Default is \code{1:9}.}
+
+\item{include_unknown}{A logical value. If \code{TRUE}, "?" will be included.
+Default is \code{FALSE}.}
 }
 \value{
 A character vector of possible linkages.
@@ -40,6 +44,8 @@ A linkage character string has the following format: \code{xy-z}.
 \item \code{z} is the second position, an integer from 1 to 9.
 }
 
+If \code{include_unknown} is \code{TRUE}, "?" will also be included.
+
 The ranges of possible anomers, first positions, and second positions
 can be specified using \code{anomer_range}, \code{pos1_range}, and \code{pos2_range}.
 }
@@ -48,6 +54,7 @@ possible_linkages("a2-?")
 possible_linkages("??-2")
 possible_linkages("a1-3")
 possible_linkages("a?-?", pos1_range = 2, pos2_range = c(2, 3))
+possible_linkages("?1-6", include_unknown = TRUE)
 
 }
 \seealso{

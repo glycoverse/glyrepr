@@ -67,3 +67,10 @@ test_that("custom ranges wrong types", {
 test_that("0 range", {
   expect_equal(possible_linkages("??-?", pos1_range = integer(0)), character(0))
 })
+
+
+test_that("include unknown", {
+  result <- possible_linkages("?1-6", include_unknown = TRUE)
+  expected <- c("a1-6", "b1-6", "?1-6")
+  expect_identical(result, expected)
+})
