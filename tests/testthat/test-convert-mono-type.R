@@ -94,21 +94,34 @@ test_that("converting glycan from concrete to concrete fails", {
 })
 
 
-patrick::with_parameters_test_that("convert mono", {
-    expect_equal(convert_mono_type(before, to), after)
-  },
-  before = c("Man", "Man", "Hex"),
-  to = c("generic", "simple", "simple"),
-  after = c("Hex", "H", "H")
-)
+test_that("convert mono types", {
+  before = c("Man", "Hex", "GlcNAc")
+  to = "simple"
+  after = c("H", "H", "N")
+  expect_equal(convert_mono_type(before, to), after)
+})
 
 
-patrick::with_parameters_test_that("convert bad mono fails", {
-    expect_error(convert_mono_type(before, to))
-  },
-  before = c("H", "Hex"),
-  to = c("concrete", "Hex")
-)
+test_that("convert mono types fails for monos already in simple form", {
+  before = c("H", "H", "N", "Hex")
+  to = "simple"
+  expect_snapshot(convert_mono_type(before, to), error = TRUE)
+})
+
+
+test_that("convert mono types with bad directions", {
+  before = c("H", "Hex")
+  to = "concrete"
+  expect_snapshot(convert_mono_type(before, to), error = TRUE)
+})
+
+
+test_that("convert mono types with multiple `to`", {
+  expect_error(
+    convert_mono_type(c("Hex", "Hex"), to = c("simple", "simple")),
+    "Only one `to` mono type can be specified"
+  )
+})
 
 
 patrick::with_parameters_test_that("deciding glycan mono type works", {
@@ -123,12 +136,17 @@ patrick::with_parameters_test_that("deciding glycan mono type works", {
 )
 
 
-patrick::with_parameters_test_that("deciding mono type works", {
-    expect_equal(decide_mono_type(mono), type)
-  },
-  mono = c("H", "Hex", "Man"),
-  type = c("simple", "generic", "concrete")
-)
+test_that("deciding mono types vectorized", {
+  mono = c("Gal", "Hex", "H")
+  expected = c("concrete", "generic", "simple")
+  expect_equal(decide_mono_type(mono), expected)
+})
+
+
+test_that("deciding mono types fails for multiple monos", {
+  mono = c("bad1", "bad2", "bad3")
+  expect_snapshot(decide_mono_type(mono), error = TRUE)
+})
 
 
 test_that("ensure_glycan_mono_type works for the same mono type", {

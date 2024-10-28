@@ -4,13 +4,13 @@
 \alias{decide_mono_type}
 \title{Decide the Type of a Monosaacharide}
 \usage{
-decide_mono_type(mono)
+decide_mono_type(monos)
 }
 \arguments{
-\item{mono}{A character string specifying a monosaccharide name.}
+\item{monos}{A character string specifying monosaccharide names.}
 }
 \value{
-A character string specifying the monosaccharide type.
+A character string specifying the monosaccharide types.
 }
 \description{
 This function decides the type of a monosaccharide name.
@@ -27,9 +27,7 @@ For the full list of monosaccharides, see \code{glyrepr::monosaccharides}.
 }
 
 \examples{
-decide_mono_type("Gal")
-decide_mono_type("Hex")
-decide_mono_type("H")
+decide_mono_type(c("Gal", "Hex", "H"))
 
 }
 \seealso{

@@ -49,3 +49,28 @@
       Error in `convert_glycan_mono_type()`:
       ! It is already "concrete".
 
+# convert mono types fails for monos already in simple form
+
+    Code
+      convert_mono_type(before, to)
+    Condition
+      Error in `convert_mono_type()`:
+      ! These monosaccharides are already "simple": "H", "H", and "N"
+
+# convert mono types with bad directions
+
+    Code
+      convert_mono_type(before, to)
+    Condition
+      Error in `convert_mono_type()`:
+      ! These monosaccharides cannot be converted to "concrete": "H" and "Hex"
+      i Conversion could only be done in this direction: concrete -> generic -> simple
+
+# deciding mono types fails for multiple monos
+
+    Code
+      decide_mono_type(mono)
+    Condition
+      Error in `decide_mono_type()`:
+      ! Unknown monosaccharide: "bad1", "bad2", and "bad3".
+

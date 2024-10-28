@@ -7,7 +7,7 @@
 convert_mono_type(mono, to)
 }
 \arguments{
-\item{mono}{A character string specifying a monosaccharide name.}
+\item{mono}{A character string specifying monosaccharide names.}
 
 \item{to}{A character string specifying the target monosaccharide type.
 It can be "concrete", "generic", or "simple".}
@@ -33,6 +33,11 @@ There are three types of monosaccharides:
 For the full list of monosaccharides, see \code{glyrepr::monosaccharides}.
 }
 
+\examples{
+convert_mono_type(c("Gal", "Hex", "GlcNAc"), to = "simple")
+convert_mono_type(c("Gal", "Man", "GlcNAc"), to = "generic")
+
+}
 \seealso{
 \code{\link[=convert_glycan_mono_type]{convert_glycan_mono_type()}}, \code{\link[=decide_glycan_mono_type]{decide_glycan_mono_type()}}, \code{\link[=decide_mono_type]{decide_mono_type()}},
 \code{\link[=ensure_glycan_mono_type]{ensure_glycan_mono_type()}}

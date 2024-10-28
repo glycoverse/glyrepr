@@ -30,12 +30,34 @@
 convert_glycan_mono_type <- function(glycan, to) {
   check_to_arg(to)
   from <- decide_glycan_mono_type(glycan)
-  valid_from_to(from, to)
+  valid_from_to_for_convert_glycan_mono_type(from, to)
   if (inherits(glycan, "ne_glycan_graph")) {
     convert_glycan_mono_type_ne(glycan, from, to)
   } else {  # "dn_glycan_graph"
     convert_glycan_mono_type_dn(glycan, from, to)
   }
+}
+
+
+valid_from_to_for_convert_glycan_mono_type <- function(from, to) {
+  tryCatch(
+    valid_from_to(from, to),
+    error_backward_convert = function(e) {
+      cli::cli_abort(c(
+        "Cannot convert from {.val {from}} to {.val {to}}.",
+        "i" = "Can only convert in this order: concrete -> generic -> simple."
+      ),
+      call = rlang::expr(convert_glycan_mono_type()),
+      class = "error_backward_convert")
+    },
+    error_convert_self = function(e) {
+      cli::cli_abort(
+        "It is already {.val {to}}.",
+        call = rlang::expr(convert_glycan_mono_type()),
+        class = "error_convert_self"
+      )
+    }
+  )
 }
 
 
@@ -80,11 +102,15 @@ ensure_glycan_mono_type <- function(glycan, to) {
 #'
 #' @inheritSection decide_mono_type Three types of monosaccharides
 #'
-#' @param mono A character string specifying a monosaccharide name.
+#' @param mono A character string specifying monosaccharide names.
 #' @param to A character string specifying the target monosaccharide type.
 #'  It can be "concrete", "generic", or "simple".
 #'
 #' @return A character string specifying the monosaccharide name in the target type.
+#'
+#' @examples
+#' convert_mono_type(c("Gal", "Hex", "GlcNAc"), to = "simple")
+#' convert_mono_type(c("Gal", "Man", "GlcNAc"), to = "generic")
 #'
 #' @seealso [convert_glycan_mono_type()], [decide_glycan_mono_type()], [decide_mono_type()],
 #' [ensure_glycan_mono_type()]
@@ -93,8 +119,27 @@ ensure_glycan_mono_type <- function(glycan, to) {
 convert_mono_type <- function(mono, to) {
   check_to_arg(to)
   from <- decide_mono_type(mono)
-  valid_from_to(from, to)
+  valid_from_to_for_convert_mono_type(mono, from, to)
   convert_mono_type_(mono, from, to)
+}
+
+
+valid_from_to_for_convert_mono_type <- function(mono, from, to) {
+  tryCatch(
+    valid_from_to(from, to),
+    error_backward_convert = function(e) {
+      cli::cli_abort(c(
+        "These monosaccharides cannot be converted to {.val {to}}: {.val {mono[e$bad_index]}}",
+        "i" = "Conversion could only be done in this direction: concrete -> generic -> simple"
+      ), call = rlang::expr(convert_mono_type()))
+    },
+    error_convert_self = function(e) {
+      cli::cli_abort(
+        "These monosaccharides are already {.val {to}}: {.val {mono[e$bad_index]}}",
+        call = rlang::expr(convert_mono_type())
+      )
+    }
+  )
 }
 
 
@@ -147,34 +192,37 @@ decide_glycan_mono_type <- function(glycan) {
 #'
 #' For the full list of monosaccharides, see `glyrepr::monosaccharides`.
 #'
-#' @param mono A character string specifying a monosaccharide name.
+#' @param monos A character string specifying monosaccharide names.
 #'
-#' @return A character string specifying the monosaccharide type.
+#' @return A character string specifying the monosaccharide types.
 #'
 #' @examples
-#' decide_mono_type("Gal")
-#' decide_mono_type("Hex")
-#' decide_mono_type("H")
+#' decide_mono_type(c("Gal", "Hex", "H"))
 #'
 #' @seealso [convert_glycan_mono_type()], [convert_mono_type()], [decide_glycan_mono_type()],
 #' [ensure_glycan_mono_type()]
 #'
 #' @export
-decide_mono_type <- function(mono) {
-  stopifnot(is.character(mono))
-  if (mono %in% monosaccharides$concrete) {
-    "concrete"
-  } else if (mono %in% monosaccharides$generic) {
-    "generic"
-  } else if (mono %in% monosaccharides$simple) {
-    "simple"
-  } else {
-    rlang::abort("Unknown monosaccharide: {mono}")
+decide_mono_type <- function(monos) {
+  if (!is.character(monos)) {
+    rlang::abort("Mono must be a character string.")
   }
+  result <- vector("character", length = length(monos))
+  result[monos %in% monosaccharides$concrete] <- "concrete"
+  result[monos %in% monosaccharides$generic] <- "generic"
+  result[monos %in% monosaccharides$simple] <- "simple"
+  unknown <- monos[result == ""]
+  if (length(unknown) > 0) {
+    cli::cli_abort("Unknown monosaccharide: {.val {unknown}}.")
+  }
+  result
 }
 
 
 check_to_arg <- function(to) {
+  if (!length(to) == 1) {
+    rlang::abort("Only one `to` mono type can be specified.")
+  }
   if (!(to %in% c("concrete", "generic", "simple"))) {
     rlang::abort("Must be one of: concrete, generic, simple.")
   }
@@ -182,17 +230,23 @@ check_to_arg <- function(to) {
 
 
 valid_from_to <- function(from, to) {
-  if ((from == "generic" && to == "concrete") || (from == "simple" && to %in% c("concrete", "generic"))) {
-    cli::cli_abort(c(
-      "Cannot convert from {.val {from}} to {.val {to}}.",
-      "i" = "Can only convert in this order: concrete -> generic -> simple."
-    ), call = rlang::caller_call(), class = "error_backward_convert")
+  factorize_types <- function(types) {
+    factor(types, levels = c("simple", "generic", "concrete"), ordered = TRUE)
   }
-  if (from == to) {
-    cli::cli_abort(
-      "It is already {.val {to}}.",
-      call = rlang::caller_call(),
-      class = "error_convert_self"
+  from <- factorize_types(from)
+  to <- factorize_types(to)
+
+  bad_order <- from < to
+  if (any(bad_order)) {
+    rlang::abort(
+      class = "error_backward_convert",
+      bad_index = which(bad_order)
+    )
+  }
+  if (any(from == to)) {
+    rlang::abort(
+      class = "error_convert_self",
+      bad_index = which(from == to)
     )
   }
 }
@@ -213,9 +267,12 @@ decide_glycan_mono_type_dn <- function(glycan) {
 
 
 convert_mono_type_ <- function(mono, from, to) {
-  from_ <- monosaccharides[[from]]
-  to_ <- monosaccharides[[to]]
-  to_[match(mono, from_)]
+  convert_one_mono_type <- function(mono, from, to) {
+    from_ <- monosaccharides[[from]]
+    to_ <- monosaccharides[[to]]
+    to_[match(mono, from_)]
+  }
+  purrr::map2_chr(mono, from, convert_one_mono_type, to = to)
 }
 
 
