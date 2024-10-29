@@ -37,10 +37,13 @@
 #' Constraints:
 #' - The graph must be directed and an outward tree (reducing end as root).
 #' - The graph must have a vertex attribute `mono` for monosaccharide names.
+#' - The graph must have a vertex attribute `sub` for substituents.
 #' - The graph must have an edge attribute `linkage` for linkages.
 #' - Monosaccharide name must be known, either generic (Hex, HexNAc, etc.)
 #'   or concrete (Glc, Gal, etc.), but not a mixture of both.
 #'   NA is not allowed.
+#' - Substituent must be valid, in the form of "xY", where x is position
+#'   and Y is substituent name, e.g. "2Ac", "3S", etc.
 #' - Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
 #'   e.g. "b1-4", "a2-3", etc.
 #'   NA is allowed for unknown linkages.
@@ -55,14 +58,16 @@
 #'
 #' Constraints:
 #' - The graph must be directed and an outward tree (reducing end as root).
-#' - The graph must have vertex attributes `type`, `mono`, and `linkage`.
+#' - The graph must have vertex attributes `type`, `mono`, `sub`, and `linkage`.
 #'   `type` should be either "mono" or "linkage".
 #'   NA is not allowed for `type`.
 #'   `mono` and `linkage` are monosaccharide name and linkage, respectively.
 #'   For nodes with `type = "mono"`, `linkage` is always NA.
-#'   For nodes with `type = "linkage"`, `mono` is always NA.
+#'   For nodes with `type = "linkage"`, `mono` and `sub` are always NA.
 #' - Monosaccharide name must be known, either generic or concrete, but not a mixture of both.
 #'   For nodes with `type = "mono"`, NA is not allowed for `mono`.
+#' - Substituent must be valid.
+#'   For nodes with `type = "mono"`, NA is not allowed for `sub`.
 #' - Linkages must be valid.
 #'   For nodes with `type = "linkage"`, NA is allowed for `linkage`.
 #' - `mono` nodes and `linkage` nodes must alternate in the graph.

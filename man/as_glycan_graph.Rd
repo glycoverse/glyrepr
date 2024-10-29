@@ -60,10 +60,13 @@ Constraints:
 \itemize{
 \item The graph must be directed and an outward tree (reducing end as root).
 \item The graph must have a vertex attribute \code{mono} for monosaccharide names.
+\item The graph must have a vertex attribute \code{sub} for substituents.
 \item The graph must have an edge attribute \code{linkage} for linkages.
 \item Monosaccharide name must be known, either generic (Hex, HexNAc, etc.)
 or concrete (Glc, Gal, etc.), but not a mixture of both.
 NA is not allowed.
+\item Substituent must be valid, in the form of "xY", where x is position
+and Y is substituent name, e.g. "2Ac", "3S", etc.
 \item Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
 e.g. "b1-4", "a2-3", etc.
 NA is allowed for unknown linkages.
@@ -80,14 +83,16 @@ It is not that intuitive, but allows a more flexible motif matching.
 Constraints:
 \itemize{
 \item The graph must be directed and an outward tree (reducing end as root).
-\item The graph must have vertex attributes \code{type}, \code{mono}, and \code{linkage}.
+\item The graph must have vertex attributes \code{type}, \code{mono}, \code{sub}, and \code{linkage}.
 \code{type} should be either "mono" or "linkage".
 NA is not allowed for \code{type}.
 \code{mono} and \code{linkage} are monosaccharide name and linkage, respectively.
 For nodes with \code{type = "mono"}, \code{linkage} is always NA.
-For nodes with \code{type = "linkage"}, \code{mono} is always NA.
+For nodes with \code{type = "linkage"}, \code{mono} and \code{sub} are always NA.
 \item Monosaccharide name must be known, either generic or concrete, but not a mixture of both.
 For nodes with \code{type = "mono"}, NA is not allowed for \code{mono}.
+\item Substituent must be valid.
+For nodes with \code{type = "mono"}, NA is not allowed for \code{sub}.
 \item Linkages must be valid.
 For nodes with \code{type = "linkage"}, NA is allowed for \code{linkage}.
 \item \code{mono} nodes and \code{linkage} nodes must alternate in the graph.
