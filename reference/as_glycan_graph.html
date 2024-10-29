@@ -33,7 +33,7 @@ as_ne_glycan_graph() is the same as as_glycan_graph() with type = "ne".'><meta p
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,10 +117,13 @@ Therefore, <code>sloop::s3_class()</code> of a glycan graph is either
 Nodes represent monosaccharides and edges represent linkages.</p>
 <p>Constraints:</p><ul><li><p>The graph must be directed and an outward tree (reducing end as root).</p></li>
 <li><p>The graph must have a vertex attribute <code>mono</code> for monosaccharide names.</p></li>
+<li><p>The graph must have a vertex attribute <code>sub</code> for substituents.</p></li>
 <li><p>The graph must have an edge attribute <code>linkage</code> for linkages.</p></li>
 <li><p>Monosaccharide name must be known, either generic (Hex, HexNAc, etc.)
 or concrete (Glc, Gal, etc.), but not a mixture of both.
 NA is not allowed.</p></li>
+<li><p>Substituent must be valid, in the form of "xY", where x is position
+and Y is substituent name, e.g. "2Ac", "3S", etc.</p></li>
 <li><p>Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
 e.g. "b1-4", "a2-3", etc.
 NA is allowed for unknown linkages.</p></li>
@@ -133,14 +136,16 @@ and they alternate in the graph to represent the structure.
 Python library <code>glycowork</code> and <code>glypy</code> use this model.
 It is not that intuitive, but allows a more flexible motif matching.</p>
 <p>Constraints:</p><ul><li><p>The graph must be directed and an outward tree (reducing end as root).</p></li>
-<li><p>The graph must have vertex attributes <code>type</code>, <code>mono</code>, and <code>linkage</code>.
+<li><p>The graph must have vertex attributes <code>type</code>, <code>mono</code>, <code>sub</code>, and <code>linkage</code>.
 <code>type</code> should be either "mono" or "linkage".
 NA is not allowed for <code>type</code>.
 <code>mono</code> and <code>linkage</code> are monosaccharide name and linkage, respectively.
 For nodes with <code>type = "mono"</code>, <code>linkage</code> is always NA.
-For nodes with <code>type = "linkage"</code>, <code>mono</code> is always NA.</p></li>
+For nodes with <code>type = "linkage"</code>, <code>mono</code> and <code>sub</code> are always NA.</p></li>
 <li><p>Monosaccharide name must be known, either generic or concrete, but not a mixture of both.
 For nodes with <code>type = "mono"</code>, NA is not allowed for <code>mono</code>.</p></li>
+<li><p>Substituent must be valid.
+For nodes with <code>type = "mono"</code>, NA is not allowed for <code>sub</code>.</p></li>
 <li><p>Linkages must be valid.
 For nodes with <code>type = "linkage"</code>, NA is allowed for <code>linkage</code>.</p></li>
 <li><p><code>mono</code> nodes and <code>linkage</code> nodes must alternate in the graph.
