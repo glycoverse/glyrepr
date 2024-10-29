@@ -98,3 +98,23 @@
       ------------------
       N
 
+# print works for NE graphs with substituent
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (NE)
+      N: 1
+      ------------------
+      N
+
+# print works for DN graphs with substituent
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (DN)
+      N: 1
+      ------------------
+      N-6S
+

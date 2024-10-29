@@ -10,6 +10,7 @@ test_that("node-edge glycan graph class", {
 test_that("validating undirected graphs", {
   graph <- igraph::make_graph(~ 1--2)
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc")
+  igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
 
   glycan <- new_ne_glycan_graph(graph)
@@ -21,6 +22,7 @@ test_that("validating undirected graphs", {
 test_that("validating an in tree", {
   graph <- igraph::make_tree(3, children = 2, mode = "in")
   igraph::V(graph)$mono <- "GlcNAc"
+  igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
 
   glycan <- new_ne_glycan_graph(graph)
@@ -31,6 +33,7 @@ test_that("validating an in tree", {
 
 test_that("validating graph without monosaccharide attribute", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
+  igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
 
   glycan <- new_ne_glycan_graph(graph)
@@ -39,9 +42,21 @@ test_that("validating graph without monosaccharide attribute", {
 })
 
 
+test_that("validating graph without substituent attribute", {
+  graph <- igraph::make_tree(3, children = 2, mode = "out")
+  igraph::V(graph)$mono <- "GlcNAc"
+  igraph::E(graph)$linkage <- "b1-4"
+
+  glycan <- new_ne_glycan_graph(graph)
+
+  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have a vertex attribute 'sub'")
+})
+
+
 test_that("validating graph with NA in monosaccharide attribute", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("GlcNAc", NA, "GlcNAc")
+  igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
 
   glycan <- new_ne_glycan_graph(graph)
@@ -50,9 +65,22 @@ test_that("validating graph with NA in monosaccharide attribute", {
 })
 
 
+test_that("validating graph with NA in substitude attribute", {
+  graph <- igraph::make_tree(3, children = 2, mode = "out")
+  igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "GlcNAc")
+  igraph::V(graph)$sub <- c("", NA, "")
+  igraph::E(graph)$linkage <- "b1-4"
+
+  glycan <- new_ne_glycan_graph(graph)
+
+  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have no NA in vertex attribute 'sub'")
+})
+
+
 test_that("validating graph without linkage attribute", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "GlcNAc")
+  igraph::V(graph)$sub <- ""
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -63,6 +91,7 @@ test_that("validating graph without linkage attribute", {
 test_that("validating one non-existing monosaccharide", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Hex", "Fuc", "Bad")
+  igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
 
   glycan <- new_ne_glycan_graph(graph)
@@ -77,6 +106,7 @@ test_that("validating one non-existing monosaccharide", {
 test_that("validating two non-existing monosaccharide", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Hex", "Bad1", "Bad2")
+  igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
 
   glycan <- new_ne_glycan_graph(graph)
@@ -90,6 +120,7 @@ test_that("validating two non-existing monosaccharide", {
 test_that("validating duplicated non-existing monosaccharide", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Hex", "Bad", "Bad")
+  igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
 
   glycan <- new_ne_glycan_graph(graph)
@@ -100,9 +131,25 @@ test_that("validating duplicated non-existing monosaccharide", {
 })
 
 
+test_that("validating bad subtituent", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
+  igraph::V(graph)$sub <- c("", "6S", "Bad")
+  igraph::E(graph)$linkage <- "b1-4"
+
+  glycan <- new_ne_glycan_graph(graph)
+
+  expect_error(validate_ne_glycan_graph(glycan))
+  err <- rlang::catch_cnd(validate_ne_glycan_graph(glycan))
+  expect_equal(err$message, "Unknown substituent: Bad")
+  expect_equal(err$subs, "Bad")
+})
+
+
 patrick::with_parameters_test_that("validating bad linkage", {
     graph <- igraph::make_graph(~ 1-+2, 2-+3)
     igraph::V(graph)$mono <- c("Hex", "Fuc", "Hex")
+    igraph::V(graph)$sub <- ""
     igraph::E(graph)$linkage <- bad_linkage
 
     glycan <- new_ne_glycan_graph(graph)
@@ -118,6 +165,7 @@ patrick::with_parameters_test_that("validating bad linkage", {
 test_that("validating bad linkages ignoring NA", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
+  igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", NA)
 
   glycan <- new_ne_glycan_graph(graph)
@@ -129,6 +177,7 @@ test_that("validating bad linkages ignoring NA", {
 test_that("validating mixed generic and concrete monosaccharides", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("Hex", "GlcNAc", "Hex")
+  igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
 
   glycan <- new_ne_glycan_graph(graph)

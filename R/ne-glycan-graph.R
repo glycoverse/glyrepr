@@ -35,6 +35,22 @@ validate_ne_glycan_graph <- function(glycan) {
   if (mix_generic_concrete(mono_names)) {
     rlang::abort("Monosaccharides must be either all generic or all concrete.")
   }
+  # Check if graph has a vertex attribute "sub"
+  # This is the substituent name, e.g. "Ac", "S", "P", or "" (no).
+  if (!has_vertex_attrs(glycan, "sub")) {
+    rlang::abort("Glycan graph must have a vertex attribute 'sub'.")
+  }
+  # Check if no NA in vertex attribute "sub"
+  subs <- igraph::vertex_attr(glycan, "sub")
+  if (any(is.na(subs))) {
+    rlang::abort("Glycan graph must have no NA in vertex attribute 'sub'.")
+  }
+  # Check if all substituents are valid
+  if (!all(valid_substituent(subs))) {
+    invalid_subs <- unique(subs[!valid_substituent(subs)])
+    msg <- glue::glue("Unknown substituent: {stringr::str_c(invalid_subs, collapse = ', ')}")
+    rlang::abort(msg, subs = invalid_subs)
+  }
   # Check if graph has an edge attribute "linkage"
   if (!has_edge_attrs(glycan, "linkage")) {
     rlang::abort("Glycan graph must have an edge attribute 'linkage'.")

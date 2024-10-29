@@ -16,8 +16,8 @@ validate_dn_glycan_graph <- function(glycan) {
     rlang::abort("Glycan graph must be an out tree.")
   }
   # Check if graph has the right vertex attributes
-  if (!has_vertex_attrs(glycan, c("type", "mono", "linkage"))) {
-    rlang::abort("Glycan graph must have vertex attributes 'type', 'mono' and 'linkage'.")
+  if (!has_vertex_attrs(glycan, c("type", "mono", "sub", "linkage"))) {
+    rlang::abort("Glycan graph must have vertex attributes 'type', 'mono', 'sub', and 'linkage'.")
   }
   # Check if no NA in "type" attribute
   if (any(is.na(igraph::vertex_attr(glycan, "type")))) {
@@ -45,6 +45,17 @@ validate_dn_glycan_graph <- function(glycan) {
   # Check if mixed use of generic and concrete monosaccharides
   if (mix_generic_concrete(mono_names)) {
     rlang::abort("Mono nodes must not mix generic and concrete monosaccharides.")
+  }
+  # Chekc if no NA in "sub" attribute
+  subs <- get_vertex_attr(glycan, "mono", "sub")
+  if (any(is.na(subs))) {
+    rlang::abort("Mono nodes must have no NA in 'sub' attribute.")
+  }
+  # Check if all substituents are valid
+  if (!all(valid_substituent(subs))) {
+    invalid_subs <- unique(subs[!valid_substituent(subs)])
+    msg <- glue::glue("Unknown substituent: {stringr::str_c(invalid_subs, collapse = ', ')}")
+    rlang::abort(msg, subs = invalid_subs)
   }
   # Check if all linkages are valid
   linkages <- get_vertex_attr(glycan, "linkage", "linkage")

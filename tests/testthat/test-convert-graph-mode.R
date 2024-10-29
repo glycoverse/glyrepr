@@ -8,6 +8,7 @@
 simple_example_ne_glycan_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 1-+3)
   igraph::V(graph)$mono <- c("N", "N", "H")
+  igraph::V(graph)$sub <- c("S", "", "")
   igraph::E(graph)$linkage <- c("b1-4", "a1-3")
   new_ne_glycan_graph(graph)
 }
@@ -17,6 +18,7 @@ simple_example_dn_glycan_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 1-+4, 4-+5)
   igraph::V(graph)$type <- c("mono", "linkage", "mono", "linkage", "mono")
   igraph::V(graph)$mono <- c("N", NA, "H", NA, "H")
+  igraph::V(graph)$sub <- c("S", NA, "", NA, "")
   igraph::V(graph)$linkage <- c(NA, "b1-4", NA, "a1-3", NA)
   new_dn_glycan_graph(graph)
 }
@@ -25,6 +27,7 @@ simple_example_dn_glycan_graph <- function() {
 complex_example_ne_glycan_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
+  igraph::V(graph)$sub <- c("S", "", "", "", "")
   igraph::E(graph)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
   new_ne_glycan_graph(graph)
 }
@@ -34,6 +37,7 @@ complex_example_dn_glycan_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 4-+5, 5-+6, 6-+7, 5-+8, 8-+9)
   igraph::V(graph)$type <- c("mono", rep(c("linkage", "mono"), times = 4))
   igraph::V(graph)$mono <- c("GlcNAc", NA, "GlcNAc", NA, "Man", NA, "Man", NA, "Man")
+  igraph::V(graph)$sub <- c("S", NA, "", NA, "", NA, "", NA, "")
   igraph::V(graph)$linkage <- c(NA, "b1-4", NA, "b1-4", NA, "a1-3", NA, "a1-6", NA)
   new_dn_glycan_graph(graph)
 }
@@ -72,6 +76,7 @@ test_that("converting one-node graph to DN graph works", {
   skip_on_old_win()
   graph <- igraph::make_graph(~ 1)
   igraph::V(graph)$mono <- "N"
+  igraph::V(graph)$sub <- ""
   igraph::V(graph)$type <- "mono"
   glycan <- new_ne_glycan_graph(graph)
 
@@ -101,6 +106,7 @@ test_that("converting one-node graph to NE graph works", {
   skip_on_old_win()
   graph <- igraph::make_graph(~ 1)
   igraph::V(graph)$mono <- "N"
+  igraph::V(graph)$sub <- ""
   igraph::V(graph)$type <- "mono"
   igraph::V(graph)$linkage <- NA_character_
   glycan <- new_dn_glycan_graph(graph)

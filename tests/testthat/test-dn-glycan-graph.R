@@ -32,7 +32,10 @@ test_that("check missing 'type' vertex attribute", {
 
   glycan <- new_dn_glycan_graph(graph)
 
-  expect_error(validate_dn_glycan_graph(glycan), "Glycan graph must have vertex attributes 'type', 'mono' and 'linkage'.")
+  expect_error(
+    validate_dn_glycan_graph(glycan),
+    "Glycan graph must have vertex attributes 'type', 'mono', 'sub', and 'linkage'."
+  )
 })
 
 
@@ -43,7 +46,25 @@ test_that("check missing 'mono' vertex attribute", {
 
   glycan <- new_dn_glycan_graph(graph)
 
-  expect_error(validate_dn_glycan_graph(glycan), "Glycan graph must have vertex attributes 'type', 'mono' and 'linkage'.")
+  expect_error(
+    validate_dn_glycan_graph(glycan),
+    "Glycan graph must have vertex attributes 'type', 'mono', 'sub', and 'linkage'."
+  )
+})
+
+
+test_that("check missing 'sub' vertex attribute", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$type <- c("mono", "linkage", "mono")
+  igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
+
+  glycan <- new_dn_glycan_graph(graph)
+
+  expect_error(
+    validate_dn_glycan_graph(glycan),
+    "Glycan graph must have vertex attributes 'type', 'mono', 'sub', and 'linkage'."
+  )
 })
 
 
@@ -54,7 +75,10 @@ test_that("check missing 'linkage' vertex attribute", {
 
   glycan <- new_dn_glycan_graph(graph)
 
-  expect_error(validate_dn_glycan_graph(glycan), "Glycan graph must have vertex attributes 'type', 'mono' and 'linkage'.")
+  expect_error(
+    validate_dn_glycan_graph(glycan),
+    "Glycan graph must have vertex attributes 'type', 'mono', 'sub', and 'linkage'."
+  )
 })
 
 
@@ -62,6 +86,7 @@ test_that("check NA in 'type' attribute", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", NA, "mono")
   igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
 
   glycan <- new_dn_glycan_graph(graph)
@@ -74,6 +99,7 @@ test_that("check bad 'type' attribute", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", "linkage", "bad")
   igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
 
   glycan <- new_dn_glycan_graph(graph)
@@ -86,6 +112,7 @@ test_that("check if 'mono' and 'linkage' nodes are alternating 1", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", "mono", "mono")
   igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, NA, NA)
 
   glycan <- new_dn_glycan_graph(graph)
@@ -98,6 +125,7 @@ test_that("check if 'mono' and 'linkage' nodes are alternating 2", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("linkage", "linkage", "linkage")
   igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, NA, NA)
 
   glycan <- new_dn_glycan_graph(graph)
@@ -110,6 +138,7 @@ test_that("check if 'mono' and 'linkage' nodes are alternating 3", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", "linkage", "linkage")
   igraph::V(graph)$mono <- c("Glc", NA, NA)
+  igraph::V(graph)$sub <- c("", NA, NA)
   igraph::V(graph)$linkage <- c(NA, NA, NA)
 
   glycan <- new_dn_glycan_graph(graph)
@@ -122,6 +151,7 @@ test_that("check NA in 'mono' attribute for 'mono' nodes", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", "linkage", "mono")
   igraph::V(graph)$mono <- c("Glc", NA, NA)
+  igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
 
   glycan <- new_dn_glycan_graph(graph)
@@ -130,10 +160,24 @@ test_that("check NA in 'mono' attribute for 'mono' nodes", {
 })
 
 
+test_that("check NA in 'sub' attribute for 'mono' nodes", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$type <- c("mono", "linkage", "mono")
+  igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, NA)
+  igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
+
+  glycan <- new_dn_glycan_graph(graph)
+
+  expect_error(validate_dn_glycan_graph(glycan), "Mono nodes must have no NA in 'sub' attribute.")
+})
+
+
 test_that("check unknown monosaccharides", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", "linkage", "mono")
   igraph::V(graph)$mono <- c("Glc", NA, "Xxx")
+  igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
 
   glycan <- new_dn_glycan_graph(graph)
@@ -146,6 +190,7 @@ test_that("check mixed use of generic and concrete monosaccharides", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", "linkage", "mono")
   igraph::V(graph)$mono <- c("Glc", NA, "Hex")
+  igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
 
   glycan <- new_dn_glycan_graph(graph)
@@ -154,10 +199,24 @@ test_that("check mixed use of generic and concrete monosaccharides", {
 })
 
 
+test_that("check invalid substituents", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$type <- c("mono", "linkage", "mono")
+  igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, "Bad")
+  igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
+
+  glycan <- new_dn_glycan_graph(graph)
+
+  expect_error(validate_dn_glycan_graph(glycan), "Unknown substituent: Bad")
+})
+
+
 test_that("check invalid linkages", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", "linkage", "mono")
   igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1", NA)
 
   glycan <- new_dn_glycan_graph(graph)
@@ -170,6 +229,7 @@ test_that("check 0 out degree linkage nodes", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4)
   igraph::V(graph)$type <- c("mono", "linkage", "mono", "linkage")
   igraph::V(graph)$mono <- c("Glc", NA, "Gal", NA)
+  igraph::V(graph)$sub <- c("", NA, "", NA)
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA, "a1-2")
 
   glycan <- new_dn_glycan_graph(graph)

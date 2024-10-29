@@ -21,6 +21,8 @@ print.ne_glycan_graph <- function(x, ..., verbose = TRUE) {
     label_getter <- function(graph) {
       if (igraph::vcount(graph) == 1) return(igraph::V(graph)$mono)
       monos <- igraph::V(graph)$mono
+      subs <- igraph::V(graph)$sub
+      monos <- dplyr::if_else(subs == "", monos, stringr::str_c(monos, subs, sep = "-"))
       if (!has_linkages(x)) return(monos)
       linkages <- purrr::map_chr(
         igraph::V(graph)[2:igraph::vcount(graph)],
@@ -46,7 +48,11 @@ print.dn_glycan_graph <- function(x, ..., verbose = TRUE) {
     label_getter <- function(graph) {
       dplyr::if_else(
         igraph::V(graph)$type == "mono",
-        igraph::V(graph)$mono,
+        dplyr::if_else(
+          igraph::V(graph)$sub == "",
+          igraph::V(graph)$mono,
+          stringr::str_c(igraph::V(graph)$mono, igraph::V(graph)$sub, sep = "-")
+        ),
         igraph::V(graph)$linkage
       )
     }

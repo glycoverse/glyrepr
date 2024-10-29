@@ -103,6 +103,7 @@ library(igraph)
 # A simple NE glycan graph: GlcNAc(b1-4)GlcNAc
 graph <- make_graph(~ 1-+2)  # 1 and 2 are monosaccharides
 V(graph)$mono <- c("GlcNAc", "GlcNAc")
+V(graph)$sub <- ""
 E(graph)$linkage <- "b1-4"
 as_glycan_graph(graph)
 
@@ -110,6 +111,7 @@ as_glycan_graph(graph)
 graph <- make_graph(~ 1-+2, 2-+3)  # 1 and 3 are monosaccharides, 2 is linkage
 V(graph)$type <- c("mono", "linkage", "mono")
 V(graph)$mono <- c("GlcNAc", NA, "GlcNAc")
+V(graph)$sub <- c("", NA, "")
 V(graph)$linkage <- c(NA, "b1-4", NA)
 as_glycan_graph(graph, type = "dn")
 

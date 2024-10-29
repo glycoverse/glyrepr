@@ -45,6 +45,12 @@ mix_generic_concrete <- function(monos) {
 }
 
 
+# Is a valid subtituent?
+valid_substituent <- function(sub) {
+  stringr::str_detect(sub, "\\d[S|P|Ac]") | sub == ""
+}
+
+
 #' Check if Linkages are Valid
 #'
 #' Valid linkages are in the form of "a1-2", "b1-4", "a?-1", etc.

@@ -91,6 +91,7 @@ convert_dn_to_ne <- function(glycan) {
   if (igraph::vcount(glycan) == 1) {
     new_graph <- igraph::make_graph(~ 1)
     igraph::V(new_graph)$mono <- igraph::V(glycan)$mono
+    igraph::V(new_graph)$sub <- igraph::V(glycan)$sub
     return(new_ne_glycan_graph(new_graph))
   }
 

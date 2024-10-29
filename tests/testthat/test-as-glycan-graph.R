@@ -2,6 +2,7 @@ good_dn_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", "linkage", "mono")
   igraph::V(graph)$mono <- c("Glc", NA, "Glc")
+  igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- NA_character_
   graph
 }
@@ -10,6 +11,7 @@ good_dn_graph <- function() {
 good_ne_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
+  igraph::V(graph)$sub <- c("", "", "")
   igraph::E(graph)$linkage <- NA_character_
   graph
 }
