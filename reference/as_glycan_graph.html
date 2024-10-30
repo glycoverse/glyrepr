@@ -33,7 +33,7 @@ as_ne_glycan_graph() is the same as as_glycan_graph() with type = "ne".'><meta p
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -126,7 +126,7 @@ NA is not allowed.</p></li>
 and Y is substituent name, e.g. "2Ac", "3S", etc.</p></li>
 <li><p>Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
 e.g. "b1-4", "a2-3", etc.
-NA is allowed for unknown linkages.</p></li>
+NA is not allowed.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="dual-node-dn-glycan-graph">Dual-Node (DN) Glycan Graph<a class="anchor" aria-label="anchor" href="#dual-node-dn-glycan-graph"></a></h2>
@@ -147,7 +147,7 @@ For nodes with <code>type = "mono"</code>, NA is not allowed for <code>mono</cod
 <li><p>Substituent must be valid.
 For nodes with <code>type = "mono"</code>, NA is not allowed for <code>sub</code>.</p></li>
 <li><p>Linkages must be valid.
-For nodes with <code>type = "linkage"</code>, NA is allowed for <code>linkage</code>.</p></li>
+For nodes with <code>type = "linkage"</code>, NA is not allowed for <code>linkage</code>.</p></li>
 <li><p><code>mono</code> nodes and <code>linkage</code> nodes must alternate in the graph.
 In another word, each edge must connect a <code>mono</code> node and a <code>linkage</code> node.</p></li>
 <li><p>The outermost nodes (nodes with out-degree 0) must be <code>mono</code> nodes,
