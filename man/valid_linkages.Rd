@@ -19,15 +19,15 @@ Specifically, the pattern is \code{xy-z}:
 \item \code{x}: the anomer, either "a", "b", or "?".
 \item \code{y}: the first position, either "1", "2" or "?".
 \item \code{z}: the second position, either a 1-9 digit or "?".
-Can also be multiple positions separated by "|", e.g. "1|2|3".
-"?" could not be used with "|".
+Can also be multiple positions separated by "/", e.g. "1/2/3".
+"?" could not be used with "/".
 }
 }
 \examples{
 # Valid linkages
-valid_linkages(c("a1-2", "?1-4", "a?-1", "b?-?", "??-?", "a1|2-3"))
+valid_linkages(c("a1-2", "?1-4", "a?-1", "b?-?", "??-?", "a1/2-3"))
 
 # Invalid linkages
-valid_linkages(c("a1-2|?", "1-4", "a|b1-2", "c1-2", "a9-1"))
+valid_linkages(c("a1-2/?", "1-4", "a/b1-2", "c1-2", "a9-1"))
 
 }

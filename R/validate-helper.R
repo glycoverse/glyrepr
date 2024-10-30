@@ -64,8 +64,8 @@ valid_anomer <- function(anomer) {
 #' - `x`: the anomer, either "a", "b", or "?".
 #' - `y`: the first position, either "1", "2" or "?".
 #' - `z`: the second position, either a 1-9 digit or "?".
-#' Can also be multiple positions separated by "|", e.g. "1|2|3".
-#' "?" could not be used with "|".
+#' Can also be multiple positions separated by "/", e.g. "1/2/3".
+#' "?" could not be used with "/".
 #'
 #' @param linkages A character vector of linkages.
 #'
@@ -73,10 +73,10 @@ valid_anomer <- function(anomer) {
 #'
 #' @examples
 #' # Valid linkages
-#' valid_linkages(c("a1-2", "?1-4", "a?-1", "b?-?", "??-?", "a1|2-3"))
+#' valid_linkages(c("a1-2", "?1-4", "a?-1", "b?-?", "??-?", "a1/2-3"))
 #'
 #' # Invalid linkages
-#' valid_linkages(c("a1-2|?", "1-4", "a|b1-2", "c1-2", "a9-1"))
+#' valid_linkages(c("a1-2/?", "1-4", "a/b1-2", "c1-2", "a9-1"))
 #'
 #' @export
 valid_linkages <- function(linkages) {
@@ -85,7 +85,7 @@ valid_linkages <- function(linkages) {
   }
   anomer_p <- "[ab\\?]"
   pos1_p <- "([12]|\\?)"
-  pos2_p <- "([1-9](\\|[1-9])*|\\?)"
+  pos2_p <- "([1-9](/[1-9])*|\\?)"
   linkage_pattern <- stringr::str_glue("^{anomer_p}{pos1_p}-{pos2_p}$")
   stringr::str_detect(linkages, linkage_pattern)
 }

@@ -5,7 +5,7 @@ patrick::with_parameters_test_that("`valid_linkages()` works for good linkages",
 
 patrick::with_parameters_test_that("`valid_linkages()` works for unknown linkages", {
   expect_true(valid_linkages(char))
-}, char = c("b1-?", "a?-3", "?1-4", "??-?", "a2-3|6"))
+}, char = c("b1-?", "a?-3", "?1-4", "??-?", "a2-3/6"))
 
 
 patrick::with_parameters_test_that("`valid_linkages()` fails for bad linkages", {

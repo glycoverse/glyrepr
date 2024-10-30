@@ -77,8 +77,8 @@ possible_linkages <- function(
   first_positions <- if (current_pos1 == "?") pos1_range else current_pos1
   if (current_pos2 == "?") {
     second_positions <- pos2_range
-  } else if (stringr::str_detect(current_pos2, "\\|")) {
-    second_positions <- stringr::str_split(current_pos2, "\\|")[[1]]
+  } else if (stringr::str_detect(current_pos2, "/")) {
+    second_positions <- stringr::str_split(current_pos2, "/")[[1]]
   } else {
     second_positions <- current_pos2
   }
