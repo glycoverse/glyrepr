@@ -83,6 +83,19 @@ test_that("validating graph with NA in substitude attribute", {
 })
 
 
+patrick::with_parameters_test_that("valid substituents", {
+  graph <- igraph::make_empty_graph(n = 1)
+  igraph::V(graph)$mono <- "GlcNAc"
+  igraph::V(graph)$sub <- sub
+  igraph::E(graph)$linkage <- character(0)
+  graph$anomer <- "b1"
+
+  glycan <- new_ne_glycan_graph(graph)
+
+  expect_no_error(validate_ne_glycan_graph(glycan))
+}, sub = c("6S", "9Ac", "2P", "?S"))
+
+
 test_that("validating graph without linkage attribute", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "GlcNAc")
