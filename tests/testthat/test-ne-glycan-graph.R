@@ -84,6 +84,7 @@ test_that("validating graph with NA in substitude attribute", {
 
 
 patrick::with_parameters_test_that("valid substituents", {
+  skip_on_old_win()
   graph <- igraph::make_empty_graph(n = 1)
   igraph::V(graph)$mono <- "GlcNAc"
   igraph::V(graph)$sub <- sub
