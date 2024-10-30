@@ -6,7 +6,7 @@
       Glycan Graph (NE)
       GlcNAc: 2, Man: 3
       ------------------
-      GlcNAc
+      GlcNAc (?1-)
       └─GlcNAc (b1-4)
         └─Man (b1-4)
           ├─Man (a1-3)
@@ -20,7 +20,7 @@
       Glycan Graph (DN)
       GlcNAc: 2, Man: 3
       ------------------
-      GlcNAc
+      GlcNAc (?1-)
       └─b1-4
         └─GlcNAc
           └─b1-4
@@ -54,7 +54,7 @@
       Glycan Graph (NE)
       GlcNAc: 2, Man: 3
       ------------------
-      GlcNAc
+      GlcNAc (?1-)
       └─GlcNAc
         └─Man
           ├─Man
@@ -68,7 +68,7 @@
       Glycan Graph (DN)
       GlcNAc: 2, Man: 3
       ------------------
-      GlcNAc
+      GlcNAc (?1-)
       └─??-?
         └─GlcNAc
           └─??-?
@@ -86,7 +86,7 @@
       Glycan Graph (NE)
       N: 1
       ------------------
-      N
+      N (a1-)
 
 # print works for one-mono DN glycan graphs
 
@@ -96,7 +96,7 @@
       Glycan Graph (DN)
       N: 1
       ------------------
-      N
+      N (a1-)
 
 # print works for NE graphs with substituent
 
@@ -106,7 +106,7 @@
       Glycan Graph (NE)
       N: 1
       ------------------
-      N
+      N (a1-)
 
 # print works for DN graphs with substituent
 
@@ -116,5 +116,5 @@
       Glycan Graph (DN)
       N: 1
       ------------------
-      N-6S
+      N-6S (a1-)
 

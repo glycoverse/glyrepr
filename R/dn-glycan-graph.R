@@ -74,6 +74,14 @@ validate_dn_glycan_graph <- function(glycan) {
   if (any(out_degrees == 0)) {
     rlang::abort("Linkage nodes must not have an out-degree of zero (no exposed linkages)")
   }
+  # Check if "anomer" attribute exists
+  if (is.null(glycan$anomer)) {
+    rlang::abort("Glycan graph must have a graph attribute 'anomer'.")
+  }
+  # Check if "anomer" attribute is valid
+  if (!valid_anomer(glycan$anomer)) {
+    rlang::abort(glue::glue("Invalid anomer: {glycan$anomer}"))
+  }
 
   glycan
 }

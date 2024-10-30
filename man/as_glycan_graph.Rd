@@ -29,6 +29,11 @@ A glycan graph is a subclass of igraph graph with additional constraints.
 This function checks these constraints and append the S3 class \code{glycan_graph}
 to the graph object.
 
+Generally, \strong{it is not recommended} to create a glycan graph using this
+function manually.
+Use the \href{https://github.com/fubin1999/glyparse}{glyparse} package
+to generate a glycan graph from a structure string.
+
 Two types of glycan graphs are supported: dual-node (DN) and node-edge (NE).
 A NE glycan graph is a directed modeling of a glycan structure,
 where nodes are monosaccharides and edges are linkages.
@@ -36,9 +41,6 @@ A DN glycan graph is another way to model a glycan structure,
 where both monosaccharides and linkages are nodes.
 Monosaccharides and linkages alternate in a DN glycan graph.
 For more details, see "details" section.
-
-Unknown linkages could either be assigned as NA or "??-?".
-NA will be converted to "??-?" internally.
 
 \code{as_dn_glycan_graph()} is the same as \code{as_glycan_graph()} with \code{type = "dn"}.
 \code{as_ne_glycan_graph()} is the same as \code{as_glycan_graph()} with \code{type = "ne"}.
@@ -59,6 +61,7 @@ Nodes represent monosaccharides and edges represent linkages.
 Constraints:
 \itemize{
 \item The graph must be directed and an outward tree (reducing end as root).
+\item The graph must have a graph attribute \code{anomer}, in the form of "a1".
 \item The graph must have a vertex attribute \code{mono} for monosaccharide names.
 \item The graph must have a vertex attribute \code{sub} for substituents.
 \item The graph must have an edge attribute \code{linkage} for linkages.
@@ -83,6 +86,7 @@ It is not that intuitive, but allows a more flexible motif matching.
 Constraints:
 \itemize{
 \item The graph must be directed and an outward tree (reducing end as root).
+\item The graph must have a graph attribute \code{anomer}, in the form of "a1".
 \item The graph must have vertex attributes \code{type}, \code{mono}, \code{sub}, and \code{linkage}.
 \code{type} should be either "mono" or "linkage".
 NA is not allowed for \code{type}.
@@ -110,6 +114,7 @@ graph <- make_graph(~ 1-+2)  # 1 and 2 are monosaccharides
 V(graph)$mono <- c("GlcNAc", "GlcNAc")
 V(graph)$sub <- ""
 E(graph)$linkage <- "b1-4"
+graph$anomer <- "a1"
 as_glycan_graph(graph)
 
 # A simple DN glycan graph: GlcNAc(b1-4)GlcNAc
@@ -118,6 +123,7 @@ V(graph)$type <- c("mono", "linkage", "mono")
 V(graph)$mono <- c("GlcNAc", NA, "GlcNAc")
 V(graph)$sub <- c("", NA, "")
 V(graph)$linkage <- c(NA, "b1-4", NA)
+graph$anomer <- "a1"
 as_glycan_graph(graph, type = "dn")
 
 }

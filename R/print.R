@@ -81,6 +81,9 @@ print_structure <- function(graph, label_getter) {
     label <- labels[node]
 
     if (prefix == "") {
+      if (graph$anomer != "??") {
+        label <- paste0(label, " (", graph$anomer, "-)")
+      }
       cli::cat_line(label)
     } else {
       connector <- if (is_last) line_last else line_mid

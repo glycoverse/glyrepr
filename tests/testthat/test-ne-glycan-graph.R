@@ -12,6 +12,7 @@ test_that("validating undirected graphs", {
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -24,6 +25,7 @@ test_that("validating an in tree", {
   igraph::V(graph)$mono <- "GlcNAc"
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -35,6 +37,7 @@ test_that("validating graph without monosaccharide attribute", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -46,6 +49,7 @@ test_that("validating graph without substituent attribute", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- "GlcNAc"
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -58,6 +62,7 @@ test_that("validating graph with NA in monosaccharide attribute", {
   igraph::V(graph)$mono <- c("GlcNAc", NA, "GlcNAc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -70,6 +75,7 @@ test_that("validating graph with NA in substitude attribute", {
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "GlcNAc")
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -81,6 +87,7 @@ test_that("validating graph without linkage attribute", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "GlcNAc")
   igraph::V(graph)$sub <- ""
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -93,6 +100,7 @@ test_that("validating one non-existing monosaccharide", {
   igraph::V(graph)$mono <- c("Hex", "Fuc", "Bad")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -108,6 +116,7 @@ test_that("validating two non-existing monosaccharide", {
   igraph::V(graph)$mono <- c("Hex", "Bad1", "Bad2")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -122,6 +131,7 @@ test_that("validating duplicated non-existing monosaccharide", {
   igraph::V(graph)$mono <- c("Hex", "Bad", "Bad")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -136,6 +146,7 @@ test_that("validating bad subtituent", {
   igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
   igraph::V(graph)$sub <- c("", "6S", "Bad")
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -151,6 +162,7 @@ patrick::with_parameters_test_that("validating bad linkage", {
     igraph::V(graph)$mono <- c("Hex", "Fuc", "Hex")
     igraph::V(graph)$sub <- ""
     igraph::E(graph)$linkage <- bad_linkage
+    graph$anomer <- "a1"
 
     glycan <- new_ne_glycan_graph(graph)
 
@@ -167,6 +179,7 @@ test_that("validating NA linkages", {
   igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", NA)
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
@@ -179,8 +192,34 @@ test_that("validating mixed generic and concrete monosaccharides", {
   igraph::V(graph)$mono <- c("Hex", "GlcNAc", "Hex")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
 
   glycan <- new_ne_glycan_graph(graph)
 
   expect_error(validate_ne_glycan_graph(glycan), "Monosaccharides must be either all generic or all concrete")
+})
+
+
+test_that("missing anomer attr", {
+  graph <- igraph::make_tree(3, children = 2, mode = "out")
+  igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- "b1-4"
+
+  glycan <- new_ne_glycan_graph(graph)
+
+  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have a graph attribute 'anomer'")
+})
+
+
+test_that("invalid anomer attr", {
+  graph <- igraph::make_tree(3, children = 2, mode = "out")
+  igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a"
+
+  glycan <- new_ne_glycan_graph(graph)
+
+  expect_error(validate_ne_glycan_graph(glycan), "Invalid anomer: a")
 })

@@ -110,6 +110,7 @@ n_glycan_core_ne <- function() {
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
+  graph$anomer <- "?1"
   new_ne_glycan_graph(graph)
 }
 
@@ -119,6 +120,7 @@ o_glycan_core_1_ne <- function() {
   igraph::V(graph)$mono <- c("GalNAc", "Gal")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-3"
+  graph$anomer <- "a1"
   new_ne_glycan_graph(graph)
 }
 
@@ -128,5 +130,6 @@ o_glycan_core_2_ne <- function() {
   igraph::V(graph)$mono <- c("GalNAc", "Gal", "GlcNAc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-3", "b1-6")
+  graph$anomer <- "a1"
   new_ne_glycan_graph(graph)
 }

@@ -51,6 +51,12 @@ valid_substituent <- function(sub) {
 }
 
 
+# Is a valid anomer?
+valid_anomer <- function(anomer) {
+  stringr::str_detect(anomer, "^[ab\\?][\\d\\?]$")
+}
+
+
 #' Check if Linkages are Valid
 #'
 #' Valid linkages are in the form of "a1-2", "b1-4", "a?-1", etc.

@@ -5,6 +5,11 @@
 #' This function checks these constraints and append the S3 class `glycan_graph`
 #' to the graph object.
 #'
+#' Generally, **it is not recommended** to create a glycan graph using this
+#' function manually.
+#' Use the [glyparse](https://github.com/fubin1999/glyparse) package
+#' to generate a glycan graph from a structure string.
+#'
 #' Two types of glycan graphs are supported: dual-node (DN) and node-edge (NE).
 #' A NE glycan graph is a directed modeling of a glycan structure,
 #' where nodes are monosaccharides and edges are linkages.
@@ -33,6 +38,7 @@
 #'
 #' Constraints:
 #' - The graph must be directed and an outward tree (reducing end as root).
+#' - The graph must have a graph attribute `anomer`, in the form of "a1".
 #' - The graph must have a vertex attribute `mono` for monosaccharide names.
 #' - The graph must have a vertex attribute `sub` for substituents.
 #' - The graph must have an edge attribute `linkage` for linkages.
@@ -55,6 +61,7 @@
 #'
 #' Constraints:
 #' - The graph must be directed and an outward tree (reducing end as root).
+#' - The graph must have a graph attribute `anomer`, in the form of "a1".
 #' - The graph must have vertex attributes `type`, `mono`, `sub`, and `linkage`.
 #'   `type` should be either "mono" or "linkage".
 #'   NA is not allowed for `type`.
@@ -89,6 +96,7 @@
 #' V(graph)$mono <- c("GlcNAc", "GlcNAc")
 #' V(graph)$sub <- ""
 #' E(graph)$linkage <- "b1-4"
+#' graph$anomer <- "a1"
 #' as_glycan_graph(graph)
 #'
 #' # A simple DN glycan graph: GlcNAc(b1-4)GlcNAc
@@ -97,6 +105,7 @@
 #' V(graph)$mono <- c("GlcNAc", NA, "GlcNAc")
 #' V(graph)$sub <- c("", NA, "")
 #' V(graph)$linkage <- c(NA, "b1-4", NA)
+#' graph$anomer <- "a1"
 #' as_glycan_graph(graph, type = "dn")
 #'
 #' @export

@@ -43,6 +43,7 @@ test_that("print works for one-mono NE glycan graphs", {
   graph <- igraph::make_graph(~ 1)
   igraph::V(graph)$mono <- "N"
   igraph::V(graph)$sub <- ""
+  graph$anomer <- "a1"
   glycan <- new_ne_glycan_graph(graph)
   expect_snapshot(print(glycan))
 })
@@ -55,6 +56,7 @@ test_that("print works for one-mono DN glycan graphs", {
   igraph::V(graph)$mono <- "N"
   igraph::V(graph)$sub <- ""
   igraph::V(graph)$linkage <- NA_character_
+  graph$anomer <- "a1"
   glycan <- new_dn_glycan_graph(graph)
   expect_snapshot(print(glycan))
 })
@@ -65,6 +67,7 @@ test_that("print works for NE graphs with substituent", {
   graph <- igraph::make_graph(~ 1)
   igraph::V(graph)$mono <- "N"
   igraph::V(graph)$sub <- "6S"
+  graph$anomer <- "a1"
   glycan <- new_ne_glycan_graph(graph)
   expect_snapshot(print(glycan))
 })
@@ -77,6 +80,7 @@ test_that("print works for DN graphs with substituent", {
   igraph::V(graph)$mono <- "N"
   igraph::V(graph)$sub <- "6S"
   igraph::V(graph)$linkage <- NA_character_
+  graph$anomer <- "a1"
   glycan <- new_dn_glycan_graph(graph)
   expect_snapshot(print(glycan))
 })

@@ -6,7 +6,7 @@
       Glycan Graph (DN)
       H: 1, N: 2
       ------------------
-      N-S
+      N-S (a1-)
       ├─b1-4
       │ └─N
       └─a1-3
@@ -20,7 +20,7 @@
       Glycan Graph (DN)
       GlcNAc: 2, Man: 3
       ------------------
-      GlcNAc-S
+      GlcNAc-S (?1-)
       └─b1-4
         └─GlcNAc
           └─b1-4
@@ -46,7 +46,7 @@
       Glycan Graph (DN)
       N: 1
       ------------------
-      N
+      N (a1-)
 
 # converting DN to NE graph works on simple example
 
@@ -56,7 +56,7 @@
       Glycan Graph (NE)
       H: 2, N: 1
       ------------------
-      N-S
+      N-S (a1-)
       ├─H (b1-4)
       └─H (a1-3)
 
@@ -68,7 +68,7 @@
       Glycan Graph (NE)
       GlcNAc: 2, Man: 3
       ------------------
-      GlcNAc-S
+      GlcNAc-S (?1-)
       └─GlcNAc (b1-4)
         └─Man (b1-4)
           ├─Man (a1-3)
@@ -82,5 +82,5 @@
       Glycan Graph (NE)
       N: 1
       ------------------
-      N
+      N (a1-)
 

@@ -10,6 +10,7 @@ simple_example_ne_glycan_graph <- function() {
   igraph::V(graph)$mono <- c("N", "N", "H")
   igraph::V(graph)$sub <- c("S", "", "")
   igraph::E(graph)$linkage <- c("b1-4", "a1-3")
+  graph$anomer <- "a1"
   new_ne_glycan_graph(graph)
 }
 
@@ -20,6 +21,7 @@ simple_example_dn_glycan_graph <- function() {
   igraph::V(graph)$mono <- c("N", NA, "H", NA, "H")
   igraph::V(graph)$sub <- c("S", NA, "", NA, "")
   igraph::V(graph)$linkage <- c(NA, "b1-4", NA, "a1-3", NA)
+  graph$anomer <- "a1"
   new_dn_glycan_graph(graph)
 }
 
@@ -29,6 +31,7 @@ complex_example_ne_glycan_graph <- function() {
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
   igraph::V(graph)$sub <- c("S", "", "", "", "")
   igraph::E(graph)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
+  graph$anomer <- "?1"
   new_ne_glycan_graph(graph)
 }
 
@@ -39,6 +42,7 @@ complex_example_dn_glycan_graph <- function() {
   igraph::V(graph)$mono <- c("GlcNAc", NA, "GlcNAc", NA, "Man", NA, "Man", NA, "Man")
   igraph::V(graph)$sub <- c("S", NA, "", NA, "", NA, "", NA, "")
   igraph::V(graph)$linkage <- c(NA, "b1-4", NA, "b1-4", NA, "a1-3", NA, "a1-6", NA)
+  graph$anomer <- "?1"
   new_dn_glycan_graph(graph)
 }
 
@@ -78,6 +82,7 @@ test_that("converting one-node graph to DN graph works", {
   igraph::V(graph)$mono <- "N"
   igraph::V(graph)$sub <- ""
   igraph::V(graph)$type <- "mono"
+  graph$anomer <- "a1"
   glycan <- new_ne_glycan_graph(graph)
 
   dn_graph <- convert_graph_mode(glycan, "dn")
@@ -109,6 +114,7 @@ test_that("converting one-node graph to NE graph works", {
   igraph::V(graph)$sub <- ""
   igraph::V(graph)$type <- "mono"
   igraph::V(graph)$linkage <- NA_character_
+  graph$anomer <- "a1"
   glycan <- new_dn_glycan_graph(graph)
 
   ne_graph <- convert_graph_mode(glycan, "ne")

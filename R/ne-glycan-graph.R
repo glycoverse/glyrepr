@@ -66,6 +66,14 @@ validate_ne_glycan_graph <- function(glycan) {
     msg <- glue::glue("Invalid linkage: {stringr::str_c(invalid_linkages, collapse = ', ')}")
     rlang::abort(msg, linkages = invalid_linkages)
   }
+  # Check if "anomer" attribute exists
+  if (is.null(glycan$anomer)) {
+    rlang::abort("Glycan graph must have a graph attribute 'anomer'.")
+  }
+  # Check if "anomer" attribute is valid
+  if (!valid_anomer(glycan$anomer)) {
+    rlang::abort(glue::glue("Invalid anomer: {glycan$anomer}"))
+  }
 
   glycan
 }

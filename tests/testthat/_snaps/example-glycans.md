@@ -6,7 +6,7 @@
       Glycan Graph (NE)
       GlcNAc: 2, Man: 3
       ------------------
-      GlcNAc
+      GlcNAc (?1-)
       └─GlcNAc (b1-4)
         └─Man (b1-4)
           ├─Man (a1-3)
@@ -20,7 +20,7 @@
       Glycan Graph (DN)
       GlcNAc: 2, Man: 3
       ------------------
-      GlcNAc
+      GlcNAc (?1-)
       └─b1-4
         └─GlcNAc
           └─b1-4
@@ -38,7 +38,7 @@
       Glycan Graph (NE)
       GlcNAc: 2, Man: 3
       ------------------
-      GlcNAc
+      GlcNAc (?1-)
       └─GlcNAc
         └─Man
           ├─Man
@@ -52,7 +52,7 @@
       Glycan Graph (NE)
       H: 3, N: 2
       ------------------
-      N
+      N (?1-)
       └─N (b1-4)
         └─H (b1-4)
           ├─H (a1-3)
@@ -66,7 +66,7 @@
       Glycan Graph (NE)
       Hex: 3, HexNAc: 2
       ------------------
-      HexNAc
+      HexNAc (?1-)
       └─HexNAc (b1-4)
         └─Hex (b1-4)
           ├─Hex (a1-3)
@@ -80,7 +80,7 @@
       Glycan Graph (NE)
       Gal: 1, GalNAc: 1
       ------------------
-      GalNAc
+      GalNAc (a1-)
       └─Gal (b1-3)
 
 # O-glycan core 2
@@ -91,7 +91,7 @@
       Glycan Graph (NE)
       Gal: 1, GalNAc: 1, GlcNAc: 1
       ------------------
-      GalNAc
+      GalNAc (a1-)
       ├─Gal (b1-3)
       └─GlcNAc (b1-6)
 
