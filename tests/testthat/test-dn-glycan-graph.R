@@ -212,6 +212,19 @@ test_that("check invalid substituents", {
 })
 
 
+test_that("check NA in `linkage` attr for linkage vertex", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$type <- c("mono", "linkage", "mono")
+  igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, "")
+  igraph::V(graph)$linkage <- NA_character_
+
+  glycan <- new_dn_glycan_graph(graph)
+
+  expect_error(validate_dn_glycan_graph(glycan), "Linkage nodes must have no NA in 'linkage' attribute")
+})
+
+
 test_that("check invalid linkages", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$type <- c("mono", "linkage", "mono")

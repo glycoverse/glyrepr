@@ -57,9 +57,12 @@ validate_dn_glycan_graph <- function(glycan) {
     msg <- glue::glue("Unknown substituent: {stringr::str_c(invalid_subs, collapse = ', ')}")
     rlang::abort(msg, subs = invalid_subs)
   }
-  # Check if all linkages are valid
+  # Check if no NA in "linkage" attribute
   linkages <- get_vertex_attr(glycan, "linkage", "linkage")
-  linkages <- linkages[!is.na(linkages)]
+  if (any(is.na(linkages))) {
+    rlang::abort("Linkage nodes must have no NA in 'linkage' attribute.")
+  }
+  # Check if all linkages are valid
   if (!all(valid_linkages(linkages))) {
     invalid_linkages <- unique(linkages[!valid_linkages(linkages)])
     msg <- glue::glue("Invalid linkage: {stringr::str_c(invalid_linkages, collapse = ', ')}")

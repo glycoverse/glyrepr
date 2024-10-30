@@ -3,7 +3,7 @@ good_dn_graph <- function() {
   igraph::V(graph)$type <- c("mono", "linkage", "mono")
   igraph::V(graph)$mono <- c("Glc", NA, "Glc")
   igraph::V(graph)$sub <- c("", NA, "")
-  igraph::V(graph)$linkage <- NA_character_
+  igraph::V(graph)$linkage <- c(NA, "b1-4", NA)
   graph
 }
 
@@ -12,7 +12,7 @@ good_ne_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- c("", "", "")
-  igraph::E(graph)$linkage <- NA_character_
+  igraph::E(graph)$linkage <- c("b1-4", "b1-4")
   graph
 }
 
@@ -66,24 +66,4 @@ test_that("vertex names are added if missing", {
   glycan <- as_ne_glycan_graph(graph)
 
   expect_true("name" %in% igraph::vertex_attr_names(glycan))
-})
-
-
-test_that("clean linkages for NE graphs", {
-  graph <- good_ne_graph()
-  graph <- igraph::set_edge_attr(graph, "linkage", value = c("?1-?", NA))
-
-  glycan <- as_ne_glycan_graph(graph)
-
-  expect_equal(igraph::E(glycan)$linkage, c("?1-?", "??-?"))
-})
-
-
-test_that("clean linkages for DN graph", {
-  graph <- good_dn_graph()
-  graph <- igraph::set_vertex_attr(graph, "linkage", value = rep(NA_character_, 3))
-
-  glycan <- as_dn_glycan_graph(graph)
-
-  expect_equal(igraph::V(glycan)$linkage, c(NA, "??-?", NA))
 })

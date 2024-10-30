@@ -69,7 +69,7 @@ NA is not allowed.
 and Y is substituent name, e.g. "2Ac", "3S", etc.
 \item Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
 e.g. "b1-4", "a2-3", etc.
-NA is allowed for unknown linkages.
+NA is not allowed.
 }
 }
 
@@ -94,7 +94,7 @@ For nodes with \code{type = "mono"}, NA is not allowed for \code{mono}.
 \item Substituent must be valid.
 For nodes with \code{type = "mono"}, NA is not allowed for \code{sub}.
 \item Linkages must be valid.
-For nodes with \code{type = "linkage"}, NA is allowed for \code{linkage}.
+For nodes with \code{type = "linkage"}, NA is not allowed for \code{linkage}.
 \item \code{mono} nodes and \code{linkage} nodes must alternate in the graph.
 In another word, each edge must connect a \code{mono} node and a \code{linkage} node.
 \item The outermost nodes (nodes with out-degree 0) must be \code{mono} nodes,

@@ -13,9 +13,6 @@
 #' Monosaccharides and linkages alternate in a DN glycan graph.
 #' For more details, see "details" section.
 #'
-#' Unknown linkages could either be assigned as NA or "??-?".
-#' NA will be converted to "??-?" internally.
-#'
 #' `as_dn_glycan_graph()` is the same as `as_glycan_graph()` with `type = "dn"`.
 #' `as_ne_glycan_graph()` is the same as `as_glycan_graph()` with `type = "ne"`.
 #'
@@ -46,7 +43,7 @@
 #'   and Y is substituent name, e.g. "2Ac", "3S", etc.
 #' - Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
 #'   e.g. "b1-4", "a2-3", etc.
-#'   NA is allowed for unknown linkages.
+#'   NA is not allowed.
 #'
 #' # Dual-Node (DN) Glycan Graph
 #'
@@ -69,7 +66,7 @@
 #' - Substituent must be valid.
 #'   For nodes with `type = "mono"`, NA is not allowed for `sub`.
 #' - Linkages must be valid.
-#'   For nodes with `type = "linkage"`, NA is allowed for `linkage`.
+#'   For nodes with `type = "linkage"`, NA is not allowed for `linkage`.
 #' - `mono` nodes and `linkage` nodes must alternate in the graph.
 #'   In another word, each edge must connect a `mono` node and a `linkage` node.
 #' - The outermost nodes (nodes with out-degree 0) must be `mono` nodes,
@@ -140,8 +137,7 @@ as_dn_glycan_graph <- function(graph) {
   graph %>%
     new_dn_glycan_graph() %>%
     validate_dn_glycan_graph() %>%
-    ensure_name_vertex_attr() %>%
-    clean_dn_linkages()
+    ensure_name_vertex_attr()
 }
 
 
@@ -153,8 +149,7 @@ as_ne_glycan_graph <- function(graph) {
   graph %>%
     new_ne_glycan_graph() %>%
     validate_ne_glycan_graph() %>%
-    ensure_name_vertex_attr() %>%
-    clean_ne_linkages()
+    ensure_name_vertex_attr()
 }
 
 
@@ -165,20 +160,4 @@ ensure_name_vertex_attr <- function(glycan) {
     glycan <- igraph::set_vertex_attr(glycan, "name", value = names)
   }
   glycan
-}
-
-
-# Replace NA in linkages to "??-?".
-clean_ne_linkages <- function(glycan) {
-  linkages <- igraph::edge_attr(glycan, "linkage")
-  linkages[is.na(linkages)] <- "??-?"
-  igraph::set_edge_attr(glycan, "linkage", value = linkages)
-}
-
-
-clean_dn_linkages <- function(glycan) {
-  types <- igraph::vertex_attr(glycan, "type")
-  linkages <- igraph::vertex_attr(glycan, "linkage")
-  linkages[(types == "linkage") & is.na(linkages)] <- "??-?"
-  igraph::set_vertex_attr(glycan, "linkage", value = linkages)
 }
