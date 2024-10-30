@@ -4,16 +4,16 @@ Specifically, the pattern is xy-z:
 x: the anomer, either "a", "b", or "?".
 y: the first position, either "1", "2" or "?".
 z: the second position, either a 1-9 digit or "?".
-Can also be multiple positions separated by "|", e.g. "1|2|3".
-"?" could not be used with "|".
+Can also be multiple positions separated by "/", e.g. "1/2/3".
+"?" could not be used with "/".
 
 '><meta property="og:description" content='Valid linkages are in the form of "a1-2", "b1-4", "a?-1", etc.
 Specifically, the pattern is xy-z:
 x: the anomer, either "a", "b", or "?".
 y: the first position, either "1", "2" or "?".
 z: the second position, either a 1-9 digit or "?".
-Can also be multiple positions separated by "|", e.g. "1|2|3".
-"?" could not be used with "|".
+Can also be multiple positions separated by "/", e.g. "1/2/3".
+"?" could not be used with "/".
 
 '><meta property="og:image" content="https://fubin1999.github.io/glyrepr/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -23,7 +23,7 @@ Can also be multiple positions separated by "|", e.g. "1|2|3".
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,8 +51,8 @@ Can also be multiple positions separated by "|", e.g. "1|2|3".
 Specifically, the pattern is <code>xy-z</code>:</p><ul><li><p><code>x</code>: the anomer, either "a", "b", or "?".</p></li>
 <li><p><code>y</code>: the first position, either "1", "2" or "?".</p></li>
 <li><p><code>z</code>: the second position, either a 1-9 digit or "?".
-Can also be multiple positions separated by "|", e.g. "1|2|3".
-"?" could not be used with "|".</p></li>
+Can also be multiple positions separated by "/", e.g. "1/2/3".
+"?" could not be used with "/".</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -76,11 +76,11 @@ Can also be multiple positions separated by "|", e.g. "1|2|3".
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Valid linkages</span></span></span>
-<span class="r-in"><span><span class="fu">valid_linkages</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a1-2"</span>, <span class="st">"?1-4"</span>, <span class="st">"a?-1"</span>, <span class="st">"b?-?"</span>, <span class="st">"??-?"</span>, <span class="st">"a1|2-3"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">valid_linkages</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a1-2"</span>, <span class="st">"?1-4"</span>, <span class="st">"a?-1"</span>, <span class="st">"b?-?"</span>, <span class="st">"??-?"</span>, <span class="st">"a1/2-3"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Invalid linkages</span></span></span>
-<span class="r-in"><span><span class="fu">valid_linkages</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a1-2|?"</span>, <span class="st">"1-4"</span>, <span class="st">"a|b1-2"</span>, <span class="st">"c1-2"</span>, <span class="st">"a9-1"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">valid_linkages</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a1-2/?"</span>, <span class="st">"1-4"</span>, <span class="st">"a/b1-2"</span>, <span class="st">"c1-2"</span>, <span class="st">"a9-1"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE FALSE FALSE FALSE FALSE</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
