@@ -38,7 +38,7 @@ print(glycan, verbose = TRUE)
 #> Glycan Graph (NE)
 #> GlcNAc: 2, Man: 3
 #> ------------------
-#> GlcNAc
+#> GlcNAc (?1-)
 #> └─GlcNAc (b1-4)
 #>   └─Man (b1-4)
 #>     ├─Man (a1-3)
