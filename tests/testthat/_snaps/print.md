@@ -106,7 +106,7 @@
       Glycan Graph (NE)
       N: 1
       ------------------
-      N (a1-)
+      N-6S (a1-)
 
 # print works for DN graphs with substituent
 

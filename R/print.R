@@ -19,7 +19,13 @@ print.ne_glycan_graph <- function(x, ..., verbose = TRUE) {
   if (verbose) {
     cli::cat_line(stringr::str_dup("-", 18))
     label_getter <- function(graph) {
-      if (igraph::vcount(graph) == 1) return(igraph::V(graph)$mono)
+      if (igraph::vcount(graph) == 1) {
+        return(dplyr::if_else(
+          igraph::V(graph)$sub == "",
+          igraph::V(graph)$mono,
+          paste0(igraph::V(graph)$mono, "-", igraph::V(graph)$sub)
+        ))
+      }
       monos <- igraph::V(graph)$mono
       subs <- igraph::V(graph)$sub
       monos <- dplyr::if_else(subs == "", monos, stringr::str_c(monos, subs, sep = "-"))
