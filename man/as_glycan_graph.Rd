@@ -62,6 +62,7 @@ Constraints:
 \itemize{
 \item The graph must be directed and an outward tree (reducing end as root).
 \item The graph must have a graph attribute \code{anomer}, in the form of "a1".
+\item The graph must have a graph attribute \code{alditol}, a logical value.
 \item The graph must have a vertex attribute \code{mono} for monosaccharide names.
 \item The graph must have a vertex attribute \code{sub} for substituents.
 \item The graph must have an edge attribute \code{linkage} for linkages.
@@ -87,6 +88,7 @@ Constraints:
 \itemize{
 \item The graph must be directed and an outward tree (reducing end as root).
 \item The graph must have a graph attribute \code{anomer}, in the form of "a1".
+\item The graph must have a graph attribute \code{alditol}, a logical value.
 \item The graph must have vertex attributes \code{type}, \code{mono}, \code{sub}, and \code{linkage}.
 \code{type} should be either "mono" or "linkage".
 NA is not allowed for \code{type}.

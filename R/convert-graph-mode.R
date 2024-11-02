@@ -89,10 +89,12 @@ convert_ne_to_dn <- function(glycan) {
 convert_dn_to_ne <- function(glycan) {
   # Deal with edge case that only one monosaccharide exists
   if (igraph::vcount(glycan) == 1) {
-    new_graph <- igraph::make_graph(~ 1)
+    new_graph <- igraph::make_graph(NULL, n = 1, directed = TRUE)
     igraph::V(new_graph)$mono <- igraph::V(glycan)$mono
     igraph::V(new_graph)$sub <- igraph::V(glycan)$sub
+    igraph::E(new_graph)$linkage <- character(0)
     new_graph$anomer <- glycan$anomer
+    new_graph$alditol <- glycan$alditol
     return(new_ne_glycan_graph(new_graph))
   }
 

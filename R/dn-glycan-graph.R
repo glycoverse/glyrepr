@@ -82,6 +82,14 @@ validate_dn_glycan_graph <- function(glycan) {
   if (!valid_anomer(glycan$anomer)) {
     rlang::abort(glue::glue("Invalid anomer: {glycan$anomer}"))
   }
+  # Check if "alditol" attribute exists
+  if (is.null(glycan$alditol)) {
+    rlang::abort("Glycan graph must have a graph attribute 'alditol'.")
+  }
+  # Check if "alditol" attribute is valid
+  if (!is.logical(glycan$alditol)) {
+    rlang::abort("Glycan graph attribute 'alditol' must be logical.")
+  }
 
   glycan
 }

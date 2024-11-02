@@ -104,11 +104,34 @@
       print(glycan)
     Output
       Glycan Graph (NE)
+      Gal: 1, GalNAc: 1
+      ------------------
+      GalNAc-6S (a1-)
+      └─Gal-6S (b1-3)
+
+# print works for DN graphs with substituent
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (DN)
+      Gal: 1, GalNAc: 1
+      ------------------
+      GalNAc-6S (a1-)
+      └─b1-3
+        └─Gal-6S
+
+# print works for one-node NE graphs with substituent
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (NE)
       N: 1
       ------------------
       N-6S (a1-)
 
-# print works for DN graphs with substituent
+# print works for one-node DN graphs with substituent
 
     Code
       print(glycan)
@@ -117,4 +140,90 @@
       N: 1
       ------------------
       N-6S (a1-)
+
+# print works for NE graphs with alditol
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (NE)
+      Gal: 1, GalNAc: 1
+      ------------------
+      GalNAc-ol (a1-)
+      └─Gal (b1-3)
+
+# print works for DN graphs with alditol
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (DN)
+      Gal: 1, GalNAc: 1
+      ------------------
+      GalNAc-ol (a1-)
+      └─b1-3
+        └─Gal
+
+# print works for one-node NE graphs with alditol
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (NE)
+      N: 1
+      ------------------
+      N-ol (a1-)
+
+# print works for one-node DN graphs with alditol
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (DN)
+      N: 1
+      ------------------
+      N-ol (a1-)
+
+# print works for NE graph with alditol and substituent on root
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (NE)
+      Gal: 1, GalNAc: 1
+      ------------------
+      GalNAc-ol-6S (a1-)
+      └─Gal (b1-3)
+
+# print works for DN graph with alditol and substituent on root
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (DN)
+      Gal: 1, GalNAc: 1
+      ------------------
+      GalNAc-ol-6S (a1-)
+      └─b1-3
+        └─Gal
+
+# print works for one-node NE graph with alditol and substituent on root
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (NE)
+      N: 1
+      ------------------
+      N-ol-6S (a1-)
+
+# print works for one-node DN graph with alditol and substituent on root
+
+    Code
+      print(glycan)
+    Output
+      Glycan Graph (DN)
+      N: 1
+      ------------------
+      N-ol-6S (a1-)
 

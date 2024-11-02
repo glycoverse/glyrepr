@@ -30,6 +30,7 @@ test_that("check missing 'type' vertex attribute", {
   igraph::V(graph)$mono <- c("Glc", NA, "Gal")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -45,6 +46,7 @@ test_that("check missing 'mono' vertex attribute", {
   igraph::V(graph)$type <- c("mono", "linkage", "mono")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -61,6 +63,7 @@ test_that("check missing 'sub' vertex attribute", {
   igraph::V(graph)$mono <- c("Glc", NA, "Gal")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -76,6 +79,7 @@ test_that("check missing 'linkage' vertex attribute", {
   igraph::V(graph)$type <- c("mono", "linkage", "mono")
   igraph::V(graph)$mono <- c("Glc", NA, "Gal")
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -93,6 +97,7 @@ test_that("check NA in 'type' attribute", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -107,6 +112,7 @@ test_that("check bad 'type' attribute", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -121,6 +127,7 @@ test_that("check if 'mono' and 'linkage' nodes are alternating 1", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, NA, NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -135,6 +142,7 @@ test_that("check if 'mono' and 'linkage' nodes are alternating 2", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, NA, NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -149,6 +157,7 @@ test_that("check if 'mono' and 'linkage' nodes are alternating 3", {
   igraph::V(graph)$sub <- c("", NA, NA)
   igraph::V(graph)$linkage <- c(NA, NA, NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -163,6 +172,7 @@ test_that("check NA in 'mono' attribute for 'mono' nodes", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -177,6 +187,7 @@ test_that("check NA in 'sub' attribute for 'mono' nodes", {
   igraph::V(graph)$sub <- c("", NA, NA)
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -191,6 +202,7 @@ test_that("check unknown monosaccharides", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -205,6 +217,7 @@ test_that("check mixed use of generic and concrete monosaccharides", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -219,6 +232,7 @@ test_that("check invalid substituents", {
   igraph::V(graph)$sub <- c("", NA, "Bad")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -233,6 +247,7 @@ test_that("check NA in `linkage` attr for linkage vertex", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- NA_character_
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -247,6 +262,7 @@ test_that("check invalid linkages", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -261,6 +277,7 @@ test_that("check 0 out degree linkage nodes", {
   igraph::V(graph)$sub <- c("", NA, "", NA)
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA, "a1-2")
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -274,6 +291,7 @@ test_that("check anomer attr exists", {
   igraph::V(graph)$mono <- c("Glc", NA, "Gal")
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
@@ -288,8 +306,38 @@ test_that("check anomer valid", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
   graph$anomer <- "a"
+  graph$alditol <- FALSE
 
   glycan <- new_dn_glycan_graph(graph)
 
   expect_error(validate_dn_glycan_graph(glycan), "Invalid anomer: a")
+})
+
+
+test_that("check alditol exists", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$type <- c("mono", "linkage", "mono")
+  igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, "")
+  igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
+  graph$anomer <- "a1"
+
+  glycan <- new_dn_glycan_graph(graph)
+
+  expect_error(validate_dn_glycan_graph(glycan), "Glycan graph must have a graph attribute 'alditol'.")
+})
+
+
+test_that("check alditol valid", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$type <- c("mono", "linkage", "mono")
+  igraph::V(graph)$mono <- c("Glc", NA, "Gal")
+  igraph::V(graph)$sub <- c("", NA, "")
+  igraph::V(graph)$linkage <- c(NA, "a1-2", NA)
+  graph$anomer <- "a1"
+  graph$alditol <- "TRUE"
+
+  glycan <- new_dn_glycan_graph(graph)
+
+  expect_error(validate_dn_glycan_graph(glycan), "Glycan graph attribute 'alditol' must be logical")
 })

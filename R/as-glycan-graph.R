@@ -39,6 +39,7 @@
 #' Constraints:
 #' - The graph must be directed and an outward tree (reducing end as root).
 #' - The graph must have a graph attribute `anomer`, in the form of "a1".
+#' - The graph must have a graph attribute `alditol`, a logical value.
 #' - The graph must have a vertex attribute `mono` for monosaccharide names.
 #' - The graph must have a vertex attribute `sub` for substituents.
 #' - The graph must have an edge attribute `linkage` for linkages.
@@ -62,6 +63,7 @@
 #' Constraints:
 #' - The graph must be directed and an outward tree (reducing end as root).
 #' - The graph must have a graph attribute `anomer`, in the form of "a1".
+#' - The graph must have a graph attribute `alditol`, a logical value.
 #' - The graph must have vertex attributes `type`, `mono`, `sub`, and `linkage`.
 #'   `type` should be either "mono" or "linkage".
 #'   NA is not allowed for `type`.

@@ -20,13 +20,20 @@ print.ne_glycan_graph <- function(x, ..., verbose = TRUE) {
     cli::cat_line(stringr::str_dup("-", 18))
     label_getter <- function(graph) {
       if (igraph::vcount(graph) == 1) {
-        return(dplyr::if_else(
-          igraph::V(graph)$sub == "",
-          igraph::V(graph)$mono,
-          paste0(igraph::V(graph)$mono, "-", igraph::V(graph)$sub)
-        ))
+        label <- igraph::V(graph)$mono
+        if (graph$alditol) {
+          label <- paste0(label, "-ol")
+        }
+        if (igraph::V(graph)$sub != "") {
+          label <- paste0(label, "-", igraph::V(graph)$sub)
+        }
+        return(label)
       }
+      root <- igraph::V(graph)[igraph::degree(graph, mode = "in") == 0]
       monos <- igraph::V(graph)$mono
+      if (graph$alditol) {
+        monos[[root]] <- paste0(monos[[root]], "-ol")
+      }
       subs <- igraph::V(graph)$sub
       monos <- dplyr::if_else(subs == "", monos, stringr::str_c(monos, subs, sep = "-"))
       if (!has_linkages(x)) return(monos)
@@ -52,12 +59,17 @@ print.dn_glycan_graph <- function(x, ..., verbose = TRUE) {
   if (verbose) {
     cli::cat_line(stringr::str_dup("-", 18))
     label_getter <- function(graph) {
+      monos <- igraph::V(graph)$mono
+      root <- igraph::V(graph)[igraph::degree(graph, mode = "in") == 0]
+      if (graph$alditol) {
+        monos[[root]] <- paste0(monos[[root]], "-ol")
+      }
       dplyr::if_else(
         igraph::V(graph)$type == "mono",
         dplyr::if_else(
           igraph::V(graph)$sub == "",
-          igraph::V(graph)$mono,
-          stringr::str_c(igraph::V(graph)$mono, igraph::V(graph)$sub, sep = "-")
+          monos,
+          stringr::str_c(monos, igraph::V(graph)$sub, sep = "-")
         ),
         igraph::V(graph)$linkage
       )

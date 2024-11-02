@@ -5,6 +5,7 @@ good_dn_graph <- function() {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::V(graph)$linkage <- c(NA, "b1-4", NA)
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
   graph
 }
 
@@ -15,6 +16,7 @@ good_ne_graph <- function() {
   igraph::V(graph)$sub <- c("", "", "")
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
   graph$anomer <- "a1"
+  graph$alditol <- FALSE
   graph
 }
 
