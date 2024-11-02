@@ -99,6 +99,7 @@
 #' V(graph)$sub <- ""
 #' E(graph)$linkage <- "b1-4"
 #' graph$anomer <- "a1"
+#' graph$alditol <- FALSE
 #' as_glycan_graph(graph)
 #'
 #' # A simple DN glycan graph: GlcNAc(b1-4)GlcNAc
@@ -108,6 +109,7 @@
 #' V(graph)$sub <- c("", NA, "")
 #' V(graph)$linkage <- c(NA, "b1-4", NA)
 #' graph$anomer <- "a1"
+#' graph$alditol <- FALSE
 #' as_glycan_graph(graph, type = "dn")
 #'
 #' @export
