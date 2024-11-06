@@ -8,12 +8,13 @@
 #'
 #' @param x A glycan graph.
 #' @param ... Ignored.
-#' @param verbose A logical value.
+#' @param verbose A logical value. If `TRUE`, the structure of the glycan graph will be printed.
+#' @param colored A logical value. If `TRUE`, monosaccharides will be colored in structure printing.
 #' If `TRUE`, the structure of the glycan graph will be printed.
 #' Default is `TRUE`.
 #'
 #' @export
-print.ne_glycan_graph <- function(x, ..., verbose = TRUE) {
+print.ne_glycan_graph <- function(x, ..., verbose = TRUE, colored = TRUE) {
   cli::cat_line("Glycan Graph (NE)")
   print_composition(x)
   if (verbose) {
@@ -21,6 +22,9 @@ print.ne_glycan_graph <- function(x, ..., verbose = TRUE) {
     label_getter <- function(graph) {
       if (igraph::vcount(graph) == 1) {
         label <- igraph::V(graph)$mono
+        if (colored) {
+          label <- add_colors(label)
+        }
         if (graph$alditol) {
           label <- paste0(label, "-ol")
         }
@@ -31,6 +35,9 @@ print.ne_glycan_graph <- function(x, ..., verbose = TRUE) {
       }
       root <- igraph::V(graph)[igraph::degree(graph, mode = "in") == 0]
       monos <- igraph::V(graph)$mono
+      if (colored) {
+        monos <- add_colors(monos)
+      }
       if (graph$alditol) {
         monos[[root]] <- paste0(monos[[root]], "-ol")
       }
@@ -53,13 +60,16 @@ print.ne_glycan_graph <- function(x, ..., verbose = TRUE) {
 
 #' @rdname print.ne_glycan_graph
 #' @export
-print.dn_glycan_graph <- function(x, ..., verbose = TRUE) {
+print.dn_glycan_graph <- function(x, ..., verbose = TRUE, colored = TRUE) {
   cli::cat_line("Glycan Graph (DN)")
   print_composition(x)
   if (verbose) {
     cli::cat_line(stringr::str_dup("-", 18))
     label_getter <- function(graph) {
       monos <- igraph::V(graph)$mono
+      if (colored) {
+        monos <- add_colors(monos)
+      }
       root <- igraph::V(graph)[igraph::degree(graph, mode = "in") == 0]
       if (graph$alditol) {
         monos[[root]] <- paste0(monos[[root]], "-ol")
@@ -121,4 +131,28 @@ print_structure <- function(graph, label_getter) {
   }
 
   print_node(graph, root, prefix = "", is_last = TRUE)
+}
+
+
+get_mono_color <- function(mono) {
+  dplyr::case_match(
+    mono,
+    c("Glc", "GlcNAc", "GlcN", "GlcA", "Qui", "QuiNAc", "Oli", "Bac", "Api") ~ "#0072BC",
+    c("Man", "ManNAc", "ManN", "ManA", "Rha", "RhaNAc", "Tyv", "Ara", "Kdn", "Pse", "LDmanHep", "Fru") ~ "#00A651",
+    c("Gal", "GalNAc", "GalN", "GalA", "Lyx", "Leg", "Kdo", "Tag") ~ "#FFD400",
+    c("Gul", "GulNAc", "GulN", "GulA", "6dGul", "Abe", "Xyl", "Dha", "Sor") ~ "#F47920",
+    c("Alt", "AltNAc", "AltN", "AltA", "6dAlt", "6dAltNAc", "Par", "Rib", "Aci", "DDmanHep", "Psi") ~ "#F69EA1",
+    c("All", "AllNAc", "AllN", "AllA", "Dig", "Neu5Ac", "MurNAc") ~ "#A54399",
+    c("Tal", "TalNAc", "TalN", "TalA", "6dTal", "6dTalNAc", "Col", "Neu5Gc", "4eLeg", "MurNGc") ~ "#8FCCE9",
+    c("Ido", "IdoNAc", "IdoN", "IdoA", "Neu", "Mur") ~ "#A17A4D",
+    c("Fuc", "FucNAc", "Sia") ~ "#ED1C24",
+    .default = "black"
+  )
+}
+
+
+add_colors <- function(monos) {
+  colors <- purrr::map_chr(monos, get_mono_color)
+  color_styles <- purrr::map(colors, cli::make_ansi_style)
+  purrr::map2_chr(monos, color_styles, ~ .y(.x))
 }

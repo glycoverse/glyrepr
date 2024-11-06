@@ -5,16 +5,18 @@
 \alias{print.dn_glycan_graph}
 \title{Print method for Glycan Graphs}
 \usage{
-\method{print}{ne_glycan_graph}(x, ..., verbose = TRUE)
+\method{print}{ne_glycan_graph}(x, ..., verbose = TRUE, colored = TRUE)
 
-\method{print}{dn_glycan_graph}(x, ..., verbose = TRUE)
+\method{print}{dn_glycan_graph}(x, ..., verbose = TRUE, colored = TRUE)
 }
 \arguments{
 \item{x}{A glycan graph.}
 
 \item{...}{Ignored.}
 
-\item{verbose}{A logical value.
+\item{verbose}{A logical value. If \code{TRUE}, the structure of the glycan graph will be printed.}
+
+\item{colored}{A logical value. If \code{TRUE}, monosaccharides will be colored in structure printing.
 If \code{TRUE}, the structure of the glycan graph will be printed.
 Default is \code{TRUE}.}
 }
