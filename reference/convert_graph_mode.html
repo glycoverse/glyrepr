@@ -15,7 +15,7 @@ See as_glycan_graph() for details."><meta property="og:image" content="https://f
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,26 +80,26 @@ Default is <code>TRUE</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Glycan Graph (NE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc: 2, Man: 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc (?1-)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─GlcNAc (b1-4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   └─Man (b1-4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     ├─Man (a1-3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     └─Man (a1-6)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0087D7;">GlcNAc</span> (?1-)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> └─<span style="color: #0087D7;">GlcNAc</span> (b1-4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   └─<span style="color: #00AF5F;">Man</span> (b1-4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ├─<span style="color: #00AF5F;">Man</span> (a1-3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     └─<span style="color: #00AF5F;">Man</span> (a1-6)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Convert to DN mode</span></span></span>
 <span class="r-in"><span><span class="fu">convert_graph_mode</span><span class="op">(</span><span class="va">glycan</span>, to <span class="op">=</span> <span class="st">"dn"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Glycan Graph (DN)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc: 2, Man: 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc (?1-)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0087D7;">GlcNAc</span> (?1-)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> └─b1-4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   └─GlcNAc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   └─<span style="color: #0087D7;">GlcNAc</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     └─b1-4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       └─Man</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       └─<span style="color: #00AF5F;">Man</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         ├─a1-3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         │ └─Man</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         │ └─<span style="color: #00AF5F;">Man</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         └─a1-6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           └─Man</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           └─<span style="color: #00AF5F;">Man</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Converting to NE mode will raise an error</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">convert_graph_mode</span><span class="op">(</span><span class="va">glycan</span>, to <span class="op">=</span> <span class="st">"ne"</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -111,11 +111,11 @@ Default is <code>TRUE</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Glycan Graph (NE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc: 2, Man: 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> GlcNAc (?1-)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─GlcNAc (b1-4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   └─Man (b1-4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     ├─Man (a1-3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     └─Man (a1-6)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0087D7;">GlcNAc</span> (?1-)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> └─<span style="color: #0087D7;">GlcNAc</span> (b1-4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   └─<span style="color: #00AF5F;">Man</span> (b1-4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ├─<span style="color: #00AF5F;">Man</span> (a1-3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     └─<span style="color: #00AF5F;">Man</span> (a1-6)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
