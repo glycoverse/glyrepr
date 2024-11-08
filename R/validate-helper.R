@@ -53,7 +53,9 @@ mix_generic_concrete <- function(monos) {
 
 # Is a valid subtituent?
 valid_substituent <- function(sub) {
-  stringr::str_detect(sub, "[\\d\\?][S|P|Ac]") | sub == ""
+  subs_pattern <- stringr::str_c(available_substituents(), collapse = "|")
+  pattern <- stringr::str_glue("[\\d\\?]({subs_pattern})")
+  sub == "" | stringr::str_detect(sub, pattern)
 }
 
 
