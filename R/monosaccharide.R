@@ -67,3 +67,35 @@ monosaccharides <- tibble::tribble(
   "S", "Sia", "Sia",
   NA, "Kdn", "Kdn"
 )
+
+
+#' Get Available Monosaacharides
+#'
+#' This function returns a tibble of available monosaccharides.
+#' The tibble has three columns: `simple`, `generic`, and `concrete`.
+#' "simple" is the simple monosaccharide name, e.g. "H", "N", "F", etc.
+#' "generic" is the generic monosaccharide name, e.g. "Hex", "HexNAc", "dHex", etc.
+#' "concrete" is the concrete monosaccharide name, e.g. "Glc", "Gal", "GlcNAc", etc.
+#'
+#' @return A tibble of available monosaccharides.
+#' @export
+available_monosaccharides <- function() {
+  monosaccharides
+}
+
+
+#' Check if a Monosaccharide is Known
+#'
+#' This function checks if a vector of monosaccharide names are known.
+#'
+#' @param mono A character vector of monosaccharide names.
+#'
+#' @return A logical vector.
+#' @export
+is_known_monosaccharide <- function(mono) {
+  (
+    mono %in% monosaccharides$simple |
+    mono %in% monosaccharides$generic |
+    mono %in% monosaccharides$concrete
+  )
+}
