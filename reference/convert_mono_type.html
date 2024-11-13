@@ -15,7 +15,7 @@ Conversion in other orders is not allowed.'><meta property="og:image" content="h
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9012</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@ Conversion in other orders is not allowed.</p>
 
 
 <dt id="arg-to">to<a class="anchor" aria-label="anchor" href="#arg-to"></a></dt>
-<dd><p>A character string specifying the target monosaccharide type.
+<dd><p>A character scalar specifying the target monosaccharide type.
 It can be "concrete", "generic", or "simple".</p></dd>
 
 
@@ -74,11 +74,31 @@ are already in the target type. Default is <code>TRUE</code>.</p></dd>
     <p>A character string specifying the monosaccharide name in the target type.</p>
     </div>
     <div class="section level2">
+    <h2 id="conversion-to-simple-type">Conversion to "simple" type<a class="anchor" aria-label="anchor" href="#conversion-to-simple-type"></a></h2>
+
+
+
+<p>When converting "concrete" to "simple", the following mapping is used:</p><ul><li><p>Glc, Man, Gal -&gt; H</p></li>
+<li><p>GlcNAc, GalNAc -&gt; N</p></li>
+<li><p>Fuc -&gt; F</p></li>
+<li><p>Neu5Ac -&gt; A</p></li>
+<li><p>Neu5Gc -&gt; G</p></li>
+<li><p>Sia -&gt; S</p></li>
+</ul><p>When converting "generic" to "simple", the following mapping is used:</p><ul><li><p>Hex -&gt; H</p></li>
+<li><p>HexNAc -&gt; N</p></li>
+<li><p>dHex -&gt; F</p></li>
+<li><p>NeuAc -&gt; A</p></li>
+<li><p>NeuGc -&gt; G</p></li>
+<li><p>Sia -&gt; S</p></li>
+</ul><p>Note that conversion from "generic" to "simple" uses an over-simplified
+rule, but this mapping is sufficient for most cases.</p>
+    </div>
+    <div class="section level2">
     <h2 id="three-types-of-monosaccharides">Three types of monosaccharides<a class="anchor" aria-label="anchor" href="#three-types-of-monosaccharides"></a></h2>
     <p>There are three types of monosaccharides:</p><ul><li><p>concrete: e.g. "Gal", "GlcNAc", "Glc", "Fuc", etc.</p></li>
 <li><p>generic: e.g. "Hex", "HexNAc", "HexA", "HexN", etc.</p></li>
 <li><p>simple: e.g. "H", "N", "S", "F".</p></li>
-</ul><p>For the full list of monosaccharides, see <code>glyrepr::monosaccharides</code>.</p>
+</ul><p>For the full list of monosaccharides, use <code><a href="available_monosaccharides.html">available_monosaccharides()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
