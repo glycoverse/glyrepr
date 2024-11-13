@@ -25,6 +25,33 @@ The conversion can only be done from "concrete" to "generic" or "simple",
 and from "generic" to "simple".
 Conversion in other orders is not allowed.
 }
+\section{Conversion to "simple" type}{
+
+
+When converting "concrete" to "simple", the following mapping is used:
+\itemize{
+\item Glc, Man, Gal -> H
+\item GlcNAc, GalNAc -> N
+\item Fuc -> F
+\item Neu5Ac -> A
+\item Neu5Gc -> G
+\item Sia -> S
+}
+
+When converting "generic" to "simple", the following mapping is used:
+\itemize{
+\item Hex -> H
+\item HexNAc -> N
+\item dHex -> F
+\item NeuAc -> A
+\item NeuGc -> G
+\item Sia -> S
+}
+
+Note that conversion from "generic" to "simple" uses an over-simplified
+rule, but this mapping is sufficient for most cases.
+}
+
 \section{Three types of monosaccharides}{
 There are three types of monosaccharides:
 \itemize{
@@ -33,7 +60,7 @@ There are three types of monosaccharides:
 \item simple: e.g. "H", "N", "S", "F".
 }
 
-For the full list of monosaccharides, see \code{glyrepr::monosaccharides}.
+For the full list of monosaccharides, use \code{\link[=available_monosaccharides]{available_monosaccharides()}}.
 }
 
 \examples{

@@ -19,12 +19,18 @@ are already in the target type. Default is \code{TRUE}.}
 A glycan graph with monosaccharides converted to the target type.
 }
 \description{
-This function converts the all monosaccharides in a glycan graph
+This function converts all monosaccharides in a glycan graph
 to a different type.
-The types are: concrete, generic, and simple.
+The types are: "concrete", "generic", and "simple" (see details below).
 The conversion can only be done from "concrete" to "generic" or "simple",
 and from "generic" to "simple".
 Conversion in other orders is not allowed.
+
+Converting monosaccharides types from higher to lower levels can lead to
+information loss. In real cases, you should avoid doing this directly and
+just use as high level as possible.
+This function is for other packages in \code{glycoverse} that know what they are
+doing for specific reasons.
 }
 \section{Three types of monosaccharides}{
 There are three types of monosaccharides:
@@ -34,7 +40,34 @@ There are three types of monosaccharides:
 \item simple: e.g. "H", "N", "S", "F".
 }
 
-For the full list of monosaccharides, see \code{glyrepr::monosaccharides}.
+For the full list of monosaccharides, use \code{\link[=available_monosaccharides]{available_monosaccharides()}}.
+}
+
+\section{Conversion to "simple" type}{
+
+
+When converting "concrete" to "simple", the following mapping is used:
+\itemize{
+\item Glc, Man, Gal -> H
+\item GlcNAc, GalNAc -> N
+\item Fuc -> F
+\item Neu5Ac -> A
+\item Neu5Gc -> G
+\item Sia -> S
+}
+
+When converting "generic" to "simple", the following mapping is used:
+\itemize{
+\item Hex -> H
+\item HexNAc -> N
+\item dHex -> F
+\item NeuAc -> A
+\item NeuGc -> G
+\item Sia -> S
+}
+
+Note that conversion from "generic" to "simple" uses an over-simplified
+rule, but this mapping is sufficient for most cases.
 }
 
 \examples{

@@ -30,7 +30,7 @@ There are three types of monosaccharides:
 \item simple: e.g. "H", "N", "S", "F".
 }
 
-For the full list of monosaccharides, see \code{glyrepr::monosaccharides}.
+For the full list of monosaccharides, use \code{\link[=available_monosaccharides]{available_monosaccharides()}}.
 }
 
 \examples{

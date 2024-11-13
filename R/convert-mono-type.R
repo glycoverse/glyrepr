@@ -1,14 +1,21 @@
 #' Convert the Type of Monosaacharides in a Glycan Graph
 #'
 #' @description
-#' This function converts the all monosaccharides in a glycan graph
+#' This function converts all monosaccharides in a glycan graph
 #' to a different type.
-#' The types are: concrete, generic, and simple.
+#' The types are: "concrete", "generic", and "simple" (see details below).
 #' The conversion can only be done from "concrete" to "generic" or "simple",
 #' and from "generic" to "simple".
 #' Conversion in other orders is not allowed.
 #'
+#' Converting monosaccharides types from higher to lower levels can lead to
+#' information loss. In real cases, you should avoid doing this directly and
+#' just use as high level as possible.
+#' This function is for other packages in `glycoverse` that know what they are
+#' doing for specific reasons.
+#'
 #' @inheritSection decide_mono_type Three types of monosaccharides
+#' @inheritSection convert_mono_type Conversion to "simple" type
 #'
 #' @param glycan A glycan graph.
 #' @param to A character string specifying the target monosaccharide type.
@@ -72,6 +79,27 @@ valid_from_to_for_convert_glycan_mono_type <- function(from, to, strict) {
 #' Conversion in other orders is not allowed.
 #'
 #' @inheritSection decide_mono_type Three types of monosaccharides
+#'
+#' @section Conversion to "simple" type:
+#'
+#' When converting "concrete" to "simple", the following mapping is used:
+#' - Glc, Man, Gal -> H
+#' - GlcNAc, GalNAc -> N
+#' - Fuc -> F
+#' - Neu5Ac -> A
+#' - Neu5Gc -> G
+#' - Sia -> S
+#'
+#' When converting "generic" to "simple", the following mapping is used:
+#' - Hex -> H
+#' - HexNAc -> N
+#' - dHex -> F
+#' - NeuAc -> A
+#' - NeuGc -> G
+#' - Sia -> S
+#'
+#' Note that conversion from "generic" to "simple" uses an over-simplified
+#' rule, but this mapping is sufficient for most cases.
 #'
 #' @param mono A character string specifying monosaccharide names.
 #' @param to A character string specifying the target monosaccharide type.
@@ -161,7 +189,7 @@ decide_glycan_mono_type <- function(glycan) {
 #' - generic: e.g. "Hex", "HexNAc", "HexA", "HexN", etc.
 #' - simple: e.g. "H", "N", "S", "F".
 #'
-#' For the full list of monosaccharides, see `glyrepr::monosaccharides`.
+#' For the full list of monosaccharides, use [available_monosaccharides()].
 #'
 #' @param monos A character string specifying monosaccharide names.
 #'
