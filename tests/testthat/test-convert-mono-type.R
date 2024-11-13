@@ -90,9 +90,9 @@ test_that("converting glycan from simple to simple with `strict` FALSE", {
 
 
 test_that("convert mono types", {
-  before = c("Man", "Hex", "GlcNAc")
+  before = c("Man", "Hex", "GlcNAc", "dHex", "Neu5Ac", "Neu5Gc", "Sia")
   to = "simple"
-  after = c("H", "H", "N")
+  after = c("H", "H", "N", "F", "A", "G", "S")
   expect_equal(convert_mono_type(before, to), after)
 })
 

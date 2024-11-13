@@ -37,12 +37,12 @@ monosaccharides <- tibble::tribble(
   NA, "HexA", "TalA",
   NA, "HexA", "IdoA",
   # Deoxyhexoses
+  "F", "dHex", "Fuc",
   NA, "dHex", "Qui",
   NA, "dHex", "Rha",
   NA, "dHex", "6dGul",
   NA, "dHex", "6dAlt",
   NA, "dHex", "6dTal",
-  "F", "dHex", "Fuc",
   # DeoxyhexNAcs
   NA, "dHexNAc", "QuiNAc",
   NA, "dHexNAc", "RhaNAc",
