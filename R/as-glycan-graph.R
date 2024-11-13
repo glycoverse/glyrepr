@@ -114,8 +114,8 @@
 #'
 #' @export
 as_glycan_graph <- function(graph, type = "auto") {
-  stopifnot(igraph::is_igraph(graph))
-  stopifnot(type %in% c("auto", "ne", "dn"))
+  checkmate::assert_class(graph, "igraph")
+  checkmate::assert_choice(type, c("auto", "ne", "dn"))
 
   if (type == "auto") {
     glycan <- new_dn_glycan_graph(graph)
@@ -146,7 +146,7 @@ as_glycan_graph <- function(graph, type = "auto") {
 #' @importFrom magrittr %>%
 #' @export
 as_dn_glycan_graph <- function(graph) {
-  stopifnot(igraph::is_igraph(graph))
+  checkmate::assert_class(graph, "igraph")
   graph %>%
     new_dn_glycan_graph() %>%
     validate_dn_glycan_graph() %>%
@@ -158,7 +158,7 @@ as_dn_glycan_graph <- function(graph) {
 #' @importFrom magrittr %>%
 #' @export
 as_ne_glycan_graph <- function(graph) {
-  stopifnot(igraph::is_igraph(graph))
+  checkmate::assert_class(graph, "igraph")
   graph %>%
     new_ne_glycan_graph() %>%
     validate_ne_glycan_graph() %>%

@@ -9,7 +9,6 @@
 #' can be specified using `anomer_range`, `pos1_range`, and `pos2_range`.
 #'
 #' @param linkage A linkage string.
-#' @param ... Not used.
 #' @param anomer_range A character vector of possible anomers.
 #' Default is `c("a", "b")`.
 #' @param pos1_range A numeric vector of possible first positions.
@@ -33,28 +32,17 @@
 #' @export
 possible_linkages <- function(
   linkage,
-  ...,
   anomer_range = c("a", "b"),
   pos1_range = 1:2,
   pos2_range = 1:9,
   include_unknown = FALSE
 ) {
   # Input checks
-  if (!is.character(linkage)) {
-    rlang::abort("Linkage must be a character.")
-  }
-  if (length(linkage) != 1) {
-    rlang::abort("Linkage must be a single character.")
-  }
-  if (!is.character(anomer_range)) {
-    rlang::abort("Anomer range must be a character vector.")
-  }
-  if (!is.numeric(pos1_range) || !is.numeric(pos2_range)) {
-    rlang::abort("Position ranges must be a numeric vector.")
-  }
-  if (!is.logical(include_unknown)) {
-    rlang::abort("Include unknown must be a logical.")
-  }
+  checkmate::assert_character(linkage, len = 1)
+  checkmate::assert_character(anomer_range, pattern = "^[ab]$", unique = TRUE)
+  checkmate::assert_numeric(pos1_range, lower = 1, upper = 2, unique = TRUE)
+  checkmate::assert_numeric(pos2_range, lower = 1, upper = 9, unique = TRUE)
+  checkmate::assert_flag(include_unknown)
 
   # Check if the linkage is valid
   if (!valid_linkages(linkage)) {

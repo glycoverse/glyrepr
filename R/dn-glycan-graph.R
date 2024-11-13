@@ -1,12 +1,12 @@
 # New Dual-Node Glycan Graph
 new_dn_glycan_graph <- function(graph) {
-  stopifnot(igraph::is_igraph(graph))
+  checkmate::assert_class(graph, "igraph")
   structure(graph, class = c("dn_glycan_graph", "glycan_graph", "igraph"))
 }
 
 
 validate_dn_glycan_graph <- function(glycan) {
-  stopifnot(inherits(glycan, "dn_glycan_graph"))
+  checkmate::assert_class(glycan, "dn_glycan_graph")
   # Check if it is a directed graph
   if (!is_directed_graph(glycan)) {
     rlang::abort("Glycan graph must be directed.")

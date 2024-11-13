@@ -4,9 +4,7 @@
 \alias{available_monosaccharides}
 \title{Get Available Monosaacharides}
 \usage{
-available_monosaccharides(
-  mono_type = c("all", "simple", "generic", "concrete")
-)
+available_monosaccharides(mono_type = "all")
 }
 \arguments{
 \item{mono_type}{A character string specifying the type of monosaccharides.

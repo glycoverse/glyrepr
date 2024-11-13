@@ -36,7 +36,10 @@
 #'
 #' @export
 convert_glycan_mono_type <- function(glycan, to, strict = TRUE) {
-  check_to_arg(to)
+  checkmate::assert_class(glycan, "glycan_graph")
+  checkmate::assert_choice(to, c("concrete", "generic", "simple"))
+  checkmate::assert_flag(strict)
+
   from <- decide_glycan_mono_type(glycan)
   valid_from_to_for_convert_glycan_mono_type(from, to, strict)
   if (inherits(glycan, "ne_glycan_graph")) {
@@ -102,7 +105,7 @@ valid_from_to_for_convert_glycan_mono_type <- function(from, to, strict) {
 #' rule, but this mapping is sufficient for most cases.
 #'
 #' @param mono A character string specifying monosaccharide names.
-#' @param to A character string specifying the target monosaccharide type.
+#' @param to A character scalar specifying the target monosaccharide type.
 #'  It can be "concrete", "generic", or "simple".
 #' @param strict If `TRUE`, the function will raise an error if the monosaccharides
 #' are already in the target type. Default is `TRUE`.
@@ -117,7 +120,10 @@ valid_from_to_for_convert_glycan_mono_type <- function(from, to, strict) {
 #'
 #' @export
 convert_mono_type <- function(mono, to, strict = TRUE) {
-  check_to_arg(to)
+  checkmate::assert_character(mono)
+  checkmate::assert_choice(to, c("concrete", "generic", "simple"))
+  checkmate::assert_flag(strict)
+
   from <- decide_mono_type(mono)
   valid_from_to_for_convert_mono_type(mono, from, to, strict)
   convert_mono_type_(mono, from, to)
@@ -169,7 +175,7 @@ valid_from_to_for_convert_mono_type <- function(mono, from, to, strict) {
 #'
 #' @export
 decide_glycan_mono_type <- function(glycan) {
-  stopifnot(is_glycan(glycan))
+  checkmate::assert_class(glycan, "glycan_graph")
   if (inherits(glycan, "ne_glycan_graph")) {
     decide_glycan_mono_type_ne(glycan)
   } else {  # "dn_glycan_graph"
@@ -202,9 +208,7 @@ decide_glycan_mono_type <- function(glycan) {
 #'
 #' @export
 decide_mono_type <- function(monos) {
-  if (!is.character(monos)) {
-    rlang::abort("Mono must be a character string.")
-  }
+  checkmate::assert_character(monos)
   result <- vector("character", length = length(monos))
   result[monos %in% monosaccharides$concrete] <- "concrete"
   result[monos %in% monosaccharides$generic] <- "generic"
@@ -214,16 +218,6 @@ decide_mono_type <- function(monos) {
     cli::cli_abort("Unknown monosaccharide: {.val {unknown}}.")
   }
   result
-}
-
-
-check_to_arg <- function(to) {
-  if (!length(to) == 1) {
-    rlang::abort("Only one `to` mono type can be specified.")
-  }
-  if (!(to %in% c("concrete", "generic", "simple"))) {
-    rlang::abort("Must be one of: concrete, generic, simple.")
-  }
 }
 
 

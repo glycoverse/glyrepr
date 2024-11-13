@@ -6,7 +6,6 @@
 \usage{
 possible_linkages(
   linkage,
-  ...,
   anomer_range = c("a", "b"),
   pos1_range = 1:2,
   pos2_range = 1:9,
@@ -15,8 +14,6 @@ possible_linkages(
 }
 \arguments{
 \item{linkage}{A linkage string.}
-
-\item{...}{Not used.}
 
 \item{anomer_range}{A character vector of possible anomers.
 Default is \code{c("a", "b")}.}

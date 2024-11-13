@@ -53,8 +53,6 @@ is_dn_glycan <- function(x) {
 #'
 #' @export
 glycan_graph_mode <- function(x) {
-  if (!is_glycan(x)) {
-    stop("Input must be a glycan graph.")
-  }
+  checkmate::assert_class(x, "glycan_graph")
   if (is_ne_glycan(x)) "ne" else "dn"
 }

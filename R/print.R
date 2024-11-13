@@ -15,6 +15,8 @@
 #'
 #' @export
 print.ne_glycan_graph <- function(x, ..., verbose = TRUE, colored = TRUE) {
+  checkmate::assert_flag(verbose)
+  checkmate::assert_flag(colored)
   cli::cat_line("Glycan Graph (NE)")
   print_composition(x)
   if (verbose) {

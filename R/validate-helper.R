@@ -88,9 +88,7 @@ valid_anomer <- function(anomer) {
 #'
 #' @export
 valid_linkages <- function(linkages) {
-  if (!is.character(linkages)) {
-    rlang::abort("Linkages must be a character vector.")
-  }
+  checkmate::assert_character(linkages)
   anomer_p <- "[ab\\?]"
   pos1_p <- "([12]|\\?)"
   pos2_p <- "([1-9](/[1-9])*|\\?)"

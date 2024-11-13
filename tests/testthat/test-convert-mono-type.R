@@ -119,14 +119,6 @@ test_that("convert mono types with bad directions", {
 })
 
 
-test_that("convert mono types with multiple `to`", {
-  expect_error(
-    convert_mono_type(c("Hex", "Hex"), to = c("simple", "simple")),
-    "Only one `to` mono type can be specified"
-  )
-})
-
-
 patrick::with_parameters_test_that("deciding glycan mono type works", {
     expect_equal(decide_glycan_mono_type(glycan), type)
   },

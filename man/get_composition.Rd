@@ -2,23 +2,18 @@
 % Please edit documentation in R/glycan-composition.R
 \name{get_composition}
 \alias{get_composition}
-\alias{get_compositions}
-\title{Get Compositions of Glycans}
+\title{Get Composition of a Glycan}
 \usage{
 get_composition(glycan)
-
-get_compositions(glycans)
 }
 \arguments{
 \item{glycan}{A glycan graph.}
-
-\item{glycans}{A list of glycan graphs.}
 }
 \value{
 A named integer vector.
 }
 \description{
-Get the compositions of a glycan graph or a list of glycan graphs.
+Get the composition of a glycan graph.
 The composition is a named integer vector.
 }
 \examples{

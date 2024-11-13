@@ -23,9 +23,7 @@
 #'
 #' @export
 has_linkages <- function(glycan) {
-  if (!is_glycan(glycan)) {
-    stop("Input must be a glycan graph.")
-  }
+  checkmate::assert_class(glycan, "glycan_graph")
   if (is_ne_glycan(glycan)) {
     has_linkages_ne(glycan)
   } else {

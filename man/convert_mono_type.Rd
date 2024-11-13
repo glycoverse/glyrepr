@@ -9,7 +9,7 @@ convert_mono_type(mono, to, strict = TRUE)
 \arguments{
 \item{mono}{A character string specifying monosaccharide names.}
 
-\item{to}{A character string specifying the target monosaccharide type.
+\item{to}{A character scalar specifying the target monosaccharide type.
 It can be "concrete", "generic", or "simple".}
 
 \item{strict}{If \code{TRUE}, the function will raise an error if the monosaccharides

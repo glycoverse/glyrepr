@@ -29,6 +29,10 @@
 #'
 #' @export
 convert_graph_mode <- function(glycan, to, strict = TRUE) {
+  checkmate::assert_class(glycan, "glycan_graph")
+  checkmate::assert_choice(to, c("ne", "dn"))
+  checkmate::assert_flag(strict)
+
   if (to == "ne" && is_dn_glycan(glycan)) {
     return(convert_dn_to_ne(glycan))
   }

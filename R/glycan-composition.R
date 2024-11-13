@@ -1,10 +1,9 @@
-#' Get Compositions of Glycans
+#' Get Composition of a Glycan
 #'
-#' Get the compositions of a glycan graph or a list of glycan graphs.
+#' Get the composition of a glycan graph.
 #' The composition is a named integer vector.
 #'
 #' @param glycan A glycan graph.
-#' @param glycans A list of glycan graphs.
 #'
 #' @return A named integer vector.
 #'
@@ -16,19 +15,12 @@
 #'
 #' @export
 get_composition <- function(glycan) {
-  stopifnot(is_glycan(glycan))
+  checkmate::assert_class(glycan, "glycan_graph")
   monos <- igraph::V(glycan)$mono
   result_tb <- table(monos)
   result <- as.integer(result_tb)
   names(result) <- names(result_tb)
   result
-}
-
-
-#' @rdname get_composition
-#' @export
-get_compositions <- function(glycans) {
-  purrr::map(glycans, get_composition)
 }
 
 
@@ -45,10 +37,10 @@ get_compositions <- function(glycans) {
 #' glycan <- n_glycan_core()
 #' count_monos(glycan)
 #'
-#' @seealso [get_composition()], [get_compositions()]
+#' @seealso [get_composition()]
 #'
 #' @export
 count_monos <- function(glycan) {
-  stopifnot(is_glycan(glycan))
+  checkmate::assert_class(glycan, "glycan_graph")
   sum(get_composition(glycan))
 }

@@ -79,8 +79,8 @@ monosaccharides <- tibble::tribble(
 #'
 #' @return A character vector of monosaccharide names.
 #' @export
-available_monosaccharides <- function(mono_type = c("all", "simple", "generic", "concrete")) {
-  mono_type <- rlang::arg_match(mono_type)
+available_monosaccharides <- function(mono_type = "all") {
+  checkmate::assert_choice(mono_type, c("all", "simple", "generic", "concrete"))
   if (mono_type == "all") {
     unique(purrr::discard(unlist(monosaccharides, use.names = FALSE), is.na))
   } else {
@@ -98,6 +98,7 @@ available_monosaccharides <- function(mono_type = c("all", "simple", "generic", 
 #' @return A logical vector.
 #' @export
 is_known_monosaccharide <- function(mono) {
+  checkmate::assert_character(mono)
   (
     mono %in% monosaccharides$simple |
     mono %in% monosaccharides$generic |

@@ -22,5 +22,5 @@ count_monos(glycan)
 
 }
 \seealso{
-\code{\link[=get_composition]{get_composition()}}, \code{\link[=get_compositions]{get_compositions()}}
+\code{\link[=get_composition]{get_composition()}}
 }

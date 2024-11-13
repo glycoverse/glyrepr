@@ -63,6 +63,7 @@
 #'
 #' @export
 n_glycan_core <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
+  validate_example_args(mode, linkage, mono_type)
   build_example_graph(mode, linkage, mono_type, n_glycan_core_ne)
 }
 
@@ -70,6 +71,7 @@ n_glycan_core <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
 #' @rdname n_glycan_core
 #' @export
 o_glycan_core_1 <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
+  validate_example_args(mode, linkage, mono_type)
   build_example_graph(mode, linkage, mono_type, o_glycan_core_1_ne)
 }
 
@@ -77,6 +79,7 @@ o_glycan_core_1 <- function(mode = "ne", linkage = TRUE, mono_type = "concrete")
 #' @rdname n_glycan_core
 #' @export
 o_glycan_core_2 <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
+  validate_example_args(mode, linkage, mono_type)
   build_example_graph(mode, linkage, mono_type, o_glycan_core_2_ne)
 }
 
@@ -135,4 +138,11 @@ o_glycan_core_2_ne <- function() {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
   new_ne_glycan_graph(graph)
+}
+
+
+validate_example_args <- function(mode, linkage, mono_type) {
+  checkmate::assert_choice(mode, c("ne", "dn"))
+  checkmate::assert_choice(mono_type, c("simple", "generic", "concrete"))
+  checkmate::assert_flag(linkage)
 }

@@ -46,14 +46,14 @@ test_that("wrong format", {
 
 
 test_that("wrong input type", {
-  expect_error(possible_linkages(1), "Linkage must be a character")
-  expect_error(possible_linkages(NA), "Linkage must be a character")
-  expect_error(possible_linkages(NULL), "Linkage must be a character")
+  expect_error(possible_linkages(1))
+  expect_error(possible_linkages(NA))
+  expect_error(possible_linkages(NULL))
 })
 
 
 test_that("multiple linkages", {
-  expect_error(possible_linkages(c("a1-3", "b1-4")), "Linkage must be a single character")
+  expect_error(possible_linkages(c("a1-3", "b1-4")))
 })
 
 
@@ -65,9 +65,9 @@ test_that("custom ranges", {
 
 
 test_that("custom ranges wrong types", {
-  expect_error(possible_linkages("??-?", anomer_range = 1), "Anomer range must be a character")
-  expect_error(possible_linkages("??-?", pos1_range = "a"), "Position ranges must be a numeric")
-  expect_error(possible_linkages("??-?", pos2_range = "a"), "Position ranges must be a numeric")
+  expect_error(possible_linkages("??-?", anomer_range = 1))
+  expect_error(possible_linkages("??-?", pos1_range = "a"))
+  expect_error(possible_linkages("??-?", pos2_range = "a"))
 })
 
 
