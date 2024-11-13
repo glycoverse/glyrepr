@@ -71,16 +71,21 @@ monosaccharides <- tibble::tribble(
 
 #' Get Available Monosaacharides
 #'
-#' This function returns a tibble of available monosaccharides.
-#' The tibble has three columns: `simple`, `generic`, and `concrete`.
-#' "simple" is the simple monosaccharide name, e.g. "H", "N", "F", etc.
-#' "generic" is the generic monosaccharide name, e.g. "Hex", "HexNAc", "dHex", etc.
-#' "concrete" is the concrete monosaccharide name, e.g. "Glc", "Gal", "GlcNAc", etc.
+#' This function returns a character vector of monosaccharide names of
+#' the given type. See [decide_mono_type()] for monosaacharide types.
 #'
-#' @return A tibble of available monosaccharides.
+#' @param mono_type A character string specifying the type of monosaccharides.
+#'  Can be "all", "simple", "generic", or "concrete". Default is "all".
+#'
+#' @return A character vector of monosaccharide names.
 #' @export
-available_monosaccharides <- function() {
-  monosaccharides
+available_monosaccharides <- function(mono_type = c("all", "simple", "generic", "concrete")) {
+  mono_type <- rlang::arg_match(mono_type)
+  if (mono_type == "all") {
+    unique(purrr::discard(unlist(monosaccharides, use.names = FALSE), is.na))
+  } else {
+    unique(purrr::discard(monosaccharides[[mono_type]], is.na))
+  }
 }
 
 

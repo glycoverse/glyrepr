@@ -4,15 +4,18 @@
 \alias{available_monosaccharides}
 \title{Get Available Monosaacharides}
 \usage{
-available_monosaccharides()
+available_monosaccharides(
+  mono_type = c("all", "simple", "generic", "concrete")
+)
+}
+\arguments{
+\item{mono_type}{A character string specifying the type of monosaccharides.
+Can be "all", "simple", "generic", or "concrete". Default is "all".}
 }
 \value{
-A tibble of available monosaccharides.
+A character vector of monosaccharide names.
 }
 \description{
-This function returns a tibble of available monosaccharides.
-The tibble has three columns: \code{simple}, \code{generic}, and \code{concrete}.
-"simple" is the simple monosaccharide name, e.g. "H", "N", "F", etc.
-"generic" is the generic monosaccharide name, e.g. "Hex", "HexNAc", "dHex", etc.
-"concrete" is the concrete monosaccharide name, e.g. "Glc", "Gal", "GlcNAc", etc.
+This function returns a character vector of monosaccharide names of
+the given type. See \code{\link[=decide_mono_type]{decide_mono_type()}} for monosaacharide types.
 }
