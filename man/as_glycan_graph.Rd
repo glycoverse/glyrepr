@@ -31,7 +31,7 @@ to the graph object.
 
 Generally, \strong{it is not recommended} to create a glycan graph using this
 function manually.
-Use the \href{https://github.com/fubin1999/glyparse}{glyparse} package
+Use the \href{https://github.com/glycoverse/glyparse}{glyparse} package
 to generate a glycan graph from a structure string.
 
 Two types of glycan graphs are supported: dual-node (DN) and node-edge (NE).

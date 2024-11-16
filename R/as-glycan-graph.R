@@ -7,7 +7,7 @@
 #'
 #' Generally, **it is not recommended** to create a glycan graph using this
 #' function manually.
-#' Use the [glyparse](https://github.com/fubin1999/glyparse) package
+#' Use the [glyparse](https://github.com/glycoverse/glyparse) package
 #' to generate a glycan graph from a structure string.
 #'
 #' Two types of glycan graphs are supported: dual-node (DN) and node-edge (NE).

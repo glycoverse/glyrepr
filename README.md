@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# glyrepr <a href="https://fubin1999.github.io/glyrepr/"><img src="man/figures/logo.png" align="right" height="138" /></a>
+# glyrepr <a href="https://glycoverse.github.io/glyrepr/"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 <!-- badges: start -->
 
@@ -9,9 +9,9 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/glyrepr)](https://CRAN.R-project.org/package=glyrepr)
-[![R-CMD-check](https://github.com/fubin1999/glyrepr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/fubin1999/glyrepr/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/glycoverse/glyrepr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/glycoverse/glyrepr/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/fubin1999/glyrepr/graph/badge.svg)](https://app.codecov.io/gh/fubin1999/glyrepr)
+coverage](https://codecov.io/gh/glycoverse/glyrepr/graph/badge.svg)](https://app.codecov.io/gh/glycoverse/glyrepr)
 <!-- badges: end -->
 
 This package is a wrapper of ‘igraph’ for representing glycan structures
@@ -25,7 +25,7 @@ You can install the development version of glyrepr from
 
 ``` r
 # install.packages("pak")
-pak::pak("fubin1999/glyrepr")
+pak::pak("glycoverse/glyrepr")
 ```
 
 ## Example
