@@ -1,6 +1,7 @@
+# This table referred to https://www.ncbi.nlm.nih.gov/glycans/snfg.html
 monosaccharides <- tibble::tribble(
   ~simple, ~generic, ~concrete,
-  # Hexoses
+  # Hexose
   "H", "Hex", "Glc",
   "H", "Hex", "Man",
   "H", "Hex", "Gal",
@@ -9,7 +10,7 @@ monosaccharides <- tibble::tribble(
   NA, "Hex", "All",
   NA, "Hex", "Tal",
   NA, "Hex", "Ido",
-  # HexNAcs
+  # HexNAc
   "N", "HexNAc", "GlcNAc",
   "N", "HexNAc", "GalNAc",
   NA, "HexNAc", "ManNAc",
@@ -18,7 +19,7 @@ monosaccharides <- tibble::tribble(
   NA, "HexNAc", "AllNAc",
   NA, "HexNAc", "TalNAc",
   NA, "HexNAc", "IdoNAc",
-  # Hexosamines
+  # Hexosamine
   NA, "HexN", "GlcN",
   NA, "HexN", "ManN",
   NA, "HexN", "GalN",
@@ -27,7 +28,7 @@ monosaccharides <- tibble::tribble(
   NA, "HexN", "AllN",
   NA, "HexN", "TalN",
   NA, "HexN", "IdoN",
-  # Hexuronates
+  # Hexuronate
   NA, "HexA", "GlcA",
   NA, "HexA", "ManA",
   NA, "HexA", "GalA",
@@ -36,36 +37,57 @@ monosaccharides <- tibble::tribble(
   NA, "HexA", "AllA",
   NA, "HexA", "TalA",
   NA, "HexA", "IdoA",
-  # Deoxyhexoses
+  # Deoxyhexose
   "F", "dHex", "Fuc",
   NA, "dHex", "Qui",
   NA, "dHex", "Rha",
   NA, "dHex", "6dGul",
   NA, "dHex", "6dAlt",
   NA, "dHex", "6dTal",
-  # DeoxyhexNAcs
+  # DeoxyhexNAc
   NA, "dHexNAc", "QuiNAc",
   NA, "dHexNAc", "RhaNAc",
   NA, "dHexNAc", "6dAltNAc",
   NA, "dHexNAc", "6dTalNAc",
   NA, "dHexNAc", "FucNAc",
-  # Dideoxyhexoses
+  # Di-deoxyhexose
   NA, "ddHex", "Oli",
   NA, "ddHex", "Tyv",
   NA, "ddHex", "Abe",
   NA, "ddHex", "Par",
   NA, "ddHex", "Dig",
   NA, "ddHex", "Col",
-  # Pentoses
+  # Pentose
   NA, "Pent", "Ara",
   NA, "Pent", "Lyx",
   NA, "Pent", "Xyl",
   NA, "Pent", "Rib",
-  # Sialic acids
+  # 3-deoxy-nonulosonic acids
   "A", "NeuAc", "Neu5Ac",
   "G", "NeuGc", "Neu5Gc",
-  "S", "Sia", "Sia",
-  NA, "Kdn", "Kdn"
+  "S", NA, "Sia",
+  NA, NA, "Neu",
+  NA, NA, "Kdn",
+  # 3,9-dideoxy-nonulosonic acids
+  NA, NA, "Pse",
+  NA, NA, "Leg",
+  NA, NA, "Aci",
+  NA, NA, "4eLeg",
+  # Unknown
+  NA, NA, "Bac",
+  NA, NA, "LDmanHep",
+  NA, NA, "Kdo",
+  NA, NA, "Dha",
+  NA, NA, "DDmanHep",
+  NA, NA, "MurNAc",
+  NA, NA, "MurNGc",
+  NA, NA, "Mur",
+  # Assigned
+  NA, NA, "Api",
+  NA, NA, "Fru",
+  NA, NA, "Tag",
+  NA, NA, "Sor",
+  NA, NA, "Psi"
 )
 
 
