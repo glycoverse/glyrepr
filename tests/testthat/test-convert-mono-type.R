@@ -89,6 +89,13 @@ test_that("converting glycan from simple to simple with `strict` FALSE", {
 })
 
 
+test_that("converting glycan mono types with NA produced", {
+  glycan <- o_glycan_core_1()
+  igraph::V(glycan)$mono[[1]] <- "Pse"  # cannot be converted to generic
+  expect_snapshot(convert_glycan_mono_type(glycan, to = "generic"), error = TRUE)
+})
+
+
 test_that("convert mono types", {
   before = c("Man", "Hex", "GlcNAc", "dHex", "Neu5Ac", "Neu5Gc", "Sia")
   to = "simple"
@@ -116,6 +123,12 @@ test_that("convert mono types with bad directions", {
   before = c("H", "Hex")
   to = "concrete"
   expect_snapshot(convert_mono_type(before, to), error = TRUE)
+})
+
+
+test_that("converting mono types with NA", {
+  # This should throw a warning
+  expect_snapshot(convert_mono_type(c("Pse", "Fuc"), "generic"))
 })
 
 

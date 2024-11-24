@@ -111,6 +111,8 @@ valid_from_to_for_convert_glycan_mono_type <- function(from, to, strict) {
 #' are already in the target type. Default is `TRUE`.
 #'
 #' @return A character string specifying the monosaccharide name in the target type.
+#' If a monosaccharide cannot be converted, it will be `NA`.
+#' If any NA values are present in the input, a warning will be thrown.
 #'
 #' @examples
 #' convert_mono_type(c("Gal", "Hex", "GlcNAc"), to = "simple")
@@ -126,7 +128,17 @@ convert_mono_type <- function(mono, to, strict = TRUE) {
 
   from <- decide_mono_type(mono)
   valid_from_to_for_convert_mono_type(mono, from, to, strict)
-  convert_mono_type_(mono, from, to)
+  res <- convert_mono_type_(mono, from, to)
+
+  bad_monos <- mono[is.na(res)]
+  if (length(bad_monos) > 0) {
+    cli::cli_warn(
+      "Some monosaccharides cannot be converted to {.val {to}}: {.val {bad_monos}}.",
+      call = rlang::expr(convert_mono_type())
+    )
+  }
+
+  res
 }
 
 
@@ -259,17 +271,21 @@ decide_glycan_mono_type_dn <- function(glycan) {
 
 
 convert_mono_type_ <- function(mono, from, to) {
-  convert_one_mono_type <- function(mono, from, to) {
-    from_ <- monosaccharides[[from]]
-    to_ <- monosaccharides[[to]]
-    to_[match(mono, from_)]
-  }
   purrr::map2_chr(mono, from, convert_one_mono_type, to = to)
 }
 
 
+convert_one_mono_type <- function(mono, from, to) {
+  from_ <- monosaccharides[[from]]
+  to_ <- monosaccharides[[to]]
+  to_[match(mono, from_)]  # it might be NA
+}
+
+
 convert_glycan_mono_type_ne <- function(glycan, from, to) {
-  new_names <- convert_mono_type_(igraph::V(glycan)$mono, from, to)
+  old_names <- igraph::V(glycan)$mono
+  new_names <- convert_mono_type_(old_names, from, to)
+  raise_error_for_na(old_names, new_names, to)
   igraph::set_vertex_attr(glycan, "mono", value = new_names)
 }
 
@@ -278,5 +294,17 @@ convert_glycan_mono_type_dn <- function(glycan, from, to) {
   mono_nodes <- which(igraph::V(glycan)$type == "mono")
   old_names <- igraph::vertex_attr(glycan, "mono")[mono_nodes]
   new_names <- convert_mono_type_(old_names, from, to)
+  raise_error_for_na(old_names, new_names, to)
   igraph::set_vertex_attr(glycan, "mono", value = new_names, index = mono_nodes)
+}
+
+
+raise_error_for_na <- function(old_names, new_names, to) {
+  bad_names <- old_names[is.na(new_names)]
+  if (length(bad_names) > 0) {
+    cli::cli_abort(
+      "Some monosaccharides cannot be converted to {.val {to}}: {.val {bad_names}}.",
+      call = rlang::expr(convert_glycan_mono_type())
+    )
+  }
 }

@@ -33,6 +33,14 @@
       Error in `convert_glycan_mono_type()`:
       ! It is already "generic".
 
+# converting glycan mono types with NA produced
+
+    Code
+      convert_glycan_mono_type(glycan, to = "generic")
+    Condition
+      Error in `convert_glycan_mono_type()`:
+      ! Some monosaccharides cannot be converted to "generic": "Pse".
+
 # convert mono types fails for monos already in simple form
 
     Code
@@ -49,6 +57,16 @@
       Error in `convert_mono_type()`:
       ! These monosaccharides cannot be converted to "concrete": "H" and "Hex"
       i Conversion could only be done in this direction: concrete -> generic -> simple
+
+# converting mono types with NA
+
+    Code
+      convert_mono_type(c("Pse", "Fuc"), "generic")
+    Condition
+      Warning in `convert_mono_type()`:
+      Some monosaccharides cannot be converted to "generic": "Pse".
+    Output
+      [1] NA     "dHex"
 
 # deciding mono types fails for multiple monos
 

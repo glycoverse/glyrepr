@@ -17,6 +17,8 @@ are already in the target type. Default is \code{TRUE}.}
 }
 \value{
 A character string specifying the monosaccharide name in the target type.
+If a monosaccharide cannot be converted, it will be \code{NA}.
+If any NA values are present in the input, a warning will be thrown.
 }
 \description{
 This function converts a monosaccharide to a different type.
