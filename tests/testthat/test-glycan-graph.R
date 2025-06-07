@@ -1,3 +1,93 @@
+# Tests for glycan graph functions
+
+good_glycan_graph <- function() {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
+  igraph::V(graph)$sub <- c("", "", "")
+  igraph::E(graph)$linkage <- c("b1-4", "b1-4")
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  graph
+}
+
+
+# Tests for as_glycan_graph --------------------------------------------------
+
+test_that("as_glycan_graph works", {
+  glycan <- as_glycan_graph(good_glycan_graph())
+  expect_s3_class(glycan, c("glycan_graph", "igraph"))
+})
+
+
+test_that("as_glycan_graph fails for invalid graphs", {
+  bad_graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+1)
+  expect_error(as_glycan_graph(bad_graph))
+})
+
+
+test_that("vertex names are added if missing", {
+  graph <- good_glycan_graph()
+  graph <- igraph::delete_vertex_attr(graph, "name")
+
+  glycan <- as_glycan_graph(graph)
+
+  expect_true("name" %in% igraph::vertex_attr_names(glycan))
+})
+
+
+# Tests for new_glycan_graph -------------------------------------------------
+
+test_that("new_glycan_graph creates correct class", {
+  graph <- igraph::make_empty_graph()
+  glycan <- new_glycan_graph(graph)
+  expect_s3_class(glycan, c("glycan_graph", "igraph"))
+})
+
+
+test_that("new_glycan_graph requires igraph input", {
+  expect_error(new_glycan_graph("not a graph"))
+})
+
+
+# Tests for validate_glycan_graph --------------------------------------------
+
+test_that("validate_glycan_graph accepts valid graphs", {
+  graph <- good_glycan_graph()
+  glycan <- new_glycan_graph(graph)
+  expect_no_error(validate_glycan_graph(glycan))
+})
+
+
+test_that("validate_glycan_graph rejects invalid graphs", {
+  # Test undirected graph
+  graph <- igraph::make_graph(~ 1--2)
+  igraph::V(graph)$mono <- c("Glc", "Gal")
+  igraph::V(graph)$sub <- c("", "")
+  igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  glycan <- new_glycan_graph(graph)
+  expect_error(validate_glycan_graph(glycan), "directed")
+})
+
+
+# Tests for ensure_name_vertex_attr ------------------------------------------
+
+test_that("ensure_name_vertex_attr adds names when missing", {
+  graph <- igraph::make_graph(~ 1-+2)
+  graph <- igraph::delete_vertex_attr(graph, "name")
+  result <- ensure_name_vertex_attr(graph)
+  expect_true("name" %in% igraph::vertex_attr_names(result))
+})
+
+
+test_that("ensure_name_vertex_attr preserves existing names", {
+  graph <- igraph::make_graph(~ A-+B)
+  result <- ensure_name_vertex_attr(graph)
+  expect_equal(igraph::V(result)$name, c("A", "B"))
+})
+
+
 test_that("glycan graph class", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
 
