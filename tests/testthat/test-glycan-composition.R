@@ -11,3 +11,33 @@ test_that("get the composition for a glycan graph", {
 
   expect_equal(sort(comp), sort(c(Glc = 2L, Gal = 1L)))
 })
+
+test_that("empty composition is valid", {
+  comp <- composition()
+  expect_s3_class(comp, "glyrepr_composition")
+})
+
+test_that("format is correct", {
+  # simple monosaccharides
+  comp <- composition(c(H = 2, N = 1))
+  expect_equal(format(comp), "H2N1")
+  # generic monosaccharides
+  comp <- composition(c(Hex = 2, HexNAc = 1))
+  expect_equal(format(comp), "Hex(2)HexNAc(1)")
+  # concrete monosaccharides
+  comp <- composition(c(Glc = 2, Gal = 1))
+  expect_equal(format(comp), "Glc(2)Gal(1)")
+})
+
+test_that("residues are reordered", {
+  comp <- composition(c(N = 1, H = 2))
+  expect_equal(format(comp), "H2N1")
+})
+
+test_that("mixed mono types are not allowed", {
+  expect_error(composition(c(H = 1, Hex = 1)), "must have only one type of monosaccharide")
+})
+
+test_that("unknown monosaccharides are not allowed", {
+  expect_error(composition(c(Glc = 1, unknown = 1)), "must have only known monosaccharides")
+})

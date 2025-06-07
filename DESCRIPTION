@@ -25,4 +25,5 @@ Imports:
     magrittr,
     purrr,
     rlang,
-    stringr
+    stringr,
+    vctrs (>= 0.6.5)
