@@ -2,13 +2,18 @@
 % Please edit documentation in R/glycan-composition.R
 \name{composition}
 \alias{composition}
+\alias{is_composition}
 \title{Create a Glycan Composition}
 \usage{
 composition(...)
+
+is_composition(x)
 }
 \arguments{
 \item{...}{Named integer vectors.
 Names are monosaccharides, values are numbers of residues.}
+
+\item{x}{A list of named integer vectors.}
 }
 \value{
 A glyrepr_composition object.

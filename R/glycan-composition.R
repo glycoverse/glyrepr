@@ -109,6 +109,57 @@ composition <- function(...) {
   x
 }
 
+#' Convert to Glycan Composition
+#'
+#' Convert an object to a glycan composition.
+#'
+#' @param x An object to convert to a glycan composition.
+#'   Can be a named integer vector, a list of named integer vectors,
+#'   or an existing glyrepr_composition object.
+#'
+#' @return A glyrepr_composition object.
+#'
+#' @examples
+#' # Convert a named vector
+#' as_composition(c(H = 5, N = 2))
+#' # Convert a list of named vectors
+#' as_composition(list(c(H = 5, N = 2), c(H = 3, N = 1)))
+#' # Convert an existing composition (returns as-is)
+#' comp <- composition(c(H = 5, N = 2))
+#' as_composition(comp)
+#'
+#' @export
+as_composition <- function(x) {
+  UseMethod("as_composition")
+}
+
+#' @export
+as_composition.glyrepr_composition <- function(x) {
+  x
+}
+
+#' @export
+as_composition.default <- function(x) {
+  if (is.null(names(x)) && is.list(x)) {
+    # Handle list of named vectors - validate that all elements are named
+    if (!all(purrr::map_lgl(x, ~ !is.null(names(.x))))) {
+      cli::cli_abort(c(
+        "All elements in the list must be named vectors.",
+        "i" = "Each vector in the list should have names indicating monosaccharides."
+      ))
+    }
+    do.call(composition, x)
+  } else if (!is.null(names(x)) && is.numeric(x)) {
+    # Handle single named vector
+    composition(x)
+  } else {
+    cli::cli_abort(c(
+      "Cannot convert object of class {.cls {class(x)}} to glyrepr_composition.",
+      "i" = "Supported types: named integer vector, list of named integer vectors, or existing glyrepr_composition."
+    ))
+  }
+}
+
 # Helper function to get the order of monosaccharides based on their position in the tibble
 get_monosaccharide_order <- function(mono_names) {
   if (length(mono_names) == 0) {

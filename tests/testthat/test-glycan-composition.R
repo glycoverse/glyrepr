@@ -43,3 +43,72 @@ test_that("mixed mono types are not allowed", {
 test_that("unknown monosaccharides are not allowed", {
   expect_error(composition(c(Glc = 1, unknown = 1)), "must have only known monosaccharides")
 })
+
+test_that("as_composition works with named vectors", {
+  # Test with simple monosaccharides
+  vec <- c(H = 5, N = 2)
+  comp <- as_composition(vec)
+  expected <- composition(c(H = 5, N = 2))
+  expect_equal(comp, expected)
+  
+  # Test with generic monosaccharides
+  vec <- c(Hex = 2, HexNAc = 1)
+  comp <- as_composition(vec)
+  expected <- composition(c(Hex = 2, HexNAc = 1))
+  expect_equal(comp, expected)
+  
+  # Test with concrete monosaccharides
+  vec <- c(Glc = 2, Gal = 1)
+  comp <- as_composition(vec)
+  expected <- composition(c(Glc = 2, Gal = 1))
+  expect_equal(comp, expected)
+})
+
+test_that("as_composition works with list of named vectors", {
+  vec_list <- list(c(H = 5, N = 2), c(H = 3, N = 1))
+  comp <- as_composition(vec_list)
+  expected <- composition(c(H = 5, N = 2), c(H = 3, N = 1))
+  expect_equal(comp, expected)
+})
+
+test_that("as_composition returns existing composition unchanged", {
+  original <- composition(c(H = 5, N = 2))
+  result <- as_composition(original)
+  expect_identical(result, original)
+})
+
+test_that("as_composition handles edge cases", {
+  # Empty named vector
+  vec <- integer(0)
+  names(vec) <- character(0)
+  comp <- as_composition(vec)
+  expected <- composition(vec)
+  expect_equal(comp, expected)
+  
+  # Single element
+  vec <- c(H = 1)
+  comp <- as_composition(vec)
+  expected <- composition(c(H = 1))
+  expect_equal(comp, expected)
+})
+
+test_that("as_composition throws errors for invalid inputs", {
+  # Unnamed vector
+  expect_error(as_composition(c(1, 2, 3)), "Cannot convert")
+  
+  # Non-numeric vector
+  expect_error(as_composition(c(a = "x", b = "y")), "Cannot convert")
+  
+  # Invalid object type
+  expect_error(as_composition(data.frame(a = 1, b = 2)), "Cannot convert")
+  
+  # List with unnamed vectors
+  expect_error(as_composition(list(c(1, 2))), "All elements in the list must be named vectors")
+})
+
+test_that("as_composition maintains sorting", {
+  # Test that residues are properly sorted
+  vec <- c(N = 1, H = 2)  # Out of order
+  comp <- as_composition(vec)
+  expect_equal(format(comp), "H2N1")  # Should be reordered
+})
