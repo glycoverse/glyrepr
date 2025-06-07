@@ -77,6 +77,7 @@ valid_composition <- function(x) {
 #'
 #' @param ... Named integer vectors.
 #'   Names are monosaccharides, values are numbers of residues.
+#' @param x A list of named integer vectors.
 #'
 #' @return A glyrepr_composition object.
 #'
@@ -153,4 +154,10 @@ format.glyrepr_composition <- function(x, ...) {
   }
   data <- vctrs::vec_data(x)
   purrr::map2_chr(vctrs::field(data, "data"), vctrs::field(data, "mono_type"), format_one)
+}
+
+#' @export
+#' @rdname composition
+is_composition <- function(x) {
+  inherits(x, "glyrepr_composition")
 }
