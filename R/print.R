@@ -3,7 +3,7 @@
 #' This function prints information about a glycan graph,
 #' including its composition and structure.
 #'
-#' For NE glycan graphs, if all linkages are unknown ("??-?"),
+#' If all linkages are unknown ("??-?"),
 #' the linkage information will be omitted.
 #'
 #' @param x A glycan graph.
@@ -14,10 +14,10 @@
 #' Default is `TRUE`.
 #'
 #' @export
-print.ne_glycan_graph <- function(x, ..., verbose = TRUE, colored = TRUE) {
+print.glycan_graph <- function(x, ..., verbose = TRUE, colored = TRUE) {
   checkmate::assert_flag(verbose)
   checkmate::assert_flag(colored)
-  cli::cat_line("Glycan Graph (NE)")
+  cli::cat_line("Glycan Graph")
   print_composition(x)
   if (verbose) {
     cli::cat_line(stringr::str_dup("-", 18))
@@ -54,37 +54,6 @@ print.ne_glycan_graph <- function(x, ..., verbose = TRUE, colored = TRUE) {
       linkages_str <- dplyr::if_else(is.na(linkages_str), "", linkages_str)
       linkages_str <- c("", linkages_str)
       return(stringr::str_c(monos, linkages_str))
-    }
-    print_structure(x, label_getter)
-  }
-}
-
-
-#' @rdname print.ne_glycan_graph
-#' @export
-print.dn_glycan_graph <- function(x, ..., verbose = TRUE, colored = TRUE) {
-  cli::cat_line("Glycan Graph (DN)")
-  print_composition(x)
-  if (verbose) {
-    cli::cat_line(stringr::str_dup("-", 18))
-    label_getter <- function(graph) {
-      monos <- igraph::V(graph)$mono
-      if (colored) {
-        monos <- add_colors(monos)
-      }
-      root <- igraph::V(graph)[igraph::degree(graph, mode = "in") == 0]
-      if (graph$alditol) {
-        monos[[root]] <- paste0(monos[[root]], "-ol")
-      }
-      dplyr::if_else(
-        igraph::V(graph)$type == "mono",
-        dplyr::if_else(
-          igraph::V(graph)$sub == "",
-          monos,
-          stringr::str_c(monos, igraph::V(graph)$sub, sep = "-")
-        ),
-        igraph::V(graph)$linkage
-      )
     }
     print_structure(x, label_getter)
   }

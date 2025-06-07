@@ -1,9 +1,9 @@
-test_that("node-edge glycan graph class", {
+test_that("glycan graph class", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_s3_class(glycan, c("ne_glycan_graph", "glycan_graph", "igraph"))
+  expect_s3_class(glycan, c("glycan_graph", "igraph"))
 })
 
 
@@ -15,9 +15,9 @@ test_that("validating undirected graphs", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must be directed")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph must be directed")
 })
 
 
@@ -29,9 +29,9 @@ test_that("validating an in tree", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must be an out tree")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph must be an out tree")
 })
 
 
@@ -42,9 +42,9 @@ test_that("validating graph without monosaccharide attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have a vertex attribute 'mono'")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph must have a vertex attribute 'mono'")
 })
 
 
@@ -55,9 +55,9 @@ test_that("validating graph without substituent attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have a vertex attribute 'sub'")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph must have a vertex attribute 'sub'")
 })
 
 
@@ -69,9 +69,9 @@ test_that("validating graph with NA in monosaccharide attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have no NA in vertex attribute 'mono'")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph must have no NA in vertex attribute 'mono'")
 })
 
 
@@ -83,9 +83,9 @@ test_that("validating graph with NA in substitude attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have no NA in vertex attribute 'sub'")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph must have no NA in vertex attribute 'sub'")
 })
 
 
@@ -98,9 +98,9 @@ patrick::with_parameters_test_that("valid substituents", {
   graph$anomer <- "b1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_no_error(validate_ne_glycan_graph(glycan))
+  expect_no_error(validate_glycan_graph(glycan))
 }, sub = c("6S", "9Ac", "2P", "?S"))
 
 
@@ -111,9 +111,9 @@ test_that("validating graph without linkage attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have an edge attribute 'linkage'")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph must have an edge attribute 'linkage'")
 })
 
 
@@ -125,10 +125,10 @@ test_that("validating one non-existing monosaccharide", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan))
-  err <- rlang::catch_cnd(validate_ne_glycan_graph(glycan))
+  expect_error(validate_glycan_graph(glycan))
+  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
   expect_equal(err$message, "Unknown monosaccharide: Bad")
   expect_equal(err$monos, "Bad")
 })
@@ -142,9 +142,9 @@ test_that("validating two non-existing monosaccharide", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  err <- rlang::catch_cnd(validate_ne_glycan_graph(glycan))
+  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
   expect_equal(err$message, "Unknown monosaccharide: Bad1, Bad2")
   expect_equal(err$monos, c("Bad1", "Bad2"))
 })
@@ -158,9 +158,9 @@ test_that("validating duplicated non-existing monosaccharide", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  err <- rlang::catch_cnd(validate_ne_glycan_graph(glycan))
+  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
   expect_equal(err$message, "Unknown monosaccharide: Bad")
   expect_equal(err$monos, "Bad")
 })
@@ -174,10 +174,10 @@ test_that("validating bad subtituent", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan))
-  err <- rlang::catch_cnd(validate_ne_glycan_graph(glycan))
+  expect_error(validate_glycan_graph(glycan))
+  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
   expect_equal(err$message, "Unknown substituent: Bad")
   expect_equal(err$subs, "Bad")
 })
@@ -191,10 +191,10 @@ patrick::with_parameters_test_that("validating bad linkage", {
     graph$anomer <- "a1"
     graph$alditol <- FALSE
 
-    glycan <- new_ne_glycan_graph(graph)
+    glycan <- new_glycan_graph(graph)
 
-    expect_error(validate_ne_glycan_graph(glycan))
-    err <- rlang::catch_cnd(validate_ne_glycan_graph(glycan))
+    expect_error(validate_glycan_graph(glycan))
+    err <- rlang::catch_cnd(validate_glycan_graph(glycan))
   },
   bad_linkage = c("1-4", "c1-4", "b1", "abc", ""),
   .test_name = bad_linkage
@@ -209,9 +209,9 @@ test_that("validating NA linkages", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan))
+  expect_error(validate_glycan_graph(glycan))
 })
 
 
@@ -223,9 +223,9 @@ test_that("validating mixed generic and concrete monosaccharides", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Monosaccharides must be either all generic or all concrete")
+  expect_error(validate_glycan_graph(glycan), "Monosaccharides must be either all generic or all concrete")
 })
 
 
@@ -236,9 +236,9 @@ test_that("missing anomer attr", {
   igraph::E(graph)$linkage <- "b1-4"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have a graph attribute 'anomer'")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph must have a graph attribute 'anomer'")
 })
 
 
@@ -250,9 +250,9 @@ test_that("invalid anomer attr", {
   graph$anomer <- "a"
   graph$alditol <- FALSE
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Invalid anomer: a")
+  expect_error(validate_glycan_graph(glycan), "Invalid anomer: a")
 })
 
 
@@ -263,9 +263,9 @@ test_that("missing alditol attr", {
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph must have a graph attribute 'alditol'")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph must have a graph attribute 'alditol'")
 })
 
 
@@ -277,7 +277,7 @@ test_that("invalid alditol attr", {
   graph$anomer <- "a1"
   graph$alditol <- "True"
 
-  glycan <- new_ne_glycan_graph(graph)
+  glycan <- new_glycan_graph(graph)
 
-  expect_error(validate_ne_glycan_graph(glycan), "Glycan graph attribute 'alditol' must be logical")
+  expect_error(validate_glycan_graph(glycan), "Glycan graph attribute 'alditol' must be logical")
 })

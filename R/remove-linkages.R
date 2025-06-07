@@ -21,21 +21,5 @@
 #' @export
 remove_linkages <- function(glycan) {
   checkmate::assert_class(glycan, "glycan_graph")
-  if (is_ne_glycan(glycan)) {
-    remove_linkages_ne(glycan)
-  } else {
-    remove_linkages_dn(glycan)
-  }
-}
-
-
-remove_linkages_ne <- function(glycan) {
   igraph::set_edge_attr(glycan, "linkage", value = "??-?")
-}
-
-
-remove_linkages_dn <- function(glycan) {
-  linkages <- igraph::V(glycan)$linkage
-  linkages[igraph::V(glycan)$type == "linkage"] <- "??-?"
-  igraph::set_vertex_attr(glycan, "linkage", value = linkages)
 }

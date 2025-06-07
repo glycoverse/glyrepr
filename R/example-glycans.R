@@ -47,8 +47,6 @@
 #'    Gal
 #' ```
 #'
-#' @param mode A character string, either "ne" or "dn".
-#' See [as_glycan_graph()] for details.
 #' @param linkage A logical indicating whether to include linkages (e.g. "b1-4").
 #'   Default is `TRUE`.
 #' @param mono_type A character string specifying the type of monosaccharides.
@@ -58,36 +56,33 @@
 #' @return A glycan graph object.
 #'
 #' @examples
-#' print(n_glycan_core(mode = "ne"), verbose = TRUE)
-#' print(o_glycan_core_1(mode = "dn"), verbose = TRUE)
+#' print(n_glycan_core(), verbose = TRUE)
+#' print(o_glycan_core_1(), verbose = TRUE)
 #'
 #' @export
-n_glycan_core <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
-  validate_example_args(mode, linkage, mono_type)
-  build_example_graph(mode, linkage, mono_type, n_glycan_core_ne)
+n_glycan_core <- function(linkage = TRUE, mono_type = "concrete") {
+  validate_example_args(linkage, mono_type)
+  build_example_graph(linkage, mono_type, n_glycan_core_base)
 }
 
 
 #' @rdname n_glycan_core
 #' @export
-o_glycan_core_1 <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
-  validate_example_args(mode, linkage, mono_type)
-  build_example_graph(mode, linkage, mono_type, o_glycan_core_1_ne)
+o_glycan_core_1 <- function(linkage = TRUE, mono_type = "concrete") {
+  validate_example_args(linkage, mono_type)
+  build_example_graph(linkage, mono_type, o_glycan_core_1_base)
 }
 
 
 #' @rdname n_glycan_core
 #' @export
-o_glycan_core_2 <- function(mode = "ne", linkage = TRUE, mono_type = "concrete") {
-  validate_example_args(mode, linkage, mono_type)
-  build_example_graph(mode, linkage, mono_type, o_glycan_core_2_ne)
+o_glycan_core_2 <- function(linkage = TRUE, mono_type = "concrete") {
+  validate_example_args(linkage, mono_type)
+  build_example_graph(linkage, mono_type, o_glycan_core_2_base)
 }
 
 
-build_example_graph <- function(mode, linkage, mono_type, builder) {
-  if (!mode %in% c("ne", "dn")) {
-    rlang::abort("Mode must be 'ne' or 'dn'.")
-  }
+build_example_graph <- function(linkage, mono_type, builder) {
   if (!mono_type %in% c("simple", "generic", "concrete")) {
     rlang::abort("Mono type must be 'simple', 'generic', or 'concrete'.")
   }
@@ -98,9 +93,6 @@ build_example_graph <- function(mode, linkage, mono_type, builder) {
   if (!linkage) {
     igraph::E(glycan)$linkage <- "??-?"
   }
-  if (mode == "dn") {
-    glycan <- convert_ne_to_dn(glycan)
-  }
   if (mono_type %in% c("simple", "generic")) {
     glycan <- convert_glycan_mono_type(glycan, mono_type)
   }
@@ -108,41 +100,40 @@ build_example_graph <- function(mode, linkage, mono_type, builder) {
 }
 
 
-n_glycan_core_ne <- function() {
+n_glycan_core_base <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
   graph$anomer <- "?1"
   graph$alditol <- FALSE
-  new_ne_glycan_graph(graph)
+  new_glycan_graph(graph)
 }
 
 
-o_glycan_core_1_ne <- function() {
+o_glycan_core_1_base <- function() {
   graph <- igraph::make_graph(~ 1-+2)
   igraph::V(graph)$mono <- c("GalNAc", "Gal")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-3"
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  new_ne_glycan_graph(graph)
+  new_glycan_graph(graph)
 }
 
 
-o_glycan_core_2_ne <- function() {
+o_glycan_core_2_base <- function() {
   graph <- igraph::make_graph(~ 1-+2, 1-+3)
   igraph::V(graph)$mono <- c("GalNAc", "Gal", "GlcNAc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-3", "b1-6")
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  new_ne_glycan_graph(graph)
+  new_glycan_graph(graph)
 }
 
 
-validate_example_args <- function(mode, linkage, mono_type) {
-  checkmate::assert_choice(mode, c("ne", "dn"))
+validate_example_args <- function(linkage, mono_type) {
   checkmate::assert_choice(mono_type, c("simple", "generic", "concrete"))
   checkmate::assert_flag(linkage)
 }

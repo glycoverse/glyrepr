@@ -6,16 +6,13 @@
 \alias{o_glycan_core_2}
 \title{Example Glycan Graphs}
 \usage{
-n_glycan_core(mode = "ne", linkage = TRUE, mono_type = "concrete")
+n_glycan_core(linkage = TRUE, mono_type = "concrete")
 
-o_glycan_core_1(mode = "ne", linkage = TRUE, mono_type = "concrete")
+o_glycan_core_1(linkage = TRUE, mono_type = "concrete")
 
-o_glycan_core_2(mode = "ne", linkage = TRUE, mono_type = "concrete")
+o_glycan_core_2(linkage = TRUE, mono_type = "concrete")
 }
 \arguments{
-\item{mode}{A character string, either "ne" or "dn".
-See \code{\link[=as_glycan_graph]{as_glycan_graph()}} for details.}
-
 \item{linkage}{A logical indicating whether to include linkages (e.g. "b1-4").
 Default is \code{TRUE}.}
 
@@ -72,7 +69,7 @@ Gal
 }
 
 \examples{
-print(n_glycan_core(mode = "ne"), verbose = TRUE)
-print(o_glycan_core_1(mode = "dn"), verbose = TRUE)
+print(n_glycan_core(), verbose = TRUE)
+print(o_glycan_core_1(), verbose = TRUE)
 
 }

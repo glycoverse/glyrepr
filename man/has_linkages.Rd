@@ -19,7 +19,7 @@ Note that even only one linkage is partial known (e.g. "a?-?"),
 this function will return \code{TRUE}.
 }
 \examples{
-glycan <- o_glycan_core_1(mode = "ne", linkage = TRUE)
+glycan <- o_glycan_core_1(linkage = TRUE)
 has_linkages(glycan)
 print(glycan)
 

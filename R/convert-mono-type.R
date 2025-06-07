@@ -42,11 +42,7 @@ convert_glycan_mono_type <- function(glycan, to, strict = TRUE) {
 
   from <- decide_glycan_mono_type(glycan)
   valid_from_to_for_convert_glycan_mono_type(from, to, strict)
-  if (inherits(glycan, "ne_glycan_graph")) {
-    convert_glycan_mono_type_ne(glycan, from, to)
-  } else {  # "dn_glycan_graph"
-    convert_glycan_mono_type_dn(glycan, from, to)
-  }
+  convert_glycan_mono_type_impl(glycan, from, to)
 }
 
 
@@ -188,11 +184,7 @@ valid_from_to_for_convert_mono_type <- function(mono, from, to, strict) {
 #' @export
 decide_glycan_mono_type <- function(glycan) {
   checkmate::assert_class(glycan, "glycan_graph")
-  if (inherits(glycan, "ne_glycan_graph")) {
-    decide_glycan_mono_type_ne(glycan)
-  } else {  # "dn_glycan_graph"
-    decide_glycan_mono_type_dn(glycan)
-  }
+  decide_glycan_mono_type_impl(glycan)
 }
 
 
@@ -256,16 +248,8 @@ valid_from_to <- function(from, to, strict) {
 }
 
 
-decide_glycan_mono_type_ne <- function(glycan) {
+decide_glycan_mono_type_impl <- function(glycan) {
   first_mono <- igraph::vertex_attr(glycan, "mono")[[1]]
-  decide_mono_type(first_mono)
-}
-
-
-decide_glycan_mono_type_dn <- function(glycan) {
-  mono_nodes <- which(igraph::V(glycan)$type == "mono")
-  mono_names <- igraph::vertex_attr(glycan, "mono")[mono_nodes]
-  first_mono <- mono_names[[1]]
   decide_mono_type(first_mono)
 }
 
@@ -282,20 +266,11 @@ convert_one_mono_type <- function(mono, from, to) {
 }
 
 
-convert_glycan_mono_type_ne <- function(glycan, from, to) {
+convert_glycan_mono_type_impl <- function(glycan, from, to) {
   old_names <- igraph::V(glycan)$mono
   new_names <- convert_mono_type_(old_names, from, to)
   raise_error_for_na(old_names, new_names, to)
   igraph::set_vertex_attr(glycan, "mono", value = new_names)
-}
-
-
-convert_glycan_mono_type_dn <- function(glycan, from, to) {
-  mono_nodes <- which(igraph::V(glycan)$type == "mono")
-  old_names <- igraph::vertex_attr(glycan, "mono")[mono_nodes]
-  new_names <- convert_mono_type_(old_names, from, to)
-  raise_error_for_na(old_names, new_names, to)
-  igraph::set_vertex_attr(glycan, "mono", value = new_names, index = mono_nodes)
 }
 
 

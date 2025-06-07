@@ -11,7 +11,7 @@
 #' @return A logical value indicating if the glycan graph has linkages.
 #'
 #' @examples
-#' glycan <- o_glycan_core_1(mode = "ne", linkage = TRUE)
+#' glycan <- o_glycan_core_1(linkage = TRUE)
 #' has_linkages(glycan)
 #' print(glycan)
 #'
@@ -24,19 +24,5 @@
 #' @export
 has_linkages <- function(glycan) {
   checkmate::assert_class(glycan, "glycan_graph")
-  if (is_ne_glycan(glycan)) {
-    has_linkages_ne(glycan)
-  } else {
-    has_linkages_dn(glycan)
-  }
-}
-
-
-has_linkages_ne <- function(glycan) {
   any(igraph::E(glycan)$linkage != "??-?")
-}
-
-
-has_linkages_dn <- function(glycan) {
-  any(igraph::V(glycan)$linkage != "??-?", na.rm = TRUE)
 }

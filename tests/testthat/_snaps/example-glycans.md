@@ -1,9 +1,9 @@
-# N-glycan core NE graph
+# N-glycan core graph
 
     Code
       print(glycan, verbose = TRUE)
     Output
-      Glycan Graph (NE)
+      Glycan Graph
       GlcNAc: 2, Man: 3
       ------------------
       GlcNAc (?1-)
@@ -12,30 +12,12 @@
           ├─Man (a1-3)
           └─Man (a1-6)
 
-# N-glycan core DN graph
+# N-glycan core graph without linkages
 
     Code
       print(glycan, verbose = TRUE)
     Output
-      Glycan Graph (DN)
-      GlcNAc: 2, Man: 3
-      ------------------
-      GlcNAc (?1-)
-      └─b1-4
-        └─GlcNAc
-          └─b1-4
-            └─Man
-              ├─a1-3
-              │ └─Man
-              └─a1-6
-                └─Man
-
-# N-glycan core NE graph without linkages
-
-    Code
-      print(glycan, verbose = TRUE)
-    Output
-      Glycan Graph (NE)
+      Glycan Graph
       GlcNAc: 2, Man: 3
       ------------------
       GlcNAc (?1-)
@@ -44,12 +26,12 @@
           ├─Man
           └─Man
 
-# N-glycan core NE graph with simple monosaccharides
+# N-glycan core graph with simple monosaccharides
 
     Code
       print(glycan, verbose = TRUE)
     Output
-      Glycan Graph (NE)
+      Glycan Graph
       H: 3, N: 2
       ------------------
       N (?1-)
@@ -58,12 +40,12 @@
           ├─H (a1-3)
           └─H (a1-6)
 
-# N-glycan core NE graph with generic monosaccharides
+# N-glycan core graph with generic monosaccharides
 
     Code
       print(glycan, verbose = TRUE)
     Output
-      Glycan Graph (NE)
+      Glycan Graph
       Hex: 3, HexNAc: 2
       ------------------
       HexNAc (?1-)
@@ -77,7 +59,7 @@
     Code
       print(glycan, verbose = TRUE)
     Output
-      Glycan Graph (NE)
+      Glycan Graph
       Gal: 1, GalNAc: 1
       ------------------
       GalNAc (a1-)
@@ -88,7 +70,7 @@
     Code
       print(glycan, verbose = TRUE)
     Output
-      Glycan Graph (NE)
+      Glycan Graph
       Gal: 1, GalNAc: 1, GlcNAc: 1
       ------------------
       GalNAc (a1-)
