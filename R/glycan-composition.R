@@ -10,9 +10,7 @@
 #' @examples
 #' glycan <- n_glycan_core()
 #' get_composition(glycan)
-#'
-#' @seealso [count_monos()]
-#'
+#' 
 #' @export
 get_composition <- function(glycan) {
   checkmate::assert_class(glycan, "glycan_graph")
@@ -21,26 +19,4 @@ get_composition <- function(glycan) {
   result <- as.integer(result_tb)
   names(result) <- names(result_tb)
   result
-}
-
-
-#' Count the Number of Monosaccharides
-#'
-#' This function returns the total number of monosaccharides of a
-#' glycan graph.
-#'
-#' @param glycan A glycan graph.
-#'
-#' @return An integer.
-#'
-#' @examples
-#' glycan <- n_glycan_core()
-#' count_monos(glycan)
-#'
-#' @seealso [get_composition()]
-#'
-#' @export
-count_monos <- function(glycan) {
-  checkmate::assert_class(glycan, "glycan_graph")
-  sum(get_composition(glycan))
 }

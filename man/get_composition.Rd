@@ -21,6 +21,3 @@ glycan <- n_glycan_core()
 get_composition(glycan)
 
 }
-\seealso{
-\code{\link[=count_monos]{count_monos()}}
-}
