@@ -4,7 +4,7 @@
       print(glycan, verbose = TRUE)
     Output
       Glycan Graph
-      GlcNAc: 2, Man: 3
+      Man(3)GlcNAc(2)
       ------------------
       GlcNAc (?1-)
       └─GlcNAc (b1-4)
@@ -18,7 +18,7 @@
       print(glycan, verbose = TRUE)
     Output
       Glycan Graph
-      GlcNAc: 2, Man: 3
+      Man(3)GlcNAc(2)
       ------------------
       GlcNAc (?1-)
       └─GlcNAc
@@ -32,7 +32,7 @@
       print(glycan, verbose = TRUE)
     Output
       Glycan Graph
-      H: 3, N: 2
+      H3N2
       ------------------
       N (?1-)
       └─N (b1-4)
@@ -46,7 +46,7 @@
       print(glycan, verbose = TRUE)
     Output
       Glycan Graph
-      Hex: 3, HexNAc: 2
+      Hex(3)HexNAc(2)
       ------------------
       HexNAc (?1-)
       └─HexNAc (b1-4)
@@ -60,7 +60,7 @@
       print(glycan, verbose = TRUE)
     Output
       Glycan Graph
-      Gal: 1, GalNAc: 1
+      Gal(1)GalNAc(1)
       ------------------
       GalNAc (a1-)
       └─Gal (b1-3)
@@ -71,7 +71,7 @@
       print(glycan, verbose = TRUE)
     Output
       Glycan Graph
-      Gal: 1, GalNAc: 1, GlcNAc: 1
+      Gal(1)GlcNAc(1)GalNAc(1)
       ------------------
       GalNAc (a1-)
       ├─Gal (b1-3)

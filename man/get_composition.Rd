@@ -10,11 +10,11 @@ get_composition(glycan)
 \item{glycan}{A glycan graph.}
 }
 \value{
-A named integer vector.
+A glyrepr_composition object.
 }
 \description{
 Get the composition of a glycan graph.
-The composition is a named integer vector.
+The composition is returned as a glyrepr_composition object.
 }
 \examples{
 glycan <- n_glycan_core()

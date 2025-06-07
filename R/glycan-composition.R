@@ -1,11 +1,11 @@
 #' Get Composition of a Glycan
 #'
 #' Get the composition of a glycan graph.
-#' The composition is a named integer vector.
+#' The composition is returned as a glyrepr_composition object.
 #'
 #' @param glycan A glycan graph.
 #'
-#' @return A named integer vector.
+#' @return A glyrepr_composition object.
 #'
 #' @examples
 #' glycan <- n_glycan_core()
@@ -18,7 +18,7 @@ get_composition <- function(glycan) {
   result_tb <- table(monos)
   result <- as.integer(result_tb)
   names(result) <- names(result_tb)
-  result
+  composition(result)
 }
 
 new_composition <- function(x) {
@@ -71,6 +71,27 @@ valid_composition <- function(x) {
   x
 }
 
+#' Create a Glycan Composition
+#'
+#' Create a glycan composition from a list of named integer vectors.
+#'
+#' @param ... Named integer vectors.
+#'   Names are monosaccharides, values are numbers of residues.
+#'
+#' @return A glyrepr_composition object.
+#'
+#' @examples
+#' # A vector with one composition
+#' composition(c(H = 5, N = 2))
+#' # A vector with multiple compositions
+#' composition(c(H = 5, N = 2), c(H = 5, N = 4, S = 2))
+#' # Residues are reordered automatically
+#' composition(c(N = 1, H = 2))
+#' # An example for generic monosaccharides
+#' composition(c(Hex = 2, HexNAc = 1))
+#' # An example for concrete monosaccharides
+#' composition(c(Glc = 2, Gal = 1))
+#'
 #' @export
 composition <- function(...) {
   args <- list(...)

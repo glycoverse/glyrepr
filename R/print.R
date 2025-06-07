@@ -62,8 +62,8 @@ print.glycan_graph <- function(x, ..., verbose = TRUE, colored = TRUE) {
 
 print_composition <- function(graph) {
   composition <- get_composition(graph)
-  comp_str <- paste(names(composition), composition, sep = ": ", collapse = ", ")
-  cli::cat_line(comp_str)
+  # For glyrepr_composition objects, use the formatted output directly
+  cli::cat_line(format(composition))
 }
 
 

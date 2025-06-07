@@ -9,7 +9,9 @@ test_that("get the composition for a glycan graph", {
 
   comp <- get_composition(glycan)
 
-  expect_equal(sort(comp), sort(c(Glc = 2L, Gal = 1L)))
+  expect_s3_class(comp, "glyrepr_composition")
+  expected_comp <- composition(c(Glc = 2L, Gal = 1L))
+  expect_equal(comp, expected_comp)
 })
 
 test_that("empty composition is valid", {

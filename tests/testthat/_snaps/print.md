@@ -4,7 +4,7 @@
       print(x)
     Output
       Glycan Graph
-      GlcNAc: 2, Man: 3
+      Man(3)GlcNAc(2)
       ------------------
       GlcNAc (?1-)
       └─GlcNAc (b1-4)
@@ -18,7 +18,7 @@
       print(x, verbose = FALSE)
     Output
       Glycan Graph
-      GlcNAc: 2, Man: 3
+      Man(3)GlcNAc(2)
 
 # print works for glycan graphs without linkages
 
@@ -26,7 +26,7 @@
       print(x)
     Output
       Glycan Graph
-      GlcNAc: 2, Man: 3
+      Man(3)GlcNAc(2)
       ------------------
       GlcNAc (?1-)
       └─GlcNAc
@@ -40,7 +40,7 @@
       print(glycan)
     Output
       Glycan Graph
-      N: 1
+      N1
       ------------------
       N (a1-)
 
@@ -50,7 +50,7 @@
       print(glycan)
     Output
       Glycan Graph
-      Gal: 1, GalNAc: 1
+      Gal(1)GalNAc(1)
       ------------------
       GalNAc-6S (a1-)
       └─Gal (b1-3)
@@ -61,7 +61,7 @@
       print(glycan)
     Output
       Glycan Graph
-      N: 1
+      N1
       ------------------
       N-6S (a1-)
 
@@ -71,7 +71,7 @@
       print(glycan)
     Output
       Glycan Graph
-      Gal: 1, GalNAc: 1
+      Gal(1)GalNAc(1)
       ------------------
       GalNAc-ol (a1-)
       └─Gal (b1-3)
@@ -82,7 +82,7 @@
       print(glycan)
     Output
       Glycan Graph
-      N: 1
+      N1
       ------------------
       N-ol (a1-)
 
@@ -92,7 +92,7 @@
       print(glycan)
     Output
       Glycan Graph
-      Gal: 1, GalNAc: 1
+      Gal(1)GalNAc(1)
       ------------------
       GalNAc-ol-6S (a1-)
       └─Gal (b1-3)
@@ -103,7 +103,7 @@
       print(glycan)
     Output
       Glycan Graph
-      N: 1
+      N1
       ------------------
       N-ol-6S (a1-)
 
