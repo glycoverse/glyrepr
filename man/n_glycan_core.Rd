@@ -4,7 +4,7 @@
 \alias{n_glycan_core}
 \alias{o_glycan_core_1}
 \alias{o_glycan_core_2}
-\title{Example Glycan Graphs}
+\title{Example Glycan Structures}
 \usage{
 n_glycan_core(linkage = TRUE, mono_type = "concrete")
 
@@ -21,10 +21,10 @@ Can be "simple" (H, N, F, S), "generic" (Hex, HexNAc, dHex, NeuAc, etc.),
 or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".}
 }
 \value{
-A glycan graph object.
+A glycan structure object.
 }
 \description{
-Create example glycan graphs for testing and demonstration.
+Create example glycan structures for testing and demonstration.
 Includes \strong{N-glycan core} and \strong{O-glycan core 1} and \strong{core 2}.
 }
 \section{N-Glycan Core}{

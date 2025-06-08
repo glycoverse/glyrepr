@@ -1,31 +1,31 @@
-test_that("print works for glycan graphs", {
+test_that("print works for glycan structures", {
   skip_on_old_win()
-  x <- new_glycan_graph(n_glycan_core())
+  x <- new_glycan_structure(n_glycan_core())
   expect_snapshot(print(x))
 })
 
 
-test_that("print works for glycan graphs with verbose = FALSE", {
-  x <- new_glycan_graph(n_glycan_core())
+test_that("print works for glycan structures with verbose = FALSE", {
+  x <- new_glycan_structure(n_glycan_core())
   expect_snapshot(print(x, verbose = FALSE))
 })
 
 
-test_that("print works for glycan graphs without linkages", {
+test_that("print works for glycan structures without linkages", {
   skip_on_old_win()
-  x <- new_glycan_graph(n_glycan_core(linkage = FALSE))
+  x <- new_glycan_structure(n_glycan_core(linkage = FALSE))
   expect_snapshot(print(x))
 })
 
 
-test_that("print works for one-mono glycan graphs", {
+test_that("print works for one-mono glycan structures", {
   skip_on_old_win()
   graph <- igraph::make_graph(NULL, n = 1, directed = TRUE)
   igraph::V(graph)$mono <- "N"
   igraph::V(graph)$sub <- ""
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
   expect_snapshot(print(glycan))
 })
 
@@ -45,7 +45,7 @@ test_that("print works for one-node graphs with substituent", {
   igraph::V(graph)$sub <- "6S"
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
   expect_snapshot(print(glycan))
 })
 
@@ -65,7 +65,7 @@ test_that("print works for one-node graphs with alditol", {
   igraph::V(graph)$sub <- ""
   graph$anomer <- "a1"
   graph$alditol <- TRUE
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
   expect_snapshot(print(glycan))
 })
 
@@ -86,6 +86,6 @@ test_that("print works for one-node graph with alditol and substituent on root",
   igraph::V(graph)$sub <- "6S"
   graph$anomer <- "a1"
   graph$alditol <- TRUE
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
   expect_snapshot(print(glycan))
 })

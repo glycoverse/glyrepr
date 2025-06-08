@@ -1,31 +1,31 @@
-new_glycan_graph <- function(graph) {
+new_glycan_structure <- function(graph) {
   checkmate::assert_class(graph, "igraph")
-  structure(graph, class = c("glycan_graph", "igraph"))
+  structure(graph, class = c("glycan_structure", "igraph"))
 }
 
-validate_glycan_graph <- function(glycan) {
-  checkmate::assert_class(glycan, "glycan_graph")
+validate_glycan_structure <- function(glycan) {
+  checkmate::assert_class(glycan, "glycan_structure")
   
   # Check if it is a directed graph
   if (!is_directed_graph(glycan)) {
-    rlang::abort("Glycan graph must be directed.")
+    rlang::abort("Glycan structure must be directed.")
   }
   
   # Check if it is an out tree
   if (!is_out_tree(glycan)) {
-    rlang::abort("Glycan graph must be an out tree.")
+    rlang::abort("Glycan structure must be an out tree.")
   }
   
   # Check if graph has a vertex attribute "mono"
   # This is the monosaccharide name, e.g. "GlcNAc", "Man", etc.
   if (!has_vertex_attrs(glycan, "mono")) {
-    rlang::abort("Glycan graph must have a vertex attribute 'mono'.")
+    rlang::abort("Glycan structure must have a vertex attribute 'mono'.")
   }
   
   # Check if no NA in vertex attribute "mono"
   mono_names <- igraph::vertex_attr(glycan, "mono")
   if (any(is.na(mono_names))) {
-    rlang::abort("Glycan graph must have no NA in vertex attribute 'mono'.")
+    rlang::abort("Glycan structure must have no NA in vertex attribute 'mono'.")
   }
   
   # Check if all monosaccharides are known
@@ -43,13 +43,13 @@ validate_glycan_graph <- function(glycan) {
   # Check if graph has a vertex attribute "sub"
   # This is the substituent name, e.g. "Ac", "S", "P", or "" (no).
   if (!has_vertex_attrs(glycan, "sub")) {
-    rlang::abort("Glycan graph must have a vertex attribute 'sub'.")
+    rlang::abort("Glycan structure must have a vertex attribute 'sub'.")
   }
   
   # Check if no NA in vertex attribute "sub"
   subs <- igraph::vertex_attr(glycan, "sub")
   if (any(is.na(subs))) {
-    rlang::abort("Glycan graph must have no NA in vertex attribute 'sub'.")
+    rlang::abort("Glycan structure must have no NA in vertex attribute 'sub'.")
   }
   
   # Check if all substituents are valid
@@ -61,13 +61,13 @@ validate_glycan_graph <- function(glycan) {
   
   # Check if graph has an edge attribute "linkage"
   if (!has_edge_attrs(glycan, "linkage")) {
-    rlang::abort("Glycan graph must have an edge attribute 'linkage'.")
+    rlang::abort("Glycan structure must have an edge attribute 'linkage'.")
   }
   
   # Check if no NA in edge attribute "linkage"
   linkages <- igraph::edge_attr(glycan, "linkage")
   if (any(is.na(linkages))) {
-    rlang::abort("Glycan graph must have no NA in edge attribute 'linkage'.")
+    rlang::abort("Glycan structure must have no NA in edge attribute 'linkage'.")
   }
   
   # Check if all linkages are valid
@@ -79,7 +79,7 @@ validate_glycan_graph <- function(glycan) {
   
   # Check if "anomer" attribute exists
   if (is.null(glycan$anomer)) {
-    rlang::abort("Glycan graph must have a graph attribute 'anomer'.")
+    rlang::abort("Glycan structure must have a graph attribute 'anomer'.")
   }
   
   # Check if "anomer" attribute is valid
@@ -89,12 +89,12 @@ validate_glycan_graph <- function(glycan) {
   
   # Check if "alditol" attribute exists
   if (is.null(glycan$alditol)) {
-    rlang::abort("Glycan graph must have a graph attribute 'alditol'.")
+    rlang::abort("Glycan structure must have a graph attribute 'alditol'.")
   }
   
   # Check if "alditol" attribute is valid
   if (!is.logical(glycan$alditol)) {
-    rlang::abort("Glycan graph attribute 'alditol' must be logical.")
+    rlang::abort("Glycan structure attribute 'alditol' must be logical.")
   }
 
   glycan
@@ -108,27 +108,27 @@ ensure_name_vertex_attr <- function(glycan) {
   glycan
 }
 
-#' Convert igraph Graph to Glycan Graph
+#' Convert igraph Graph to Glycan Structure
 #'
 #' @description
-#' A glycan graph is a subclass of igraph graph with additional constraints.
-#' This function checks these constraints and append the S3 class `glycan_graph`
+#' A glycan structure is a subclass of igraph graph with additional constraints.
+#' This function checks these constraints and append the S3 class `glycan_structure`
 #' to the graph object.
 #'
-#' Generally, **it is not recommended** to create a glycan graph using this
+#' Generally, **it is not recommended** to create a glycan structure using this
 #' function manually.
 #' Use the [glyparse](https://github.com/glycoverse/glyparse) package
-#' to generate a glycan graph from a structure string.
+#' to generate a glycan structure from a structure string.
 #'
-#' A glycan graph is a directed modeling of a glycan structure,
+#' A glycan structure is a directed modeling of a glycan structure,
 #' where nodes are monosaccharides and edges are linkages.
 #'
 #' @details
 #' # S3 Classes
 #'
-#' A glycan graph is merely an igraph graph with an additional S3 class `glycan_graph`.
-#' Therefore, `sloop::s3_class()` of a glycan graph is 
-#' `c("glycan_graph", "igraph")`.
+#' A glycan structure is merely an igraph graph with an additional S3 class `glycan_structure`.
+#' Therefore, `sloop::s3_class()` of a glycan structure is 
+#' `c("glycan_structure", "igraph")`.
 #'
 #' Constraints:
 #' - The graph must be directed and an outward tree (reducing end as root).
@@ -149,34 +149,34 @@ ensure_name_vertex_attr <- function(glycan) {
 #' @param graph An igraph graph object.
 #' @param x An object to check.
 #'
-#' @return A glycan graph object.
+#' @return A glycan structure object.
 #'
 #' @examples
 #' library(igraph)
 #'
-#' # A simple glycan graph: GlcNAc(b1-4)GlcNAc
+#' # A simple glycan structure: GlcNAc(b1-4)GlcNAc
 #' graph <- make_graph(~ 1-+2)  # 1 and 2 are monosaccharides
 #' V(graph)$mono <- c("GlcNAc", "GlcNAc")
 #' V(graph)$sub <- ""
 #' E(graph)$linkage <- "b1-4"
 #' graph$anomer <- "a1"
 #' graph$alditol <- FALSE
-#' as_glycan_graph(graph)
+#' as_glycan_structure(graph)
 #'
 #' @importFrom magrittr %>%
 #' @export
-as_glycan_graph <- function(graph) {
+as_glycan_structure <- function(graph) {
   checkmate::assert_class(graph, "igraph")
   
   graph %>%
-    new_glycan_graph() %>%
-    validate_glycan_graph() %>%
+    new_glycan_structure() %>%
+    validate_glycan_structure() %>%
     ensure_name_vertex_attr()
 }
 
 
 #' @export 
-#' @rdname as_glycan_graph
-is_glycan_graph <- function(x) {
-  inherits(x, "glycan_graph")
+#' @rdname as_glycan_structure
+is_glycan_structure <- function(x) {
+  inherits(x, "glycan_structure")
 }

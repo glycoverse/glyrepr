@@ -2,19 +2,19 @@
 % Please edit documentation in R/remove-linkages.R
 \name{remove_linkages}
 \alias{remove_linkages}
-\title{Remove All Linkages from a Glycan Graph}
+\title{Remove All Linkages from a Glycan Structure}
 \usage{
 remove_linkages(glycan)
 }
 \arguments{
-\item{glycan}{A glycan graph.}
+\item{glycan}{A glycan structure.}
 }
 \value{
-A glycan graph with all linkages removed.
+A glycan structure with all linkages removed.
 }
 \description{
-An unkonwn linkage in a glycan graph is represented by "??-?".
-This function replaces all linkages in a glycan graph with "??-?",
+An unkonwn linkage in a glycan structure is represented by "??-?".
+This function replaces all linkages in a glycan structure with "??-?",
 so that \code{has_linkages()} will return \code{FALSE}.
 }
 \examples{

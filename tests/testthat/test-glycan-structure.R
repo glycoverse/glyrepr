@@ -1,6 +1,6 @@
-# Tests for glycan graph functions
+# Tests for glycan structure functions
 
-good_glycan_graph <- function() {
+good_glycan_structure <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- c("", "", "")
@@ -11,54 +11,54 @@ good_glycan_graph <- function() {
 }
 
 
-# Tests for as_glycan_graph --------------------------------------------------
+# Tests for as_glycan_structure --------------------------------------------------
 
-test_that("as_glycan_graph works", {
-  glycan <- as_glycan_graph(good_glycan_graph())
-  expect_s3_class(glycan, c("glycan_graph", "igraph"))
+test_that("as_glycan_structure works", {
+  glycan <- as_glycan_structure(good_glycan_structure())
+  expect_s3_class(glycan, c("glycan_structure", "igraph"))
 })
 
 
-test_that("as_glycan_graph fails for invalid graphs", {
+test_that("as_glycan_structure fails for invalid graphs", {
   bad_graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+1)
-  expect_error(as_glycan_graph(bad_graph))
+  expect_error(as_glycan_structure(bad_graph))
 })
 
 
 test_that("vertex names are added if missing", {
-  graph <- good_glycan_graph()
+  graph <- good_glycan_structure()
   graph <- igraph::delete_vertex_attr(graph, "name")
 
-  glycan <- as_glycan_graph(graph)
+  glycan <- as_glycan_structure(graph)
 
   expect_true("name" %in% igraph::vertex_attr_names(glycan))
 })
 
 
-# Tests for new_glycan_graph -------------------------------------------------
+# Tests for new_glycan_structure -------------------------------------------------
 
-test_that("new_glycan_graph creates correct class", {
+test_that("new_glycan_structure creates correct class", {
   graph <- igraph::make_empty_graph()
-  glycan <- new_glycan_graph(graph)
-  expect_s3_class(glycan, c("glycan_graph", "igraph"))
+  glycan <- new_glycan_structure(graph)
+  expect_s3_class(glycan, c("glycan_structure", "igraph"))
 })
 
 
-test_that("new_glycan_graph requires igraph input", {
-  expect_error(new_glycan_graph("not a graph"))
+test_that("new_glycan_structure requires igraph input", {
+  expect_error(new_glycan_structure("not a graph"))
 })
 
 
-# Tests for validate_glycan_graph --------------------------------------------
+# Tests for validate_glycan_structure --------------------------------------------
 
-test_that("validate_glycan_graph accepts valid graphs", {
-  graph <- good_glycan_graph()
-  glycan <- new_glycan_graph(graph)
-  expect_no_error(validate_glycan_graph(glycan))
+test_that("validate_glycan_structure accepts valid graphs", {
+  graph <- good_glycan_structure()
+  glycan <- new_glycan_structure(graph)
+  expect_no_error(validate_glycan_structure(glycan))
 })
 
 
-test_that("validate_glycan_graph rejects invalid graphs", {
+test_that("validate_glycan_structure rejects invalid graphs", {
   # Test undirected graph
   graph <- igraph::make_graph(~ 1--2)
   igraph::V(graph)$mono <- c("Glc", "Gal")
@@ -66,8 +66,8 @@ test_that("validate_glycan_graph rejects invalid graphs", {
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  glycan <- new_glycan_graph(graph)
-  expect_error(validate_glycan_graph(glycan), "directed")
+  glycan <- new_glycan_structure(graph)
+  expect_error(validate_glycan_structure(glycan), "directed")
 })
 
 
@@ -88,12 +88,12 @@ test_that("ensure_name_vertex_attr preserves existing names", {
 })
 
 
-test_that("glycan graph class", {
+test_that("glycan structure class", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_s3_class(glycan, c("glycan_graph", "igraph"))
+  expect_s3_class(glycan, c("glycan_structure", "igraph"))
 })
 
 
@@ -105,9 +105,9 @@ test_that("validating undirected graphs", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph must be directed")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure must be directed")
 })
 
 
@@ -119,9 +119,9 @@ test_that("validating an in tree", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph must be an out tree")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure must be an out tree")
 })
 
 
@@ -132,9 +132,9 @@ test_that("validating graph without monosaccharide attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph must have a vertex attribute 'mono'")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure must have a vertex attribute 'mono'")
 })
 
 
@@ -145,9 +145,9 @@ test_that("validating graph without substituent attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph must have a vertex attribute 'sub'")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure must have a vertex attribute 'sub'")
 })
 
 
@@ -159,9 +159,9 @@ test_that("validating graph with NA in monosaccharide attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph must have no NA in vertex attribute 'mono'")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure must have no NA in vertex attribute 'mono'")
 })
 
 
@@ -173,9 +173,9 @@ test_that("validating graph with NA in substitude attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph must have no NA in vertex attribute 'sub'")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure must have no NA in vertex attribute 'sub'")
 })
 
 
@@ -188,9 +188,9 @@ patrick::with_parameters_test_that("valid substituents", {
   graph$anomer <- "b1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_no_error(validate_glycan_graph(glycan))
+  expect_no_error(validate_glycan_structure(glycan))
 }, sub = c("6S", "9Ac", "2P", "?S"))
 
 
@@ -201,9 +201,9 @@ test_that("validating graph without linkage attribute", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph must have an edge attribute 'linkage'")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure must have an edge attribute 'linkage'")
 })
 
 
@@ -215,10 +215,10 @@ test_that("validating one non-existing monosaccharide", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan))
-  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
+  expect_error(validate_glycan_structure(glycan))
+  err <- rlang::catch_cnd(validate_glycan_structure(glycan))
   expect_equal(err$message, "Unknown monosaccharide: Bad")
   expect_equal(err$monos, "Bad")
 })
@@ -232,9 +232,9 @@ test_that("validating two non-existing monosaccharide", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
+  err <- rlang::catch_cnd(validate_glycan_structure(glycan))
   expect_equal(err$message, "Unknown monosaccharide: Bad1, Bad2")
   expect_equal(err$monos, c("Bad1", "Bad2"))
 })
@@ -248,9 +248,9 @@ test_that("validating duplicated non-existing monosaccharide", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
+  err <- rlang::catch_cnd(validate_glycan_structure(glycan))
   expect_equal(err$message, "Unknown monosaccharide: Bad")
   expect_equal(err$monos, "Bad")
 })
@@ -264,10 +264,10 @@ test_that("validating bad subtituent", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan))
-  err <- rlang::catch_cnd(validate_glycan_graph(glycan))
+  expect_error(validate_glycan_structure(glycan))
+  err <- rlang::catch_cnd(validate_glycan_structure(glycan))
   expect_equal(err$message, "Unknown substituent: Bad")
   expect_equal(err$subs, "Bad")
 })
@@ -281,10 +281,10 @@ patrick::with_parameters_test_that("validating bad linkage", {
     graph$anomer <- "a1"
     graph$alditol <- FALSE
 
-    glycan <- new_glycan_graph(graph)
+    glycan <- new_glycan_structure(graph)
 
-    expect_error(validate_glycan_graph(glycan))
-    err <- rlang::catch_cnd(validate_glycan_graph(glycan))
+    expect_error(validate_glycan_structure(glycan))
+    err <- rlang::catch_cnd(validate_glycan_structure(glycan))
   },
   bad_linkage = c("1-4", "c1-4", "b1", "abc", ""),
   .test_name = bad_linkage
@@ -299,9 +299,9 @@ test_that("validating NA linkages", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan))
+  expect_error(validate_glycan_structure(glycan))
 })
 
 
@@ -313,9 +313,9 @@ test_that("validating mixed generic and concrete monosaccharides", {
   graph$anomer <- "a1"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Monosaccharides must be either all generic or all concrete")
+  expect_error(validate_glycan_structure(glycan), "Monosaccharides must be either all generic or all concrete")
 })
 
 
@@ -326,9 +326,9 @@ test_that("missing anomer attr", {
   igraph::E(graph)$linkage <- "b1-4"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph must have a graph attribute 'anomer'")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure must have a graph attribute 'anomer'")
 })
 
 
@@ -340,9 +340,9 @@ test_that("invalid anomer attr", {
   graph$anomer <- "a"
   graph$alditol <- FALSE
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Invalid anomer: a")
+  expect_error(validate_glycan_structure(glycan), "Invalid anomer: a")
 })
 
 
@@ -353,9 +353,9 @@ test_that("missing alditol attr", {
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph must have a graph attribute 'alditol'")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure must have a graph attribute 'alditol'")
 })
 
 
@@ -367,7 +367,7 @@ test_that("invalid alditol attr", {
   graph$anomer <- "a1"
   graph$alditol <- "True"
 
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
-  expect_error(validate_glycan_graph(glycan), "Glycan graph attribute 'alditol' must be logical")
+  expect_error(validate_glycan_structure(glycan), "Glycan structure attribute 'alditol' must be logical")
 })

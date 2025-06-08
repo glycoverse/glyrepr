@@ -2,19 +2,19 @@
 % Please edit documentation in R/has-linkages.R
 \name{has_linkages}
 \alias{has_linkages}
-\title{Determine if a Glycan Graph has Linkages}
+\title{Determine if a Glycan Structure has Linkages}
 \usage{
 has_linkages(glycan)
 }
 \arguments{
-\item{glycan}{A glycan graph.}
+\item{glycan}{A glycan structure.}
 }
 \value{
-A logical value indicating if the glycan graph has linkages.
+A logical value indicating if the glycan structure has linkages.
 }
 \description{
-Unknown linkages in a glycan graph are represented by "??-?".
-This function checks if all linkages in a glycan graph are unknown.
+Unknown linkages in a glycan structure are represented by "??-?".
+This function checks if all linkages in a glycan structure are unknown.
 Note that even only one linkage is partial known (e.g. "a?-?"),
 this function will return \code{TRUE}.
 }

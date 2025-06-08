@@ -1,10 +1,10 @@
 #' Remove All Substituents from a Glycan
 #'
-#' This function replaces all substituents in a glycan graph with empty strings.
+#' This function replaces all substituents in a glycan structure with empty strings.
 #'
-#' @param glycan A glycan graph.
+#' @param glycan A glycan structure.
 #'
-#' @return A glycan graph.
+#' @return A glycan structure.
 #'
 #' @examples
 #' glycan <- n_glycan_core()
@@ -14,6 +14,6 @@
 #'
 #' @export
 remove_substituents <- function(glycan) {
-  checkmate::assert_class(glycan, "glycan_graph")
+  checkmate::assert_class(glycan, "glycan_structure")
   igraph::set_vertex_attr(glycan, "sub", value = "")
 }

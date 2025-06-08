@@ -1,9 +1,9 @@
 #' Get Composition of a Glycan
 #'
-#' Get the composition of a glycan graph.
+#' Get the composition of a glycan structure.
 #' The composition is returned as a glyrepr_composition object.
 #'
-#' @param glycan A glycan graph.
+#' @param glycan A glycan structure.
 #'
 #' @return A glyrepr_composition object.
 #'
@@ -13,7 +13,7 @@
 #' 
 #' @export
 get_composition <- function(glycan) {
-  checkmate::assert_class(glycan, "glycan_graph")
+  checkmate::assert_class(glycan, "glycan_structure")
   monos <- igraph::V(glycan)$mono
   result_tb <- table(monos)
   result <- as.integer(result_tb)

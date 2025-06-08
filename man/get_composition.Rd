@@ -7,13 +7,13 @@
 get_composition(glycan)
 }
 \arguments{
-\item{glycan}{A glycan graph.}
+\item{glycan}{A glycan structure.}
 }
 \value{
 A glyrepr_composition object.
 }
 \description{
-Get the composition of a glycan graph.
+Get the composition of a glycan structure.
 The composition is returned as a glyrepr_composition object.
 }
 \examples{

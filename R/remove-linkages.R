@@ -1,13 +1,13 @@
-#' Remove All Linkages from a Glycan Graph
+#' Remove All Linkages from a Glycan Structure
 #'
 #' @description
-#' An unkonwn linkage in a glycan graph is represented by "??-?".
-#' This function replaces all linkages in a glycan graph with "??-?",
+#' An unkonwn linkage in a glycan structure is represented by "??-?".
+#' This function replaces all linkages in a glycan structure with "??-?",
 #' so that `has_linkages()` will return `FALSE`.
 #'
-#' @param glycan A glycan graph.
+#' @param glycan A glycan structure.
 #'
-#' @return A glycan graph with all linkages removed.
+#' @return A glycan structure with all linkages removed.
 #'
 #' @examples
 #' glycan <- n_glycan_core()
@@ -20,6 +20,6 @@
 #'
 #' @export
 remove_linkages <- function(glycan) {
-  checkmate::assert_class(glycan, "glycan_graph")
+  checkmate::assert_class(glycan, "glycan_structure")
   igraph::set_edge_attr(glycan, "linkage", value = "??-?")
 }

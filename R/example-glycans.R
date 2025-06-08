@@ -1,7 +1,7 @@
-#' Example Glycan Graphs
+#' Example Glycan Structures
 #'
 #' @description
-#' Create example glycan graphs for testing and demonstration.
+#' Create example glycan structures for testing and demonstration.
 #' Includes **N-glycan core** and **O-glycan core 1** and **core 2**.
 #'
 #' @details
@@ -53,7 +53,7 @@
 #'   Can be "simple" (H, N, F, S), "generic" (Hex, HexNAc, dHex, NeuAc, etc.),
 #'   or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".
 #'
-#' @return A glycan graph object.
+#' @return A glycan structure object.
 #'
 #' @examples
 #' print(n_glycan_core(), verbose = TRUE)
@@ -107,7 +107,7 @@ n_glycan_core_base <- function() {
   igraph::E(graph)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
   graph$anomer <- "?1"
   graph$alditol <- FALSE
-  new_glycan_graph(graph)
+  new_glycan_structure(graph)
 }
 
 
@@ -118,7 +118,7 @@ o_glycan_core_1_base <- function() {
   igraph::E(graph)$linkage <- "b1-3"
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  new_glycan_graph(graph)
+  new_glycan_structure(graph)
 }
 
 
@@ -129,7 +129,7 @@ o_glycan_core_2_base <- function() {
   igraph::E(graph)$linkage <- c("b1-3", "b1-6")
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  new_glycan_graph(graph)
+  new_glycan_structure(graph)
 }
 
 

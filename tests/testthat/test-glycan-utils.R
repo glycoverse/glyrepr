@@ -1,11 +1,11 @@
-test_that("get the composition for a glycan graph", {
+test_that("get the composition for a glycan structure", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  glycan <- new_glycan_graph(graph)
+  glycan <- new_glycan_structure(graph)
 
   comp <- get_composition(glycan)
 

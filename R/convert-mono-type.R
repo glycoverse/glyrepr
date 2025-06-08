@@ -1,7 +1,7 @@
-#' Convert the Type of Monosaacharides in a Glycan Graph
+#' Convert the Type of Monosaacharides in a Glycan Structure
 #'
 #' @description
-#' This function converts all monosaccharides in a glycan graph
+#' This function converts all monosaccharides in a glycan structure
 #' to a different type.
 #' The types are: "concrete", "generic", and "simple" (see details below).
 #' The conversion can only be done from "concrete" to "generic" or "simple",
@@ -17,13 +17,13 @@
 #' @inheritSection decide_mono_type Three types of monosaccharides
 #' @inheritSection convert_mono_type Conversion to "simple" type
 #'
-#' @param glycan A glycan graph.
+#' @param glycan A glycan structure.
 #' @param to A character string specifying the target monosaccharide type.
 #' It can be "concrete", "generic", or "simple".
 #' @param strict If `TRUE`, the function will raise an error if the monosaccharides
 #' are already in the target type. Default is `TRUE`.
 #'
-#' @return A glycan graph with monosaccharides converted to the target type.
+#' @return A glycan structure with monosaccharides converted to the target type.
 #'
 #' @examples
 #' concrete_glycan <- n_glycan_core(mono_type = "concrete")
@@ -36,7 +36,7 @@
 #'
 #' @export
 convert_glycan_mono_type <- function(glycan, to, strict = TRUE) {
-  checkmate::assert_class(glycan, "glycan_graph")
+  checkmate::assert_class(glycan, "glycan_structure")
   checkmate::assert_choice(to, c("concrete", "generic", "simple"))
   checkmate::assert_flag(strict)
 
@@ -157,20 +157,20 @@ valid_from_to_for_convert_mono_type <- function(mono, from, to, strict) {
 }
 
 
-#' Decide the Type of Monosaacharides in a Glycan Graph
+#' Decide the Type of Monosaacharides in a Glycan Structure
 #'
-#' This function trys to decide the type of monosaccharides in a glycan graph.
+#' This function trys to decide the type of monosaccharides in a glycan structure.
 #'
 #' @details
 #' By saying "trys" in the description, it means that the function only
 #' checks the first monosaccharide in the graph to decide the type.
-#' This is reasonable because the monosaccharides in a glycan graph are always
+#' This is reasonable because the monosaccharides in a glycan structure are always
 #' of the same type if it was created with the functions in this package.
 #' The validation functions will ensure this.
 #'
 #' @inheritSection decide_mono_type Three types of monosaccharides
 #'
-#' @param glycan A glycan graph.
+#' @param glycan A glycan structure.
 #'
 #' @return A character string specifying the monosaccharide type.
 #'
@@ -183,7 +183,7 @@ valid_from_to_for_convert_mono_type <- function(mono, from, to, strict) {
 #'
 #' @export
 decide_glycan_mono_type <- function(glycan) {
-  checkmate::assert_class(glycan, "glycan_graph")
+  checkmate::assert_class(glycan, "glycan_structure")
   decide_glycan_mono_type_impl(glycan)
 }
 

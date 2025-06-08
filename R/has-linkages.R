@@ -1,14 +1,14 @@
-#' Determine if a Glycan Graph has Linkages
+#' Determine if a Glycan Structure has Linkages
 #'
 #' @description
-#' Unknown linkages in a glycan graph are represented by "??-?".
-#' This function checks if all linkages in a glycan graph are unknown.
+#' Unknown linkages in a glycan structure are represented by "??-?".
+#' This function checks if all linkages in a glycan structure are unknown.
 #' Note that even only one linkage is partial known (e.g. "a?-?"),
 #' this function will return `TRUE`.
 #'
-#' @param glycan A glycan graph.
+#' @param glycan A glycan structure.
 #'
-#' @return A logical value indicating if the glycan graph has linkages.
+#' @return A logical value indicating if the glycan structure has linkages.
 #'
 #' @examples
 #' glycan <- o_glycan_core_1(linkage = TRUE)
@@ -23,6 +23,6 @@
 #'
 #' @export
 has_linkages <- function(glycan) {
-  checkmate::assert_class(glycan, "glycan_graph")
+  checkmate::assert_class(glycan, "glycan_structure")
   any(igraph::E(glycan)$linkage != "??-?")
 }

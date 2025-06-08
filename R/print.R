@@ -1,23 +1,23 @@
-#' Print method for Glycan Graphs
+#' Print method for Glycan Structures
 #'
-#' This function prints information about a glycan graph,
+#' This function prints information about a glycan structure,
 #' including its composition and structure.
 #'
 #' If all linkages are unknown ("??-?"),
 #' the linkage information will be omitted.
 #'
-#' @param x A glycan graph.
+#' @param x A glycan structure.
 #' @param ... Ignored.
-#' @param verbose A logical value. If `TRUE`, the structure of the glycan graph will be printed.
+#' @param verbose A logical value. If `TRUE`, the structure of the glycan structure will be printed.
 #' @param colored A logical value. If `TRUE`, monosaccharides will be colored in structure printing.
-#' If `TRUE`, the structure of the glycan graph will be printed.
+#' If `TRUE`, the structure of the glycan structure will be printed.
 #' Default is `TRUE`.
 #'
 #' @export
-print.glycan_graph <- function(x, ..., verbose = TRUE, colored = TRUE) {
+print.glycan_structure <- function(x, ..., verbose = TRUE, colored = TRUE) {
   checkmate::assert_flag(verbose)
   checkmate::assert_flag(colored)
-  cli::cat_line("Glycan Graph")
+  cli::cat_line("Glycan Structure")
   print_composition(x)
   if (verbose) {
     cli::cat_line(stringr::str_dup("-", 18))

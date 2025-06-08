@@ -2,23 +2,23 @@
 % Please edit documentation in R/convert-mono-type.R
 \name{decide_glycan_mono_type}
 \alias{decide_glycan_mono_type}
-\title{Decide the Type of Monosaacharides in a Glycan Graph}
+\title{Decide the Type of Monosaacharides in a Glycan Structure}
 \usage{
 decide_glycan_mono_type(glycan)
 }
 \arguments{
-\item{glycan}{A glycan graph.}
+\item{glycan}{A glycan structure.}
 }
 \value{
 A character string specifying the monosaccharide type.
 }
 \description{
-This function trys to decide the type of monosaccharides in a glycan graph.
+This function trys to decide the type of monosaccharides in a glycan structure.
 }
 \details{
 By saying "trys" in the description, it means that the function only
 checks the first monosaccharide in the graph to decide the type.
-This is reasonable because the monosaccharides in a glycan graph are always
+This is reasonable because the monosaccharides in a glycan structure are always
 of the same type if it was created with the functions in this package.
 The validation functions will ensure this.
 }

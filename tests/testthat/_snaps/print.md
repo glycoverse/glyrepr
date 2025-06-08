@@ -1,9 +1,9 @@
-# print works for glycan graphs
+# print works for glycan structures
 
     Code
       print(x)
     Output
-      Glycan Graph
+      Glycan Structure
       Man(3)GlcNAc(2)
       ------------------
       GlcNAc (?1-)
@@ -12,20 +12,20 @@
           ├─Man (a1-3)
           └─Man (a1-6)
 
-# print works for glycan graphs with verbose = FALSE
+# print works for glycan structures with verbose = FALSE
 
     Code
       print(x, verbose = FALSE)
     Output
-      Glycan Graph
+      Glycan Structure
       Man(3)GlcNAc(2)
 
-# print works for glycan graphs without linkages
+# print works for glycan structures without linkages
 
     Code
       print(x)
     Output
-      Glycan Graph
+      Glycan Structure
       Man(3)GlcNAc(2)
       ------------------
       GlcNAc (?1-)
@@ -34,12 +34,12 @@
           ├─Man
           └─Man
 
-# print works for one-mono glycan graphs
+# print works for one-mono glycan structures
 
     Code
       print(glycan)
     Output
-      Glycan Graph
+      Glycan Structure
       N1
       ------------------
       N (a1-)
@@ -49,7 +49,7 @@
     Code
       print(glycan)
     Output
-      Glycan Graph
+      Glycan Structure
       Gal(1)GalNAc(1)
       ------------------
       GalNAc-6S (a1-)
@@ -60,7 +60,7 @@
     Code
       print(glycan)
     Output
-      Glycan Graph
+      Glycan Structure
       N1
       ------------------
       N-6S (a1-)
@@ -70,7 +70,7 @@
     Code
       print(glycan)
     Output
-      Glycan Graph
+      Glycan Structure
       Gal(1)GalNAc(1)
       ------------------
       GalNAc-ol (a1-)
@@ -81,7 +81,7 @@
     Code
       print(glycan)
     Output
-      Glycan Graph
+      Glycan Structure
       N1
       ------------------
       N-ol (a1-)
@@ -91,7 +91,7 @@
     Code
       print(glycan)
     Output
-      Glycan Graph
+      Glycan Structure
       Gal(1)GalNAc(1)
       ------------------
       GalNAc-ol-6S (a1-)
@@ -102,7 +102,7 @@
     Code
       print(glycan)
     Output
-      Glycan Graph
+      Glycan Structure
       N1
       ------------------
       N-ol-6S (a1-)

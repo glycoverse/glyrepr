@@ -7,13 +7,13 @@
 remove_substituents(glycan)
 }
 \arguments{
-\item{glycan}{A glycan graph.}
+\item{glycan}{A glycan structure.}
 }
 \value{
-A glycan graph.
+A glycan structure.
 }
 \description{
-This function replaces all substituents in a glycan graph with empty strings.
+This function replaces all substituents in a glycan structure with empty strings.
 }
 \examples{
 glycan <- n_glycan_core()

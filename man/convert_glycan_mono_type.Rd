@@ -2,12 +2,12 @@
 % Please edit documentation in R/convert-mono-type.R
 \name{convert_glycan_mono_type}
 \alias{convert_glycan_mono_type}
-\title{Convert the Type of Monosaacharides in a Glycan Graph}
+\title{Convert the Type of Monosaacharides in a Glycan Structure}
 \usage{
 convert_glycan_mono_type(glycan, to, strict = TRUE)
 }
 \arguments{
-\item{glycan}{A glycan graph.}
+\item{glycan}{A glycan structure.}
 
 \item{to}{A character string specifying the target monosaccharide type.
 It can be "concrete", "generic", or "simple".}
@@ -16,10 +16,10 @@ It can be "concrete", "generic", or "simple".}
 are already in the target type. Default is \code{TRUE}.}
 }
 \value{
-A glycan graph with monosaccharides converted to the target type.
+A glycan structure with monosaccharides converted to the target type.
 }
 \description{
-This function converts all monosaccharides in a glycan graph
+This function converts all monosaccharides in a glycan structure
 to a different type.
 The types are: "concrete", "generic", and "simple" (see details below).
 The conversion can only be done from "concrete" to "generic" or "simple",
