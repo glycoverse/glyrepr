@@ -1,3 +1,24 @@
+# Tests for has_linkages() function
+test_that("`has_linkages()` works for glycans with intact linkages", {
+  glycan <- o_glycan_core_1(linkage = TRUE)
+  expect_true(has_linkages(glycan))
+})
+
+
+test_that("`has_linkages()` works for glycan with partial linkages", {
+  glycan <- o_glycan_core_2(linkage = TRUE)
+  glycan <- igraph::set_edge_attr(glycan, "linkage", value = c("??-?", "b1-6"))
+  expect_true(has_linkages(glycan))
+})
+
+
+test_that("`has_linkages()` works for glycans without linkages", {
+  glycan <- o_glycan_core_1(linkage = FALSE)
+  expect_false(has_linkages(glycan))
+})
+
+
+# Tests for possible_linkages() function
 test_that("a?-2", {
   result <- possible_linkages("a?-2")
   expected <- c("a1-2", "a2-2")
@@ -80,4 +101,12 @@ test_that("include unknown", {
   result <- possible_linkages("?1-6", include_unknown = TRUE)
   expected <- c("a1-6", "b1-6", "?1-6")
   expect_identical(result, expected)
+})
+
+
+# Tests for remove_linkages() function
+test_that("works for glycans", {
+  glycan <- o_glycan_core_2(linkage = TRUE)
+  glycan <- remove_linkages(glycan)
+  expect_false(has_linkages(glycan))
 })
