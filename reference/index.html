@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9016</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,10 +41,16 @@
 
       <dl><dt>
 
-          <code><a href="as_glycan_graph.html">as_glycan_graph()</a></code>
+          <code><a href="as_composition.html">as_composition()</a></code>
 
         </dt>
-        <dd>Convert igraph Graph to Glycan Graph</dd>
+        <dd>Convert to Glycan Composition</dd>
+      </dl><dl><dt>
+
+          <code><a href="as_glycan_structure.html">as_glycan_structure()</a></code> <code><a href="as_glycan_structure.html">is_glycan_structure()</a></code>
+
+        </dt>
+        <dd>Convert igraph Graph to Glycan Structure</dd>
       </dl><dl><dt>
 
           <code><a href="available_monosaccharides.html">available_monosaccharides()</a></code>
@@ -59,10 +65,16 @@
         <dd>Get Available Substituents</dd>
       </dl><dl><dt>
 
+          <code><a href="composition.html">composition()</a></code> <code><a href="composition.html">is_composition()</a></code>
+
+        </dt>
+        <dd>Create a Glycan Composition</dd>
+      </dl><dl><dt>
+
           <code><a href="convert_glycan_mono_type.html">convert_glycan_mono_type()</a></code>
 
         </dt>
-        <dd>Convert the Type of Monosaacharides in a Glycan Graph</dd>
+        <dd>Convert the Type of Monosaacharides in a Glycan Structure</dd>
       </dl><dl><dt>
 
           <code><a href="convert_mono_type.html">convert_mono_type()</a></code>
@@ -71,16 +83,10 @@
         <dd>Convert a Monosaacharide to a Different Type</dd>
       </dl><dl><dt>
 
-          <code><a href="count_monos.html">count_monos()</a></code>
-
-        </dt>
-        <dd>Count the Number of Monosaccharides</dd>
-      </dl><dl><dt>
-
           <code><a href="decide_glycan_mono_type.html">decide_glycan_mono_type()</a></code>
 
         </dt>
-        <dd>Decide the Type of Monosaacharides in a Glycan Graph</dd>
+        <dd>Decide the Type of Monosaacharides in a Glycan Structure</dd>
       </dl><dl><dt>
 
           <code><a href="decide_mono_type.html">decide_mono_type()</a></code>
@@ -98,13 +104,7 @@
           <code><a href="has_linkages.html">has_linkages()</a></code>
 
         </dt>
-        <dd>Determine if a Glycan Graph has Linkages</dd>
-      </dl><dl><dt>
-
-          <code><a href="is_glycan.html">is_glycan()</a></code>
-
-        </dt>
-        <dd>Check if an Object is a Glycan Graph</dd>
+        <dd>Determine if a Glycan Structure has Linkages</dd>
       </dl><dl><dt>
 
           <code><a href="is_known_monosaccharide.html">is_known_monosaccharide()</a></code>
@@ -116,7 +116,7 @@
           <code><a href="n_glycan_core.html">n_glycan_core()</a></code> <code><a href="n_glycan_core.html">o_glycan_core_1()</a></code> <code><a href="n_glycan_core.html">o_glycan_core_2()</a></code>
 
         </dt>
-        <dd>Example Glycan Graphs</dd>
+        <dd>Example Glycan Structures</dd>
       </dl><dl><dt>
 
           <code><a href="possible_linkages.html">possible_linkages()</a></code>
@@ -125,22 +125,28 @@
         <dd>Generate Possible Linkages</dd>
       </dl><dl><dt>
 
-          <code><a href="print.glycan_graph.html">print(<i>&lt;glycan_graph&gt;</i>)</a></code>
+          <code><a href="print.glycan_structure.html">print(<i>&lt;glycan_structure&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print method for Glycan Graphs</dd>
+        <dd>Print method for Glycan Structures</dd>
       </dl><dl><dt>
 
           <code><a href="remove_linkages.html">remove_linkages()</a></code>
 
         </dt>
-        <dd>Remove All Linkages from a Glycan Graph</dd>
+        <dd>Remove All Linkages from a Glycan Structure</dd>
       </dl><dl><dt>
 
           <code><a href="remove_substituents.html">remove_substituents()</a></code>
 
         </dt>
         <dd>Remove All Substituents from a Glycan</dd>
+      </dl><dl><dt>
+
+          <code><a href="structure_to_iupac.html">structure_to_iupac()</a></code>
+
+        </dt>
+        <dd>Convert Glycan Structure to IUPAC-like Sequence</dd>
       </dl><dl><dt>
 
           <code><a href="valid_linkages.html">valid_linkages()</a></code>
