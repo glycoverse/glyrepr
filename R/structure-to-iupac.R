@@ -62,8 +62,8 @@ structure_to_iupac <- function(glycan) {
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
   }
-  
-  structure_map_chr(glycan, .structure_to_iupac_single)
+
+  unname(attr(glycan, "iupacs")[vctrs::field(glycan, "codes")])
 }
 
 # Internal function to convert a single igraph to IUPAC
