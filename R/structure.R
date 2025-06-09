@@ -73,7 +73,7 @@ glycan_structure <- function(...) {
   
   if (length(graphs) == 0) {
     # Return empty vector
-    return(new_glycan_structure(character(), character(), list()))
+    return(new_glycan_structure(character(), list()))
   }
   
   # Validate and process each graph
@@ -84,18 +84,16 @@ glycan_structure <- function(...) {
       ensure_name_vertex_attr()
   })
   
-  # Use hash values of IUPAC codes for deduplication
+  # Use IUPAC codes directly as codes for deduplication
   iupacs <- purrr::map_chr(processed_graphs, .structure_to_iupac_single)
-  codes <- purrr::map_chr(iupacs, rlang::hash)
   
-  # Create a unique list based on uniqueness of codes
-  unique_indices <- which(!duplicated(codes))
+  # Create a unique list based on uniqueness of IUPAC codes
+  unique_indices <- which(!duplicated(iupacs))
   unique_graphs <- processed_graphs[unique_indices]
-  names(unique_graphs) <- codes[unique_indices]
   unique_iupacs <- iupacs[unique_indices]
-  names(unique_iupacs) <- codes[unique_indices]
+  names(unique_graphs) <- unique_iupacs
   
-  new_glycan_structure(codes, unique_iupacs, unique_graphs)
+  new_glycan_structure(iupacs, unique_graphs)
 }
 
 # Helper function to validate a single glycan structure
@@ -197,10 +195,9 @@ validate_single_glycan_structure <- function(glycan) {
 }
 
 # Helper function to create a new glycan structure vector
-new_glycan_structure <- function(codes = character(), iupacs = character(), structures = list()) {
+new_glycan_structure <- function(codes = character(), structures = list()) {
   vctrs::new_rcrd(
     list(codes = codes),
-    iupacs = iupacs,
     structures = structures,
     class = "glyrepr_structure"
   )
@@ -306,13 +303,12 @@ vec_ptype_abbr.glyrepr_structure <- function(x, ...) "structure"
 format.glyrepr_structure <- function(x, ...) {
   data <- vctrs::vec_data(x)
   codes <- vctrs::field(data, "codes")
-  iupacs <- attr(x, "iupacs")
-  unname(iupacs[codes])
+  unname(codes)
 }
 
 #' @export
 obj_print_footer.glyrepr_structure <- function(x, ...) {
-  cat("# Unique structures: ", format(length(attr(x, "iupacs"))), "\n", sep = "")
+  cat("# Unique structures: ", format(length(attr(x, "structures"))), "\n", sep = "")
 }
 
 #' @export

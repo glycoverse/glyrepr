@@ -345,7 +345,6 @@ test_that("glycan_structure creates empty vector by default", {
   sv <- glycan_structure()
   expect_s3_class(sv, "glyrepr_structure")
   expect_equal(length(sv), 0)
-  expect_length(attr(sv, "iupacs"), 0)
   expect_length(attr(sv, "structures"), 0)
 })
 
@@ -355,9 +354,8 @@ test_that("glycan_structure works with single glycan structure", {
   
   expect_s3_class(sv, "glyrepr_structure")
   expect_equal(length(sv), 1)
-  expect_length(attr(sv, "iupacs"), 1)
   expect_length(attr(sv, "structures"), 1)
-  expect_equal(attr(sv, "iupacs")[[1]], "Gal(b1-3)GalNAc(a1-")
+  expect_equal(vctrs::field(sv, "codes")[1], "Gal(b1-3)GalNAc(a1-")
 })
 
 test_that("glycan_structure works with multiple different glycan structures", {
@@ -367,7 +365,6 @@ test_that("glycan_structure works with multiple different glycan structures", {
   
   expect_s3_class(sv, "glyrepr_structure")
   expect_equal(length(sv), 2)
-  expect_length(attr(sv, "iupacs"), 2)
   expect_length(attr(sv, "structures"), 2)
 })
 
@@ -378,8 +375,7 @@ test_that("glycan_structure removes duplicates based on IUPAC codes", {
   
   expect_s3_class(sv, "glyrepr_structure")
   expect_equal(length(sv), 2)  # Original vector has 2 elements
-  expect_length(attr(sv, "iupacs"), 1)  # But only 1 unique structure
-  expect_length(attr(sv, "structures"), 1)
+  expect_length(attr(sv, "structures"), 1)  # But only 1 unique structure
 })
 
 test_that("glycan_structure handles structures with different IUPAC but same graph topology", {
@@ -390,7 +386,7 @@ test_that("glycan_structure handles structures with different IUPAC but same gra
   sv <- glycan_structure(graph1, graph2)
   
   expect_equal(length(sv), 2)
-  expect_length(attr(sv, "iupacs"), 2)  # Different IUPAC codes
+  expect_length(attr(sv, "structures"), 2)  # Different IUPAC codes
 })
 
 test_that("glycan_structure validates input", {
@@ -532,8 +528,8 @@ test_that("glycan_structure preserves glycan structures correctly", {
   
   # Check IUPAC codes are generated correctly
   expected_iupacs <- c(structure_to_iupac(graph1), structure_to_iupac(graph2))
-  stored_iupacs <- attr(sv, "iupacs")
-  expect_equal(sort(unname(stored_iupacs)), sort(expected_iupacs))
+  stored_codes <- vctrs::field(sv, "codes")
+  expect_equal(sort(unique(stored_codes)), sort(expected_iupacs))
 })
 
 test_that("glycan_structure handles complex branched structures", {
@@ -562,5 +558,4 @@ test_that("glycan_structure maintains hash uniqueness property", {
   
   expect_equal(length(sv), 5)  # 5 elements in vector
   expect_length(attr(sv, "structures"), 1)  # But only 1 unique structure
-  expect_length(attr(sv, "iupacs"), 1)
 }) 
