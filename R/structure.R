@@ -315,6 +315,24 @@ obj_print_footer.glyrepr_structure <- function(x, ...) {
   cat("# Unique structures: ", format(length(attr(x, "iupacs"))), "\n", sep = "")
 }
 
+#' @export
+obj_print_data.glyrepr_structure <- function(x, ..., max_n = 10) {
+  if (length(x) == 0) {
+    return()
+  }
+
+  formatted <- format(x)
+  n <- length(formatted)
+  n_show <- min(n, max_n)
+  # Print each IUPAC structure on its own line with indexing, up to max_n
+  for (i in seq_len(n_show)) {
+    cat("[", i, "] ", formatted[i], "\n", sep = "")
+  }
+  if (n > max_n) {
+    cat("... (", n - max_n, " more not shown)\n", sep = "")
+  }
+}
+
 #' Access Individual Glycan Structures
 #'
 #' Extract individual glycan structure graphs from a glycan structure vector.
