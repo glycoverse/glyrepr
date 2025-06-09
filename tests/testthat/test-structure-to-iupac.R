@@ -314,3 +314,61 @@ test_that("structure_to_iupac handles edge cases with linkages", {
   result2 <- structure_to_iupac(glycan2)
   expect_equal(result2, "Gal(b1-8)Glc(a7-")
 }) 
+
+test_that("structure_to_iupac supports substituents", {
+  # Create a simple structure with a substituent: Glc with 3Me
+  graph <- igraph::make_graph(edges = integer(0), n = 1)
+  igraph::V(graph)$mono <- "Glc"
+  igraph::V(graph)$sub <- "3Me"  # 3号位置有Me修饰
+  igraph::E(graph)$linkage <- character(0)
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  glycan <- glycan_structure(graph)
+  
+  result <- structure_to_iupac(glycan)
+  # Expected: Glc3Me(a1-
+  expect_equal(result, "Glc3Me(a1-")
+  
+  # Test with linear structure: Glc with 3Me -> GlcNAc with 6Ac
+  graph2 <- igraph::make_graph(~ 1-+2)
+  igraph::V(graph2)$mono <- c("Glc", "GlcNAc")
+  igraph::V(graph2)$sub <- c("3Me", "6Ac")
+  igraph::E(graph2)$linkage <- "b1-4"
+  graph2$anomer <- "a1"
+  graph2$alditol <- FALSE
+  glycan2 <- glycan_structure(graph2)
+  
+  result2 <- structure_to_iupac(glycan2)
+  # Expected: GlcNAc6Ac(b1-4)Glc3Me(a1-
+  expect_equal(result2, "GlcNAc6Ac(b1-4)Glc3Me(a1-")
+})
+
+test_that("structure_to_iupac handles empty substituents", {
+  # Test with empty substituents (should work as before)
+  graph <- igraph::make_graph(~ 1-+2)
+  igraph::V(graph)$mono <- c("Glc", "GlcNAc")
+  igraph::V(graph)$sub <- c("", "")  # No substituents
+  igraph::E(graph)$linkage <- "b1-4"
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  glycan <- glycan_structure(graph)
+  
+  result <- structure_to_iupac(glycan)
+  # Expected: GlcNAc(b1-4)Glc(a1-
+  expect_equal(result, "GlcNAc(b1-4)Glc(a1-")
+})
+
+test_that("structure_to_iupac handles mixed substituents", {
+  # Test with some having substituents, some not
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Glc", "GlcNAc", "Gal")
+  igraph::V(graph)$sub <- c("3Me", "", "6S")  # Mixed substituents
+  igraph::E(graph)$linkage <- c("b1-4", "b1-3")
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  glycan <- glycan_structure(graph)
+  
+  result <- structure_to_iupac(glycan)
+  # Expected: Gal6S(b1-3)GlcNAc(b1-4)Glc3Me(a1-
+  expect_equal(result, "Gal6S(b1-3)GlcNAc(b1-4)Glc3Me(a1-")
+}) 

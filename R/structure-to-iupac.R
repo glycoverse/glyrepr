@@ -10,9 +10,10 @@
 #' # Sequence Format
 #' 
 #' The sequence follows the format mono(linkage)mono, where:
-#' - mono: monosaccharide name (e.g., Glc, GlcNAc, Man)
+#' - mono: monosaccharide name with optional substituents (e.g., Glc, GlcNAc, Glc3Me)
 #' - linkage: glycosidic linkage (e.g., b1-4, a1-3)
 #' - Branches are enclosed in square brackets []
+#' - Substituents are appended directly to monosaccharide names (e.g., Glc3Me for Glc with 3Me substituent)
 #' 
 #' # Backbone Selection
 #' 
@@ -38,6 +39,16 @@
 #' 
 #' # Branched structure  
 #' structure_to_iupac(n_glycan_core())
+#' 
+#' # Structure with substituents
+#' graph <- igraph::make_graph(~ 1-+2)
+#' igraph::V(graph)$mono <- c("Glc", "GlcNAc")
+#' igraph::V(graph)$sub <- c("3Me", "6Ac")
+#' igraph::E(graph)$linkage <- "b1-4"
+#' graph$anomer <- "a1"
+#' graph$alditol <- FALSE
+#' glycan <- glycan_structure(graph)
+#' structure_to_iupac(glycan)  # Returns "GlcNAc6Ac(b1-4)Glc3Me(a1-"
 #' 
 #' # Vectorized structures
 #' structs <- glycan_structure(o_glycan_core_1(), n_glycan_core())
@@ -205,7 +216,14 @@ seq_glycan <- function(glycan, node, depths) {
   
   # Base case: leaf node
   if (length(children) == 0) {
-    return(igraph::vertex_attr(glycan, "mono", node))
+    mono <- igraph::vertex_attr(glycan, "mono", node)
+    sub <- igraph::vertex_attr(glycan, "sub", node)
+    # Combine monosaccharide with substituent if present
+    if (sub == "") {
+      return(mono)
+    } else {
+      return(paste0(mono, sub))
+    }
   }
   
   # Find backbone child (deepest, break ties by linkage)
@@ -263,11 +281,20 @@ seq_glycan <- function(glycan, node, depths) {
     }
   }
   
-  # Get current node's monosaccharide
+  # Get current node's monosaccharide and substituent
   current_mono <- igraph::vertex_attr(glycan, "mono", node)
+  current_sub <- igraph::vertex_attr(glycan, "sub", node)
   
-  # Combine: backbone + (backbone_linkage) + branches + current_mono
+  # Combine monosaccharide with substituent if present
+  # Format: mono + substituent (e.g., "Glc" + "3Me" = "Glc3Me")
+  current_mono_with_sub <- if (current_sub == "") {
+    current_mono
+  } else {
+    paste0(current_mono, current_sub)
+  }
+  
+  # Combine: backbone + (backbone_linkage) + branches + current_mono_with_sub
   branches_str <- paste0(branch_parts, collapse = "")
-  paste0(backbone_seq, "(", backbone_linkage, ")", branches_str, current_mono)
+  paste0(backbone_seq, "(", backbone_linkage, ")", branches_str, current_mono_with_sub)
 }
 
