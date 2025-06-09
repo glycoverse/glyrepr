@@ -650,7 +650,7 @@ test_that("c() preserves structure integrity across combinations", {
 
 # Tests for vector casting and subsetting functionality -------------------------
 
-skip("暂时跳过：glycan_structure 向量的子集化结构保持性测试")
+skip("Skip: structure retrenching. Reason: not implemented")
 test_that("glycan_structure vectors can be subset with necessary structure preservation", {
   sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   
@@ -725,4 +725,10 @@ test_that("structure vector methods handle edge cases", {
   expect_equal(length(combined2), 2)
   expect_length(attr(combined1, "structures"), 1)
   expect_length(attr(combined2, "structures"), 1)
+})
+
+# Tests for vector conversion -------------------------
+test_that("converting to character", {
+  sv <- glycan_structure(o_glycan_core_1())
+  expect_equal(as.character(sv), "Gal(b1-3)GalNAc(a1-")
 })

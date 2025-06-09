@@ -349,6 +349,11 @@ vec_cast.glyrepr_structure.glyrepr_structure <- function(x, to, ...) {
   x
 }
 
+#' @export
+as.character.glyrepr_structure <- function(x, ...) {
+  vctrs::vec_data(x)
+}
+
 #' Access Individual Glycan Structures
 #'
 #' Extract individual glycan structure graphs from a glycan structure vector.
