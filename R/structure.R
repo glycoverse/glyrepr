@@ -161,11 +161,11 @@ ensure_name_vertex_attr <- function(glycan) {
 #' E(graph)$linkage <- "b1-4"
 #' graph$anomer <- "a1"
 #' graph$alditol <- FALSE
-#' as_glycan_structure(graph)
+#' glycan_structure(graph)
 #'
 #' @importFrom magrittr %>%
 #' @export
-as_glycan_structure <- function(graph) {
+glycan_structure <- function(graph) {
   checkmate::assert_class(graph, "igraph")
   
   graph %>%
@@ -176,7 +176,7 @@ as_glycan_structure <- function(graph) {
 
 
 #' @export 
-#' @rdname as_glycan_structure
+#' @rdname glycan_structure
 is_glycan_structure <- function(x) {
   inherits(x, "glycan_structure")
 }

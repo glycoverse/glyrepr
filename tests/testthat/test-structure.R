@@ -11,17 +11,17 @@ good_glycan_structure <- function() {
 }
 
 
-# Tests for as_glycan_structure --------------------------------------------------
+# Tests for glycan_structure --------------------------------------------------
 
-test_that("as_glycan_structure works", {
-  glycan <- as_glycan_structure(good_glycan_structure())
+test_that("glycan_structure works", {
+  glycan <- glycan_structure(good_glycan_structure())
   expect_s3_class(glycan, c("glycan_structure", "igraph"))
 })
 
 
-test_that("as_glycan_structure fails for invalid graphs", {
+test_that("glycan_structure fails for invalid graphs", {
   bad_graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+1)
-  expect_error(as_glycan_structure(bad_graph))
+  expect_error(glycan_structure(bad_graph))
 })
 
 
@@ -29,7 +29,7 @@ test_that("vertex names are added if missing", {
   graph <- good_glycan_structure()
   graph <- igraph::delete_vertex_attr(graph, "name")
 
-  glycan <- as_glycan_structure(graph)
+  glycan <- glycan_structure(graph)
 
   expect_true("name" %in% igraph::vertex_attr_names(glycan))
 })

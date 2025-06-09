@@ -19,7 +19,7 @@ create_simple_glycan <- function(mono_names, linkages, anomer = "?1") {
   igraph::E(graph)$linkage <- linkages
   graph$anomer <- anomer
   graph$alditol <- FALSE
-  as_glycan_structure(graph)
+  glycan_structure(graph)
 }
 
 # Tests for structure_vctr constructor --------------------------------------------
@@ -212,7 +212,7 @@ test_that("structure_vctr handles complex branched structures", {
   igraph::E(graph)$linkage <- c("b1-4", "a1-3", "a1-6")
   graph$anomer <- "b1"
   graph$alditol <- FALSE
-  complex_glycan <- as_glycan_structure(graph)
+  complex_glycan <- glycan_structure(graph)
   
   sv <- structure_vctr(list(complex_glycan))
   
