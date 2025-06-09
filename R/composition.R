@@ -117,18 +117,15 @@ as_composition.glyrepr_composition <- function(x) {
 
 #' @export
 as_composition.glyrepr_structure <- function(x) {
-  # Extract individual igraph objects and convert each to composition
-  data <- vctrs::vec_data(x)
-  codes <- vctrs::field(data, "codes")
-  structures <- attr(x, "structures")
-  
-  # Get individual structures and convert to compositions
-  individual_graphs <- purrr::map(codes, ~ structures[[.x]])
-  compositions <- purrr::map(individual_graphs, function(graph) {
+  # Use structure_map to convert each structure to composition
+  compositions <- structure_map(x, function(graph) {
     monos <- igraph::V(graph)$mono
     result_tb <- table(monos)
     result <- as.integer(result_tb)
     names(result) <- names(result_tb)
+    # Sort by monosaccharides tibble order (top to bottom)
+    mono_order <- get_monosaccharide_order(names(result))
+    result <- result[order(mono_order)]
     result
   })
   

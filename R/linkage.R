@@ -6,9 +6,9 @@
 #' Note that even only one linkage is partial known (e.g. "a?-?"),
 #' this function will return `TRUE`.
 #'
-#' @param glycan An igraph object representing a glycan structure, or a glyrepr_structure vector.
+#' @param glycan A glyrepr_structure vector.
 #'
-#' @return A logical value indicating if the glycan structure has linkages, or a vector of logical values if input is vectorized.
+#' @return A logical vector indicating if each glycan structure has linkages.
 #'
 #' @examples
 #' glycan <- o_glycan_core_1(linkage = TRUE)
@@ -23,39 +23,20 @@
 #'
 #' @export
 has_linkages <- function(glycan) {
-  UseMethod("has_linkages")
-}
-
-#' @export
-has_linkages.igraph <- function(glycan) {
-  any(igraph::E(glycan)$linkage != "??-?")
-}
-
-#' @export
-has_linkages.glyrepr_structure <- function(glycan) {
-  # Extract individual igraph objects and apply has_linkages to each
-  data <- vctrs::vec_data(glycan)
-  codes <- vctrs::field(data, "codes")
-  structures <- attr(glycan, "structures")
-  
-  # Get individual structures and apply has_linkages
-  individual_graphs <- purrr::map(codes, ~ structures[[.x]])
-  purrr::map_lgl(individual_graphs, has_linkages.igraph)
-}
-
-#' @export
-has_linkages.default <- function(glycan) {
-  # Try to handle legacy glycan_structure objects (single igraphs with glycan_structure class)
-  if (inherits(glycan, "glycan_structure") && inherits(glycan, "igraph")) {
-    return(has_linkages.igraph(glycan))
+  if (!is_glycan_structure(glycan)) {
+    rlang::abort(c(
+      "Input must be a glyrepr_structure vector.",
+      "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
+    ))
   }
   
-  rlang::abort(c(
-    "Cannot check linkages for object of class {.cls {class(glycan)}}.",
-    "i" = "Supported types: igraph object or glyrepr_structure vector."
-  ))
+  structure_map_lgl(glycan, .has_linkages_single)
 }
 
+# Internal function to check linkages in a single igraph
+.has_linkages_single <- function(glycan) {
+  any(igraph::E(glycan)$linkage != "??-?")
+}
 
 #' Generate Possible Linkages
 #'
@@ -142,9 +123,9 @@ possible_linkages <- function(
 #'
 #' This function replaces all linkages in a glycan structure with "??-?".
 #'
-#' @param glycan An igraph object representing a glycan structure, or a glyrepr_structure vector.
+#' @param glycan A glyrepr_structure vector.
 #'
-#' @return An igraph object representing a glycan structure, or a glyrepr_structure vector.
+#' @return A glyrepr_structure vector with all linkages removed.
 #'
 #' @examples
 #' glycan <- o_glycan_core_1(linkage = TRUE)
@@ -153,45 +134,17 @@ possible_linkages <- function(
 #'
 #' @export
 remove_linkages <- function(glycan) {
-  UseMethod("remove_linkages")
-}
-
-#' @export
-remove_linkages.igraph <- function(glycan) {
-  igraph::set_edge_attr(glycan, "linkage", value = "??-?")
-}
-
-#' @export
-remove_linkages.glyrepr_structure <- function(glycan) {
-  # Extract individual igraph objects and apply remove_linkages to each
-  data <- vctrs::vec_data(glycan)
-  codes <- vctrs::field(data, "codes")
-  structures <- attr(glycan, "structures")
-  
-  # Remove linkages from each unique structure
-  modified_structures <- purrr::map(structures, ~ remove_linkages.igraph(.x))
-  names(modified_structures) <- names(structures)
-  
-  # Update the stored structures
-  attr(glycan, "structures") <- modified_structures
-  
-  # Regenerate IUPAC codes for the modified structures
-  new_iupacs <- purrr::map_chr(modified_structures, structure_to_iupac.igraph)
-  names(new_iupacs) <- names(modified_structures)
-  attr(glycan, "iupacs") <- new_iupacs
-  
-  glycan
-}
-
-#' @export
-remove_linkages.default <- function(glycan) {
-  # Try to handle legacy glycan_structure objects (single igraphs with glycan_structure class)
-  if (inherits(glycan, "glycan_structure") && inherits(glycan, "igraph")) {
-    return(remove_linkages.igraph(glycan))
+  if (!is_glycan_structure(glycan)) {
+    rlang::abort(c(
+      "Input must be a glyrepr_structure vector.",
+      "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
+    ))
   }
   
-  rlang::abort(c(
-    "Cannot remove linkages for object of class {.cls {class(glycan)}}.",
-    "i" = "Supported types: igraph object or glyrepr_structure vector."
-  ))
+  structure_map_structure(glycan, .remove_linkages_single)
+}
+
+# Internal function to remove linkages from a single igraph
+.remove_linkages_single <- function(glycan) {
+  igraph::set_edge_attr(glycan, "linkage", value = "??-?")
 }

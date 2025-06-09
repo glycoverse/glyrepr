@@ -29,9 +29,9 @@
 #' 
 #' Smaller linkages are placed on the backbone, larger ones in branches.
 #'
-#' @param glycan An igraph object representing a glycan structure, or a glyrepr_structure vector
+#' @param glycan A glyrepr_structure vector.
 #'
-#' @return A character string representing the IUPAC-like sequence, or a vector of sequences if input is vectorized
+#' @return A character vector representing the IUPAC sequences.
 #'
 #' @examples
 #' # Simple linear structure
@@ -56,11 +56,18 @@
 #'
 #' @export
 structure_to_iupac <- function(glycan) {
-  UseMethod("structure_to_iupac")
+  if (!is_glycan_structure(glycan)) {
+    rlang::abort(c(
+      "Input must be a glyrepr_structure vector.",
+      "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
+    ))
+  }
+  
+  structure_map_chr(glycan, .structure_to_iupac_single)
 }
 
-#' @export
-structure_to_iupac.igraph <- function(glycan) {
+# Internal function to convert a single igraph to IUPAC
+.structure_to_iupac_single <- function(glycan) {
   # Find root (node with in-degree 0)
   root <- which(igraph::degree(glycan, mode = "in") == 0)
   if (length(root) != 1) {
@@ -76,31 +83,6 @@ structure_to_iupac.igraph <- function(glycan) {
   # Add root anomer at the end
   anomer <- glycan$anomer
   paste0(seq_result, "(", anomer, "-")
-}
-
-#' @export
-structure_to_iupac.glyrepr_structure <- function(glycan) {
-  # Extract individual igraph objects and apply structure_to_iupac to each
-  data <- vctrs::vec_data(glycan)
-  codes <- vctrs::field(data, "codes")
-  structures <- attr(glycan, "structures")
-  
-  # Get individual structures and apply structure_to_iupac
-  individual_graphs <- purrr::map(codes, ~ structures[[.x]])
-  purrr::map_chr(individual_graphs, structure_to_iupac.igraph)
-}
-
-#' @export
-structure_to_iupac.default <- function(glycan) {
-  # Try to handle legacy glycan_structure objects (single igraphs with glycan_structure class)
-  if (inherits(glycan, "glycan_structure") && inherits(glycan, "igraph")) {
-    return(structure_to_iupac.igraph(glycan))
-  }
-  
-  rlang::abort(c(
-    "Cannot convert object of class {.cls {class(glycan)}} to IUPAC sequence.",
-    "i" = "Supported types: igraph object or glyrepr_structure vector."
-  ))
 }
 
 #' Parse linkage string into comparable components

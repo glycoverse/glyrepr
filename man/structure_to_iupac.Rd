@@ -7,10 +7,10 @@
 structure_to_iupac(glycan)
 }
 \arguments{
-\item{glycan}{An igraph object representing a glycan structure, or a glyrepr_structure vector}
+\item{glycan}{A glyrepr_structure vector.}
 }
 \value{
-A character string representing the IUPAC-like sequence, or a vector of sequences if input is vectorized
+A character vector representing the IUPAC sequences.
 }
 \description{
 Convert a glycan structure to a sequence representation in the form of

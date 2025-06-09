@@ -12,50 +12,24 @@ available_substituents <- function() {
 #'
 #' This function replaces all substituents in a glycan structure with empty strings.
 #'
-#' @param glycan An igraph object representing a glycan structure, or a glyrepr_structure vector.
+#' @param glycan A glyrepr_structure vector.
 #'
-#' @return An igraph object representing a glycan structure, or a glyrepr_structure vector.
+#' @return A glyrepr_structure vector with all substituents removed.
 #' @export
 remove_substituents <- function(glycan) {
-  UseMethod("remove_substituents")
+  if (!is_glycan_structure(glycan)) {
+    rlang::abort(c(
+      "Input must be a glyrepr_structure vector.",
+      "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
+    ))
+  }
+  
+  structure_map_structure(glycan, .remove_substituents_single)
 }
 
-#' @export
-remove_substituents.igraph <- function(glycan) {
+# Internal function to remove substituents from a single igraph
+.remove_substituents_single <- function(glycan) {
   igraph::set_vertex_attr(glycan, "sub", value = "")
 }
 
-#' @export
-remove_substituents.glyrepr_structure <- function(glycan) {
-  # Extract individual igraph objects and apply remove_substituents to each
-  data <- vctrs::vec_data(glycan)
-  codes <- vctrs::field(data, "codes")
-  structures <- attr(glycan, "structures")
-  
-  # Remove substituents from each unique structure
-  modified_structures <- purrr::map(structures, ~ remove_substituents.igraph(.x))
-  names(modified_structures) <- names(structures)
-  
-  # Update the stored structures
-  attr(glycan, "structures") <- modified_structures
-  
-  # Regenerate IUPAC codes for the modified structures
-  new_iupacs <- purrr::map_chr(modified_structures, structure_to_iupac.igraph)
-  names(new_iupacs) <- names(modified_structures)
-  attr(glycan, "iupacs") <- new_iupacs
-  
-  glycan
-}
 
-#' @export
-remove_substituents.default <- function(glycan) {
-  # Try to handle legacy glycan_structure objects (single igraphs with glycan_structure class)
-  if (inherits(glycan, "glycan_structure") && inherits(glycan, "igraph")) {
-    return(remove_substituents.igraph(glycan))
-  }
-  
-  rlang::abort(c(
-    "Cannot remove substituents for object of class {.cls {class(glycan)}}.",
-    "i" = "Supported types: igraph object or glyrepr_structure vector."
-  ))
-}

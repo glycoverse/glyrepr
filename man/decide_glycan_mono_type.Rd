@@ -7,10 +7,10 @@
 decide_glycan_mono_type(glycan)
 }
 \arguments{
-\item{glycan}{An igraph object representing a glycan structure, or a glyrepr_structure vector.}
+\item{glycan}{A glyrepr_structure vector.}
 }
 \value{
-A character string specifying the monosaccharide type, or a vector of types if input is vectorized.
+A character vector specifying the monosaccharide type for each structure.
 }
 \description{
 This function trys to decide the type of monosaccharides in a glycan structure.

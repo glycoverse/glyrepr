@@ -250,7 +250,7 @@ test_that("structure_to_iupac produces correct sequence for examples in document
 
 test_that("structure_to_iupac throws appropriate errors", {
   # Test with non-glycan_structure object
-  expect_error(structure_to_iupac("not a glycan"), "Cannot convert object")
+  expect_error(structure_to_iupac("not a glycan"), "Input must be a glyrepr_structure vector")
   
   # Create a valid glycan first, then test error from structure_to_iupac
   graph <- igraph::make_graph(~ 1-+2)
@@ -261,17 +261,16 @@ test_that("structure_to_iupac throws appropriate errors", {
   graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
-  # Manually create invalid structure (multiple roots) by bypassing validation
+  # Test the internal function directly with an invalid structure (multiple roots)
   invalid_graph <- igraph::make_graph(~ 1-+3, 2-+3)  # Two roots: 1 and 2
   igraph::V(invalid_graph)$mono <- c("Glc", "Man", "Gal")
   igraph::V(invalid_graph)$sub <- ""
   igraph::E(invalid_graph)$linkage <- c("a1-3", "b1-4")
   invalid_graph$anomer <- "a1"
   invalid_graph$alditol <- FALSE
-  # Bypass validation by setting class directly
-  class(invalid_graph) <- c("glycan_structure", "igraph")
   
-  expect_error(structure_to_iupac(invalid_graph), "exactly one root")
+  # Test the internal function .structure_to_iupac_single
+  expect_error(glyrepr:::.structure_to_iupac_single(invalid_graph), "exactly one root")
 })
 
 test_that("depth calculation works correctly", {
