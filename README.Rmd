@@ -50,8 +50,28 @@ pak::pak("glycoverse/glyrepr")
 
 ```{r}
 library(glyrepr)
+library(igraph)
 
-glycan <- n_glycan_core()
-print(glycan, verbose = TRUE)
+# Create glycan compositions
+comp <- glycan_composition(
+  c(Man = 5, GlcNAc = 2),
+  c(Man = 3, Gal = 2, GlcNAc = 4, Fuc = 1, Neu5Ac = 2)
+)
+comp
+
+# Create glycan structures
+# Here we manually create an igraph object and convert it to a glycan structure.
+# In practice, you should use the `glyparse` package to create glycan structures
+# from IUPAC names or other formats.
+graph <- make_graph(~ 1-+2, 2-+3)
+igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
+igraph::V(graph)$sub <- ""
+igraph::E(graph)$linkage <- c("b1-4", "b1-4")
+graph$anomer <- "a1"
+graph$alditol <- FALSE
+glycan <- glycan_structure(graph)
+glycan
+
+# Get the composition of a glycan structure
+as_glycan_composition(glycan)
 ```
-
