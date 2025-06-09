@@ -74,7 +74,7 @@ valid_glycan_composition <- function(x) {
     if (!all(is_known_monosaccharide(names(x)))) {
       cli::cli_abort(c(
         "{.arg ...} must have only known monosaccharides.",
-        "i" = "Call {.fun known_monosaccharides} to see all known monosaccharides."
+        "i" = "Call {.fun available_monosaccharides} to see all known monosaccharides."
       ))
     }
     # Check if all residues have the same type (generic or concrete)
