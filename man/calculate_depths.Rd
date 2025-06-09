@@ -7,7 +7,7 @@
 calculate_depths(glycan, root)
 }
 \arguments{
-\item{glycan}{A glycan_structure object}
+\item{glycan}{An igraph object representing a glycan structure}
 
 \item{root}{Root vertex}
 }

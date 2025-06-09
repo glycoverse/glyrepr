@@ -6,9 +6,13 @@ test_that("`has_linkages()` works for glycans with intact linkages", {
 
 
 test_that("`has_linkages()` works for glycan with partial linkages", {
-  glycan <- o_glycan_core_2(linkage = TRUE)
+  glycan_vec <- o_glycan_core_2(linkage = TRUE)
+  glycan <- get_structure_graphs(glycan_vec, 1)  # Extract the igraph
   glycan <- igraph::set_edge_attr(glycan, "linkage", value = c("??-?", "b1-6"))
-  expect_true(has_linkages(glycan))
+  
+  # Create a new vectorized structure with the modified graph
+  modified_glycan_vec <- glycan_structure(glycan)
+  expect_true(has_linkages(modified_glycan_vec))
 })
 
 

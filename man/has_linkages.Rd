@@ -7,10 +7,10 @@
 has_linkages(glycan)
 }
 \arguments{
-\item{glycan}{A glycan structure.}
+\item{glycan}{An igraph object representing a glycan structure, or a glyrepr_structure vector.}
 }
 \value{
-A logical value indicating if the glycan structure has linkages.
+A logical value indicating if the glycan structure has linkages, or a vector of logical values if input is vectorized.
 }
 \description{
 Unknown linkages in a glycan structure are represented by "??-?".

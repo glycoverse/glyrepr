@@ -3,39 +3,36 @@
 \name{glycan_structure}
 \alias{glycan_structure}
 \alias{is_glycan_structure}
-\title{Convert igraph Graph to Glycan Structure}
+\title{Create a Glycan Structure Vector}
 \usage{
-glycan_structure(graph)
+glycan_structure(...)
 
 is_glycan_structure(x)
 }
 \arguments{
-\item{graph}{An igraph graph object.}
+\item{...}{igraph graph objects to be converted to glycan structures, or existing glycan structure vectors.}
 
-\item{x}{An object to check.}
+\item{x}{An object to check or convert.}
 }
 \value{
-A glycan structure object.
+A glycan structure vector object.
 }
 \description{
-A glycan structure is a subclass of igraph graph with additional constraints.
-This function checks these constraints and append the S3 class \code{glycan_structure}
-to the graph object.
+A vector of glycan structures with efficient storage using hash-based deduplication.
+}
+\details{
+The underlying implementation uses hash values of IUPAC codes of the glycan structures.
+This prevents redundant storage and computation, which is very useful for glycan structures.
 
-Generally, \strong{it is not recommended} to create a glycan structure using this
-function manually.
-Use the \href{https://github.com/glycoverse/glyparse}{glyparse} package
-to generate a glycan structure from a structure string.
-
-A glycan structure is a directed modeling of a glycan structure,
+Each glycan structure is a directed graph modeling of a glycan structure,
 where nodes are monosaccharides and edges are linkages.
 }
 \section{S3 Classes}{
-A glycan structure is merely an igraph graph with an additional S3 class \code{glycan_structure}.
-Therefore, \code{sloop::s3_class()} of a glycan structure is
-\code{c("glycan_structure", "igraph")}.
+A glycan structure vector is a vctrs record with additional S3 class \code{glyrepr_structure}.
+Therefore, \code{sloop::s3_class()} of a glycan structure vector is
+\code{c("glyrepr_structure", "vctrs_rcrd", "vctrs_vctr")}.
 
-Constraints:
+Constraints for individual structures:
 \itemize{
 \item The graph must be directed and an outward tree (reducing end as root).
 \item The graph must have a graph attribute \code{anomer}, in the form of "a1".
@@ -64,6 +61,11 @@ V(graph)$sub <- ""
 E(graph)$linkage <- "b1-4"
 graph$anomer <- "a1"
 graph$alditol <- FALSE
+
+# Create glycan structure vector
 glycan_structure(graph)
+
+# Create vector with multiple structures
+glycan_structure(graph, o_glycan_core_1())
 
 }

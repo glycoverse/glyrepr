@@ -250,7 +250,7 @@ test_that("structure_to_iupac produces correct sequence for examples in document
 
 test_that("structure_to_iupac throws appropriate errors", {
   # Test with non-glycan_structure object
-  expect_error(structure_to_iupac("not a glycan"), "glycan_structure")
+  expect_error(structure_to_iupac("not a glycan"), "Cannot convert object")
   
   # Create a valid glycan first, then test error from structure_to_iupac
   graph <- igraph::make_graph(~ 1-+2)
@@ -275,8 +275,9 @@ test_that("structure_to_iupac throws appropriate errors", {
 })
 
 test_that("depth calculation works correctly", {
-  # Test depth calculation on n_glycan_core
-  glycan <- n_glycan_core()
+  # Test depth calculation on n_glycan_core - need to extract the igraph
+  glycan_vector <- n_glycan_core()
+  glycan <- get_structure_graphs(glycan_vector, 1)  # Get the first (and only) structure
   root <- which(igraph::degree(glycan, mode = "in") == 0)
   depths <- calculate_depths(glycan, root)
   

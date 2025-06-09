@@ -2,7 +2,7 @@
 % Please edit documentation in R/substituent.R
 \name{available_substituents}
 \alias{available_substituents}
-\title{Get Available Substituents}
+\title{Available Substituents}
 \usage{
 available_substituents()
 }

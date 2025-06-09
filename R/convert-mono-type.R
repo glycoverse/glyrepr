@@ -36,13 +36,52 @@
 #'
 #' @export
 convert_glycan_mono_type <- function(glycan, to, strict = TRUE) {
-  checkmate::assert_class(glycan, "glycan_structure")
+  UseMethod("convert_glycan_mono_type")
+}
+
+#' @export
+convert_glycan_mono_type.igraph <- function(glycan, to, strict = TRUE) {
   checkmate::assert_choice(to, c("concrete", "generic", "simple"))
   checkmate::assert_flag(strict)
 
   from <- decide_glycan_mono_type(glycan)
   valid_from_to_for_convert_glycan_mono_type(from, to, strict)
   convert_glycan_mono_type_impl(glycan, from, to)
+}
+
+#' @export
+convert_glycan_mono_type.glyrepr_structure <- function(glycan, to, strict = TRUE) {
+  # Extract individual igraph objects and apply convert_glycan_mono_type to each
+  data <- vctrs::vec_data(glycan)
+  codes <- vctrs::field(data, "codes")
+  structures <- attr(glycan, "structures")
+  
+  # Convert each unique structure
+  converted_structures <- purrr::map(structures, ~ convert_glycan_mono_type.igraph(.x, to, strict))
+  names(converted_structures) <- names(structures)
+  
+  # Update the stored structures
+  attr(glycan, "structures") <- converted_structures
+  
+  # Regenerate IUPAC codes for the converted structures
+  new_iupacs <- purrr::map_chr(converted_structures, structure_to_iupac.igraph)
+  names(new_iupacs) <- names(converted_structures)
+  attr(glycan, "iupacs") <- new_iupacs
+  
+  glycan
+}
+
+#' @export
+convert_glycan_mono_type.default <- function(glycan, to, strict = TRUE) {
+  # Try to handle legacy glycan_structure objects (single igraphs with glycan_structure class)
+  if (inherits(glycan, "glycan_structure") && inherits(glycan, "igraph")) {
+    return(convert_glycan_mono_type.igraph(glycan, to, strict))
+  }
+  
+  rlang::abort(c(
+    "Cannot convert monosaccharide types for object of class {.cls {class(glycan)}}.",
+    "i" = "Supported types: igraph object or glyrepr_structure vector."
+  ))
 }
 
 
@@ -170,9 +209,9 @@ valid_from_to_for_convert_mono_type <- function(mono, from, to, strict) {
 #'
 #' @inheritSection decide_mono_type Three types of monosaccharides
 #'
-#' @param glycan A glycan structure.
+#' @param glycan An igraph object representing a glycan structure, or a glyrepr_structure vector.
 #'
-#' @return A character string specifying the monosaccharide type.
+#' @return A character string specifying the monosaccharide type, or a vector of types if input is vectorized.
 #'
 #' @examples
 #' decide_glycan_mono_type(n_glycan_core(mono_type = "concrete"))
@@ -183,8 +222,37 @@ valid_from_to_for_convert_mono_type <- function(mono, from, to, strict) {
 #'
 #' @export
 decide_glycan_mono_type <- function(glycan) {
-  checkmate::assert_class(glycan, "glycan_structure")
+  UseMethod("decide_glycan_mono_type")
+}
+
+#' @export
+decide_glycan_mono_type.igraph <- function(glycan) {
   decide_glycan_mono_type_impl(glycan)
+}
+
+#' @export
+decide_glycan_mono_type.glyrepr_structure <- function(glycan) {
+  # Extract individual igraph objects and apply decide_glycan_mono_type to each
+  data <- vctrs::vec_data(glycan)
+  codes <- vctrs::field(data, "codes")
+  structures <- attr(glycan, "structures")
+  
+  # Get individual structures and apply decide_glycan_mono_type
+  individual_graphs <- purrr::map(codes, ~ structures[[.x]])
+  purrr::map_chr(individual_graphs, decide_glycan_mono_type.igraph)
+}
+
+#' @export
+decide_glycan_mono_type.default <- function(glycan) {
+  # Try to handle legacy glycan_structure objects (single igraphs with glycan_structure class)
+  if (inherits(glycan, "glycan_structure") && inherits(glycan, "igraph")) {
+    return(decide_glycan_mono_type.igraph(glycan))
+  }
+  
+  rlang::abort(c(
+    "Cannot decide monosaccharide type for object of class {.cls {class(glycan)}}.",
+    "i" = "Supported types: igraph object or glyrepr_structure vector."
+  ))
 }
 
 

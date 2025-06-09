@@ -116,6 +116,27 @@ as_composition.glyrepr_composition <- function(x) {
 }
 
 #' @export
+as_composition.glyrepr_structure <- function(x) {
+  # Extract individual igraph objects and convert each to composition
+  data <- vctrs::vec_data(x)
+  codes <- vctrs::field(data, "codes")
+  structures <- attr(x, "structures")
+  
+  # Get individual structures and convert to compositions
+  individual_graphs <- purrr::map(codes, ~ structures[[.x]])
+  compositions <- purrr::map(individual_graphs, function(graph) {
+    monos <- igraph::V(graph)$mono
+    result_tb <- table(monos)
+    result <- as.integer(result_tb)
+    names(result) <- names(result_tb)
+    result
+  })
+  
+  # Create composition vector
+  do.call(composition, compositions)
+}
+
+#' @export
 as_composition.default <- function(x) {
   if (is.null(names(x)) && is.list(x)) {
     # Handle list of named vectors - validate that all elements are named

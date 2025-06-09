@@ -7,10 +7,10 @@
 structure_to_iupac(glycan)
 }
 \arguments{
-\item{glycan}{A glycan_structure object}
+\item{glycan}{An igraph object representing a glycan structure, or a glyrepr_structure vector}
 }
 \value{
-A character string representing the IUPAC-like sequence
+A character string representing the IUPAC-like sequence, or a vector of sequences if input is vectorized
 }
 \description{
 Convert a glycan structure to a sequence representation in the form of
@@ -49,5 +49,9 @@ structure_to_iupac(o_glycan_core_1())
 
 # Branched structure  
 structure_to_iupac(n_glycan_core())
+
+# Vectorized structures
+structs <- glycan_structure(o_glycan_core_1(), n_glycan_core())
+structure_to_iupac(structs)
 
 }

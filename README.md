@@ -1,3 +1,4 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # glyrepr <a href="https://glycoverse.github.io/glyrepr/"><img src="man/figures/logo.png" align="right" height="138" /></a>
@@ -13,15 +14,16 @@ status](https://www.r-pkg.org/badges/version/glyrepr)](https://CRAN.R-project.or
 coverage](https://codecov.io/gh/glycoverse/glyrepr/graph/badge.svg)](https://app.codecov.io/gh/glycoverse/glyrepr)
 <!-- badges: end -->
 
-This package is a wrapper of 'igraph' for representing glycan structures
-in R. It introduces an S3 class called "glycan_structure" along with a suite
-of functions to create and manipulate glycan structures.
+This package is a wrapper of ‘igraph’ for representing glycan structures
+in R. It introduces a vectorized S3 class called “glyrepr_structure”
+along with a suite of functions to create and manipulate glycan
+structures efficiently.
 
-If you are a glycomics or glycoproteomics researcher, you likely won't
+If you are a glycomics or glycoproteomics researcher, you likely won’t
 need to interact with this package directly. All you need to know is
-that it defines the "glycan_structure" S3 class to represent glycan
-structures, so you won't be surprised if you encounter this name
-elsewhere in `glycoverse.`
+that it defines the “glyrepr_structure” S3 class to represent glycan
+structures in a vectorized manner, so you won’t be surprised if you
+encounter this name elsewhere in `glycoverse.`
 
 In fact, the functions in this packages are heavily used by other
 `glycoverse` packages such as
@@ -46,7 +48,7 @@ library(glyrepr)
 
 glycan <- n_glycan_core()
 print(glycan, verbose = TRUE)
-#> Glycan Structure (NE)
+#> Glycan Graph
 #> GlcNAc: 2, Man: 3
 #> ------------------
 #> GlcNAc (?1-)

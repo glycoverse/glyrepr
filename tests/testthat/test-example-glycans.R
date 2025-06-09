@@ -1,9 +1,11 @@
 test_that("N-glycan core structure", {
   skip_on_old_win()
   glycan <- n_glycan_core()
-  expect_s3_class(glycan, c("glycan_structure", "igraph"))
+  expect_s3_class(glycan, c("glyrepr_structure", "vctrs_rcrd", "vctrs_vctr"))
   expect_snapshot(print(glycan, verbose = TRUE))
-  expect_no_error(validate_glycan_structure(glycan))
+  # Extract the igraph for validation
+  graph <- get_structure_graphs(glycan, 1)
+  expect_no_error(validate_glycan_structure(graph))
 })
 
 

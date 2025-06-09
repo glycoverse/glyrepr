@@ -53,7 +53,7 @@
 #'   Can be "simple" (H, N, F, S), "generic" (Hex, HexNAc, dHex, NeuAc, etc.),
 #'   or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".
 #'
-#' @return A glycan structure object.
+#' @return A glycan structure (igraph) object.
 #'
 #' @examples
 #' print(n_glycan_core(), verbose = TRUE)
@@ -96,7 +96,7 @@ build_example_graph <- function(linkage, mono_type, builder) {
   if (mono_type %in% c("simple", "generic")) {
     glycan <- convert_glycan_mono_type(glycan, mono_type)
   }
-  glycan
+  glycan_structure(glycan)
 }
 
 
@@ -107,7 +107,7 @@ n_glycan_core_base <- function() {
   igraph::E(graph)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
   graph$anomer <- "?1"
   graph$alditol <- FALSE
-  new_glycan_structure(graph)
+  graph
 }
 
 
@@ -118,7 +118,7 @@ o_glycan_core_1_base <- function() {
   igraph::E(graph)$linkage <- "b1-3"
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  new_glycan_structure(graph)
+  graph
 }
 
 
@@ -129,7 +129,7 @@ o_glycan_core_2_base <- function() {
   igraph::E(graph)$linkage <- c("b1-3", "b1-6")
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  new_glycan_structure(graph)
+  graph
 }
 
 

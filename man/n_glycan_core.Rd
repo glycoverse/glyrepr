@@ -21,7 +21,7 @@ Can be "simple" (H, N, F, S), "generic" (Hex, HexNAc, dHex, NeuAc, etc.),
 or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".}
 }
 \value{
-A glycan structure object.
+A glycan structure (igraph) object.
 }
 \description{
 Create example glycan structures for testing and demonstration.

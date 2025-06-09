@@ -2,29 +2,22 @@
 % Please edit documentation in R/linkage.R
 \name{remove_linkages}
 \alias{remove_linkages}
-\title{Remove All Linkages from a Glycan Structure}
+\title{Remove All Linkages from a Glycan}
 \usage{
 remove_linkages(glycan)
 }
 \arguments{
-\item{glycan}{A glycan structure.}
+\item{glycan}{An igraph object representing a glycan structure, or a glyrepr_structure vector.}
 }
 \value{
-A glycan structure with all linkages removed.
+An igraph object representing a glycan structure, or a glyrepr_structure vector.
 }
 \description{
-An unkonwn linkage in a glycan structure is represented by "??-?".
-This function replaces all linkages in a glycan structure with "??-?",
-so that \code{has_linkages()} will return \code{FALSE}.
+This function replaces all linkages in a glycan structure with "??-?".
 }
 \examples{
-glycan <- n_glycan_core()
-print(glycan)
+glycan <- o_glycan_core_1(linkage = TRUE)
+glycan
+remove_linkages(glycan)
 
-glycan <- remove_linkages(glycan)
-print(glycan)
-
-}
-\seealso{
-\code{\link[=has_linkages]{has_linkages()}}, \code{\link[=possible_linkages]{possible_linkages()}}
 }

@@ -7,18 +7,11 @@
 remove_substituents(glycan)
 }
 \arguments{
-\item{glycan}{A glycan structure.}
+\item{glycan}{An igraph object representing a glycan structure, or a glyrepr_structure vector.}
 }
 \value{
-A glycan structure.
+An igraph object representing a glycan structure, or a glyrepr_structure vector.
 }
 \description{
 This function replaces all substituents in a glycan structure with empty strings.
-}
-\examples{
-glycan <- n_glycan_core()
-igraph::V(glycan)$sub[[1]] <- "3Me"
-glycan
-remove_substituents(glycan)
-
 }

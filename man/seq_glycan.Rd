@@ -7,7 +7,7 @@
 seq_glycan(glycan, node, depths)
 }
 \arguments{
-\item{glycan}{A glycan_structure object}
+\item{glycan}{An igraph object representing a glycan structure}
 
 \item{node}{Current node}
 
