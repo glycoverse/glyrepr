@@ -94,7 +94,7 @@ monosaccharides <- tibble::tribble(
 #' Get Available Monosaacharides
 #'
 #' This function returns a character vector of monosaccharide names of
-#' the given type. See [decide_mono_type()] for monosaacharide types.
+#' the given type. See [get_mono_type()] for monosaacharide types.
 #'
 #' @param mono_type A character string specifying the type of monosaccharides.
 #'  Can be "all", "simple", "generic", or "concrete". Default is "all".

@@ -39,11 +39,19 @@ glycan_composition <- function(...) {
 new_glycan_composition <- function(x) {
   # Use vctrs::list_of instead of new_list_of
   x <- vctrs::list_of(!!!x, .ptype = integer())
-  first_monos <- purrr::map_chr(x, ~names(.x)[1])
+  first_monos <- purrr::map_chr(x, function(.x) {
+    if (length(.x) == 0) {
+      return(NA_character_)
+    } else {
+      return(names(.x)[1])
+    }
+  })
   # Handle unknown monosaccharides gracefully by assigning "unknown" type
   mono_types <- purrr::map_chr(first_monos, function(mono) {
-    if (is_known_monosaccharide(mono)) {
-      decide_mono_type(mono)
+    if (is.na(mono)) {
+      return("unknown")  # For empty compositions
+    } else if (is_known_monosaccharide(mono)) {
+      get_mono_type(mono)
     } else {
       "unknown"
     }
@@ -53,6 +61,11 @@ new_glycan_composition <- function(x) {
 
 valid_glycan_composition <- function(x) {
   valid_one <- function(x) {
+    # Allow empty compositions (for conversion results)
+    if (length(x) == 0) {
+      return(TRUE)
+    }
+    
     # Check if the composition is named
     if (is.null(names(x))) {
       cli::cli_abort("{.arg ...} must be named.")
@@ -66,11 +79,11 @@ valid_glycan_composition <- function(x) {
     }
     # Check if all residues have the same type (simple, generic, or concrete)
     local({
-      mono_types <- decide_mono_type(names(x))
+      mono_types <- get_mono_type(names(x))
       if (length(unique(mono_types)) > 1) {
         cli::cli_abort(c(
           "{.arg ...} must have only one type of monosaccharide.",
-          "i" = "Call {.fun decide_mono_type} to see the type of each monosaccharide."
+          "i" = "Call {.fun get_mono_type} to see the type of each monosaccharide."
         ))
       }
     })
@@ -168,7 +181,7 @@ get_monosaccharide_order <- function(mono_names) {
   }
   
   # Determine mono_type from the first monosaccharide
-  mono_type <- decide_mono_type(mono_names[1])
+  mono_type <- get_mono_type(mono_names[1])
   # Get the corresponding column from monosaccharides tibble
   mono_column <- monosaccharides[[mono_type]]
   # Get the order for each monosaccharide based on its position in the specific column

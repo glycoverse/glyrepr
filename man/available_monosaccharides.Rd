@@ -15,5 +15,5 @@ A character vector of monosaccharide names.
 }
 \description{
 This function returns a character vector of monosaccharide names of
-the given type. See \code{\link[=decide_mono_type]{decide_mono_type()}} for monosaacharide types.
+the given type. See \code{\link[=get_mono_type]{get_mono_type()}} for monosaacharide types.
 }
