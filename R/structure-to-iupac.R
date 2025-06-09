@@ -63,7 +63,7 @@ structure_to_iupac <- function(glycan) {
     ))
   }
 
-  unname(vctrs::field(glycan, "codes"))
+  unname(vctrs::vec_data(glycan))
 }
 
 # Internal function to convert a single igraph to IUPAC

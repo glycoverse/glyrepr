@@ -30,7 +30,7 @@ where nodes are monosaccharides and edges are linkages.
 \section{S3 Classes}{
 A glycan structure vector is a vctrs record with additional S3 class \code{glyrepr_structure}.
 Therefore, \code{sloop::s3_class()} of a glycan structure vector is
-\code{c("glyrepr_structure", "vctrs_rcrd", "vctrs_vctr")}.
+\code{c("glyrepr_structure", "vctrs_vctr")}.
 
 Constraints for individual structures:
 \itemize{

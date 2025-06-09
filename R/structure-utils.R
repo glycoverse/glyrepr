@@ -65,8 +65,7 @@ structure_map <- function(.x, .f, ...) {
     rlang::abort("`.f` must be a function.")
   }
   
-  data <- vctrs::vec_data(.x)
-  codes <- vctrs::field(data, "codes")
+  codes <- vctrs::vec_data(.x)
   structures <- attr(.x, "structures")
   
   # Apply function only to unique structures
@@ -122,8 +121,7 @@ structure_map_structure <- function(.x, .f, ...) {
     rlang::abort("`.f` must be a function.")
   }
   
-  data <- vctrs::vec_data(.x)
-  codes <- vctrs::field(data, "codes")
+  codes <- vctrs::vec_data(.x)
   structures <- attr(.x, "structures")
   
   # Apply function only to unique structures

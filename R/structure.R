@@ -13,7 +13,7 @@
 #'
 #' A glycan structure vector is a vctrs record with additional S3 class `glyrepr_structure`.
 #' Therefore, `sloop::s3_class()` of a glycan structure vector is 
-#' `c("glyrepr_structure", "vctrs_rcrd", "vctrs_vctr")`.
+#' `c("glyrepr_structure", "vctrs_vctr")`.
 #'
 #' Constraints for individual structures:
 #' - The graph must be directed and an outward tree (reducing end as root).
@@ -196,8 +196,8 @@ validate_single_glycan_structure <- function(glycan) {
 
 # Helper function to create a new glycan structure vector
 new_glycan_structure <- function(codes = character(), structures = list()) {
-  vctrs::new_rcrd(
-    list(codes = codes),
+  vctrs::new_vctr(
+    codes,
     structures = structures,
     class = "glyrepr_structure"
   )
@@ -209,8 +209,7 @@ get_structures_from_vector <- function(x) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
   
-  data <- vctrs::vec_data(x)
-  codes <- vctrs::field(data, "codes")
+  codes <- vctrs::vec_data(x)
   structures <- attr(x, "structures")
   
   # Return list of individual structures corresponding to each element
@@ -301,8 +300,7 @@ vec_ptype_abbr.glyrepr_structure <- function(x, ...) "structure"
 
 #' @export
 format.glyrepr_structure <- function(x, ...) {
-  data <- vctrs::vec_data(x)
-  codes <- vctrs::field(data, "codes")
+  codes <- vctrs::vec_data(x)
   unname(codes)
 }
 
@@ -371,8 +369,7 @@ get_structure_graphs <- function(x, i = NULL) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
   
-  data <- vctrs::vec_data(x)
-  codes <- vctrs::field(data, "codes")
+  codes <- vctrs::vec_data(x)
   structures <- attr(x, "structures")
   
   if (is.null(i)) {
@@ -413,8 +410,7 @@ validate_glycan_structure.igraph <- function(glycan) {
 #' @export
 validate_glycan_structure.glyrepr_structure <- function(glycan) {
   # For vectorized structures, validate each individual structure
-  data <- vctrs::vec_data(glycan)
-  codes <- vctrs::field(data, "codes")
+  codes <- vctrs::vec_data(glycan)
   structures <- attr(glycan, "structures")
   
   # Validate each unique structure
