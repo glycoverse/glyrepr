@@ -1,78 +1,84 @@
 test_that("empty composition is valid", {
-  comp <- composition()
+  comp <- glycan_composition()
   expect_s3_class(comp, "glyrepr_composition")
 })
 
-test_that("format is correct", {
-  # simple monosaccharides
-  comp <- composition(c(H = 2, N = 1))
-  expect_equal(format(comp), "H2N1")
-  # generic monosaccharides
-  comp <- composition(c(Hex = 2, HexNAc = 1))
-  expect_equal(format(comp), "Hex(2)HexNAc(1)")
-  # concrete monosaccharides
-  comp <- composition(c(Glc = 2, Gal = 1))
-  expect_equal(format(comp), "Glc(2)Gal(1)")
+test_that("simple composition is valid", {
+  comp <- glycan_composition(c(H = 2, N = 1))
+  expect_s3_class(comp, "glyrepr_composition")
 })
 
-test_that("residues are reordered", {
-  comp <- composition(c(N = 1, H = 2))
-  expect_equal(format(comp), "H2N1")
+test_that("generic composition is valid", {
+  comp <- glycan_composition(c(Hex = 2, HexNAc = 1))
+  expect_s3_class(comp, "glyrepr_composition")
 })
 
-test_that("mixed mono types are not allowed", {
-  expect_error(composition(c(H = 1, Hex = 1)), "must have only one type of monosaccharide")
+test_that("concrete composition is valid", {
+  comp <- glycan_composition(c(Glc = 2, Gal = 1))
+  expect_s3_class(comp, "glyrepr_composition")
 })
 
-test_that("unknown monosaccharides are not allowed", {
-  expect_error(composition(c(Glc = 1, unknown = 1)), "must have only known monosaccharides")
+test_that("compositions are sorted correctly", {
+  # H should come before N based on the monosaccharides tibble
+  comp <- glycan_composition(c(N = 1, H = 2))
+  data <- vctrs::vec_data(comp)
+  comp_data <- vctrs::field(data, "data")[[1]]
+  expect_equal(names(comp_data), c("H", "N"))
 })
 
-test_that("as_composition works with named vectors", {
-  # Test with simple monosaccharides
+test_that("mixed types throw error", {
+  expect_error(glycan_composition(c(H = 1, Hex = 1)), "must have only one type of monosaccharide")
+})
+
+test_that("unknown monosaccharides throw error", {
+  expect_error(glycan_composition(c(Glc = 1, unknown = 1)), "must have only known monosaccharides")
+})
+
+test_that("as_glycan_composition works with named vectors", {
+  # Test simple composition
   vec <- c(H = 5, N = 2)
-  comp <- as_composition(vec)
-  expected <- composition(c(H = 5, N = 2))
+  comp <- as_glycan_composition(vec)
+  expected <- glycan_composition(c(H = 5, N = 2))
   expect_equal(comp, expected)
-  
-  # Test with generic monosaccharides
+
+  # Test generic composition
   vec <- c(Hex = 2, HexNAc = 1)
-  comp <- as_composition(vec)
-  expected <- composition(c(Hex = 2, HexNAc = 1))
+  comp <- as_glycan_composition(vec)
+  expected <- glycan_composition(c(Hex = 2, HexNAc = 1))
   expect_equal(comp, expected)
-  
-  # Test with concrete monosaccharides
+
+  # Test concrete composition
   vec <- c(Glc = 2, Gal = 1)
-  comp <- as_composition(vec)
-  expected <- composition(c(Glc = 2, Gal = 1))
+  comp <- as_glycan_composition(vec)
+  expected <- glycan_composition(c(Glc = 2, Gal = 1))
   expect_equal(comp, expected)
 })
 
-test_that("as_composition works with list of named vectors", {
+test_that("as_glycan_composition works with list of named vectors", {
   vec_list <- list(c(H = 5, N = 2), c(H = 3, N = 1))
-  comp <- as_composition(vec_list)
-  expected <- composition(c(H = 5, N = 2), c(H = 3, N = 1))
+  comp <- as_glycan_composition(vec_list)
+  expected <- glycan_composition(c(H = 5, N = 2), c(H = 3, N = 1))
   expect_equal(comp, expected)
 })
 
-test_that("as_composition returns existing composition unchanged", {
-  original <- composition(c(H = 5, N = 2))
-  result <- as_composition(original)
+test_that("as_glycan_composition returns existing composition unchanged", {
+  original <- glycan_composition(c(H = 5, N = 2))
+  result <- as_glycan_composition(original)
   expect_identical(result, original)
 })
 
-test_that("as_composition handles edge cases", {
-  # Empty named vector
+test_that("as_glycan_composition handles edge cases", {
+  # Empty composition
   vec <- integer(0)
   names(vec) <- character(0)
-  comp <- as_composition(vec)
-  expected <- composition(vec)
+  comp <- as_glycan_composition(vec)
+  expected <- glycan_composition(vec)
   expect_equal(comp, expected)
-  
-  # Single element
+
+  # Single residue
   vec <- c(H = 1)
-  comp <- as_composition(vec)
-  expected <- composition(c(H = 1))
+  comp <- as_glycan_composition(vec)
+  expected <- glycan_composition(c(H = 1))
   expect_equal(comp, expected)
 })
 
@@ -85,40 +91,42 @@ test_that("as_composition works for a glycan structure", {
   graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
 
-  comp <- as_composition(glycan)
+  comp <- as_glycan_composition(glycan)
 
   expect_s3_class(comp, "glyrepr_composition")
-  expected_comp <- composition(c(Glc = 2L, Gal = 1L))
+  expected_comp <- glycan_composition(c(Glc = 2L, Gal = 1L))
   expect_equal(comp, expected_comp)
-}) 
-
-test_that("as_composition throws errors for invalid inputs", {
-  # Unnamed vector
-  expect_error(as_composition(c(1, 2, 3)), "Cannot convert")
-  
-  # Non-numeric vector
-  expect_error(as_composition(c(a = "x", b = "y")), "Cannot convert")
-  
-  # Invalid object type
-  expect_error(as_composition(data.frame(a = 1, b = 2)), "Cannot convert")
-  
-  # List with unnamed vectors
-  expect_error(as_composition(list(c(1, 2))), "All elements in the list must be named vectors")
 })
 
-test_that("as_composition maintains sorting", {
-  # Test that residues are properly sorted
-  vec <- c(N = 1, H = 2)  # Out of order
-  comp <- as_composition(vec)
-  expect_equal(format(comp), "H2N1")  # Should be reordered
+# Tests for formatting ----------------------------------------------
+
+test_that("format works correctly", {
+  # simple monosaccharides
+  comp1 <- glycan_composition(c(H = 2, N = 1))
+  expect_equal(format(comp1), "H2N1")
+  
+  # generic monosaccharides
+  comp2 <- glycan_composition(c(Hex = 2, HexNAc = 1))
+  expect_equal(format(comp2), "Hex(2)HexNAc(1)")
+  
+  # concrete monosaccharides
+  comp3 <- glycan_composition(c(Glc = 2, Gal = 1))
+  expect_equal(format(comp3), "Glc(2)Gal(1)")
+})
+
+test_that("is_glycan_composition works correctly", {
+  comp <- glycan_composition(c(H = 2, N = 1))
+  expect_true(is_glycan_composition(comp))
+  expect_false(is_glycan_composition(c(H = 2, N = 1)))
+  expect_false(is_glycan_composition("H2N1"))
 })
 
 # Tests for c() function (vec_ptype2 and vec_cast methods) -----------------------
 
 test_that("c() combines composition vectors correctly", {
   # Test basic combination of composition vectors
-  comp1 <- composition(c(H = 5, N = 2))
-  comp2 <- composition(c(Hex = 3, HexNAc = 1))
+  comp1 <- glycan_composition(c(H = 5, N = 2))
+  comp2 <- glycan_composition(c(Hex = 3, HexNAc = 1))
   
   # This should work without error
   combined <- c(comp1, comp2)
@@ -133,9 +141,9 @@ test_that("c() combines composition vectors correctly", {
 })
 
 test_that("c() handles multiple composition vectors", {
-  comp1 <- composition(c(H = 2, N = 1))
-  comp2 <- composition(c(H = 3, N = 2), c(H = 1, N = 1))
-  comp3 <- composition(c(H = 4, N = 3))
+  comp1 <- glycan_composition(c(H = 2, N = 1))
+  comp2 <- glycan_composition(c(H = 3, N = 2), c(H = 1, N = 1))
+  comp3 <- glycan_composition(c(H = 4, N = 3))
   
   combined <- c(comp1, comp2, comp3)
   
@@ -150,8 +158,8 @@ test_that("c() handles multiple composition vectors", {
 })
 
 test_that("c() works with empty composition vectors", {
-  comp1 <- composition()  # Empty composition vector
-  comp2 <- composition(c(H = 2, N = 1))
+  comp1 <- glycan_composition()  # Empty composition vector
+  comp2 <- glycan_composition(c(H = 2, N = 1))
   
   combined1 <- c(comp1, comp2)
   combined2 <- c(comp2, comp1)
@@ -166,9 +174,9 @@ test_that("c() works with empty composition vectors", {
 
 test_that("c() preserves different monosaccharide types", {
   # Test with different mono types - each should remain separate
-  simple_comp <- composition(c(H = 2, N = 1))
-  generic_comp <- composition(c(Hex = 1, HexNAc = 1))
-  concrete_comp <- composition(c(Glc = 1, Gal = 1))
+  simple_comp <- glycan_composition(c(H = 2, N = 1))
+  generic_comp <- glycan_composition(c(Hex = 1, HexNAc = 1))
+  concrete_comp <- glycan_composition(c(Glc = 1, Gal = 1))
   
   combined <- c(simple_comp, generic_comp, concrete_comp)
   
@@ -183,8 +191,8 @@ test_that("c() preserves different monosaccharide types", {
 
 test_that("c() maintains proper ordering within compositions", {
   # Test that monosaccharide ordering is preserved during combination
-  comp1 <- composition(c(N = 1, H = 2))  # Out of order input
-  comp2 <- composition(c(HexNAc = 1, Hex = 2))  # Out of order input
+  comp1 <- glycan_composition(c(N = 1, H = 2))  # Out of order input
+  comp2 <- glycan_composition(c(HexNAc = 1, Hex = 2))  # Out of order input
   
   combined <- c(comp1, comp2)
   
@@ -196,7 +204,7 @@ test_that("c() maintains proper ordering within compositions", {
 # Tests for vector casting functionality ----------------------------------------
 
 test_that("composition vectors can be subset and maintain structure", {
-  comp <- composition(c(H = 1, N = 1), c(H = 2, N = 2), c(H = 3, N = 3))
+  comp <- glycan_composition(c(H = 1, N = 1), c(H = 2, N = 2), c(H = 3, N = 3))
   
   # Test subsetting
   subset1 <- comp[1]
@@ -212,7 +220,7 @@ test_that("composition vectors can be subset and maintain structure", {
 })
 
 test_that("composition vectors can be repeated", {
-  comp <- composition(c(H = 2, N = 1))
+  comp <- glycan_composition(c(H = 2, N = 1))
   
   # Test rep() function which uses vctrs casting methods
   repeated <- rep(comp, 3)

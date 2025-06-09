@@ -1,4 +1,42 @@
-new_composition <- function(x) {
+#' Create a Glycan Composition
+#'
+#' Create a glycan composition from a list of named integer vectors.
+#'
+#' @param ... Named integer vectors.
+#'   Names are monosaccharides, values are numbers of residues.
+#' @param x A list of named integer vectors.
+#'
+#' @return A glyrepr_composition object.
+#'
+#' @examples
+#' # A vector with one composition
+#' glycan_composition(c(H = 5, N = 2))
+#' # A vector with multiple compositions
+#' glycan_composition(c(H = 5, N = 2), c(H = 5, N = 4, S = 2))
+#' # Residues are reordered automatically
+#' glycan_composition(c(N = 1, H = 2))
+#' # An example for generic monosaccharides
+#' glycan_composition(c(Hex = 2, HexNAc = 1))
+#' # An example for concrete monosaccharides
+#' glycan_composition(c(Glc = 2, Gal = 1))
+#'
+#' @export
+glycan_composition <- function(...) {
+  args <- list(...)
+  x <- purrr::map(args, ~ {
+    result <- as.integer(.x)
+    names(result) <- names(.x)
+    # Sort by monosaccharides tibble order (top to bottom)
+    mono_order <- get_monosaccharide_order(names(result))
+    result <- result[order(mono_order)]
+    result
+  })
+  x <- new_glycan_composition(x)
+  x <- valid_glycan_composition(x)
+  x
+}
+
+new_glycan_composition <- function(x) {
   # Use vctrs::list_of instead of new_list_of
   x <- vctrs::list_of(!!!x, .ptype = integer())
   first_monos <- purrr::map_chr(x, ~names(.x)[1])
@@ -13,7 +51,7 @@ new_composition <- function(x) {
   vctrs::new_rcrd(list(data = x, mono_type = mono_types), class = "glyrepr_composition")
 }
 
-valid_composition <- function(x) {
+valid_glycan_composition <- function(x) {
   valid_one <- function(x) {
     # Check if the composition is named
     if (is.null(names(x))) {
@@ -48,44 +86,6 @@ valid_composition <- function(x) {
   x
 }
 
-#' Create a Glycan Composition
-#'
-#' Create a glycan composition from a list of named integer vectors.
-#'
-#' @param ... Named integer vectors.
-#'   Names are monosaccharides, values are numbers of residues.
-#' @param x A list of named integer vectors.
-#'
-#' @return A glyrepr_composition object.
-#'
-#' @examples
-#' # A vector with one composition
-#' composition(c(H = 5, N = 2))
-#' # A vector with multiple compositions
-#' composition(c(H = 5, N = 2), c(H = 5, N = 4, S = 2))
-#' # Residues are reordered automatically
-#' composition(c(N = 1, H = 2))
-#' # An example for generic monosaccharides
-#' composition(c(Hex = 2, HexNAc = 1))
-#' # An example for concrete monosaccharides
-#' composition(c(Glc = 2, Gal = 1))
-#'
-#' @export
-composition <- function(...) {
-  args <- list(...)
-  x <- purrr::map(args, ~ {
-    result <- as.integer(.x)
-    names(result) <- names(.x)
-    # Sort by monosaccharides tibble order (top to bottom)
-    mono_order <- get_monosaccharide_order(names(result))
-    result <- result[order(mono_order)]
-    result
-  })
-  x <- new_composition(x)
-  x <- valid_composition(x)
-  x
-}
-
 #' Convert to Glycan Composition
 #'
 #' Convert an object to a glycan composition.
@@ -98,25 +98,25 @@ composition <- function(...) {
 #'
 #' @examples
 #' # Convert a named vector
-#' as_composition(c(H = 5, N = 2))
+#' as_glycan_composition(c(H = 5, N = 2))
 #' # Convert a list of named vectors
-#' as_composition(list(c(H = 5, N = 2), c(H = 3, N = 1)))
+#' as_glycan_composition(list(c(H = 5, N = 2), c(H = 3, N = 1)))
 #' # Convert an existing composition (returns as-is)
-#' comp <- composition(c(H = 5, N = 2))
-#' as_composition(comp)
+#' comp <- glycan_composition(c(H = 5, N = 2))
+#' as_glycan_composition(comp)
 #'
 #' @export
-as_composition <- function(x) {
-  UseMethod("as_composition")
+as_glycan_composition <- function(x) {
+  UseMethod("as_glycan_composition")
 }
 
 #' @export
-as_composition.glyrepr_composition <- function(x) {
+as_glycan_composition.glyrepr_composition <- function(x) {
   x
 }
 
 #' @export
-as_composition.glyrepr_structure <- function(x) {
+as_glycan_composition.glyrepr_structure <- function(x) {
   # Use structure_map to convert each structure to composition
   compositions <- structure_map(x, function(graph) {
     monos <- igraph::V(graph)$mono
@@ -130,11 +130,11 @@ as_composition.glyrepr_structure <- function(x) {
   })
   
   # Create composition vector
-  do.call(composition, compositions)
+  do.call(glycan_composition, compositions)
 }
 
 #' @export
-as_composition.default <- function(x) {
+as_glycan_composition.default <- function(x) {
   if (is.null(names(x)) && is.list(x)) {
     # Handle list of named vectors - validate that all elements are named
     if (!all(purrr::map_lgl(x, ~ !is.null(names(.x))))) {
@@ -143,10 +143,10 @@ as_composition.default <- function(x) {
         "i" = "Each vector in the list should have names indicating monosaccharides."
       ))
     }
-    do.call(composition, x)
+    do.call(glycan_composition, x)
   } else if (!is.null(names(x)) && is.numeric(x)) {
     # Handle single named vector
-    composition(x)
+    glycan_composition(x)
   } else {
     cli::cli_abort(c(
       "Cannot convert object of class {.cls {class(x)}} to glyrepr_composition.",
@@ -203,14 +203,14 @@ format.glyrepr_composition <- function(x, ...) {
 }
 
 #' @export
-#' @rdname composition
-is_composition <- function(x) {
+#' @rdname glycan_composition
+is_glycan_composition <- function(x) {
   inherits(x, "glyrepr_composition")
 }
 
 #' @export
 vec_ptype2.glyrepr_composition.glyrepr_composition <- function(x, y, ...) {
-  new_composition(list())
+  new_glycan_composition(list())
 }
 
 #' @export
