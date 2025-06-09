@@ -34,7 +34,6 @@ has_edge_attrs <- function(graph, attrs) {
 # Are all monosaaccharides known?
 is_known_mono <- function(monos) {
   known_monos <- c(
-    .unique_no_na(monosaccharides$simple),
     .unique_no_na(monosaccharides$generic),
     monosaccharides$concrete
   )
@@ -44,10 +43,9 @@ is_known_mono <- function(monos) {
 
 # Are generic and concrete monosaccharides mixed?
 mix_generic_concrete <- function(monos) {
-  has_simple <- any(monos %in% .unique_no_na(monosaccharides$simple))
   has_generic <- any(monos %in% .unique_no_na(monosaccharides$generic))
   has_concrete <- any(monos %in% monosaccharides$concrete)
-  sum(as.integer(c(has_simple, has_generic, has_concrete))) > 1
+  sum(as.integer(c(has_generic, has_concrete))) > 1
 }
 
 

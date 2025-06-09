@@ -30,14 +30,13 @@ For structures and compositions, returns the type for each element.
 \description{
 This function determines the type of monosaccharides in character vectors,
 glycan compositions, or glycan structures.
-Supported types: "concrete", "generic", and "simple" (see details below).
+Supported types: "concrete" and "generic" (see details below).
 }
-\section{Three types of monosaccharides}{
-There are three types of monosaccharides:
+\section{Two types of monosaccharides}{
+There are two types of monosaccharides:
 \itemize{
 \item concrete: e.g. "Gal", "GlcNAc", "Glc", "Fuc", etc.
 \item generic: e.g. "Hex", "HexNAc", "HexA", "HexN", etc.
-\item simple: e.g. "H", "N", "S", "F".
 }
 
 For the full list of monosaccharides, use \code{\link[=available_monosaccharides]{available_monosaccharides()}}.
@@ -45,12 +44,11 @@ For the full list of monosaccharides, use \code{\link[=available_monosaccharides
 
 \examples{
 # Character vector
-get_mono_type(c("Gal", "Hex", "H"))
+get_mono_type(c("Gal", "Hex"))
 
 # Glycan structures
 get_mono_type(n_glycan_core(mono_type = "concrete"))
 get_mono_type(n_glycan_core(mono_type = "generic"))
-get_mono_type(n_glycan_core(mono_type = "simple"))
 
 # Glycan compositions
 comp <- glycan_composition(c(Glc = 2, GalNAc = 1))

@@ -17,7 +17,7 @@ o_glycan_core_2(linkage = TRUE, mono_type = "concrete")
 Default is \code{TRUE}.}
 
 \item{mono_type}{A character string specifying the type of monosaccharides.
-Can be "simple" (H, N, F, S), "generic" (Hex, HexNAc, dHex, NeuAc, etc.),
+Can be "generic" (Hex, HexNAc, dHex, NeuAc, etc.)
 or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".}
 }
 \value{

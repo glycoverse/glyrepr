@@ -8,7 +8,7 @@ available_monosaccharides(mono_type = "all")
 }
 \arguments{
 \item{mono_type}{A character string specifying the type of monosaccharides.
-Can be "all", "simple", "generic", or "concrete". Default is "all".}
+Can be "all", "generic", or "concrete". Default is "all".}
 }
 \value{
 A character vector of monosaccharide names.

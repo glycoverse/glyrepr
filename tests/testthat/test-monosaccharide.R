@@ -1,16 +1,11 @@
 patrick::with_parameters_test_that("known monosaccharides", {
   expect_true(is_known_monosaccharide(mono))
-}, mono = c("Gal", "Hex", "H"))
+}, mono = c("Gal", "Hex"))
 
 
 patrick::with_parameters_test_that("unknown monosaccharides", {
   expect_false(is_known_monosaccharide(mono))
 }, mono = c("X", "Hx", "Nac"))
-
-
-test_that("get all simple monosaccharides", {
-  expect_setequal(available_monosaccharides("simple"), c("H", "N", "F", "S", "A", "G"))
-})
 
 
 test_that("get all generic monosaccharides", {
@@ -29,6 +24,6 @@ test_that("get all concrete monosaccharides", {
 
 test_that("get all monosaccharides", {
   res <- available_monosaccharides()
-  expect_contains(res, c("H", "Hex", "Man"))
+  expect_contains(res, c("Hex", "Man"))
   expect_true(length(unique(res)) == length(res))
 })

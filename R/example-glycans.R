@@ -50,7 +50,7 @@
 #' @param linkage A logical indicating whether to include linkages (e.g. "b1-4").
 #'   Default is `TRUE`.
 #' @param mono_type A character string specifying the type of monosaccharides.
-#'   Can be "simple" (H, N, F, S), "generic" (Hex, HexNAc, dHex, NeuAc, etc.),
+#'   Can be "generic" (Hex, HexNAc, dHex, NeuAc, etc.)
 #'   or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".
 #'
 #' @return A glycan structure (igraph) object.
@@ -83,8 +83,8 @@ o_glycan_core_2 <- function(linkage = TRUE, mono_type = "concrete") {
 
 
 build_example_graph <- function(linkage, mono_type, builder) {
-  if (!mono_type %in% c("simple", "generic", "concrete")) {
-    rlang::abort("Mono type must be 'simple', 'generic', or 'concrete'.")
+  if (!mono_type %in% c("generic", "concrete")) {
+    rlang::abort("Mono type must be 'generic' or 'concrete'.")
   }
   if (!is.logical(linkage) && length(linkage) != 1) {
     rlang::abort("Linkage must be a single logical.")
@@ -93,7 +93,7 @@ build_example_graph <- function(linkage, mono_type, builder) {
   if (!linkage) {
     igraph::E(glycan)$linkage <- "??-?"
   }
-  if (mono_type %in% c("simple", "generic")) {
+  if (mono_type == "generic") {
     # Convert the igraph to glyrepr_structure first, then convert mono type
     glycan_struct <- glycan_structure(glycan)
     glycan_struct <- convert_mono_type(glycan_struct, mono_type)
@@ -137,6 +137,6 @@ o_glycan_core_2_base <- function() {
 
 
 validate_example_args <- function(linkage, mono_type) {
-  checkmate::assert_choice(mono_type, c("simple", "generic", "concrete"))
+  checkmate::assert_choice(mono_type, c("generic", "concrete"))
   checkmate::assert_flag(linkage)
 }

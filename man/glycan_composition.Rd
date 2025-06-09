@@ -22,12 +22,12 @@ A glyrepr_composition object.
 Create a glycan composition from a list of named integer vectors.
 }
 \examples{
-# A vector with one composition
-glycan_composition(c(H = 5, N = 2))
+# A vector with one composition (generic monosaccharides)
+glycan_composition(c(Hex = 5, HexNAc = 2))
 # A vector with multiple compositions
-glycan_composition(c(H = 5, N = 2), c(H = 5, N = 4, S = 2))
+glycan_composition(c(Hex = 5, HexNAc = 2), c(Hex = 5, HexNAc = 4, dHex = 2))
 # Residues are reordered automatically
-glycan_composition(c(N = 1, H = 2))
+glycan_composition(c(HexNAc = 1, Hex = 2))
 # An example for generic monosaccharides
 glycan_composition(c(Hex = 2, HexNAc = 1))
 # An example for concrete monosaccharides

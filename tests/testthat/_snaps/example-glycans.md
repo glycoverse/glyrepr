@@ -16,15 +16,6 @@
       [1] Man(??-?)[Man(??-?)]Man(??-?)GlcNAc(??-?)GlcNAc(?1-
       # Unique structures: 1
 
-# N-glycan core structure with simple monosaccharides
-
-    Code
-      print(glycan, verbose = TRUE)
-    Output
-      <glycan_structure[1]>
-      [1] H(a1-3)[H(a1-6)]H(b1-4)N(b1-4)N(?1-
-      # Unique structures: 1
-
 # N-glycan core structure with generic monosaccharides
 
     Code

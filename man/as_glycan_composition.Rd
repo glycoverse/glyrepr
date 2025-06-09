@@ -19,11 +19,11 @@ Convert an object to a glycan composition.
 }
 \examples{
 # Convert a named vector
-as_glycan_composition(c(H = 5, N = 2))
+as_glycan_composition(c(Hex = 5, HexNAc = 2))
 # Convert a list of named vectors
-as_glycan_composition(list(c(H = 5, N = 2), c(H = 3, N = 1)))
+as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
 # Convert an existing composition (returns as-is)
-comp <- glycan_composition(c(H = 5, N = 2))
+comp <- glycan_composition(c(Hex = 5, HexNAc = 2))
 as_glycan_composition(comp)
 
 }

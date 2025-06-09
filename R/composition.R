@@ -9,12 +9,12 @@
 #' @return A glyrepr_composition object.
 #'
 #' @examples
-#' # A vector with one composition
-#' glycan_composition(c(H = 5, N = 2))
+#' # A vector with one composition (generic monosaccharides)
+#' glycan_composition(c(Hex = 5, HexNAc = 2))
 #' # A vector with multiple compositions
-#' glycan_composition(c(H = 5, N = 2), c(H = 5, N = 4, S = 2))
+#' glycan_composition(c(Hex = 5, HexNAc = 2), c(Hex = 5, HexNAc = 4, dHex = 2))
 #' # Residues are reordered automatically
-#' glycan_composition(c(N = 1, H = 2))
+#' glycan_composition(c(HexNAc = 1, Hex = 2))
 #' # An example for generic monosaccharides
 #' glycan_composition(c(Hex = 2, HexNAc = 1))
 #' # An example for concrete monosaccharides
@@ -77,7 +77,7 @@ valid_glycan_composition <- function(x) {
         "i" = "Call {.fun known_monosaccharides} to see all known monosaccharides."
       ))
     }
-    # Check if all residues have the same type (simple, generic, or concrete)
+    # Check if all residues have the same type (generic or concrete)
     local({
       mono_types <- get_mono_type(names(x))
       if (length(unique(mono_types)) > 1) {
@@ -111,11 +111,11 @@ valid_glycan_composition <- function(x) {
 #'
 #' @examples
 #' # Convert a named vector
-#' as_glycan_composition(c(H = 5, N = 2))
+#' as_glycan_composition(c(Hex = 5, HexNAc = 2))
 #' # Convert a list of named vectors
-#' as_glycan_composition(list(c(H = 5, N = 2), c(H = 3, N = 1)))
+#' as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
 #' # Convert an existing composition (returns as-is)
-#' comp <- glycan_composition(c(H = 5, N = 2))
+#' comp <- glycan_composition(c(Hex = 5, HexNAc = 2))
 #' as_glycan_composition(comp)
 #'
 #' @export
@@ -205,11 +205,7 @@ vec_ptype_abbr.glyrepr_composition <- function(x, ...) "comp"
 #' @export
 format.glyrepr_composition <- function(x, ...) {
   format_one <- function(comp, mono_type) {
-    if (mono_type == "simple") {
-      paste0(names(comp), comp, collapse = "")
-    } else {
-      paste0(names(comp), "(", comp, ")", collapse = "")
-    }
+    paste0(names(comp), "(", comp, ")", collapse = "")
   }
   data <- vctrs::vec_data(x)
   purrr::map2_chr(vctrs::field(data, "data"), vctrs::field(data, "mono_type"), format_one)

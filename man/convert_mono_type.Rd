@@ -32,53 +32,25 @@ with monosaccharides converted to the target type.
 \description{
 This function converts monosaccharide types of monosaccharide characters,
 glycan compositions, or glycan structures.
-Supported types: "concrete", "generic", and "simple" (see details below).
-The conversion can only be done from "concrete" to "generic" or "simple",
-and from "generic" to "simple".
+Supported types: "concrete" and "generic" (see details below).
+The conversion can only be done from "concrete" to "generic".
 }
-\section{Three types of monosaccharides}{
-There are three types of monosaccharides:
+\section{Two types of monosaccharides}{
+There are two types of monosaccharides:
 \itemize{
 \item concrete: e.g. "Gal", "GlcNAc", "Glc", "Fuc", etc.
 \item generic: e.g. "Hex", "HexNAc", "HexA", "HexN", etc.
-\item simple: e.g. "H", "N", "S", "F".
 }
 
 For the full list of monosaccharides, use \code{\link[=available_monosaccharides]{available_monosaccharides()}}.
 }
 
-\section{Conversion to "simple" type:}{
-When converting "concrete" to "simple", the following mapping is used:
-\itemize{
-\item Glc, Man, Gal -> H
-\item GlcNAc, GalNAc -> N
-\item Fuc -> F
-\item Neu5Ac -> A
-\item Neu5Gc -> G
-\item Sia -> S
-}
-
-When converting "generic" to "simple", the following mapping is used:
-\itemize{
-\item Hex -> H
-\item HexNAc -> N
-\item dHex -> F
-\item NeuAc -> A
-\item NeuGc -> G
-\item Sia -> S
-}
-}
-
 \examples{
 # Allowed
-convert_mono_type(c("Gal", "GlcNAc"), to = "simple")  # concrete -> simple
 convert_mono_type(c("Gal", "GlcNAc"), to = "generic")  # concrete -> generic
-convert_mono_type(c("Hex", "HexNAc"), to = "simple")  # generic -> simple
 
 # Not allowed
 \dontrun{
-convert_mono_type(c("H", "N"), to = "concrete")  # simple -> concrete
-convert_mono_type(c("H", "N"), to = "generic")  # simple -> generic
 convert_mono_type(c("Hex", "HexNAc"), to = "concrete")  # generic -> concrete
 }
 
@@ -87,13 +59,13 @@ comps <- glycan_composition(
   c(Hex = 5, HexNAc = 2),
   c(Hex = 5, HexNAc = 4, dHex = 1)
 )
-convert_mono_type(comps, to = "simple")
+convert_mono_type(comps, to = "generic")
 
 # Convert glycan structures
 strucs <- glycan_structure(
   n_glycan_core(),
   o_glycan_core_1()
 )
-convert_mono_type(strucs, to = "simple")
+convert_mono_type(strucs, to = "generic")
 
 }
