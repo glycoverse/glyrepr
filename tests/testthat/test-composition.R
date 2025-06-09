@@ -112,3 +112,112 @@ test_that("as_composition maintains sorting", {
   comp <- as_composition(vec)
   expect_equal(format(comp), "H2N1")  # Should be reordered
 })
+
+# Tests for c() function (vec_ptype2 and vec_cast methods) -----------------------
+
+test_that("c() combines composition vectors correctly", {
+  # Test basic combination of composition vectors
+  comp1 <- composition(c(H = 5, N = 2))
+  comp2 <- composition(c(Hex = 3, HexNAc = 1))
+  
+  # This should work without error
+  combined <- c(comp1, comp2)
+  
+  expect_s3_class(combined, "glyrepr_composition")
+  expect_equal(length(combined), 2)
+  
+  # Check that both compositions are preserved
+  formatted <- format(combined)
+  expect_equal(formatted[1], "H5N2")
+  expect_equal(formatted[2], "Hex(3)HexNAc(1)")
+})
+
+test_that("c() handles multiple composition vectors", {
+  comp1 <- composition(c(H = 2, N = 1))
+  comp2 <- composition(c(H = 3, N = 2), c(H = 1, N = 1))
+  comp3 <- composition(c(H = 4, N = 3))
+  
+  combined <- c(comp1, comp2, comp3)
+  
+  expect_s3_class(combined, "glyrepr_composition")
+  expect_equal(length(combined), 4)  # 1 + 2 + 1 = 4 total compositions
+  
+  formatted <- format(combined)
+  expect_equal(formatted[1], "H2N1")
+  expect_equal(formatted[2], "H3N2") 
+  expect_equal(formatted[3], "H1N1")
+  expect_equal(formatted[4], "H4N3")
+})
+
+test_that("c() works with empty composition vectors", {
+  comp1 <- composition()  # Empty composition vector
+  comp2 <- composition(c(H = 2, N = 1))
+  
+  combined1 <- c(comp1, comp2)
+  combined2 <- c(comp2, comp1)
+  
+  expect_s3_class(combined1, "glyrepr_composition")
+  expect_s3_class(combined2, "glyrepr_composition")
+  expect_equal(length(combined1), 1)
+  expect_equal(length(combined2), 1)
+  expect_equal(format(combined1), "H2N1")
+  expect_equal(format(combined2), "H2N1")
+})
+
+test_that("c() preserves different monosaccharide types", {
+  # Test with different mono types - each should remain separate
+  simple_comp <- composition(c(H = 2, N = 1))
+  generic_comp <- composition(c(Hex = 1, HexNAc = 1))
+  concrete_comp <- composition(c(Glc = 1, Gal = 1))
+  
+  combined <- c(simple_comp, generic_comp, concrete_comp)
+  
+  expect_s3_class(combined, "glyrepr_composition")
+  expect_equal(length(combined), 3)
+  
+  formatted <- format(combined)
+  expect_equal(formatted[1], "H2N1")
+  expect_equal(formatted[2], "Hex(1)HexNAc(1)")
+  expect_equal(formatted[3], "Glc(1)Gal(1)")  # Corrected order based on monosaccharide tibble
+})
+
+test_that("c() maintains proper ordering within compositions", {
+  # Test that monosaccharide ordering is preserved during combination
+  comp1 <- composition(c(N = 1, H = 2))  # Out of order input
+  comp2 <- composition(c(HexNAc = 1, Hex = 2))  # Out of order input
+  
+  combined <- c(comp1, comp2)
+  
+  formatted <- format(combined)
+  expect_equal(formatted[1], "H2N1")  # Should be reordered
+  expect_equal(formatted[2], "Hex(2)HexNAc(1)")  # Should be reordered
+})
+
+# Tests for vector casting functionality ----------------------------------------
+
+test_that("composition vectors can be subset and maintain structure", {
+  comp <- composition(c(H = 1, N = 1), c(H = 2, N = 2), c(H = 3, N = 3))
+  
+  # Test subsetting
+  subset1 <- comp[1]
+  subset2 <- comp[c(1, 3)]
+  
+  expect_s3_class(subset1, "glyrepr_composition")
+  expect_s3_class(subset2, "glyrepr_composition")
+  expect_equal(length(subset1), 1)
+  expect_equal(length(subset2), 2)
+  
+  expect_equal(format(subset1), "H1N1")
+  expect_equal(format(subset2), c("H1N1", "H3N3"))
+})
+
+test_that("composition vectors can be repeated", {
+  comp <- composition(c(H = 2, N = 1))
+  
+  # Test rep() function which uses vctrs casting methods
+  repeated <- rep(comp, 3)
+  
+  expect_s3_class(repeated, "glyrepr_composition")
+  expect_equal(length(repeated), 3)
+  expect_equal(format(repeated), rep("H2N1", 3))
+})

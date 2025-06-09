@@ -207,3 +207,13 @@ format.glyrepr_composition <- function(x, ...) {
 is_composition <- function(x) {
   inherits(x, "glyrepr_composition")
 }
+
+#' @export
+vec_ptype2.glyrepr_composition.glyrepr_composition <- function(x, y, ...) {
+  new_composition(list())
+}
+
+#' @export
+vec_cast.glyrepr_composition.glyrepr_composition <- function(x, to, ...) {
+  x
+}

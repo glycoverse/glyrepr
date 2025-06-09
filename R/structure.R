@@ -329,6 +329,28 @@ obj_print_data.glyrepr_structure <- function(x, ..., max_n = 10) {
   }
 }
 
+#' @export
+vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
+  x_structures <- attr(x, "structures")
+  y_structures <- attr(y, "structures")
+  
+  # Combine all structures from both x and y
+  all_structures <- c(x_structures, y_structures)
+  
+  # Remove duplicates (keep first occurrence)
+  unique_names <- unique(names(all_structures))
+  combined_structures <- all_structures[unique_names]
+  names(combined_structures) <- unique_names
+  
+  # Create prototype with all structures
+  new_glycan_structure(character(), structures = combined_structures)
+}
+
+#' @export
+vec_cast.glyrepr_structure.glyrepr_structure <- function(x, to, ...) {
+  x
+}
+
 #' Access Individual Glycan Structures
 #'
 #' Extract individual glycan structure graphs from a glycan structure vector.
