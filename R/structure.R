@@ -285,10 +285,22 @@ as_glycan_structure.list <- function(x) {
 }
 
 #' @export
+as_glycan_structure.character <- function(x) {
+  if (length(x) == 1) {
+    graph <- .parse_iupac_condensed_single(x)
+    return(glycan_structure(graph))
+  } else {
+    # Multiple characters - return list of structures
+    graphs <- purrr::map(x, .parse_iupac_condensed_single)
+    return(do.call(glycan_structure, graphs))
+  }
+}
+
+#' @export
 as_glycan_structure.default <- function(x) {
   rlang::abort(c(
     "Cannot convert object of class {.cls {class(x)}} to glyrepr_structure.",
-    "i" = "Supported types: igraph object, list of igraph objects, or existing glyrepr_structure."
+    "i" = "Supported types: igraph object, list of igraph objects, character vector (IUPAC-condensed), or existing glyrepr_structure."
   ))
 }
 

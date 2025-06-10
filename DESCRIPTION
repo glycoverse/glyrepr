@@ -25,5 +25,6 @@ Imports:
     magrittr,
     purrr,
     rlang,
+    rstackdeque,
     stringr,
     vctrs (>= 0.6.5)
