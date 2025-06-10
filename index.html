@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,8 +53,8 @@
 </div>
 <!-- badges: start -->
 
-<p>This package is a wrapper of ‘igraph’ for representing glycan structures in R. It introduces an S3 class called “glycan_structure” along with a suite of functions to create and manipulate glycan structures.</p>
-<p>If you are a glycomics or glycoproteomics researcher, you likely won’t need to interact with this package directly. All you need to know is that it defines the “glycan_structure” S3 class to represent glycan structures, so you won’t be surprised if you encounter this name elsewhere in <code>glycoverse.</code></p>
+<p>This package is a wrapper of ‘igraph’ for representing glycan structures in R. It introduces a vectorized S3 class called “glyrepr_structure” along with a suite of functions to create and manipulate glycan structures efficiently.</p>
+<p>If you are a glycomics or glycoproteomics researcher, you likely won’t need to interact with this package directly. All you need to know is that it defines the “glyrepr_structure” S3 class to represent glycan structures in a vectorized manner, so you won’t be surprised if you encounter this name elsewhere in <code>glycoverse.</code></p>
 <p>In fact, the functions in this packages are heavily used by other <code>glycoverse</code> packages such as <a href="https://github.com/glycoverse/glyparse" class="external-link">glyparse</a> and <a href="https://github.com/glycoverse/glymotif" class="external-link">glymotif</a>, which you are probably already using or will use.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -69,17 +69,45 @@
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glycoverse.github.io/glyrepr/">glyrepr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.igraph.org/" class="external-link">igraph</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'igraph'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     decompose, spectrum</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     union</span></span>
 <span></span>
-<span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">glycan</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Glycan Structure (NE)</span></span>
-<span><span class="co">#&gt; GlcNAc: 2, Man: 3</span></span>
-<span><span class="co">#&gt; ------------------</span></span>
-<span><span class="co">#&gt; GlcNAc (?1-)</span></span>
-<span><span class="co">#&gt; └─GlcNAc (b1-4)</span></span>
-<span><span class="co">#&gt;   └─Man (b1-4)</span></span>
-<span><span class="co">#&gt;     ├─Man (a1-3)</span></span>
-<span><span class="co">#&gt;     └─Man (a1-6)</span></span></code></pre></div>
+<span><span class="co"># Create glycan compositions</span></span>
+<span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/glycan_composition.html">glycan_composition</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">5</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, Gal <span class="op">=</span> <span class="fl">2</span>, GlcNAc <span class="op">=</span> <span class="fl">4</span>, Fuc <span class="op">=</span> <span class="fl">1</span>, Neu5Ac <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">comp</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] Man(5)GlcNAc(2)                      Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(2)</span></span>
+<span></span>
+<span><span class="co"># Create glycan structures</span></span>
+<span><span class="co"># Here we manually create an igraph object and convert it to a glycan structure.</span></span>
+<span><span class="co"># In practice, you should use the `glyparse` package to create glycan structures</span></span>
+<span><span class="co"># from IUPAC names or other formats.</span></span>
+<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">make_graph</a></span><span class="op">(</span><span class="op">~</span> <span class="fl">1</span><span class="op">-</span><span class="op">+</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">-</span><span class="op">+</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span><span class="op">$</span><span class="va">mono</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Glc"</span>, <span class="st">"Gal"</span>, <span class="st">"Glc"</span><span class="op">)</span></span>
+<span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span><span class="op">$</span><span class="va">sub</span> <span class="op">&lt;-</span> <span class="st">""</span></span>
+<span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span><span class="op">$</span><span class="va">linkage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1-4"</span>, <span class="st">"b1-4"</span><span class="op">)</span></span>
+<span><span class="va">graph</span><span class="op">$</span><span class="va">anomer</span> <span class="op">&lt;-</span> <span class="st">"a1"</span></span>
+<span><span class="va">graph</span><span class="op">$</span><span class="va">alditol</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/glycan_structure.html">glycan_structure</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span></span>
+<span><span class="va">glycan</span></span>
+<span><span class="co">#&gt; &lt;glycan_structure[1]&gt;</span></span>
+<span><span class="co">#&gt; [1] Glc(b1-4)Gal(b1-4)Glc(a1-</span></span>
+<span><span class="co">#&gt; # Unique structures: 1</span></span>
+<span></span>
+<span><span class="co"># Get the composition of a glycan structure</span></span>
+<span><span class="fu"><a href="reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[1]&gt;</span></span>
+<span><span class="co">#&gt; [1] Glc(2)Gal(1)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
