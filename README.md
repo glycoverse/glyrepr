@@ -62,7 +62,8 @@ comp <- glycan_composition(
 )
 comp
 #> <glycan_composition[2]>
-#> [1] Man(5)GlcNAc(2)                      Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(2)
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(2)
 
 # Create glycan structures
 # Here we manually create an igraph object and convert it to a glycan structure.
@@ -80,8 +81,24 @@ glycan
 #> [1] Glc(b1-4)Gal(b1-4)Glc(a1-
 #> # Unique structures: 1
 
+# Parse IUPAC-condensed glycan text representation
+# `glyrepr` supports IUPAC-condensed glycan text representation natively.
+# For other formats like WURCS or glycoCT, use the `glyparse` package.
+# For example, the following two glycan structures are equivalent:
+as_glycan_structure(c("GlcNAc(b1-4)GlcNAc", "Man(a1-2)GlcNAc"))
+#> <glycan_structure[2]>
+#> [1] GlcNAc(b1-4)GlcNAc(?1-
+#> [2] Man(a1-2)GlcNAc(?1-
+#> # Unique structures: 2
+
 # Get the composition of a glycan structure
 as_glycan_composition(glycan)
 #> <glycan_composition[1]>
 #> [1] Glc(2)Gal(1)
+
+# Count the number of given residues
+count_mono(n_glycan_core(), "Hex")
+#> [1] 3
+count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
+#> [1] 5
 ```

@@ -9,6 +9,7 @@ as_glycan_structure(x)
 \arguments{
 \item{x}{An object to convert to a glycan structure vector.
 Can be an igraph object, a list of igraph objects,
+a character vector of IUPAC-condensed strings,
 or an existing glyrepr_structure object.}
 }
 \value{
@@ -33,5 +34,8 @@ as_glycan_structure(graph)
 o_glycan_vec <- o_glycan_core_1()
 o_glycan_graph <- get_structure_graphs(o_glycan_vec, 1)
 as_glycan_structure(list(graph, o_glycan_graph))
+
+# Convert a character vector of IUPAC-condensed strings
+as_glycan_structure(c("GlcNAc(b1-4)GlcNAc", "Man(a1-2)GlcNAc"))
 
 }

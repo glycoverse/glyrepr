@@ -72,6 +72,16 @@ graph$alditol <- FALSE
 glycan <- glycan_structure(graph)
 glycan
 
+# Parse IUPAC-condensed glycan text representation
+# `glyrepr` supports IUPAC-condensed glycan text representation natively.
+# For other formats like WURCS or glycoCT, use the `glyparse` package.
+# For example, the following two glycan structures are equivalent:
+as_glycan_structure(c("GlcNAc(b1-4)GlcNAc", "Man(a1-2)GlcNAc"))
+
 # Get the composition of a glycan structure
 as_glycan_composition(glycan)
+
+# Count the number of given residues
+count_mono(n_glycan_core(), "Hex")
+count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
 ```

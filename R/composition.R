@@ -105,6 +105,7 @@ valid_glycan_composition <- function(x) {
 #'
 #' @param x An object to convert to a glycan composition.
 #'   Can be a named integer vector, a list of named integer vectors,
+#'   a glycan structure vector,
 #'   or an existing glyrepr_composition object.
 #'
 #' @return A glyrepr_composition object.
@@ -112,11 +113,17 @@ valid_glycan_composition <- function(x) {
 #' @examples
 #' # Convert a named vector
 #' as_glycan_composition(c(Hex = 5, HexNAc = 2))
+#' 
 #' # Convert a list of named vectors
 #' as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
+#' 
 #' # Convert an existing composition (returns as-is)
 #' comp <- glycan_composition(c(Hex = 5, HexNAc = 2))
 #' as_glycan_composition(comp)
+#' 
+#' # Convert a glycan structure vector
+#' strucs <- c(n_glycan_core(), o_glycan_core_1())
+#' as_glycan_composition(strucs)
 #'
 #' @export
 as_glycan_composition <- function(x) {
