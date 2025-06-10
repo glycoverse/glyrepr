@@ -304,18 +304,47 @@ format.glyrepr_structure <- function(x, ...) {
   unname(codes)
 }
 
+#' Format Glycan Structure with Optional Colors
+#'
+#' @param x A glyrepr_structure object
+#' @param colored A logical value indicating whether to add colors
+#' @return A character vector of formatted structures
+#' @keywords internal
+format_glycan_structure <- function(x, colored = TRUE) {
+  if (!colored) {
+    return(format(x))
+  }
+  
+  codes <- vctrs::vec_data(x)
+  structures <- attr(x, "structures")
+  
+  # For each unique structure, add colors if concrete type
+  purrr::map_chr(codes, function(code) {
+    structure <- structures[[code]]
+    mono_names <- igraph::V(structure)$mono
+    mono_type <- get_mono_type(mono_names[1])  # All monos in a structure have same type
+    
+    # Add colors to monosaccharides and gray linkages
+    if (colored) {
+      colorize_iupac_string(code, mono_names)
+    } else {
+      code
+    }
+  })
+}
+
 #' @export
 obj_print_footer.glyrepr_structure <- function(x, ...) {
   cat("# Unique structures: ", format(length(attr(x, "structures"))), "\n", sep = "")
 }
 
 #' @export
-obj_print_data.glyrepr_structure <- function(x, ..., max_n = 10) {
+obj_print_data.glyrepr_structure <- function(x, ..., max_n = 10, colored = TRUE) {
   if (length(x) == 0) {
     return()
   }
 
-  formatted <- format(x)
+  formatted <- format_glycan_structure(x, colored = colored)
   n <- length(formatted)
   n_show <- min(n, max_n)
   # Print each IUPAC structure on its own line with indexing, up to max_n

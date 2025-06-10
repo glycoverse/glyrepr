@@ -19,6 +19,7 @@ URL: https://glycoverse.github.io/glyrepr/
 Imports: 
     checkmate,
     cli,
+    dplyr,
     glue,
     igraph,
     magrittr,

@@ -226,3 +226,34 @@ vec_ptype2.glyrepr_composition.glyrepr_composition <- function(x, y, ...) {
 vec_cast.glyrepr_composition.glyrepr_composition <- function(x, to, ...) {
   x
 }
+
+#' @export
+obj_print_data.glyrepr_composition <- function(x, ..., max_n = 10, colored = TRUE) {
+  if (length(x) == 0) {
+    return()
+  }
+
+  # Format with colors if concrete type
+  format_one_colored <- function(comp, mono_type) {
+    mono_names <- names(comp)
+    # Add colors to monosaccharides (generic monos automatically get black color)
+    if (colored) {
+      mono_names <- add_colors(mono_names, colored = TRUE)
+    }
+    paste0(mono_names, "(", comp, ")", collapse = "")
+  }
+  
+  data <- vctrs::vec_data(x)
+  formatted <- purrr::map2_chr(vctrs::field(data, "data"), vctrs::field(data, "mono_type"), format_one_colored)
+  
+  n <- length(formatted)
+  n_show <- min(n, max_n)
+  
+  # Print each composition on its own line with indexing, up to max_n
+  for (i in seq_len(n_show)) {
+    cat("[", i, "] ", formatted[i], "\n", sep = "")
+  }
+  if (n > max_n) {
+    cat("... (", n - max_n, " more not shown)\n", sep = "")
+  }
+}
