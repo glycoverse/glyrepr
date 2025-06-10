@@ -27,7 +27,8 @@ structure_map_structure(.x, .f, ...)
 \arguments{
 \item{.x}{A glycan structure vector (glyrepr_structure).}
 
-\item{.f}{A function that takes an igraph object and returns a result.}
+\item{.f}{A function that takes an igraph object and returns a result.
+Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string naming a function.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
 
@@ -71,6 +72,10 @@ structure_map_int(structures, igraph::vcount)
 
 # Map a function that returns logical
 structure_map_lgl(structures, function(g) igraph::vcount(g) > 5)
+
+# Use purrr-style lambda functions  
+structure_map_int(structures, ~ igraph::vcount(.x))
+structure_map_lgl(structures, ~ igraph::vcount(.x) > 5)
 
 # Map a function that modifies structure (must return igraph)
 add_vertex_names <- function(g) {

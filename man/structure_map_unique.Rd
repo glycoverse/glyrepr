@@ -9,7 +9,8 @@ structure_map_unique(.x, .f, ...)
 \arguments{
 \item{.x}{A glycan structure vector (glyrepr_structure).}
 
-\item{.f}{A function that takes an igraph object and returns a result.}
+\item{.f}{A function that takes an igraph object and returns a result.
+Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string naming a function.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
 }
@@ -30,5 +31,9 @@ structures <- glycan_structure(core1, core1, core1)  # same structure 3 times
 # Only compute once for the unique structure
 unique_results <- structure_map_unique(structures, igraph::vcount)
 length(unique_results)  # 1, not 3
+
+# Use purrr-style lambda
+unique_results2 <- structure_map_unique(structures, ~ igraph::vcount(.x))
+length(unique_results2)  # 1, not 3
 
 }

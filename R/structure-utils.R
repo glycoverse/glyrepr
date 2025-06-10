@@ -6,7 +6,8 @@
 #' Similar to purrr mapping functions, but optimized for glycan structure vectors.
 #'
 #' @param .x A glycan structure vector (glyrepr_structure).
-#' @param .f A function that takes an igraph object and returns a result.
+#' @param .f A function that takes an igraph object and returns a result. 
+#'   Can be a function, purrr-style lambda (`~ .x$attr`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `structure_map_vec`).
 #'
@@ -41,6 +42,10 @@
 #' # Map a function that returns logical
 #' structure_map_lgl(structures, function(g) igraph::vcount(g) > 5)
 #' 
+#' # Use purrr-style lambda functions  
+#' structure_map_int(structures, ~ igraph::vcount(.x))
+#' structure_map_lgl(structures, ~ igraph::vcount(.x) > 5)
+#' 
 #' # Map a function that modifies structure (must return igraph)
 #' add_vertex_names <- function(g) {
 #'   if (!("name" %in% igraph::vertex_attr_names(g))) {
@@ -61,9 +66,7 @@ structure_map <- function(.x, .f, ...) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
   
-  if (!is.function(.f)) {
-    rlang::abort("`.f` must be a function.")
-  }
+  .f <- rlang::as_function(.f)
   
   codes <- vctrs::vec_data(.x)
   structures <- attr(.x, "structures")
@@ -117,9 +120,7 @@ structure_map_structure <- function(.x, .f, ...) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
   
-  if (!is.function(.f)) {
-    rlang::abort("`.f` must be a function.")
-  }
+  .f <- rlang::as_function(.f)
   
   codes <- vctrs::vec_data(.x)
   structures <- attr(.x, "structures")
@@ -150,7 +151,8 @@ structure_map_structure <- function(.x, .f, ...) {
 #' care about unique results.
 #'
 #' @param .x A glycan structure vector (glyrepr_structure).
-#' @param .f A function that takes an igraph object and returns a result.
+#' @param .f A function that takes an igraph object and returns a result. 
+#'   Can be a function, purrr-style lambda (`~ .x$attr`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
 #'
 #' @return A list with results for each unique structure, named by their hash codes.
@@ -163,6 +165,10 @@ structure_map_structure <- function(.x, .f, ...) {
 #' # Only compute once for the unique structure
 #' unique_results <- structure_map_unique(structures, igraph::vcount)
 #' length(unique_results)  # 1, not 3
+#' 
+#' # Use purrr-style lambda
+#' unique_results2 <- structure_map_unique(structures, ~ igraph::vcount(.x))
+#' length(unique_results2)  # 1, not 3
 #'
 #' @export
 structure_map_unique <- function(.x, .f, ...) {
@@ -170,9 +176,7 @@ structure_map_unique <- function(.x, .f, ...) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
   
-  if (!is.function(.f)) {
-    rlang::abort("`.f` must be a function.")
-  }
+  .f <- rlang::as_function(.f)
   
   structures <- attr(.x, "structures")
   
