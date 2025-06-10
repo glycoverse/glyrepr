@@ -36,15 +36,15 @@ test_that("vertex names are added if missing", {
 })
 
 
-# Tests for validate_glycan_structure --------------------------------------------
+# Tests for glycan_structure validation during creation --------------------------
 
-test_that("validate_glycan_structure accepts valid graphs", {
+test_that("glycan_structure accepts valid graphs", {
   graph <- good_glycan_graph()
-  expect_no_error(validate_glycan_structure(graph))
+  expect_no_error(glycan_structure(graph))
 })
 
 
-test_that("validate_glycan_structure rejects invalid graphs", {
+test_that("glycan_structure rejects invalid graphs", {
   # Test undirected graph
   graph <- igraph::make_graph(~ 1--2)
   igraph::V(graph)$mono <- c("Glc", "Gal")
