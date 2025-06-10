@@ -11,7 +11,7 @@ Similar to purrr mapping functions, but optimized for glycan structure vectors."
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,8 @@ Similar to purrr mapping functions, but optimized for glycan structure vectors.<
 
 
 <dt id="arg--f">.f<a class="anchor" aria-label="anchor" href="#arg--f"></a></dt>
-<dd><p>A function that takes an igraph object and returns a result.</p></dd>
+<dd><p>A function that takes an igraph object and returns a result.
+Can be a function, purrr-style lambda (<code>~ .x$attr</code>), or a character string naming a function.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -111,6 +112,12 @@ than applying <code>.f</code> to each element individually when there are duplic
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Map a function that returns logical</span></span></span>
 <span class="r-in"><span><span class="fu">structure_map_lgl</span><span class="op">(</span><span class="va">structures</span>, <span class="kw">function</span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE FALSE FALSE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use purrr-style lambda functions  </span></span></span>
+<span class="r-in"><span><span class="fu">structure_map_int</span><span class="op">(</span><span class="va">structures</span>, <span class="op">~</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2 5 2</span>
+<span class="r-in"><span><span class="fu">structure_map_lgl</span><span class="op">(</span><span class="va">structures</span>, <span class="op">~</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE FALSE FALSE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Map a function that modifies structure (must return igraph)</span></span></span>
