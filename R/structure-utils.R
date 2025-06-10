@@ -184,3 +184,94 @@ structure_map_unique <- function(.x, .f, ...) {
   results <- purrr::map(structures, .f, ...)
   results
 }
+
+#' Test Predicates on Glycan Structure Vectors
+#'
+#' @description
+#' These functions test predicates on unique structures in a glycan structure vector,
+#' taking advantage of hash-based deduplication to avoid redundant computation.
+#' Similar to purrr predicate functions, but optimized for glycan structure vectors.
+#'
+#' @param .x A glycan structure vector (glyrepr_structure).
+#' @param .p A predicate function that takes an igraph object and returns a logical value. 
+#'   Can be a function, purrr-style lambda (`~ .x$attr`), or a character string naming a function.
+#' @param ... Additional arguments passed to `.p`.
+#'
+#' @details
+#' These functions only evaluate `.p` once for each unique structure, making them
+#' much more efficient than applying `.p` to each element individually when there
+#' are duplicate structures.
+#' 
+#' - `structure_some()`: Returns `TRUE` if at least one unique structure satisfies the predicate
+#' - `structure_every()`: Returns `TRUE` if all unique structures satisfy the predicate  
+#' - `structure_none()`: Returns `TRUE` if no unique structures satisfy the predicate
+#'
+#' @return A single logical value.
+#'
+#' @examples
+#' # Create a structure vector with duplicates
+#' core1 <- o_glycan_core_1()
+#' core2 <- n_glycan_core()
+#' structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+#' 
+#' # Test if some structures have more than 5 vertices
+#' structure_some(structures, function(g) igraph::vcount(g) > 5)
+#' 
+#' # Test if all structures have at least 3 vertices
+#' structure_every(structures, function(g) igraph::vcount(g) >= 3)
+#' 
+#' # Test if no structures have more than 20 vertices
+#' structure_none(structures, function(g) igraph::vcount(g) > 20)
+#' 
+#' # Use purrr-style lambda functions
+#' structure_some(structures, ~ igraph::vcount(.x) > 5)
+#' structure_every(structures, ~ igraph::vcount(.x) >= 3)
+#' structure_none(structures, ~ igraph::vcount(.x) > 20)
+#'
+#' @name structure_predicates
+NULL
+
+#' @rdname structure_predicates
+#' @export
+structure_some <- function(.x, .p, ...) {
+  if (!is_glycan_structure(.x)) {
+    rlang::abort("Input must be a glycan_structure vector.")
+  }
+  
+  .p <- rlang::as_function(.p)
+  
+  structures <- attr(.x, "structures")
+  
+  # Apply predicate only to unique structures using purrr::some
+  purrr::some(structures, .p, ...)
+}
+
+#' @rdname structure_predicates
+#' @export
+structure_every <- function(.x, .p, ...) {
+  if (!is_glycan_structure(.x)) {
+    rlang::abort("Input must be a glycan_structure vector.")
+  }
+  
+  .p <- rlang::as_function(.p)
+  
+  structures <- attr(.x, "structures")
+  
+  # Apply predicate only to unique structures using purrr::every
+  purrr::every(structures, .p, ...)
+}
+
+#' @rdname structure_predicates
+#' @export
+structure_none <- function(.x, .p, ...) {
+  if (!is_glycan_structure(.x)) {
+    rlang::abort("Input must be a glycan_structure vector.")
+  }
+  
+  .p <- rlang::as_function(.p)
+  
+  structures <- attr(.x, "structures")
+  
+  # Apply predicate only to unique structures using purrr::none
+  purrr::none(structures, .p, ...)
+}
