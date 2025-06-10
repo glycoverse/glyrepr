@@ -46,6 +46,7 @@
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>An object to convert to a glycan composition.
 Can be a named integer vector, a list of named integer vectors,
+a glycan structure vector,
 or an existing glyrepr_composition object.</p></dd>
 
 </dl></div>
@@ -60,16 +61,25 @@ or an existing glyrepr_composition object.</p></dd>
 <span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Hex <span class="op">=</span> <span class="fl">5</span>, HexNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[1]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Convert a list of named vectors</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Hex <span class="op">=</span> <span class="fl">5</span>, HexNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Hex <span class="op">=</span> <span class="fl">3</span>, HexNAc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[2]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #000000;">Hex</span>(3)<span style="color: #000000;">HexNAc</span>(1)</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Convert an existing composition (returns as-is)</span></span></span>
 <span class="r-in"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Hex <span class="op">=</span> <span class="fl">5</span>, HexNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="va">comp</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[1]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Convert a glycan structure vector</span></span></span>
+<span class="r-in"><span><span class="va">strucs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="n_glycan_core.html">o_glycan_core_1</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[2]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #0087D7;">GlcNAc</span>(2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
