@@ -101,7 +101,7 @@ convert_mono_type.glyrepr_structure <- function(x, to) {
   
   checkmate::assert_choice(to, c("concrete", "generic"))
   
-  structure_map_structure(x, function(graph) {
+  smap_structure(x, function(graph) {
     .convert_glycan_mono_type_single(graph, to)
   })
 }
@@ -274,7 +274,7 @@ get_mono_type.glyrepr_structure <- function(x) {
     ))
   }
   
-  structure_map_chr(x, .get_mono_type_single)
+  smap_chr(x, .get_mono_type_single)
 }
 
 #' @export

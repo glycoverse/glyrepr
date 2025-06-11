@@ -30,7 +30,7 @@ has_linkages <- function(glycan) {
     ))
   }
   
-  structure_map_lgl(glycan, .has_linkages_single)
+  smap_lgl(glycan, .has_linkages_single)
 }
 
 # Internal function to check linkages in a single igraph
@@ -141,7 +141,7 @@ remove_linkages <- function(glycan) {
     ))
   }
   
-  structure_map_structure(glycan, .remove_linkages_single)
+  smap_structure(glycan, .remove_linkages_single)
 }
 
 # Internal function to remove linkages from a single igraph

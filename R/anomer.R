@@ -8,5 +8,5 @@
 #' x <- n_glycan_core()
 #' get_anomer(x)
 get_anomer <- function(x) {
-  structure_map_chr(x, function(g) g$anomer)
+  smap_chr(x, function(g) g$anomer)
 }

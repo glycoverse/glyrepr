@@ -137,8 +137,8 @@ as_glycan_composition.glyrepr_composition <- function(x) {
 
 #' @export
 as_glycan_composition.glyrepr_structure <- function(x) {
-  # Use structure_map to convert each structure to composition
-  compositions <- structure_map(x, function(graph) {
+  # Use smap to convert each structure to composition
+  compositions <- smap(x, function(graph) {
     monos <- igraph::V(graph)$mono
     result_tb <- table(monos)
     result <- as.integer(result_tb)

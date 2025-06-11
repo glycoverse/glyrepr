@@ -24,7 +24,7 @@ remove_substituents <- function(glycan) {
     ))
   }
   
-  structure_map_structure(glycan, .remove_substituents_single)
+  smap_structure(glycan, .remove_substituents_single)
 }
 
 # Internal function to remove substituents from a single igraph
