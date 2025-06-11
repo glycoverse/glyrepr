@@ -424,4 +424,343 @@ test_that("smap2_chr works correctly", {
   expect_type(result, "character")
   expect_equal(length(result), 3)
   expect_true(all(grepl("^prefix[123]_\\d+$", result)))
+})
+
+# Tests for spmap functions -----------------------------------------
+
+test_that("spmap functions work with regular functions", {
+  # Create test structures
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2)
+  weights <- c(1.0, 2.0)
+  factors <- c(2, 3)
+  
+  # Test spmap_dbl with regular function
+  result <- spmap_dbl(list(structures, weights, factors), 
+                      function(g, w, f) igraph::vcount(g) * w * f)
+  expect_equal(length(result), 2)
+  expect_type(result, "double")
+  
+  # Test spmap_int with regular function
+  add_values <- c(1, 2)
+  result_int <- spmap_int(list(structures, add_values), 
+                          function(g, a) igraph::vcount(g) + a)
+  expect_equal(length(result_int), 2)
+  expect_type(result_int, "integer")
+  
+  # Test spmap_lgl with regular function
+  thresholds <- c(5, 6)
+  result_lgl <- spmap_lgl(list(structures, thresholds), 
+                          function(g, t) igraph::vcount(g) > t)
+  expect_equal(length(result_lgl), 2)
+  expect_type(result_lgl, "logical")
+})
+
+test_that("spmap functions work with purrr-style lambda functions", {
+  # Create test structures
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2)
+  weights <- c(1.0, 2.0)
+  factors <- c(2, 3)
+  
+  # Test spmap_dbl with purrr lambda
+  result_lambda <- spmap_dbl(list(structures, weights, factors), 
+                             ~ igraph::vcount(..1) * ..2 * ..3)
+  result_regular <- spmap_dbl(list(structures, weights, factors), 
+                              function(g, w, f) igraph::vcount(g) * w * f)
+  expect_equal(result_lambda, result_regular)
+  
+  # Test spmap_chr with purrr lambda
+  prefixes <- c("pre1_", "pre2_")
+  result_chr_lambda <- spmap_chr(list(structures, prefixes), 
+                                 ~ paste0(..2, igraph::vcount(..1)))
+  expect_equal(length(result_chr_lambda), 2)
+  expect_type(result_chr_lambda, "character")
+})
+
+test_that("spmap functions work with recycling", {
+  # Create test structures
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2, core1)
+  
+  # Test with single weight (should be recycled)
+  single_weight <- 2.0
+  single_factor <- 3
+  result <- spmap_dbl(list(structures, single_weight, single_factor), 
+                      ~ igraph::vcount(..1) * ..2 * ..3)
+  expect_equal(length(result), 3)
+  expect_type(result, "double")
+  
+  # All results should use the same weight and factor
+  expected <- smap_dbl(structures, ~ igraph::vcount(.x) * 2.0 * 3)
+  expect_equal(result, expected)
+})
+
+test_that("spmap_structure works with regular functions", {
+  # Create test structures
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2)
+  
+  # Function that adds graph attribute based on multiple arguments
+  add_attributes <- function(g, label, value) {
+    g <- igraph::set_graph_attr(g, "custom_label", label)
+    g <- igraph::set_graph_attr(g, "custom_value", value)
+    g
+  }
+  
+  labels <- c("label1", "label2")
+  values <- c(10, 20)
+  result <- spmap_structure(list(structures, labels, values), add_attributes)
+  
+  expect_s3_class(result, "glyrepr_structure")
+  expect_equal(length(result), 2)
+  
+  # Check that attributes were added
+  structures_list <- attr(result, "structures")
+  first_structure <- structures_list[[vctrs::vec_data(result)[1]]]
+  expect_equal(igraph::graph_attr(first_structure, "custom_label"), "label1")
+  expect_equal(igraph::graph_attr(first_structure, "custom_value"), 10)
+})
+
+test_that("spmap functions handle duplicate structures efficiently", {
+  # Create structures with duplicates to test efficiency
+  core1 <- o_glycan_core_1()
+  structures <- glycan_structure(core1, core1, core1)
+  weights <- c(1.0, 2.0, 1.0)
+  factors <- c(2, 3, 2)
+  
+  # This should only compute twice: once for (core1, 1.0, 2) and once for (core1, 2.0, 3)
+  result <- spmap_dbl(list(structures, weights, factors), 
+                      function(g, w, f) igraph::vcount(g) * w * f)
+  
+  expect_equal(length(result), 3)
+  expect_type(result, "double")
+  
+  # First and third should be equal (same combination)
+  expect_equal(result[1], result[3])
+  expect_false(result[1] == result[2])  # Different combination
+})
+
+test_that("spmap functions validate inputs", {
+  core1 <- o_glycan_core_1()
+  structures <- glycan_structure(core1)
+  
+  # Test that .l must be a list
+  expect_error(spmap_dbl(structures, ~ igraph::vcount(.x)), "non-empty list")
+  expect_error(spmap_dbl(list(), ~ igraph::vcount(.x)), "non-empty list")
+  
+  # Test that first element must be glycan_structure
+  expect_error(spmap_dbl(list(c(1, 2, 3), c(1, 2, 3)), ~ .x * .y), "glycan_structure")
+  expect_error(spmap_structure(list("not_a_structure"), ~ .x), "glycan_structure")
+  
+  # Test that spmap_structure validates return type
+  expect_error(
+    spmap_structure(list(structures, 1), ~ "not_an_igraph"), 
+    "igraph object"
+  )
+})
+
+test_that("spmap functions handle edge cases", {
+  # Test with single structure
+  single <- glycan_structure(o_glycan_core_1())
+  result <- spmap_dbl(list(single, 3.0, 2), ~ igraph::vcount(..1) * ..2 * ..3)
+  expect_equal(length(result), 1)
+  expect_type(result, "double")
+  
+  # Test with empty structures
+  empty <- glycan_structure()
+  empty_result <- spmap_dbl(list(empty, numeric(0), numeric(0)), ~ igraph::vcount(..1) * ..2 * ..3)
+  expect_equal(length(empty_result), 0)
+  expect_type(empty_result, "double")
+})
+
+test_that("spmap basic functionality works", {
+  # Create test structures
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2)
+  values1 <- c("a", "b")
+  values2 <- c(1, 2)
+  
+  # Test spmap (returns list)
+  result <- spmap(list(structures, values1, values2), function(g, v1, v2) {
+    list(vcount = igraph::vcount(g), value1 = v1, value2 = v2)
+  })
+  
+  expect_type(result, "list")
+  expect_equal(length(result), 2)
+  expect_equal(result[[1]]$value1, "a")
+  expect_equal(result[[1]]$value2, 1)
+  expect_equal(result[[2]]$value1, "b")
+  expect_equal(result[[2]]$value2, 2)
+})
+
+# Tests for simap functions -----------------------------------------
+
+test_that("simap functions work with regular functions", {
+  # Create test structures
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2, core1)
+  
+  # Test simap_chr with regular function (using index)
+  result <- simap_chr(structures, function(g, i) paste0("Structure_", i, "_vcount_", igraph::vcount(g)))
+  expect_equal(length(result), 3)
+  expect_type(result, "character")
+  expect_true(grepl("Structure_1_", result[1]))
+  expect_true(grepl("Structure_2_", result[2]))
+  expect_true(grepl("Structure_3_", result[3]))
+  
+  # Test simap_int with regular function (using index)
+  result_int <- simap_int(structures, function(g, i) igraph::vcount(g) + i)
+  expect_equal(length(result_int), 3)
+  expect_type(result_int, "integer")
+  
+  # Test simap_lgl with regular function (using index)
+  result_lgl <- simap_lgl(structures, function(g, i) i > 1)
+  expect_equal(length(result_lgl), 3)
+  expect_type(result_lgl, "logical")
+  expect_false(result_lgl[1])  # index 1
+  expect_true(result_lgl[2])   # index 2
+  expect_true(result_lgl[3])   # index 3
+})
+
+test_that("simap functions work with purrr-style lambda functions", {
+  # Create test structures
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2, core1)
+  
+  # Test simap_chr with purrr lambda
+  result_lambda <- simap_chr(structures, ~ paste0("Pos", .y, "_vertices", igraph::vcount(.x)))
+  result_regular <- simap_chr(structures, function(g, i) paste0("Pos", i, "_vertices", igraph::vcount(g)))
+  expect_equal(result_lambda, result_regular)
+  
+  # Test simap_dbl with purrr lambda
+  result_dbl <- simap_dbl(structures, ~ igraph::vcount(.x) * .y)
+  expect_equal(length(result_dbl), 3)
+  expect_type(result_dbl, "double")
+})
+
+test_that("simap functions work with named vectors", {
+  # Create test structures with names
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2, core1)
+  names(structures) <- c("first", "second", "third")
+  
+  # Test simap_chr with named vector
+  result <- simap_chr(structures, ~ paste0(.y, "_has_", igraph::vcount(.x), "_vertices"))
+  expect_equal(length(result), 3)
+  expect_type(result, "character")
+  expect_true(grepl("first_has_", result[1]))
+  expect_true(grepl("second_has_", result[2]))
+  expect_true(grepl("third_has_", result[3]))
+  
+  # Test that it uses names, not indices
+  result_with_func <- simap_chr(structures, function(g, name) paste0(name, "_", igraph::vcount(g)))
+  expect_true(grepl("^first_", result_with_func[1]))
+  expect_true(grepl("^second_", result_with_func[2]))
+  expect_true(grepl("^third_", result_with_func[3]))
+})
+
+test_that("simap_structure works with regular functions", {
+  # Create test structures
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2)
+  
+  # Function that adds index/name as graph attribute
+  add_index_attr <- function(g, idx) {
+    igraph::set_graph_attr(g, "position", idx)
+  }
+  
+  result <- simap_structure(structures, add_index_attr)
+  
+  expect_s3_class(result, "glyrepr_structure")
+  expect_equal(length(result), 2)
+  
+  # Check that attributes were added
+  structures_list <- attr(result, "structures")
+  first_structure <- structures_list[[vctrs::vec_data(result)[1]]]
+  expect_equal(igraph::graph_attr(first_structure, "position"), 1)
+})
+
+test_that("simap functions handle duplicate structures efficiently", {
+  # Create structures with duplicates to test efficiency
+  core1 <- o_glycan_core_1()
+  structures <- glycan_structure(core1, core1, core1)
+  
+  # This should compute three times since indices are different: (core1, 1), (core1, 2), (core1, 3)
+  result <- simap_chr(structures, function(g, i) paste0("Structure_", i, "_vcount_", igraph::vcount(g)))
+  
+  expect_equal(length(result), 3)
+  expect_type(result, "character")
+  
+  # All should be different because indices are different
+  expect_false(result[1] == result[2])
+  expect_false(result[1] == result[3])
+  expect_false(result[2] == result[3])
+  
+  # But if we have duplicate structure-index combinations (shouldn't happen with normal indexing)
+  # Let's test with names
+  names(structures) <- c("same", "different", "same")
+  result_named <- simap_chr(structures, function(g, name) paste0(name, "_", igraph::vcount(g)))
+  
+  # First and third should be equal (same name)
+  expect_equal(result_named[1], result_named[3])
+  expect_false(result_named[1] == result_named[2])
+})
+
+test_that("simap functions validate inputs", {
+  core1 <- o_glycan_core_1()
+  structures <- glycan_structure(core1)
+  
+  # Test that first argument must be glycan_structure
+  expect_error(simap_chr(c(1, 2, 3), ~ paste(.x, .y)), "glycan_structure")
+  expect_error(simap_structure("not_a_structure", ~ .x), "glycan_structure")
+  
+  # Test that simap_structure validates return type
+  expect_error(
+    simap_structure(structures, ~ "not_an_igraph"), 
+    "igraph object"
+  )
+})
+
+test_that("simap functions handle edge cases", {
+  # Test with single structure
+  single <- glycan_structure(o_glycan_core_1())
+  result <- simap_chr(single, ~ paste0("Index", .y, "_vertices", igraph::vcount(.x)))
+  expect_equal(length(result), 1)
+  expect_type(result, "character")
+  expect_true(grepl("Index1_", result[1]))
+  
+  # Test with empty structures
+  empty <- glycan_structure()
+  empty_result <- simap_chr(empty, ~ paste0(.y, "_", igraph::vcount(.x)))
+  expect_equal(length(empty_result), 0)
+  expect_type(empty_result, "character")
+})
+
+test_that("simap basic functionality works", {
+  # Create test structures
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- glycan_structure(core1, core2)
+  
+  # Test simap (returns list)
+  result <- simap(structures, function(g, i) {
+    list(vcount = igraph::vcount(g), index = i)
+  })
+  
+  expect_type(result, "list")
+  expect_equal(length(result), 2)
+  expect_equal(result[[1]]$index, 1)
+  expect_equal(result[[2]]$index, 2)
+  expect_true(is.numeric(result[[1]]$vcount))
+  expect_true(is.numeric(result[[2]]$vcount))
 }) 

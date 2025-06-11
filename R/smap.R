@@ -326,14 +326,12 @@ snone <- function(.x, .p, ...) {
 #' smap2_dbl(structures, 2.5, ~ igraph::vcount(.x) * .y)
 #' 
 #' # Map a function that modifies structure based on second argument
-#' add_n_vertices <- function(g, n) {
-#'   for (i in seq_len(n)) {
-#'     g <- igraph::add_vertices(g, 1)
-#'   }
-#'   g
+#' # This example adds a graph attribute instead of modifying topology
+#' add_weight_attr <- function(g, weight) {
+#'   igraph::set_graph_attr(g, "weight", weight)
 #' }
-#' n_vertices_to_add <- c(1, 2, 1)
-#' smap2_structure(structures, n_vertices_to_add, add_n_vertices)
+#' weights_to_add <- c(1.5, 2.5, 1.5)
+#' smap2_structure(structures, weights_to_add, add_weight_attr)
 #'
 #' @name smap2
 NULL
@@ -446,6 +444,402 @@ smap2_structure <- function(.x, .y, .f, ...) {
     result <- .f(structures[[row$code]], row$y_val, ...)
     if (!inherits(result, "igraph")) {
       rlang::abort("Function `.f` must return an igraph object when using `smap2_structure()`.")
+    }
+    result
+  })
+  names(transformed_structures) <- unique_combinations_df$combo_key
+  
+  # Create new glycan structure vector from transformed structures
+  # Map back to original positions
+  individual_structures <- purrr::map(combinations_df$combo_key, ~ transformed_structures[[.x]])
+  
+  do.call(glycan_structure, individual_structures)
+}
+
+#' Map Functions Over Glycan Structure Vectors and Multiple Arguments
+#'
+#' @description
+#' These functions apply a function to each unique structure in a glycan structure vector
+#' along with corresponding elements from multiple other vectors,
+#' taking advantage of hash-based deduplication to avoid redundant computation.
+#' Similar to purrr pmap functions, but optimized for glycan structure vectors.
+#'
+#' @param .l A list where the first element is a glycan structure vector (glyrepr_structure)
+#'   and the remaining elements are vectors of the same length or length 1 (will be recycled).
+#' @param .f A function that takes an igraph object (from first element of `.l`) and 
+#'   values from other elements, returning a result. 
+#'   Can be a function, purrr-style lambda (`~ .x + .y + .z`), or a character string naming a function.
+#' @param ... Additional arguments passed to `.f`.
+#' @param .ptype A prototype for the return type (for `spmap_vec`).
+#'
+#' @details
+#' These functions only compute `.f` once for each unique combination of structure and corresponding
+#' values from other vectors, then map the results back to the original vector positions. This is much more efficient
+#' than applying `.f` to each element combination individually when there are duplicate combinations.
+#'
+#' - `spmap()`: Returns a list with the same length as the input vectors
+#' - `spmap_vec()`: Returns an atomic vector with the same length as the input vectors
+#' - `spmap_lgl()`: Returns a logical vector
+#' - `spmap_int()`: Returns an integer vector  
+#' - `spmap_dbl()`: Returns a double vector
+#' - `spmap_chr()`: Returns a character vector
+#' - `spmap_structure()`: Returns a new glycan structure vector (`.f` must return igraph objects)
+#'
+#' @return 
+#' - `spmap()`: A list
+#' - `spmap_vec()`: An atomic vector of type specified by `.ptype`
+#' - `spmap_lgl/int/dbl/chr()`: Atomic vectors of the corresponding type
+#' - `spmap_structure()`: A new glyrepr_structure object
+#'
+#' @examples
+#' # Create structure vectors with duplicates
+#' core1 <- o_glycan_core_1()
+#' core2 <- n_glycan_core()
+#' structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+#' weights <- c(1.0, 2.0, 1.0)  # corresponding weights
+#' factors <- c(2, 3, 2)  # corresponding factors
+#' 
+#' # Map a function that uses structure, weight, and factor
+#' spmap_dbl(list(structures, weights, factors), 
+#'           function(g, w, f) igraph::vcount(g) * w * f)
+#' 
+#' # Use purrr-style lambda functions  
+#' spmap_dbl(list(structures, weights, factors), ~ igraph::vcount(..1) * ..2 * ..3)
+#' 
+#' # Test with recycling
+#' spmap_dbl(list(structures, 2.0, 3), ~ igraph::vcount(..1) * ..2 * ..3)
+#'
+#' @name spmap
+NULL
+
+#' @rdname spmap
+#' @export
+spmap <- function(.l, .f, ...) {
+  if (!is.list(.l) || length(.l) == 0) {
+    rlang::abort("Input `.l` must be a non-empty list.")
+  }
+  
+  if (!is_glycan_structure(.l[[1]])) {
+    rlang::abort("First element of `.l` must be a glycan_structure vector.")
+  }
+  
+  # Handle empty input
+  if (length(.l[[1]]) == 0) {
+    return(list())
+  }
+  
+  # Recycle all vectors to match length of first vector
+  target_length <- length(.l[[1]])
+  .l <- purrr::map(.l, ~ vctrs::vec_recycle(.x, target_length))
+  
+  .f <- rlang::as_function(.f)
+  
+  codes <- vctrs::vec_data(.l[[1]])
+  structures <- attr(.l[[1]], "structures")
+  
+  # Create unique combinations data frame for proper handling
+  combinations_df <- data.frame(
+    code = codes,
+    stringsAsFactors = FALSE
+  )
+  
+  # Add other arguments as columns
+  for (i in seq_along(.l)[-1]) {
+    combinations_df[[paste0("arg", i)]] <- .l[[i]]
+  }
+  
+  # Create combination key
+  combinations_df$combo_key <- do.call(paste, c(combinations_df[setdiff(names(combinations_df), "combo_key")], sep = "|||"))
+  
+  unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
+  
+  # Apply function only to unique combinations
+  unique_results <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
+    row <- unique_combinations_df[i, ]
+    # Build full argument list: first is structure, then other args
+    args <- list(structures[[row$code]])
+    if (length(.l) > 1) {
+      for (j in 2:length(.l)) {
+        args[[j]] <- row[[paste0("arg", j)]]
+      }
+    }
+    do.call(.f, c(args, list(...)))
+  })
+  names(unique_results) <- unique_combinations_df$combo_key
+  
+  # Map results back to original vector positions
+  purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+}
+
+#' @rdname spmap
+#' @export
+spmap_vec <- function(.l, .f, ..., .ptype = NULL) {
+  results <- spmap(.l, .f, ...)
+  vctrs::vec_c(!!!results, .ptype = .ptype)
+}
+
+#' @rdname spmap
+#' @export
+spmap_lgl <- function(.l, .f, ...) {
+  spmap_vec(.l, .f, ..., .ptype = logical())
+}
+
+#' @rdname spmap
+#' @export
+spmap_int <- function(.l, .f, ...) {
+  spmap_vec(.l, .f, ..., .ptype = integer())
+}
+
+#' @rdname spmap
+#' @export
+spmap_dbl <- function(.l, .f, ...) {
+  spmap_vec(.l, .f, ..., .ptype = double())
+}
+
+#' @rdname spmap
+#' @export
+spmap_chr <- function(.l, .f, ...) {
+  spmap_vec(.l, .f, ..., .ptype = character())
+}
+
+#' @rdname spmap
+#' @export
+spmap_structure <- function(.l, .f, ...) {
+  if (!is.list(.l) || length(.l) == 0) {
+    rlang::abort("Input `.l` must be a non-empty list.")
+  }
+  
+  if (!is_glycan_structure(.l[[1]])) {
+    rlang::abort("First element of `.l` must be a glycan_structure vector.")
+  }
+  
+  # Handle empty input
+  if (length(.l[[1]]) == 0) {
+    return(glycan_structure())
+  }
+  
+  # Recycle all vectors to match length of first vector
+  target_length <- length(.l[[1]])
+  .l <- purrr::map(.l, ~ vctrs::vec_recycle(.x, target_length))
+  
+  .f <- rlang::as_function(.f)
+  
+  codes <- vctrs::vec_data(.l[[1]])
+  structures <- attr(.l[[1]], "structures")
+  
+  # Create unique combinations data frame for proper handling
+  combinations_df <- data.frame(
+    code = codes,
+    stringsAsFactors = FALSE
+  )
+  
+  # Add other arguments as columns
+  for (i in seq_along(.l)[-1]) {
+    combinations_df[[paste0("arg", i)]] <- .l[[i]]
+  }
+  
+  # Create combination key
+  combinations_df$combo_key <- do.call(paste, c(combinations_df[setdiff(names(combinations_df), "combo_key")], sep = "|||"))
+  
+  unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
+  
+  # Apply function only to unique combinations
+  transformed_structures <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
+    row <- unique_combinations_df[i, ]
+    # Build full argument list: first is structure, then other args
+    args <- list(structures[[row$code]])
+    if (length(.l) > 1) {
+      for (j in 2:length(.l)) {
+        args[[j]] <- row[[paste0("arg", j)]]
+      }
+    }
+    result <- do.call(.f, c(args, list(...)))
+    if (!inherits(result, "igraph")) {
+      rlang::abort("Function `.f` must return an igraph object when using `spmap_structure()`.")
+    }
+    result
+  })
+  names(transformed_structures) <- unique_combinations_df$combo_key
+  
+  # Create new glycan structure vector from transformed structures
+  # Map back to original positions
+  individual_structures <- purrr::map(combinations_df$combo_key, ~ transformed_structures[[.x]])
+  
+  do.call(glycan_structure, individual_structures)
+}
+
+#' Map Functions Over Glycan Structure Vectors with Indices
+#'
+#' @description
+#' These functions apply a function to each unique structure in a glycan structure vector
+#' along with their corresponding indices,
+#' taking advantage of hash-based deduplication to avoid redundant computation.
+#' Similar to purrr imap functions, but optimized for glycan structure vectors.
+#'
+#' @param .x A glycan structure vector (glyrepr_structure).
+#' @param .f A function that takes an igraph object (from `.x`) and an index/name,
+#'   returning a result. 
+#'   Can be a function, purrr-style lambda (`~ paste(.x, .y)`), or a character string naming a function.
+#' @param ... Additional arguments passed to `.f`.
+#' @param .ptype A prototype for the return type (for `simap_vec`).
+#'
+#' @details
+#' These functions only compute `.f` once for each unique combination of structure and corresponding
+#' index/name, then map the results back to the original vector positions. This is much more efficient
+#' than applying `.f` to each element individually when there are duplicate structures.
+#'
+#' The index passed to `.f` is the position in the original vector (1-based).
+#' If the vector has names, the names are passed instead of indices.
+#'
+#' - `simap()`: Returns a list with the same length as `.x`
+#' - `simap_vec()`: Returns an atomic vector with the same length as `.x`
+#' - `simap_lgl()`: Returns a logical vector
+#' - `simap_int()`: Returns an integer vector  
+#' - `simap_dbl()`: Returns a double vector
+#' - `simap_chr()`: Returns a character vector
+#' - `simap_structure()`: Returns a new glycan structure vector (`.f` must return igraph objects)
+#'
+#' @return 
+#' - `simap()`: A list
+#' - `simap_vec()`: An atomic vector of type specified by `.ptype`
+#' - `simap_lgl/int/dbl/chr()`: Atomic vectors of the corresponding type
+#' - `simap_structure()`: A new glyrepr_structure object
+#'
+#' @examples
+#' # Create structure vectors with duplicates
+#' core1 <- o_glycan_core_1()
+#' core2 <- n_glycan_core()
+#' structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+#' 
+#' # Map a function that uses both structure and index
+#' simap_chr(structures, function(g, i) paste0("Structure_", i, "_vcount_", igraph::vcount(g)))
+#' 
+#' # Use purrr-style lambda functions  
+#' simap_chr(structures, ~ paste0("Pos", .y, "_vertices", igraph::vcount(.x)))
+#' 
+#' # With named vectors
+#' names(structures) <- c("first", "second", "third")
+#' simap_chr(structures, ~ paste0(.y, "_has_", igraph::vcount(.x), "_vertices"))
+#'
+#' @name simap
+NULL
+
+#' @rdname simap
+#' @export
+simap <- function(.x, .f, ...) {
+  if (!is_glycan_structure(.x)) {
+    rlang::abort("Input `.x` must be a glycan_structure vector.")
+  }
+  
+  # Handle empty input
+  if (length(.x) == 0) {
+    return(list())
+  }
+  
+  .f <- rlang::as_function(.f)
+  
+  codes <- vctrs::vec_data(.x)
+  structures <- attr(.x, "structures")
+  
+  # Get indices or names
+  if (!is.null(names(.x))) {
+    indices <- names(.x)
+  } else {
+    indices <- seq_along(.x)
+  }
+  
+  # Create unique combinations data frame for proper handling
+  combinations_df <- data.frame(
+    code = codes,
+    index = indices,
+    stringsAsFactors = FALSE
+  )
+  combinations_df$combo_key <- paste0(combinations_df$code, "|||", combinations_df$index)
+  
+  unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
+  
+  # Apply function only to unique combinations
+  unique_results <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
+    row <- unique_combinations_df[i, ]
+    .f(structures[[row$code]], row$index, ...)
+  })
+  names(unique_results) <- unique_combinations_df$combo_key
+  
+  # Map results back to original vector positions
+  purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+}
+
+#' @rdname simap
+#' @export
+simap_vec <- function(.x, .f, ..., .ptype = NULL) {
+  results <- simap(.x, .f, ...)
+  vctrs::vec_c(!!!results, .ptype = .ptype)
+}
+
+#' @rdname simap
+#' @export
+simap_lgl <- function(.x, .f, ...) {
+  simap_vec(.x, .f, ..., .ptype = logical())
+}
+
+#' @rdname simap
+#' @export
+simap_int <- function(.x, .f, ...) {
+  simap_vec(.x, .f, ..., .ptype = integer())
+}
+
+#' @rdname simap
+#' @export
+simap_dbl <- function(.x, .f, ...) {
+  simap_vec(.x, .f, ..., .ptype = double())
+}
+
+#' @rdname simap
+#' @export
+simap_chr <- function(.x, .f, ...) {
+  simap_vec(.x, .f, ..., .ptype = character())
+}
+
+#' @rdname simap
+#' @export
+simap_structure <- function(.x, .f, ...) {
+  if (!is_glycan_structure(.x)) {
+    rlang::abort("Input `.x` must be a glycan_structure vector.")
+  }
+  
+  # Handle empty input
+  if (length(.x) == 0) {
+    return(glycan_structure())
+  }
+  
+  .f <- rlang::as_function(.f)
+  
+  codes <- vctrs::vec_data(.x)
+  structures <- attr(.x, "structures")
+  
+  # Get indices or names
+  if (!is.null(names(.x))) {
+    indices <- names(.x)
+  } else {
+    indices <- seq_along(.x)
+  }
+  
+  # Create unique combinations data frame for proper handling
+  combinations_df <- data.frame(
+    code = codes,
+    index = indices,
+    stringsAsFactors = FALSE
+  )
+  combinations_df$combo_key <- paste0(combinations_df$code, "|||", combinations_df$index)
+  
+  unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
+  
+  # Apply function only to unique combinations
+  transformed_structures <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
+    row <- unique_combinations_df[i, ]
+    result <- .f(structures[[row$code]], row$index, ...)
+    if (!inherits(result, "igraph")) {
+      rlang::abort("Function `.f` must return an igraph object when using `simap_structure()`.")
     }
     result
   })
