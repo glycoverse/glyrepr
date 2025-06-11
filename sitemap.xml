@@ -38,9 +38,12 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/remove_substituents.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/replace_monos_with_colored.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/seq_glycan.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/reference/structure_map.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/reference/structure_map_unique.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/reference/structure_predicates.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/simap.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/smap.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/smap2.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/smap_predicates.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/smap_unique.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/spmap.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/structure_to_iupac.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/valid_linkages.html</loc></url>
 </urlset>
