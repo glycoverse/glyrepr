@@ -372,6 +372,12 @@ obj_print_data.glyrepr_structure <- function(x, ..., max_n = 10, colored = TRUE)
   }
 }
 
+#' @importFrom pillar pillar_shaft
+#' @export
+pillar_shaft.glyrepr_structure <- function(x, ...) {
+  pillar::pillar_shaft(format(x))
+}
+
 #' @export
 vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
   x_structures <- attr(x, "structures")

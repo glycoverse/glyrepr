@@ -462,6 +462,12 @@ test_that("format.glyrepr_structure handles duplicates correctly", {
   expect_equal(formatted[1], "Gal(b1-3)GalNAc(a1-")
 })
 
+test_that("truncation works in tibble", {
+  sv <- glycan_structure(n_glycan_core(), n_glycan_core(), n_glycan_core())
+  tibble <- tibble::tibble(struc = sv, a = 1)
+  expect_snapshot(print(tibble, width = 30))
+})
+
 # Tests for vctrs methods -----------------------------------------------------
 
 test_that("vec_ptype_abbr.glyrepr_structure returns correct abbreviation", {
