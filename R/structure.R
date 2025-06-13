@@ -325,20 +325,21 @@ format.glyrepr_structure <- function(x, ...) {
   unname(codes)
 }
 
-#' Format Glycan Structure with Optional Colors
+#' Format a Subset of Glycan Structures with Optional Colors
 #'
 #' @param x A glyrepr_structure object
+#' @param indices Indices of structures to format
 #' @param colored A logical value indicating whether to add colors
-#' @return A character vector of formatted structures
+#' @return A character vector of formatted structures for the specified indices
 #' @keywords internal
-format_glycan_structure <- function(x, colored = TRUE) {
+format_glycan_structure_subset <- function(x, indices, colored = TRUE) {
   if (!colored) {
-    return(format(x))
+    return(format(x)[indices])
   }
   
   data <- vctrs::vec_data(x)
-  codes <- vctrs::field(data, "iupac")
-  mono_types <- vctrs::field(data, "mono_type")
+  codes <- vctrs::field(data, "iupac")[indices]
+  mono_types <- vctrs::field(data, "mono_type")[indices]
   structures <- attr(x, "structures")
   
   # For each structure, add colors if concrete type
@@ -355,6 +356,7 @@ format_glycan_structure <- function(x, colored = TRUE) {
   })
 }
 
+
 #' @export
 obj_print_footer.glyrepr_structure <- function(x, ...) {
   cat("# Unique structures: ", format(length(attr(x, "structures"))), "\n", sep = "")
@@ -366,9 +368,13 @@ obj_print_data.glyrepr_structure <- function(x, ..., max_n = 10, colored = TRUE)
     return()
   }
 
-  formatted <- format_glycan_structure(x, colored = colored)
-  n <- length(formatted)
+  n <- length(x)
   n_show <- min(n, max_n)
+  
+  # Only format the structures that need to be shown to improve performance
+  indices_to_show <- seq_len(n_show)
+  formatted <- format_glycan_structure_subset(x, indices_to_show, colored = colored)
+  
   # Print each IUPAC structure on its own line with indexing, up to max_n
   for (i in seq_len(n_show)) {
     cat("[", i, "] ", formatted[i], "\n", sep = "")
