@@ -13,7 +13,7 @@ Similar to purrr imap functions, but optimized for glycan structure vectors."><m
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -119,11 +119,6 @@ If the vector has names, the names are passed instead of indices.</p><ul><li><p>
 <span class="r-in"><span><span class="co"># Use purrr-style lambda functions  </span></span></span>
 <span class="r-in"><span><span class="fu">simap_chr</span><span class="op">(</span><span class="va">structures</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Pos"</span>, <span class="va">.y</span>, <span class="st">"_vertices"</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Pos1_vertices2" "Pos2_vertices5" "Pos3_vertices2"</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># With named vectors</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">structures</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first"</span>, <span class="st">"second"</span>, <span class="st">"third"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">simap_chr</span><span class="op">(</span><span class="va">structures</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">.y</span>, <span class="st">"_has_"</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span>, <span class="st">"_vertices"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "first_has_2_vertices"  "second_has_5_vertices" "third_has_2_vertices" </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

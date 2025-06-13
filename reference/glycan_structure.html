@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@ where nodes are monosaccharides and edges are linkages.</p>
     <h2 id="s-classes">S3 Classes<a class="anchor" aria-label="anchor" href="#s-classes"></a></h2>
     <p>A glycan structure vector is a vctrs record with additional S3 class <code>glyrepr_structure</code>.
 Therefore, <code>sloop::s3_class()</code> of a glycan structure vector is
-<code>c("glyrepr_structure", "vctrs_vctr")</code>.</p>
+<code>c("glyrepr_structure", "vctrs_rcrd")</code>.</p>
 <p>Constraints for individual structures:</p><ul><li><p>The graph must be directed and an outward tree (reducing end as root).</p></li>
 <li><p>The graph must have a graph attribute <code>anomer</code>, in the form of "a1".</p></li>
 <li><p>The graph must have a graph attribute <code>alditol</code>, a logical value.</p></li>
