@@ -130,7 +130,7 @@ convert_mono_type.glyrepr_structure <- function(x, to) {
   # Use smap_structure with optimized lambda function
   # Skip redundant type checking and validation since we already did it
   smap_structure(x, function(graph) {
-    from <- get_mono_type_impl(graph)
+    from <- get_graph_mono_type(graph)
     if (from == to) {
       return(graph)
     }
@@ -214,31 +214,6 @@ convert_mono_type.glyrepr_composition <- function(x, to) {
   do.call(glycan_composition, new_compositions)
 }
 
-# Internal function to convert monosaccharide types in a single igraph
-.convert_glycan_mono_type_single <- function(glycan, to) {
-  from <- .get_mono_type_single(glycan)
-  
-  # Check if conversion is valid
-  tryCatch(
-    valid_from_to(from, to, strict = FALSE),
-    error_backward_convert = function(e) {
-      cli::cli_abort(c(
-        "Cannot convert from {.val {from}} to {.val {to}}.",
-        "i" = "Can only convert in this order: concrete -> generic."
-      ),
-      call = rlang::expr(convert_mono_type()),
-      class = "error_backward_convert")
-    }
-  )
-  
-  # If already target type, return as-is
-  if (from == to) {
-    return(glycan)
-  }
-  
-  convert_glycan_mono_type_impl(glycan, from, to)
-}
-
 #' Get Monosaccharide Types
 #'
 #' This function determines the type of monosaccharides in character vectors,
@@ -306,7 +281,8 @@ get_mono_type.glyrepr_structure <- function(x) {
     ))
   }
   
-  smap_chr(x, .get_mono_type_single)
+  data <- vctrs::vec_data(x)
+  vctrs::field(data, "mono_type")
 }
 
 #' @export
@@ -321,11 +297,6 @@ get_mono_type.glyrepr_composition <- function(x) {
   
   data <- vctrs::vec_data(x)
   vctrs::field(data, "mono_type")
-}
-
-# Internal function to get monosaccharide type in a single igraph
-.get_mono_type_single <- function(glycan) {
-  get_mono_type_impl(glycan)
 }
 
 valid_from_to <- function(from, to, strict) {
@@ -350,8 +321,9 @@ valid_from_to <- function(from, to, strict) {
   }
 }
 
-get_mono_type_impl <- function(glycan) {
-  first_mono <- igraph::vertex_attr(glycan, "mono")[[1]]
+get_graph_mono_type <- function(graph) {
+  # This function is the implementation of get_mono_type for a single glycan graph.
+  first_mono <- igraph::vertex_attr(graph, "mono")[[1]]
   get_mono_type(first_mono)
 }
 

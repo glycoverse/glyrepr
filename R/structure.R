@@ -13,7 +13,7 @@
 #'
 #' A glycan structure vector is a vctrs record with additional S3 class `glyrepr_structure`.
 #' Therefore, `sloop::s3_class()` of a glycan structure vector is 
-#' `c("glyrepr_structure", "vctrs_vctr")`.
+#' `c("glyrepr_structure", "vctrs_rcrd")`.
 #'
 #' Constraints for individual structures:
 #' - The graph must be directed and an outward tree (reducing end as root).
@@ -73,7 +73,7 @@ glycan_structure <- function(...) {
   
   if (length(graphs) == 0) {
     # Return empty vector
-    return(new_glycan_structure(character(), list()))
+    return(new_glycan_structure(character(), character()))
   }
   
   # Validate and process each graph
@@ -84,16 +84,19 @@ glycan_structure <- function(...) {
       ensure_name_vertex_attr()
   })
   
-  # Use IUPAC codes directly as codes for deduplication
+  # Use IUPAC codes directly as data for the rcrd structure
   iupacs <- purrr::map_chr(processed_graphs, .structure_to_iupac_single)
   
-  # Create a unique list based on uniqueness of IUPAC codes
+  # Get mono types for each structure
+  mono_types <- purrr::map_chr(processed_graphs, get_graph_mono_type)
+  
+  # Create a unique list based on uniqueness of IUPAC codes for structures storage
   unique_indices <- which(!duplicated(iupacs))
   unique_graphs <- processed_graphs[unique_indices]
   unique_iupacs <- iupacs[unique_indices]
   names(unique_graphs) <- unique_iupacs
   
-  new_glycan_structure(iupacs, unique_graphs)
+  new_glycan_structure(iupacs, mono_types, unique_graphs)
 }
 
 # Helper function to validate a single glycan structure
@@ -195,9 +198,9 @@ validate_single_glycan_structure <- function(glycan) {
 }
 
 # Helper function to create a new glycan structure vector
-new_glycan_structure <- function(codes = character(), structures = list()) {
-  vctrs::new_vctr(
-    codes,
+new_glycan_structure <- function(iupac = character(), mono_type = character(), structures = list()) {
+  vctrs::new_rcrd(
+    list(iupac = iupac, mono_type = mono_type),
     structures = structures,
     class = "glyrepr_structure"
   )
@@ -209,7 +212,8 @@ get_structures_from_vector <- function(x) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
   
-  codes <- vctrs::vec_data(x)
+  data <- vctrs::vec_data(x)
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(x, "structures")
   
   # Return list of individual structures corresponding to each element
@@ -316,7 +320,8 @@ vec_ptype_abbr.glyrepr_structure <- function(x, ...) "structure"
 
 #' @export
 format.glyrepr_structure <- function(x, ...) {
-  codes <- vctrs::vec_data(x)
+  data <- vctrs::vec_data(x)
+  codes <- vctrs::field(data, "iupac")
   unname(codes)
 }
 
@@ -331,14 +336,15 @@ format_glycan_structure <- function(x, colored = TRUE) {
     return(format(x))
   }
   
-  codes <- vctrs::vec_data(x)
+  data <- vctrs::vec_data(x)
+  codes <- vctrs::field(data, "iupac")
+  mono_types <- vctrs::field(data, "mono_type")
   structures <- attr(x, "structures")
   
-  # For each unique structure, add colors if concrete type
-  purrr::map_chr(codes, function(code) {
+  # For each structure, add colors if concrete type
+  purrr::map2_chr(codes, mono_types, function(code, mono_type) {
     structure <- structures[[code]]
     mono_names <- igraph::V(structure)$mono
-    mono_type <- get_mono_type(mono_names[1])  # All monos in a structure have same type
     
     # Add colors to monosaccharides and gray linkages
     if (colored) {
@@ -392,7 +398,7 @@ vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
   names(combined_structures) <- unique_names
   
   # Create prototype with all structures
-  new_glycan_structure(character(), structures = combined_structures)
+  new_glycan_structure(character(), character(), structures = combined_structures)
 }
 
 #' @export
@@ -402,7 +408,8 @@ vec_cast.glyrepr_structure.glyrepr_structure <- function(x, to, ...) {
 
 #' @export
 as.character.glyrepr_structure <- function(x, ...) {
-  vctrs::vec_data(x)
+  data <- vctrs::vec_data(x)
+  vctrs::field(data, "iupac")
 }
 
 #' Access Individual Glycan Structures
@@ -425,7 +432,8 @@ get_structure_graphs <- function(x, i = NULL) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
   
-  codes <- vctrs::vec_data(x)
+  data <- vctrs::vec_data(x)
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(x, "structures")
   
   if (is.null(i)) {

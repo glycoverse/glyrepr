@@ -68,7 +68,8 @@ smap <- function(.x, .f, ...) {
   
   .f <- rlang::as_function(.f)
   
-  codes <- vctrs::vec_data(.x)
+  data <- vctrs::vec_data(.x)
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(.x, "structures")
   
   # Apply function only to unique structures
@@ -122,7 +123,8 @@ smap_structure <- function(.x, .f, ...) {
   
   .f <- rlang::as_function(.f)
   
-  codes <- vctrs::vec_data(.x)
+  data <- vctrs::vec_data(.x)
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(.x, "structures")
   
   # Apply function only to unique structures
@@ -353,7 +355,8 @@ smap2 <- function(.x, .y, .f, ...) {
   
   .f <- rlang::as_function(.f)
   
-  codes <- vctrs::vec_data(.x)
+  data <- vctrs::vec_data(.x)
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(.x, "structures")
   
   # Create unique combinations data frame for proper handling
@@ -425,7 +428,8 @@ smap2_structure <- function(.x, .y, .f, ...) {
   
   .f <- rlang::as_function(.f)
   
-  codes <- vctrs::vec_data(.x)
+  data <- vctrs::vec_data(.x)
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(.x, "structures")
   
   # Create unique combinations data frame for proper handling
@@ -515,7 +519,8 @@ NULL
 #' @rdname spmap
 #' @export
 spmap <- function(.l, .f, ...) {
-  if (!is.list(.l) || length(.l) == 0) {
+  # Check if it's actually a plain list, not a vctrs object that looks like a list
+  if (!inherits(.l, "list") || inherits(.l, "vctrs_vctr") || length(.l) == 0) {
     rlang::abort("Input `.l` must be a non-empty list.")
   }
   
@@ -534,7 +539,8 @@ spmap <- function(.l, .f, ...) {
   
   .f <- rlang::as_function(.f)
   
-  codes <- vctrs::vec_data(.l[[1]])
+  data <- vctrs::vec_data(.l[[1]])
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(.l[[1]], "structures")
   
   # Create unique combinations data frame for proper handling
@@ -624,7 +630,8 @@ spmap_structure <- function(.l, .f, ...) {
   
   .f <- rlang::as_function(.f)
   
-  codes <- vctrs::vec_data(.l[[1]])
+  data <- vctrs::vec_data(.l[[1]])
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(.l[[1]], "structures")
   
   # Create unique combinations data frame for proper handling
@@ -717,10 +724,6 @@ spmap_structure <- function(.l, .f, ...) {
 #' # Use purrr-style lambda functions  
 #' simap_chr(structures, ~ paste0("Pos", .y, "_vertices", igraph::vcount(.x)))
 #' 
-#' # With named vectors
-#' names(structures) <- c("first", "second", "third")
-#' simap_chr(structures, ~ paste0(.y, "_has_", igraph::vcount(.x), "_vertices"))
-#'
 #' @name simap
 NULL
 
@@ -738,7 +741,8 @@ simap <- function(.x, .f, ...) {
   
   .f <- rlang::as_function(.f)
   
-  codes <- vctrs::vec_data(.x)
+  data <- vctrs::vec_data(.x)
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(.x, "structures")
   
   # Get indices or names
@@ -814,7 +818,8 @@ simap_structure <- function(.x, .f, ...) {
   
   .f <- rlang::as_function(.f)
   
-  codes <- vctrs::vec_data(.x)
+  data <- vctrs::vec_data(.x)
+  codes <- vctrs::field(data, "iupac")
   structures <- attr(.x, "structures")
   
   # Get indices or names

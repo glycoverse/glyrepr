@@ -521,7 +521,8 @@ test_that("spmap_structure works with regular functions", {
   
   # Check that attributes were added
   structures_list <- attr(result, "structures")
-  first_structure <- structures_list[[vctrs::vec_data(result)[1]]]
+  data <- vctrs::vec_data(result)
+  first_structure <- structures_list[[vctrs::field(data, "iupac")[1]]]
   expect_equal(igraph::graph_attr(first_structure, "custom_label"), "label1")
   expect_equal(igraph::graph_attr(first_structure, "custom_value"), 10)
 })
@@ -646,28 +647,6 @@ test_that("simap functions work with purrr-style lambda functions", {
   expect_type(result_dbl, "double")
 })
 
-test_that("simap functions work with named vectors", {
-  # Create test structures with names
-  core1 <- o_glycan_core_1()
-  core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
-  names(structures) <- c("first", "second", "third")
-  
-  # Test simap_chr with named vector
-  result <- simap_chr(structures, ~ paste0(.y, "_has_", igraph::vcount(.x), "_vertices"))
-  expect_equal(length(result), 3)
-  expect_type(result, "character")
-  expect_true(grepl("first_has_", result[1]))
-  expect_true(grepl("second_has_", result[2]))
-  expect_true(grepl("third_has_", result[3]))
-  
-  # Test that it uses names, not indices
-  result_with_func <- simap_chr(structures, function(g, name) paste0(name, "_", igraph::vcount(g)))
-  expect_true(grepl("^first_", result_with_func[1]))
-  expect_true(grepl("^second_", result_with_func[2]))
-  expect_true(grepl("^third_", result_with_func[3]))
-})
-
 test_that("simap_structure works with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
@@ -686,7 +665,8 @@ test_that("simap_structure works with regular functions", {
   
   # Check that attributes were added
   structures_list <- attr(result, "structures")
-  first_structure <- structures_list[[vctrs::vec_data(result)[1]]]
+  data <- vctrs::vec_data(result)
+  first_structure <- structures_list[[vctrs::field(data, "iupac")[1]]]
   expect_equal(igraph::graph_attr(first_structure, "position"), 1)
 })
 
@@ -706,14 +686,10 @@ test_that("simap functions handle duplicate structures efficiently", {
   expect_false(result[1] == result[3])
   expect_false(result[2] == result[3])
   
-  # But if we have duplicate structure-index combinations (shouldn't happen with normal indexing)
-  # Let's test with names
-  names(structures) <- c("same", "different", "same")
-  result_named <- simap_chr(structures, function(g, name) paste0(name, "_", igraph::vcount(g)))
-  
-  # First and third should be equal (same name)
-  expect_equal(result_named[1], result_named[3])
-  expect_false(result_named[1] == result_named[2])
+  # Test that each result contains the expected structure and index information
+  expect_true(grepl("Structure_1_", result[1]))
+  expect_true(grepl("Structure_2_", result[2]))
+  expect_true(grepl("Structure_3_", result[3]))
 })
 
 test_that("simap functions validate inputs", {

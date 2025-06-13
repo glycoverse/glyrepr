@@ -137,14 +137,18 @@ as_glycan_composition.glyrepr_composition <- function(x) {
 
 #' @export
 as_glycan_composition.glyrepr_structure <- function(x) {
-  # Use smap to convert each structure to composition
-  compositions <- smap(x, function(graph) {
+  # Get mono_types directly from the structure data
+  data <- vctrs::vec_data(x)
+  structure_mono_types <- vctrs::field(data, "mono_type")
+  
+  # Use smap2 to convert each structure to composition with known mono_type
+  compositions <- smap2(x, structure_mono_types, function(graph, mono_type) {
     monos <- igraph::V(graph)$mono
     result_tb <- table(monos)
     result <- as.integer(result_tb)
     names(result) <- names(result_tb)
-    # Sort by monosaccharides tibble order (top to bottom)
-    mono_order <- get_monosaccharide_order(names(result))
+    # Sort by monosaccharides tibble order using the known mono_type
+    mono_order <- get_monosaccharide_order_with_type(names(result), mono_type)
     result <- result[order(mono_order)]
     result
   })
@@ -189,6 +193,21 @@ get_monosaccharide_order <- function(mono_names) {
   
   # Determine mono_type from the first monosaccharide
   mono_type <- get_mono_type(mono_names[1])
+  get_monosaccharide_order_with_type(mono_names, mono_type)
+}
+
+# Helper function to get the order of monosaccharides when mono_type is already known
+get_monosaccharide_order_with_type <- function(mono_names, mono_type) {
+  if (length(mono_names) == 0) {
+    return(integer(0))
+  }
+  
+  # Check if all monosaccharides are known, if not, return original order
+  if (!all(is_known_monosaccharide(mono_names))) {
+    # Return sequential order for unknown monosaccharides
+    return(seq_along(mono_names))
+  }
+  
   # Get the corresponding column from monosaccharides tibble
   mono_column <- monosaccharides[[mono_type]]
   # Get the order for each monosaccharide based on its position in the specific column

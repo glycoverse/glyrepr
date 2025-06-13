@@ -78,8 +78,4 @@ simap_chr(structures, function(g, i) paste0("Structure_", i, "_vcount_", igraph:
 # Use purrr-style lambda functions  
 simap_chr(structures, ~ paste0("Pos", .y, "_vertices", igraph::vcount(.x)))
 
-# With named vectors
-names(structures) <- c("first", "second", "third")
-simap_chr(structures, ~ paste0(.y, "_has_", igraph::vcount(.x), "_vertices"))
-
 }

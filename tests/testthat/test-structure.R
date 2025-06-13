@@ -355,7 +355,8 @@ test_that("glycan_structure works with single glycan structure", {
   expect_s3_class(sv, "glyrepr_structure")
   expect_equal(length(sv), 1)
   expect_length(attr(sv, "structures"), 1)
-  expect_equal(vctrs::vec_data(sv)[1], "Gal(b1-3)GalNAc(a1-")
+  data <- vctrs::vec_data(sv)
+  expect_equal(vctrs::field(data, "iupac")[1], "Gal(b1-3)GalNAc(a1-")
 })
 
 test_that("glycan_structure works with multiple different glycan structures", {
@@ -534,7 +535,8 @@ test_that("glycan_structure preserves glycan structures correctly", {
   
   # Check IUPAC codes are generated correctly
   expected_iupacs <- c(structure_to_iupac(graph1), structure_to_iupac(graph2))
-  stored_codes <- vctrs::vec_data(sv)
+  data <- vctrs::vec_data(sv)
+  stored_codes <- vctrs::field(data, "iupac")
   expect_equal(sort(unique(stored_codes)), sort(expected_iupacs))
 })
 
