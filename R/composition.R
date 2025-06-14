@@ -157,6 +157,90 @@ as_glycan_composition.glyrepr_structure <- function(x) {
   do.call(glycan_composition, compositions)
 }
 
+# Helper function to parse a single composition string
+parse_single_composition <- function(char) {
+  # Handle empty string - treat as empty composition
+  if (char == "" || is.na(char)) {
+    return(list(composition = NULL, valid = TRUE))
+  }
+  
+  # Try to parse the character string
+  tryCatch({
+    # Use regex to find all patterns like "MonoName(number)"
+    pattern <- "([A-Za-z0-9]+)\\((\\d+)\\)"
+    matches <- stringr::str_extract_all(char, pattern, simplify = FALSE)[[1]]
+
+    if (length(matches) == 0) {
+      return(list(composition = NULL, valid = FALSE))
+    }
+
+    # Check if the entire string was matched (no remaining characters)
+    total_matched_length <- sum(stringr::str_length(matches))
+    if (total_matched_length != stringr::str_length(char)) {
+      return(list(composition = NULL, valid = FALSE))
+    }
+
+    # Parse each match using stringr::str_match
+    parsed_matches <- purrr::map(matches, function(match) {
+      match_result <- stringr::str_match(match, pattern)
+      list(
+        name = match_result[1, 2],  # First capture group
+        count = as.integer(match_result[1, 3])  # Second capture group
+      )
+    })
+
+    # Extract names and counts
+    mono_names <- purrr::map_chr(parsed_matches, "name")
+    mono_counts <- purrr::map_int(parsed_matches, "count")
+
+    # Create named vector
+    comp <- mono_counts
+    names(comp) <- mono_names
+
+    return(list(composition = comp, valid = TRUE))
+
+  }, error = function(e) {
+    return(list(composition = NULL, valid = FALSE))
+  })
+}
+
+#' @export
+as_glycan_composition.character <- function(x) {
+  # Handle empty character vector
+  if (length(x) == 0) {
+    return(glycan_composition())
+  }
+  
+  # Parse each character string using the helper function
+  parse_result <- purrr::map(x, parse_single_composition)
+  
+  # Extract validity and compositions
+  valid_flags <- purrr::map_lgl(parse_result, "valid")
+  compositions <- purrr::map(parse_result, "composition")
+  
+  # Find invalid indices
+  invalid_indices <- which(!valid_flags)
+  
+  # Check for invalid characters
+  if (length(invalid_indices) > 0) {
+    cli::cli_abort(c(
+      "Characters cannot be parsed as glycan compositions at index {invalid_indices}",
+      "i" = "Expected format: 'Hex(5)HexNAc(2)' with monosaccharide names followed by counts in parentheses."
+    ))
+  }
+  
+  # Filter out NULL entries (from empty strings)
+  compositions <- compositions[!purrr::map_lgl(compositions, is.null)]
+  
+  # Handle case where all strings were empty
+  if (length(compositions) == 0) {
+    return(glycan_composition())
+  }
+  
+  # Create composition vector
+  do.call(glycan_composition, compositions)
+}
+
 #' @export
 as_glycan_composition.default <- function(x) {
   if (is.null(names(x)) && is.list(x)) {
@@ -177,6 +261,11 @@ as_glycan_composition.default <- function(x) {
       "i" = "Supported types: named integer vector, list of named integer vectors, or existing glyrepr_composition."
     ))
   }
+}
+
+#' @export
+as.character.glyrepr_composition <- function(x, ...) {
+  format(x)
 }
 
 # Helper function to get the order of monosaccharides based on their position in the tibble

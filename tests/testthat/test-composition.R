@@ -238,3 +238,40 @@ test_that("truncation works in tibble for compositions", {
   tibble <- tibble::tibble(comp = comp, a = 1)
   expect_snapshot(print(tibble, width = 30))
 })
+
+# Tests for character conversion ----------------------------------------------
+test_that("as_glycan_composition works for compositions", {
+  chars <- c("Hex(5)HexNAc(2)", "Gal(2)Man(3)GlcNAc(2)Fuc(1)Neu5Ac(2)")
+  expected <- glycan_composition(
+    c(Hex = 5, HexNAc = 2),
+    c(Gal = 2, Man = 3, GlcNAc = 2, Fuc = 1, Neu5Ac = 2)
+  )
+  expect_equal(as_glycan_composition(chars), expected)
+})
+
+test_that("as_glycan_composition works for empty characters", {
+  char1 <- c("")
+  char2 <- character()
+  expected <- glycan_composition()
+  expect_equal(as_glycan_composition(char1), expected)
+  expect_equal(as_glycan_composition(char2), expected)
+})
+
+test_that("as_glycan_composition raises error for illegal characters", {
+  chars <- c("H5N2", "invalid", "Hex(5)HexNAc(2)")  # we do not support "H5N2" format yet
+  err_msg <- "Characters cannot be parsed as glycan compositions at index 1 and 2"
+  expect_error(as_glycan_composition(chars), err_msg)
+})
+
+test_that("as_glycan_composition reorder residues", {
+  chars <- c("Hex(2)HexNAc(1)", "HexNAc(1)Hex(2)")
+  comp <- as_glycan_composition(chars)
+  expected <- c("Hex(2)HexNAc(1)", "Hex(2)HexNAc(1)")
+  expect_equal(format(comp), expected)
+})
+
+test_that("as.character works for compositions", {
+  chars <- c("Hex(2)HexNAc(1)", "Hex(5)HexNAc(2)")
+  comp <- as_glycan_composition(chars)
+  expect_equal(as.character(comp), chars)
+})
