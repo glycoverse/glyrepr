@@ -212,3 +212,29 @@ test_that("composition vectors can be repeated", {
   expect_equal(length(repeated), 3)
   expect_equal(format(repeated), rep("Hex(2)HexNAc(1)", 3))
 })
+
+# Tests for printing performance ----------------------------------------------
+
+test_that("large composition printing performance is acceptable", {
+  # Create a large composition vector
+  comps <- rep(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1, dHex = 1)), 500)
+  large_comp <- do.call(glycan_composition, comps)
+  
+  # This should complete quickly without freezing
+  start_time <- Sys.time()
+  output <- capture.output(print(large_comp))
+  end_time <- Sys.time()
+  
+  # Should take less than 1 second
+  expect_true(as.numeric(end_time - start_time) < 1)
+  
+  # Should only show 10 compositions plus summary line
+  expect_length(output, 12)  # 10 compositions + header + summary
+  expect_match(output[12], "\\.\\.\\. \\(990 more not shown\\)")
+})
+
+test_that("truncation works in tibble for compositions", {
+  comp <- glycan_composition(c(Hex = 2, HexNAc = 1), c(Glc = 1, Gal = 2), c(Hex = 3, dHex = 1))
+  tibble <- tibble::tibble(comp = comp, a = 1)
+  expect_snapshot(print(tibble, width = 30))
+})

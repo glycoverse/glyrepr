@@ -253,12 +253,12 @@ vec_cast.glyrepr_composition.glyrepr_composition <- function(x, to, ...) {
   x
 }
 
-#' @export
-obj_print_data.glyrepr_composition <- function(x, ..., max_n = 10, colored = TRUE) {
-  if (length(x) == 0) {
-    return()
+# Helper function to format a subset of compositions
+format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
+  if (!colored) {
+    return(format(x)[indices])
   }
-
+  
   # Format with colors if concrete type
   format_one_colored <- function(comp, mono_type) {
     mono_names <- names(comp)
@@ -270,10 +270,24 @@ obj_print_data.glyrepr_composition <- function(x, ..., max_n = 10, colored = TRU
   }
   
   data <- vctrs::vec_data(x)
-  formatted <- purrr::map2_chr(vctrs::field(data, "data"), vctrs::field(data, "mono_type"), format_one_colored)
+  comp_data <- vctrs::field(data, "data")[indices]
+  mono_types <- vctrs::field(data, "mono_type")[indices]
   
-  n <- length(formatted)
+  purrr::map2_chr(comp_data, mono_types, format_one_colored)
+}
+
+#' @export
+obj_print_data.glyrepr_composition <- function(x, ..., max_n = 10, colored = TRUE) {
+  if (length(x) == 0) {
+    return()
+  }
+
+  n <- length(x)
   n_show <- min(n, max_n)
+  
+  # Only format the compositions that need to be shown to improve performance
+  indices_to_show <- seq_len(n_show)
+  formatted <- format_glycan_composition_subset(x, indices_to_show, colored = colored)
   
   # Print each composition on its own line with indexing, up to max_n
   for (i in seq_len(n_show)) {
@@ -282,4 +296,10 @@ obj_print_data.glyrepr_composition <- function(x, ..., max_n = 10, colored = TRU
   if (n > max_n) {
     cat("... (", n - max_n, " more not shown)\n", sep = "")
   }
+}
+
+#' @importFrom pillar pillar_shaft
+#' @export
+pillar_shaft.glyrepr_composition <- function(x, ...) {
+  pillar::pillar_shaft(format(x))
 }
