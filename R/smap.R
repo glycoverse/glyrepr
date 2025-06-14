@@ -10,6 +10,8 @@
 #'   Can be a function, purrr-style lambda (`~ .x$attr`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `smap_vec`).
+#' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
+#'   parallel processing is automatically enabled when the number of unique structures > 100.
 #'
 #' @details
 #' These functions only compute `.f` once for each unique structure, then map
@@ -59,9 +61,35 @@
 #' @name smap
 NULL
 
+# Helper function for parallel processing
+.smap_apply <- function(data_list, func, use_parallel = NULL, auto_threshold = 100, ...) {
+  n_tasks <- length(data_list)
+  
+  # Determine whether to use parallel processing
+  if (is.null(use_parallel)) {
+    use_parallel <- n_tasks > auto_threshold
+  }
+  
+  if (use_parallel && n_tasks > 1) {
+    # Check if future backend is set up
+    if (!future::nbrOfWorkers() > 1) {
+      cli::cli_inform("No parallel backend detected. Using sequential processing.")
+      use_parallel <- FALSE
+    }
+  } else if (use_parallel && n_tasks <= 1) {
+    use_parallel <- FALSE
+  }
+  
+  if (use_parallel) {
+    furrr::future_map(data_list, func, ...)
+  } else {
+    purrr::map(data_list, func, ...)
+  }
+}
+
 #' @rdname smap
 #' @export
-smap <- function(.x, .f, ...) {
+smap <- function(.x, .f, ..., .parallel = NULL) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
@@ -72,11 +100,14 @@ smap <- function(.x, .f, ...) {
   codes <- vctrs::field(data, "iupac")
   structures <- attr(.x, "structures")
   
+  # Extract dots without .parallel
+  dots <- list(...)
+  
   # Apply function only to unique structures
   unique_codes <- names(structures)
-  unique_results <- purrr::map(unique_codes, function(code) {
-    .f(structures[[code]], ...)
-  })
+  unique_results <- .smap_apply(unique_codes, function(code) {
+    do.call(.f, c(list(structures[[code]]), dots))
+  }, use_parallel = .parallel)
   names(unique_results) <- unique_codes
   
   # Map results back to original vector positions
@@ -85,38 +116,43 @@ smap <- function(.x, .f, ...) {
 
 #' @rdname smap
 #' @export
-smap_vec <- function(.x, .f, ..., .ptype = NULL) {
-  results <- smap(.x, .f, ...)
+smap_vec <- function(.x, .f, ..., .ptype = NULL, .parallel = NULL) {
+  # Extract .parallel from ... to avoid passing it to user function
+  results <- smap(.x, .f, ..., .parallel = .parallel)
   vctrs::vec_c(!!!results, .ptype = .ptype)
 }
 
 #' @rdname smap
 #' @export
-smap_lgl <- function(.x, .f, ...) {
-  smap_vec(.x, .f, ..., .ptype = logical())
+smap_lgl <- function(.x, .f, ..., .parallel = NULL) {
+  # Extract .parallel from ... to avoid passing it to user function
+  smap_vec(.x, .f, ..., .ptype = logical(), .parallel = .parallel)
 }
 
 #' @rdname smap
 #' @export
-smap_int <- function(.x, .f, ...) {
-  smap_vec(.x, .f, ..., .ptype = integer())
+smap_int <- function(.x, .f, ..., .parallel = NULL) {
+  # Extract .parallel from ... to avoid passing it to user function
+  smap_vec(.x, .f, ..., .ptype = integer(), .parallel = .parallel)
 }
 
 #' @rdname smap
 #' @export
-smap_dbl <- function(.x, .f, ...) {
-  smap_vec(.x, .f, ..., .ptype = double())
+smap_dbl <- function(.x, .f, ..., .parallel = NULL) {
+  # Extract .parallel from ... to avoid passing it to user function
+  smap_vec(.x, .f, ..., .ptype = double(), .parallel = .parallel)
 }
 
 #' @rdname smap
 #' @export
-smap_chr <- function(.x, .f, ...) {
-  smap_vec(.x, .f, ..., .ptype = character())
+smap_chr <- function(.x, .f, ..., .parallel = NULL) {
+  # Extract .parallel from ... to avoid passing it to user function
+  smap_vec(.x, .f, ..., .ptype = character(), .parallel = .parallel)
 }
 
 #' @rdname smap
 #' @export
-smap_structure <- function(.x, .f, ...) {
+smap_structure <- function(.x, .f, ..., .parallel = NULL) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
@@ -127,15 +163,18 @@ smap_structure <- function(.x, .f, ...) {
   codes <- vctrs::field(data, "iupac")
   structures <- attr(.x, "structures")
   
+  # Extract dots without .parallel
+  dots <- list(...)
+  
   # Apply function only to unique structures
   unique_codes <- names(structures)
-  transformed_structures <- purrr::map(unique_codes, function(code) {
-    result <- .f(structures[[code]], ...)
+  transformed_structures <- .smap_apply(unique_codes, function(code) {
+    result <- do.call(.f, c(list(structures[[code]]), dots))
     if (!inherits(result, "igraph")) {
       rlang::abort("Function `.f` must return an igraph object when using `smap_structure()`.")
     }
     result
-  })
+  }, use_parallel = .parallel)
   
   # Create new glycan structure vector from transformed structures
   # Map back to original positions
@@ -156,6 +195,8 @@ smap_structure <- function(.x, .f, ...) {
 #' @param .f A function that takes an igraph object and returns a result. 
 #'   Can be a function, purrr-style lambda (`~ .x$attr`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
+#' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
+#'   parallel processing is automatically enabled when the number of unique structures > 100.
 #'
 #' @return A list with results for each unique structure, named by their hash codes.
 #'
@@ -173,7 +214,7 @@ smap_structure <- function(.x, .f, ...) {
 #' length(unique_results2)  # 1, not 3
 #'
 #' @export
-smap_unique <- function(.x, .f, ...) {
+smap_unique <- function(.x, .f, ..., .parallel = NULL) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
@@ -182,8 +223,13 @@ smap_unique <- function(.x, .f, ...) {
   
   structures <- attr(.x, "structures")
   
+  # Extract dots without .parallel
+  dots <- list(...)
+  
   # Apply function only to unique structures
-  results <- purrr::map(structures, .f, ...)
+  results <- .smap_apply(structures, function(g) {
+    do.call(.f, c(list(g), dots))
+  }, use_parallel = .parallel)
   results
 }
 
@@ -291,6 +337,8 @@ snone <- function(.x, .p, ...) {
 #'   Can be a function, purrr-style lambda (`~ .x + .y`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `smap2_vec`).
+#' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
+#'   parallel processing is automatically enabled when the number of unique combinations > 100.
 #'
 #' @details
 #' These functions only compute `.f` once for each unique combination of structure and corresponding
@@ -340,7 +388,7 @@ NULL
 
 #' @rdname smap2
 #' @export
-smap2 <- function(.x, .y, .f, ...) {
+smap2 <- function(.x, .y, .f, ..., .parallel = NULL) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input `.x` must be a glycan_structure vector.")
   }
@@ -370,10 +418,10 @@ smap2 <- function(.x, .y, .f, ...) {
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
   # Apply function only to unique combinations
-  unique_results <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
+  unique_results <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
     row <- unique_combinations_df[i, ]
     .f(structures[[row$code]], row$y_val, ...)
-  })
+  }, use_parallel = .parallel)
   names(unique_results) <- unique_combinations_df$combo_key
   
   # Map results back to original vector positions
@@ -382,38 +430,38 @@ smap2 <- function(.x, .y, .f, ...) {
 
 #' @rdname smap2
 #' @export
-smap2_vec <- function(.x, .y, .f, ..., .ptype = NULL) {
-  results <- smap2(.x, .y, .f, ...)
+smap2_vec <- function(.x, .y, .f, ..., .ptype = NULL, .parallel = NULL) {
+  results <- smap2(.x, .y, .f, ..., .parallel = .parallel)
   vctrs::vec_c(!!!results, .ptype = .ptype)
 }
 
 #' @rdname smap2
 #' @export
-smap2_lgl <- function(.x, .y, .f, ...) {
-  smap2_vec(.x, .y, .f, ..., .ptype = logical())
+smap2_lgl <- function(.x, .y, .f, ..., .parallel = NULL) {
+  smap2_vec(.x, .y, .f, ..., .ptype = logical(), .parallel = .parallel)
 }
 
 #' @rdname smap2
 #' @export
-smap2_int <- function(.x, .y, .f, ...) {
-  smap2_vec(.x, .y, .f, ..., .ptype = integer())
+smap2_int <- function(.x, .y, .f, ..., .parallel = NULL) {
+  smap2_vec(.x, .y, .f, ..., .ptype = integer(), .parallel = .parallel)
 }
 
 #' @rdname smap2
 #' @export
-smap2_dbl <- function(.x, .y, .f, ...) {
-  smap2_vec(.x, .y, .f, ..., .ptype = double())
+smap2_dbl <- function(.x, .y, .f, ..., .parallel = NULL) {
+  smap2_vec(.x, .y, .f, ..., .ptype = double(), .parallel = .parallel)
 }
 
 #' @rdname smap2
 #' @export
-smap2_chr <- function(.x, .y, .f, ...) {
-  smap2_vec(.x, .y, .f, ..., .ptype = character())
+smap2_chr <- function(.x, .y, .f, ..., .parallel = NULL) {
+  smap2_vec(.x, .y, .f, ..., .ptype = character(), .parallel = .parallel)
 }
 
 #' @rdname smap2
 #' @export
-smap2_structure <- function(.x, .y, .f, ...) {
+smap2_structure <- function(.x, .y, .f, ..., .parallel = NULL) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input `.x` must be a glycan_structure vector.")
   }
@@ -443,14 +491,14 @@ smap2_structure <- function(.x, .y, .f, ...) {
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
   # Apply function only to unique combinations
-  transformed_structures <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
+  transformed_structures <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
     row <- unique_combinations_df[i, ]
     result <- .f(structures[[row$code]], row$y_val, ...)
     if (!inherits(result, "igraph")) {
       rlang::abort("Function `.f` must return an igraph object when using `smap2_structure()`.")
     }
     result
-  })
+  }, use_parallel = .parallel)
   names(transformed_structures) <- unique_combinations_df$combo_key
   
   # Create new glycan structure vector from transformed structures
@@ -475,6 +523,8 @@ smap2_structure <- function(.x, .y, .f, ...) {
 #'   Can be a function, purrr-style lambda (`~ .x + .y + .z`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `spmap_vec`).
+#' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
+#'   parallel processing is automatically enabled when the number of unique combinations > 100.
 #'
 #' @details
 #' These functions only compute `.f` once for each unique combination of structure and corresponding
@@ -518,7 +568,7 @@ NULL
 
 #' @rdname spmap
 #' @export
-spmap <- function(.l, .f, ...) {
+spmap <- function(.l, .f, ..., .parallel = NULL) {
   # Check if it's actually a plain list, not a vctrs object that looks like a list
   if (!inherits(.l, "list") || inherits(.l, "vctrs_vctr") || length(.l) == 0) {
     rlang::abort("Input `.l` must be a non-empty list.")
@@ -560,7 +610,7 @@ spmap <- function(.l, .f, ...) {
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
   # Apply function only to unique combinations
-  unique_results <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
+  unique_results <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
     row <- unique_combinations_df[i, ]
     # Build full argument list: first is structure, then other args
     args <- list(structures[[row$code]])
@@ -570,7 +620,7 @@ spmap <- function(.l, .f, ...) {
       }
     }
     do.call(.f, c(args, list(...)))
-  })
+  }, use_parallel = .parallel)
   names(unique_results) <- unique_combinations_df$combo_key
   
   # Map results back to original vector positions
@@ -579,38 +629,38 @@ spmap <- function(.l, .f, ...) {
 
 #' @rdname spmap
 #' @export
-spmap_vec <- function(.l, .f, ..., .ptype = NULL) {
-  results <- spmap(.l, .f, ...)
+spmap_vec <- function(.l, .f, ..., .ptype = NULL, .parallel = NULL) {
+  results <- spmap(.l, .f, ..., .parallel = .parallel)
   vctrs::vec_c(!!!results, .ptype = .ptype)
 }
 
 #' @rdname spmap
 #' @export
-spmap_lgl <- function(.l, .f, ...) {
-  spmap_vec(.l, .f, ..., .ptype = logical())
+spmap_lgl <- function(.l, .f, ..., .parallel = NULL) {
+  spmap_vec(.l, .f, ..., .ptype = logical(), .parallel = .parallel)
 }
 
 #' @rdname spmap
 #' @export
-spmap_int <- function(.l, .f, ...) {
-  spmap_vec(.l, .f, ..., .ptype = integer())
+spmap_int <- function(.l, .f, ..., .parallel = NULL) {
+  spmap_vec(.l, .f, ..., .ptype = integer(), .parallel = .parallel)
 }
 
 #' @rdname spmap
 #' @export
-spmap_dbl <- function(.l, .f, ...) {
-  spmap_vec(.l, .f, ..., .ptype = double())
+spmap_dbl <- function(.l, .f, ..., .parallel = NULL) {
+  spmap_vec(.l, .f, ..., .ptype = double(), .parallel = .parallel)
 }
 
 #' @rdname spmap
 #' @export
-spmap_chr <- function(.l, .f, ...) {
-  spmap_vec(.l, .f, ..., .ptype = character())
+spmap_chr <- function(.l, .f, ..., .parallel = NULL) {
+  spmap_vec(.l, .f, ..., .ptype = character(), .parallel = .parallel)
 }
 
 #' @rdname spmap
 #' @export
-spmap_structure <- function(.l, .f, ...) {
+spmap_structure <- function(.l, .f, ..., .parallel = NULL) {
   if (!is.list(.l) || length(.l) == 0) {
     rlang::abort("Input `.l` must be a non-empty list.")
   }
@@ -651,7 +701,7 @@ spmap_structure <- function(.l, .f, ...) {
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
   # Apply function only to unique combinations
-  transformed_structures <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
+  transformed_structures <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
     row <- unique_combinations_df[i, ]
     # Build full argument list: first is structure, then other args
     args <- list(structures[[row$code]])
@@ -665,7 +715,7 @@ spmap_structure <- function(.l, .f, ...) {
       rlang::abort("Function `.f` must return an igraph object when using `spmap_structure()`.")
     }
     result
-  })
+  }, use_parallel = .parallel)
   names(transformed_structures) <- unique_combinations_df$combo_key
   
   # Create new glycan structure vector from transformed structures

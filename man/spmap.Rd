@@ -10,19 +10,19 @@
 \alias{spmap_structure}
 \title{Map Functions Over Glycan Structure Vectors and Multiple Arguments}
 \usage{
-spmap(.l, .f, ...)
+spmap(.l, .f, ..., .parallel = NULL)
 
-spmap_vec(.l, .f, ..., .ptype = NULL)
+spmap_vec(.l, .f, ..., .ptype = NULL, .parallel = NULL)
 
-spmap_lgl(.l, .f, ...)
+spmap_lgl(.l, .f, ..., .parallel = NULL)
 
-spmap_int(.l, .f, ...)
+spmap_int(.l, .f, ..., .parallel = NULL)
 
-spmap_dbl(.l, .f, ...)
+spmap_dbl(.l, .f, ..., .parallel = NULL)
 
-spmap_chr(.l, .f, ...)
+spmap_chr(.l, .f, ..., .parallel = NULL)
 
-spmap_structure(.l, .f, ...)
+spmap_structure(.l, .f, ..., .parallel = NULL)
 }
 \arguments{
 \item{.l}{A list where the first element is a glycan structure vector (glyrepr_structure)
@@ -33,6 +33,9 @@ values from other elements, returning a result.
 Can be a function, purrr-style lambda (\code{~ .x + .y + .z}), or a character string naming a function.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
+
+\item{.parallel}{Logical; whether to use parallel processing. If \code{NULL} (default),
+parallel processing is automatically enabled when the number of unique combinations > 100.}
 
 \item{.ptype}{A prototype for the return type (for \code{spmap_vec}).}
 }
