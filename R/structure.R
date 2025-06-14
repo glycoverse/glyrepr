@@ -413,6 +413,36 @@ vec_cast.glyrepr_structure.glyrepr_structure <- function(x, to, ...) {
 }
 
 #' @export
+vec_restore.glyrepr_structure <- function(x, to, ...) {
+  # x is the proxy data (data.frame) after vctrs operations
+  # to is the original glyrepr_structure object for reference
+
+  # Extract data from the proxy
+  data <- vctrs::vec_data(x)
+  iupacs <- vctrs::field(data, "iupac")
+  mono_types <- vctrs::field(data, "mono_type")
+
+  # Get available structures
+  available_structures <- attr(to, "structures")
+
+  # Find which unique structures are still needed
+  needed_codes <- unique(iupacs)
+
+  # For slicing operations, optimize by removing unused structures
+  # For combination operations, we typically get all the needed structures already
+  if (length(needed_codes) > 0 && length(available_structures) > 0) {
+    # Only keep structures that are actually used
+    retrenched_structures <- available_structures[needed_codes[needed_codes %in% names(available_structures)]]
+  } else {
+    retrenched_structures <- available_structures
+  }
+
+  # Create new vector with structures
+  new_glycan_structure(iupacs, mono_types, structures = retrenched_structures)
+}
+
+
+#' @export
 as.character.glyrepr_structure <- function(x, ...) {
   data <- vctrs::vec_data(x)
   vctrs::field(data, "iupac")

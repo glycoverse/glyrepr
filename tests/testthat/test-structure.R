@@ -658,7 +658,6 @@ test_that("c() preserves structure integrity across combinations", {
 
 # Tests for vector casting and subsetting functionality -------------------------
 
-skip("Skip: structure retrenching. Reason: not implemented")
 test_that("glycan_structure vectors can be subset with necessary structure preservation", {
   sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   
@@ -733,6 +732,207 @@ test_that("structure vector methods handle edge cases", {
   expect_equal(length(combined2), 2)
   expect_length(attr(combined1, "structures"), 1)
   expect_length(attr(combined2, "structures"), 1)
+})
+
+# Tests for tibble and dplyr operations with structure optimization -----------
+
+test_that("tibble row subsetting optimizes structure storage", {
+  skip_if_not_installed("tibble")
+  library(tibble)
+  
+  # Create test data with duplicates
+  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  df <- tibble(id = 1:3, structure = sv, name = c("A", "B", "C"))
+  
+  # Original should have 2 unique structures
+  expect_length(attr(sv, "structures"), 2)
+  
+  # Single row subsetting should optimize to 1 unique structure
+  subset1 <- df[1, ]
+  expect_equal(length(subset1$structure), 1)
+  expect_length(attr(subset1$structure, "structures"), 1)
+  
+  # Multiple row subsetting with same structure should optimize to 1 unique
+  subset2 <- df[c(1, 3), ]  # Both point to same structure
+  expect_equal(length(subset2$structure), 2)
+  expect_length(attr(subset2$structure, "structures"), 1)
+  
+  # Multiple row subsetting with different structures should keep both
+  subset3 <- df[2:3, ]
+  expect_equal(length(subset3$structure), 2)
+  expect_length(attr(subset3$structure, "structures"), 2)
+  
+  # Single row with different structure
+  subset4 <- df[2, ]
+  expect_equal(length(subset4$structure), 1)
+  expect_length(attr(subset4$structure, "structures"), 1)
+})
+
+test_that("dplyr filter operations optimize structure storage", {
+  skip_if_not_installed("dplyr")
+  library(tibble)
+  library(dplyr)
+  
+  # Create test data with duplicates
+  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  df <- tibble(id = 1:3, structure = sv, score = c(10, 20, 30))
+  
+  # Filter to single row should optimize to 1 unique structure
+  filtered1 <- df %>% filter(id == 1)
+  expect_equal(length(filtered1$structure), 1)
+  expect_length(attr(filtered1$structure, "structures"), 1)
+  
+  # Filter to multiple rows with same structure should optimize
+  filtered2 <- df %>% filter(id != 2)  # Keeps rows 1 and 3 (same structure)
+  expect_equal(length(filtered2$structure), 2)
+  expect_length(attr(filtered2$structure, "structures"), 1)
+  
+  # Filter to multiple rows with different structures should keep both
+  filtered3 <- df %>% filter(id >= 2)  # Keeps rows 2 and 3 (different structures)
+  expect_equal(length(filtered3$structure), 2)
+  expect_length(attr(filtered3$structure, "structures"), 2)
+  
+  # Filter by score
+  filtered4 <- df %>% filter(score >= 20)
+  expect_equal(length(filtered4$structure), 2)
+  expect_length(attr(filtered4$structure, "structures"), 2)
+})
+
+test_that("dplyr slice operations optimize structure storage", {
+  skip_if_not_installed("dplyr")
+  library(tibble)
+  library(dplyr)
+  
+  # Create test data
+  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  df <- tibble(id = 1:3, structure = sv)
+  
+  # slice() operations
+  sliced1 <- df %>% slice(1)
+  expect_equal(length(sliced1$structure), 1)
+  expect_length(attr(sliced1$structure, "structures"), 1)
+  
+  sliced2 <- df %>% slice(c(1, 3))
+  expect_equal(length(sliced2$structure), 2)
+  expect_length(attr(sliced2$structure, "structures"), 1)
+  
+  sliced3 <- df %>% slice(2:3)
+  expect_equal(length(sliced3$structure), 2)
+  expect_length(attr(sliced3$structure, "structures"), 2)
+  
+  # slice_head() and slice_tail()
+  head_slice <- df %>% slice_head(n = 1)
+  expect_equal(length(head_slice$structure), 1)
+  expect_length(attr(head_slice$structure, "structures"), 1)
+  
+  tail_slice <- df %>% slice_tail(n = 1)
+  expect_equal(length(tail_slice$structure), 1)
+  expect_length(attr(tail_slice$structure, "structures"), 1)
+})
+
+test_that("dplyr arrange and other operations preserve structure optimization", {
+  skip_if_not_installed("dplyr")
+  library(tibble)
+  library(dplyr)
+  
+  # Create test data
+  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  df <- tibble(id = 1:3, structure = sv, score = c(30, 10, 20))
+  
+  # arrange() should maintain all structures
+  arranged <- df %>% arrange(score)
+  expect_equal(length(arranged$structure), 3)
+  expect_length(attr(arranged$structure, "structures"), 2)
+  
+  # arrange() + slice() should optimize
+  arranged_sliced <- df %>% arrange(score) %>% slice(1)
+  expect_equal(length(arranged_sliced$structure), 1)
+  expect_length(attr(arranged_sliced$structure, "structures"), 1)
+  
+  # top_n() operations
+  top2 <- df %>% top_n(2, score)
+  expect_equal(length(top2$structure), 2)
+  expect_length(attr(top2$structure, "structures"), 1)  # top_n selects id=1 and id=3, both have same structure
+  
+  # distinct() operations with duplicated structures
+  df_with_dups <- tibble(
+    id = rep(1:3, each = 2),
+    structure = rep(sv, each = 2)
+  )
+  distinct_result <- df_with_dups %>% distinct(structure, .keep_all = TRUE)
+  expect_equal(length(distinct_result$structure), 2)
+  expect_length(attr(distinct_result$structure, "structures"), 2)
+})
+
+test_that("complex tibble and dplyr workflows maintain optimization", {
+  skip_if_not_installed("dplyr")
+  library(tibble)
+  library(dplyr)
+  
+  # Create more complex test data
+  sv <- glycan_structure(
+    o_glycan_core_1(), n_glycan_core(), o_glycan_core_1(), 
+    n_glycan_core(), o_glycan_core_1()
+  )
+  df <- tibble(
+    id = 1:5,
+    structure = sv,
+    type = c("A", "B", "A", "B", "A"),
+    score = c(10, 20, 15, 25, 30)
+  )
+  
+  # Original should have 2 unique structures
+  expect_length(attr(sv, "structures"), 2)
+  
+  # Complex workflow: filter + arrange + slice
+  result1 <- df %>%
+    filter(type == "A") %>%
+    arrange(desc(score)) %>%
+    slice(1:2)
+  
+  expect_equal(length(result1$structure), 2)
+  expect_length(attr(result1$structure, "structures"), 1)  # All type A have same structure
+  
+  # Another complex workflow: group operations
+  result2 <- df %>%
+    group_by(type) %>%
+    slice_max(score, n = 1) %>%
+    ungroup()
+  
+  expect_equal(length(result2$structure), 2)
+  expect_length(attr(result2$structure, "structures"), 2)  # One from each type
+  
+  # Workflow with structure column operations
+  result3 <- df %>%
+    filter(score >= 20) %>%
+    select(structure, score)
+  
+  expect_equal(length(result3$structure), 3)  # score >= 20 selects 3 rows (id=2,4,5)
+  expect_length(attr(result3$structure, "structures"), 2)  # These have 2 different structures
+})
+
+test_that("tibble operations preserve structure content integrity", {
+  skip_if_not_installed("dplyr")
+  library(tibble)
+  library(dplyr)
+  
+  # Create test data
+  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  df <- tibble(id = 1:3, structure = sv)
+  
+  # Verify that optimization doesn't affect structure content
+  subset_df <- df %>% filter(id == 1)
+  
+  # Extract the structure and verify it's correct
+  structure_graph <- get_structure_graphs(subset_df$structure, 1)
+  expect_s3_class(structure_graph, "igraph")
+  
+  # Verify structure content (o_glycan_core_1 has GalNAc and Gal)
+  expect_true("GalNAc" %in% igraph::V(structure_graph)$mono)
+  expect_true("Gal" %in% igraph::V(structure_graph)$mono)
+  
+  # Verify IUPAC representation is preserved
+  expect_equal(format(subset_df$structure)[1], "Gal(b1-3)GalNAc(a1-")
 })
 
 # Tests for vector conversion -------------------------
