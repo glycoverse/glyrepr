@@ -10,19 +10,19 @@
 \alias{smap_structure}
 \title{Map Functions Over Glycan Structure Vectors}
 \usage{
-smap(.x, .f, ..., .parallel = NULL)
+smap(.x, .f, ..., .parallel = FALSE)
 
-smap_vec(.x, .f, ..., .ptype = NULL, .parallel = NULL)
+smap_vec(.x, .f, ..., .ptype = NULL, .parallel = FALSE)
 
-smap_lgl(.x, .f, ..., .parallel = NULL)
+smap_lgl(.x, .f, ..., .parallel = FALSE)
 
-smap_int(.x, .f, ..., .parallel = NULL)
+smap_int(.x, .f, ..., .parallel = FALSE)
 
-smap_dbl(.x, .f, ..., .parallel = NULL)
+smap_dbl(.x, .f, ..., .parallel = FALSE)
 
-smap_chr(.x, .f, ..., .parallel = NULL)
+smap_chr(.x, .f, ..., .parallel = FALSE)
 
-smap_structure(.x, .f, ..., .parallel = NULL)
+smap_structure(.x, .f, ..., .parallel = FALSE)
 }
 \arguments{
 \item{.x}{A glycan structure vector (glyrepr_structure).}
@@ -32,8 +32,8 @@ Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string 
 
 \item{...}{Additional arguments passed to \code{.f}.}
 
-\item{.parallel}{Logical; whether to use parallel processing. If \code{NULL} (default),
-parallel processing is automatically enabled when the number of unique structures > 100.}
+\item{.parallel}{Logical; whether to use parallel processing. If \code{FALSE} (default),
+parallel processing is disabled. Set to \code{TRUE} to enable parallel processing.}
 
 \item{.ptype}{A prototype for the return type (for \code{smap_vec}).}
 }
@@ -104,17 +104,17 @@ result_seq <- smap_int(structures, igraph::vcount, .parallel = FALSE)
 # future::plan(future::multisession, workers = 4)
 result_par <- smap_int(structures, igraph::vcount, .parallel = TRUE)
 
-# Example 2: Automatic parallel processing for large datasets
-# When you have >100 unique structures, parallel processing is automatic
+# Example 2: Manual parallel processing for large datasets
+# Parallel processing is disabled by default - you need to explicitly enable it
 
 # Simulate a large dataset (in practice, this might come from parsing 
 # a large glycomics dataset with many different structures)
 # Note: This is just for demonstration - in real use, you'd have 
 # genuinely different structures from your data
 
-# For datasets with >100 unique structures:
-# large_structures <- your_large_glycan_dataset  # >100 unique structures
-# result_auto <- smap_int(large_structures, igraph::vcount)  # Auto-parallel
+# For large datasets, you can enable parallel processing manually:
+# large_structures <- your_large_glycan_dataset  # Many unique structures
+# result_parallel <- smap_int(large_structures, igraph::vcount, .parallel = TRUE)
 
 # Example 3: Complex computation that benefits from parallelization
 complex_analysis <- function(g) {
@@ -143,8 +143,8 @@ system.time({
 # When processing large glycomics datasets:
 # glycan_data <- parse_glycan_file("large_dataset.txt")  # Many structures
 # 
-# # Compute molecular properties - automatically parallel if >100 unique
-# molecular_weights <- smap_dbl(glycan_data, calculate_molecular_weight)
+# # Compute molecular properties - manually enable parallel if needed
+# molecular_weights <- smap_dbl(glycan_data, calculate_molecular_weight, .parallel = TRUE)
 # 
 # # Force parallel for expensive computations even with fewer structures  
 # complexity_scores <- smap_dbl(glycan_data, expensive_complexity_analysis, 

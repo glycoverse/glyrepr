@@ -10,19 +10,19 @@
 \alias{smap2_structure}
 \title{Map Functions Over Two Glycan Structure Vectors}
 \usage{
-smap2(.x, .y, .f, ..., .parallel = NULL)
+smap2(.x, .y, .f, ..., .parallel = FALSE)
 
-smap2_vec(.x, .y, .f, ..., .ptype = NULL, .parallel = NULL)
+smap2_vec(.x, .y, .f, ..., .ptype = NULL, .parallel = FALSE)
 
-smap2_lgl(.x, .y, .f, ..., .parallel = NULL)
+smap2_lgl(.x, .y, .f, ..., .parallel = FALSE)
 
-smap2_int(.x, .y, .f, ..., .parallel = NULL)
+smap2_int(.x, .y, .f, ..., .parallel = FALSE)
 
-smap2_dbl(.x, .y, .f, ..., .parallel = NULL)
+smap2_dbl(.x, .y, .f, ..., .parallel = FALSE)
 
-smap2_chr(.x, .y, .f, ..., .parallel = NULL)
+smap2_chr(.x, .y, .f, ..., .parallel = FALSE)
 
-smap2_structure(.x, .y, .f, ..., .parallel = NULL)
+smap2_structure(.x, .y, .f, ..., .parallel = FALSE)
 }
 \arguments{
 \item{.x}{A glycan structure vector (glyrepr_structure).}
@@ -34,8 +34,8 @@ Can be a function, purrr-style lambda (\code{~ .x + .y}), or a character string 
 
 \item{...}{Additional arguments passed to \code{.f}.}
 
-\item{.parallel}{Logical; whether to use parallel processing. If \code{NULL} (default),
-parallel processing is automatically enabled when the number of unique combinations > 100.
+\item{.parallel}{Logical; whether to use parallel processing. If \code{FALSE} (default),
+parallel processing is disabled. Set to \code{TRUE} to enable parallel processing.
 See examples in \code{\link{smap}} for how to set up and use parallel processing.}
 
 \item{.ptype}{A prototype for the return type (for \code{smap2_vec}).}

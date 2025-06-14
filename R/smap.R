@@ -10,8 +10,8 @@
 #'   Can be a function, purrr-style lambda (`~ .x$attr`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `smap_vec`).
-#' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
-#'   parallel processing is automatically enabled when the number of unique structures > 100.
+#' @param .parallel Logical; whether to use parallel processing. If `FALSE` (default), 
+#'   parallel processing is disabled. Set to `TRUE` to enable parallel processing.
 #'
 #' @details
 #' These functions only compute `.f` once for each unique structure, then map
@@ -72,17 +72,17 @@
 #' # future::plan(future::multisession, workers = 4)
 #' result_par <- smap_int(structures, igraph::vcount, .parallel = TRUE)
 #' 
-#' # Example 2: Automatic parallel processing for large datasets
-#' # When you have >100 unique structures, parallel processing is automatic
+#' # Example 2: Manual parallel processing for large datasets
+#' # Parallel processing is disabled by default - you need to explicitly enable it
 #' 
 #' # Simulate a large dataset (in practice, this might come from parsing 
 #' # a large glycomics dataset with many different structures)
 #' # Note: This is just for demonstration - in real use, you'd have 
 #' # genuinely different structures from your data
 #' 
-#' # For datasets with >100 unique structures:
-#' # large_structures <- your_large_glycan_dataset  # >100 unique structures
-#' # result_auto <- smap_int(large_structures, igraph::vcount)  # Auto-parallel
+#' # For large datasets, you can enable parallel processing manually:
+#' # large_structures <- your_large_glycan_dataset  # Many unique structures
+#' # result_parallel <- smap_int(large_structures, igraph::vcount, .parallel = TRUE)
 #' 
 #' # Example 3: Complex computation that benefits from parallelization
 #' complex_analysis <- function(g) {
@@ -111,8 +111,8 @@
 #' # When processing large glycomics datasets:
 #' # glycan_data <- parse_glycan_file("large_dataset.txt")  # Many structures
 #' # 
-#' # # Compute molecular properties - automatically parallel if >100 unique
-#' # molecular_weights <- smap_dbl(glycan_data, calculate_molecular_weight)
+#' # # Compute molecular properties - manually enable parallel if needed
+#' # molecular_weights <- smap_dbl(glycan_data, calculate_molecular_weight, .parallel = TRUE)
 #' # 
 #' # # Force parallel for expensive computations even with fewer structures  
 #' # complexity_scores <- smap_dbl(glycan_data, expensive_complexity_analysis, 
@@ -123,12 +123,12 @@
 NULL
 
 # Helper function for parallel processing
-.smap_apply <- function(data_list, func, use_parallel = NULL, auto_threshold = 100, ...) {
+.smap_apply <- function(data_list, func, use_parallel = FALSE, auto_threshold = 100, ...) {
   n_tasks <- length(data_list)
   
-  # Determine whether to use parallel processing
+  # Handle NULL values for backward compatibility
   if (is.null(use_parallel)) {
-    use_parallel <- n_tasks > auto_threshold
+    use_parallel <- FALSE
   }
   
   if (use_parallel && n_tasks > 1) {
@@ -150,7 +150,7 @@ NULL
 
 #' @rdname smap
 #' @export
-smap <- function(.x, .f, ..., .parallel = NULL) {
+smap <- function(.x, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
@@ -177,7 +177,7 @@ smap <- function(.x, .f, ..., .parallel = NULL) {
 
 #' @rdname smap
 #' @export
-smap_vec <- function(.x, .f, ..., .ptype = NULL, .parallel = NULL) {
+smap_vec <- function(.x, .f, ..., .ptype = NULL, .parallel = FALSE) {
   # Extract .parallel from ... to avoid passing it to user function
   results <- smap(.x, .f, ..., .parallel = .parallel)
   vctrs::vec_c(!!!results, .ptype = .ptype)
@@ -185,35 +185,35 @@ smap_vec <- function(.x, .f, ..., .ptype = NULL, .parallel = NULL) {
 
 #' @rdname smap
 #' @export
-smap_lgl <- function(.x, .f, ..., .parallel = NULL) {
+smap_lgl <- function(.x, .f, ..., .parallel = FALSE) {
   # Extract .parallel from ... to avoid passing it to user function
   smap_vec(.x, .f, ..., .ptype = logical(), .parallel = .parallel)
 }
 
 #' @rdname smap
 #' @export
-smap_int <- function(.x, .f, ..., .parallel = NULL) {
+smap_int <- function(.x, .f, ..., .parallel = FALSE) {
   # Extract .parallel from ... to avoid passing it to user function
   smap_vec(.x, .f, ..., .ptype = integer(), .parallel = .parallel)
 }
 
 #' @rdname smap
 #' @export
-smap_dbl <- function(.x, .f, ..., .parallel = NULL) {
+smap_dbl <- function(.x, .f, ..., .parallel = FALSE) {
   # Extract .parallel from ... to avoid passing it to user function
   smap_vec(.x, .f, ..., .ptype = double(), .parallel = .parallel)
 }
 
 #' @rdname smap
 #' @export
-smap_chr <- function(.x, .f, ..., .parallel = NULL) {
+smap_chr <- function(.x, .f, ..., .parallel = FALSE) {
   # Extract .parallel from ... to avoid passing it to user function
   smap_vec(.x, .f, ..., .ptype = character(), .parallel = .parallel)
 }
 
 #' @rdname smap
 #' @export
-smap_structure <- function(.x, .f, ..., .parallel = NULL) {
+smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
@@ -256,8 +256,8 @@ smap_structure <- function(.x, .f, ..., .parallel = NULL) {
 #' @param .f A function that takes an igraph object and returns a result. 
 #'   Can be a function, purrr-style lambda (`~ .x$attr`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
-#' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
-#'   parallel processing is automatically enabled when the number of unique structures > 100.
+#' @param .parallel Logical; whether to use parallel processing. If `FALSE` (default), 
+#'   parallel processing is disabled. Set to `TRUE` to enable parallel processing.
 #'   See examples in \code{\link{smap}} for how to set up and use parallel processing.
 #'
 #' @return A list with results for each unique structure, named by their hash codes.
@@ -276,7 +276,7 @@ smap_structure <- function(.x, .f, ..., .parallel = NULL) {
 #' length(unique_results2)  # 1, not 3
 #'
 #' @export
-smap_unique <- function(.x, .f, ..., .parallel = NULL) {
+smap_unique <- function(.x, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
@@ -399,8 +399,8 @@ snone <- function(.x, .p, ...) {
 #'   Can be a function, purrr-style lambda (`~ .x + .y`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `smap2_vec`).
-#' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
-#'   parallel processing is automatically enabled when the number of unique combinations > 100.
+#' @param .parallel Logical; whether to use parallel processing. If `FALSE` (default), 
+#'   parallel processing is disabled. Set to `TRUE` to enable parallel processing.
 #'   See examples in \code{\link{smap}} for how to set up and use parallel processing.
 #'
 #' @details
@@ -451,7 +451,7 @@ NULL
 
 #' @rdname smap2
 #' @export
-smap2 <- function(.x, .y, .f, ..., .parallel = NULL) {
+smap2 <- function(.x, .y, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input `.x` must be a glycan_structure vector.")
   }
@@ -493,38 +493,38 @@ smap2 <- function(.x, .y, .f, ..., .parallel = NULL) {
 
 #' @rdname smap2
 #' @export
-smap2_vec <- function(.x, .y, .f, ..., .ptype = NULL, .parallel = NULL) {
+smap2_vec <- function(.x, .y, .f, ..., .ptype = NULL, .parallel = FALSE) {
   results <- smap2(.x, .y, .f, ..., .parallel = .parallel)
   vctrs::vec_c(!!!results, .ptype = .ptype)
 }
 
 #' @rdname smap2
 #' @export
-smap2_lgl <- function(.x, .y, .f, ..., .parallel = NULL) {
+smap2_lgl <- function(.x, .y, .f, ..., .parallel = FALSE) {
   smap2_vec(.x, .y, .f, ..., .ptype = logical(), .parallel = .parallel)
 }
 
 #' @rdname smap2
 #' @export
-smap2_int <- function(.x, .y, .f, ..., .parallel = NULL) {
+smap2_int <- function(.x, .y, .f, ..., .parallel = FALSE) {
   smap2_vec(.x, .y, .f, ..., .ptype = integer(), .parallel = .parallel)
 }
 
 #' @rdname smap2
 #' @export
-smap2_dbl <- function(.x, .y, .f, ..., .parallel = NULL) {
+smap2_dbl <- function(.x, .y, .f, ..., .parallel = FALSE) {
   smap2_vec(.x, .y, .f, ..., .ptype = double(), .parallel = .parallel)
 }
 
 #' @rdname smap2
 #' @export
-smap2_chr <- function(.x, .y, .f, ..., .parallel = NULL) {
+smap2_chr <- function(.x, .y, .f, ..., .parallel = FALSE) {
   smap2_vec(.x, .y, .f, ..., .ptype = character(), .parallel = .parallel)
 }
 
 #' @rdname smap2
 #' @export
-smap2_structure <- function(.x, .y, .f, ..., .parallel = NULL) {
+smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input `.x` must be a glycan_structure vector.")
   }
@@ -586,8 +586,8 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = NULL) {
 #'   Can be a function, purrr-style lambda (`~ .x + .y + .z`), or a character string naming a function.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `spmap_vec`).
-#' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
-#'   parallel processing is automatically enabled when the number of unique combinations > 100.
+#' @param .parallel Logical; whether to use parallel processing. If `FALSE` (default), 
+#'   parallel processing is disabled. Set to `TRUE` to enable parallel processing.
 #'   See examples in \code{\link{smap}} for how to set up and use parallel processing.
 #'
 #' @details
@@ -632,7 +632,7 @@ NULL
 
 #' @rdname spmap
 #' @export
-spmap <- function(.l, .f, ..., .parallel = NULL) {
+spmap <- function(.l, .f, ..., .parallel = FALSE) {
   # Check if it's actually a plain list, not a vctrs object that looks like a list
   if (!inherits(.l, "list") || inherits(.l, "vctrs_vctr") || length(.l) == 0) {
     rlang::abort("Input `.l` must be a non-empty list.")
@@ -693,38 +693,38 @@ spmap <- function(.l, .f, ..., .parallel = NULL) {
 
 #' @rdname spmap
 #' @export
-spmap_vec <- function(.l, .f, ..., .ptype = NULL, .parallel = NULL) {
+spmap_vec <- function(.l, .f, ..., .ptype = NULL, .parallel = FALSE) {
   results <- spmap(.l, .f, ..., .parallel = .parallel)
   vctrs::vec_c(!!!results, .ptype = .ptype)
 }
 
 #' @rdname spmap
 #' @export
-spmap_lgl <- function(.l, .f, ..., .parallel = NULL) {
+spmap_lgl <- function(.l, .f, ..., .parallel = FALSE) {
   spmap_vec(.l, .f, ..., .ptype = logical(), .parallel = .parallel)
 }
 
 #' @rdname spmap
 #' @export
-spmap_int <- function(.l, .f, ..., .parallel = NULL) {
+spmap_int <- function(.l, .f, ..., .parallel = FALSE) {
   spmap_vec(.l, .f, ..., .ptype = integer(), .parallel = .parallel)
 }
 
 #' @rdname spmap
 #' @export
-spmap_dbl <- function(.l, .f, ..., .parallel = NULL) {
+spmap_dbl <- function(.l, .f, ..., .parallel = FALSE) {
   spmap_vec(.l, .f, ..., .ptype = double(), .parallel = .parallel)
 }
 
 #' @rdname spmap
 #' @export
-spmap_chr <- function(.l, .f, ..., .parallel = NULL) {
+spmap_chr <- function(.l, .f, ..., .parallel = FALSE) {
   spmap_vec(.l, .f, ..., .ptype = character(), .parallel = .parallel)
 }
 
 #' @rdname spmap
 #' @export
-spmap_structure <- function(.l, .f, ..., .parallel = NULL) {
+spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
   if (!is.list(.l) || length(.l) == 0) {
     rlang::abort("Input `.l` must be a non-empty list.")
   }

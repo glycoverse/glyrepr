@@ -10,19 +10,19 @@
 \alias{spmap_structure}
 \title{Map Functions Over Glycan Structure Vectors and Multiple Arguments}
 \usage{
-spmap(.l, .f, ..., .parallel = NULL)
+spmap(.l, .f, ..., .parallel = FALSE)
 
-spmap_vec(.l, .f, ..., .ptype = NULL, .parallel = NULL)
+spmap_vec(.l, .f, ..., .ptype = NULL, .parallel = FALSE)
 
-spmap_lgl(.l, .f, ..., .parallel = NULL)
+spmap_lgl(.l, .f, ..., .parallel = FALSE)
 
-spmap_int(.l, .f, ..., .parallel = NULL)
+spmap_int(.l, .f, ..., .parallel = FALSE)
 
-spmap_dbl(.l, .f, ..., .parallel = NULL)
+spmap_dbl(.l, .f, ..., .parallel = FALSE)
 
-spmap_chr(.l, .f, ..., .parallel = NULL)
+spmap_chr(.l, .f, ..., .parallel = FALSE)
 
-spmap_structure(.l, .f, ..., .parallel = NULL)
+spmap_structure(.l, .f, ..., .parallel = FALSE)
 }
 \arguments{
 \item{.l}{A list where the first element is a glycan structure vector (glyrepr_structure)
@@ -34,8 +34,8 @@ Can be a function, purrr-style lambda (\code{~ .x + .y + .z}), or a character st
 
 \item{...}{Additional arguments passed to \code{.f}.}
 
-\item{.parallel}{Logical; whether to use parallel processing. If \code{NULL} (default),
-parallel processing is automatically enabled when the number of unique combinations > 100.
+\item{.parallel}{Logical; whether to use parallel processing. If \code{FALSE} (default),
+parallel processing is disabled. Set to \code{TRUE} to enable parallel processing.
 See examples in \code{\link{smap}} for how to set up and use parallel processing.}
 
 \item{.ptype}{A prototype for the return type (for \code{spmap_vec}).}
