@@ -10,19 +10,19 @@
 \alias{smap_structure}
 \title{Map Functions Over Glycan Structure Vectors}
 \usage{
-smap(.x, .f, ...)
+smap(.x, .f, ..., .parallel = NULL)
 
-smap_vec(.x, .f, ..., .ptype = NULL)
+smap_vec(.x, .f, ..., .ptype = NULL, .parallel = NULL)
 
-smap_lgl(.x, .f, ...)
+smap_lgl(.x, .f, ..., .parallel = NULL)
 
-smap_int(.x, .f, ...)
+smap_int(.x, .f, ..., .parallel = NULL)
 
-smap_dbl(.x, .f, ...)
+smap_dbl(.x, .f, ..., .parallel = NULL)
 
-smap_chr(.x, .f, ...)
+smap_chr(.x, .f, ..., .parallel = NULL)
 
-smap_structure(.x, .f, ...)
+smap_structure(.x, .f, ..., .parallel = NULL)
 }
 \arguments{
 \item{.x}{A glycan structure vector (glyrepr_structure).}
@@ -31,6 +31,9 @@ smap_structure(.x, .f, ...)
 Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string naming a function.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
+
+\item{.parallel}{Logical; whether to use parallel processing. If \code{NULL} (default),
+parallel processing is automatically enabled when the number of unique structures > 100.}
 
 \item{.ptype}{A prototype for the return type (for \code{smap_vec}).}
 }
