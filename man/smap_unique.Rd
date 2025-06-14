@@ -15,7 +15,8 @@ Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string 
 \item{...}{Additional arguments passed to \code{.f}.}
 
 \item{.parallel}{Logical; whether to use parallel processing. If \code{NULL} (default),
-parallel processing is automatically enabled when the number of unique structures > 100.}
+parallel processing is automatically enabled when the number of unique structures > 100.
+See examples in \code{\link{smap}} for how to set up and use parallel processing.}
 }
 \value{
 A list with results for each unique structure, named by their hash codes.

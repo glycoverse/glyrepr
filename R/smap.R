@@ -57,6 +57,67 @@
 #'   }
 #' }
 #' smap_structure(structures, add_vertex_names)
+#' 
+#' \dontrun{
+#' # Parallel processing examples
+#' 
+#' # Example 1: Manual control of parallel processing
+#' # For small datasets, you can still force parallel processing
+#' 
+#' # Force sequential processing (default for small datasets)
+#' result_seq <- smap_int(structures, igraph::vcount, .parallel = FALSE)
+#' 
+#' # Force parallel processing (requires parallel backend setup)
+#' # First set up a parallel backend:
+#' # future::plan(future::multisession, workers = 4)
+#' result_par <- smap_int(structures, igraph::vcount, .parallel = TRUE)
+#' 
+#' # Example 2: Automatic parallel processing for large datasets
+#' # When you have >100 unique structures, parallel processing is automatic
+#' 
+#' # Simulate a large dataset (in practice, this might come from parsing 
+#' # a large glycomics dataset with many different structures)
+#' # Note: This is just for demonstration - in real use, you'd have 
+#' # genuinely different structures from your data
+#' 
+#' # For datasets with >100 unique structures:
+#' # large_structures <- your_large_glycan_dataset  # >100 unique structures
+#' # result_auto <- smap_int(large_structures, igraph::vcount)  # Auto-parallel
+#' 
+#' # Example 3: Complex computation that benefits from parallelization
+#' complex_analysis <- function(g) {
+#'   # Simulate expensive computation (e.g., complex graph analysis)
+#'   Sys.sleep(0.01)  # 10ms delay per unique structure
+#'   list(
+#'     vcount = igraph::vcount(g),
+#'     ecount = igraph::ecount(g),
+#'     diameter = igraph::diameter(g),
+#'     transitivity = igraph::transitivity(g)
+#'   )
+#' }
+#' 
+#' # Even with few unique structures, complex computations benefit from parallel
+#' # Set up parallel backend first: future::plan(future::multisession, workers = 4)
+#' system.time({
+#'   results_par <- smap(structures, complex_analysis, .parallel = TRUE)
+#' })
+#' 
+#' # Compare with sequential processing
+#' system.time({
+#'   results_seq <- smap(structures, complex_analysis, .parallel = FALSE)
+#' })
+#' 
+#' # Example 4: Practical use case with real data
+#' # When processing large glycomics datasets:
+#' # glycan_data <- parse_glycan_file("large_dataset.txt")  # Many structures
+#' # 
+#' # # Compute molecular properties - automatically parallel if >100 unique
+#' # molecular_weights <- smap_dbl(glycan_data, calculate_molecular_weight)
+#' # 
+#' # # Force parallel for expensive computations even with fewer structures  
+#' # complexity_scores <- smap_dbl(glycan_data, expensive_complexity_analysis, 
+#' #                               .parallel = TRUE)
+#' }
 #'
 #' @name smap
 NULL
@@ -197,6 +258,7 @@ smap_structure <- function(.x, .f, ..., .parallel = NULL) {
 #' @param ... Additional arguments passed to `.f`.
 #' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
 #'   parallel processing is automatically enabled when the number of unique structures > 100.
+#'   See examples in \code{\link{smap}} for how to set up and use parallel processing.
 #'
 #' @return A list with results for each unique structure, named by their hash codes.
 #'
@@ -339,6 +401,7 @@ snone <- function(.x, .p, ...) {
 #' @param .ptype A prototype for the return type (for `smap2_vec`).
 #' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
 #'   parallel processing is automatically enabled when the number of unique combinations > 100.
+#'   See examples in \code{\link{smap}} for how to set up and use parallel processing.
 #'
 #' @details
 #' These functions only compute `.f` once for each unique combination of structure and corresponding
@@ -525,6 +588,7 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = NULL) {
 #' @param .ptype A prototype for the return type (for `spmap_vec`).
 #' @param .parallel Logical; whether to use parallel processing. If `NULL` (default), 
 #'   parallel processing is automatically enabled when the number of unique combinations > 100.
+#'   See examples in \code{\link{smap}} for how to set up and use parallel processing.
 #'
 #' @details
 #' These functions only compute `.f` once for each unique combination of structure and corresponding

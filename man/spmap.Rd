@@ -35,7 +35,8 @@ Can be a function, purrr-style lambda (\code{~ .x + .y + .z}), or a character st
 \item{...}{Additional arguments passed to \code{.f}.}
 
 \item{.parallel}{Logical; whether to use parallel processing. If \code{NULL} (default),
-parallel processing is automatically enabled when the number of unique combinations > 100.}
+parallel processing is automatically enabled when the number of unique combinations > 100.
+See examples in \code{\link{smap}} for how to set up and use parallel processing.}
 
 \item{.ptype}{A prototype for the return type (for \code{spmap_vec}).}
 }
