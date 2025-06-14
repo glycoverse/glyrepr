@@ -11,7 +11,7 @@ Similar to purrr map2 functions, but optimized for glycan structure vectors."><m
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,19 +42,19 @@ Similar to purrr map2 functions, but optimized for glycan structure vectors.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">smap2</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">smap2</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap2_vec</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .ptype <span class="op">=</span> <span class="cn">NULL</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap2_vec</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .ptype <span class="op">=</span> <span class="cn">NULL</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap2_lgl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap2_lgl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap2_int</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap2_int</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap2_dbl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap2_dbl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap2_chr</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap2_chr</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap2_structure</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">smap2_structure</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -79,8 +79,8 @@ Can be a function, purrr-style lambda (<code>~ .x + .y</code>), or a character s
 
 
 <dt id="arg--parallel">.parallel<a class="anchor" aria-label="anchor" href="#arg--parallel"></a></dt>
-<dd><p>Logical; whether to use parallel processing. If <code>NULL</code> (default),
-parallel processing is automatically enabled when the number of unique combinations &gt; 100.
+<dd><p>Logical; whether to use parallel processing. If <code>FALSE</code> (default),
+parallel processing is disabled. Set to <code>TRUE</code> to enable parallel processing.
 See examples in <code><a href="smap.html">smap</a></code> for how to set up and use parallel processing.</p></dd>
 
 

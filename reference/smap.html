@@ -11,7 +11,7 @@ Similar to purrr mapping functions, but optimized for glycan structure vectors."
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,19 +42,19 @@ Similar to purrr mapping functions, but optimized for glycan structure vectors.<
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">smap</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">smap</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_vec</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .ptype <span class="op">=</span> <span class="cn">NULL</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap_vec</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .ptype <span class="op">=</span> <span class="cn">NULL</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_lgl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap_lgl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_int</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap_int</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_dbl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap_dbl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_chr</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap_chr</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_structure</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">smap_structure</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,8 +75,8 @@ Can be a function, purrr-style lambda (<code>~ .x$attr</code>), or a character s
 
 
 <dt id="arg--parallel">.parallel<a class="anchor" aria-label="anchor" href="#arg--parallel"></a></dt>
-<dd><p>Logical; whether to use parallel processing. If <code>NULL</code> (default),
-parallel processing is automatically enabled when the number of unique structures &gt; 100.</p></dd>
+<dd><p>Logical; whether to use parallel processing. If <code>FALSE</code> (default),
+parallel processing is disabled. Set to <code>TRUE</code> to enable parallel processing.</p></dd>
 
 
 <dt id="arg--ptype">.ptype<a class="anchor" aria-label="anchor" href="#arg--ptype"></a></dt>
@@ -154,17 +154,17 @@ than applying <code>.f</code> to each element individually when there are duplic
 <span class="r-in"><span><span class="co"># future::plan(future::multisession, workers = 4)</span></span></span>
 <span class="r-in"><span><span class="va">result_par</span> <span class="op">&lt;-</span> <span class="fu">smap_int</span><span class="op">(</span><span class="va">structures</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span>, .parallel <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 2: Automatic parallel processing for large datasets</span></span></span>
-<span class="r-in"><span><span class="co"># When you have &gt;100 unique structures, parallel processing is automatic</span></span></span>
+<span class="r-in"><span><span class="co"># Example 2: Manual parallel processing for large datasets</span></span></span>
+<span class="r-in"><span><span class="co"># Parallel processing is disabled by default - you need to explicitly enable it</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Simulate a large dataset (in practice, this might come from parsing </span></span></span>
 <span class="r-in"><span><span class="co"># a large glycomics dataset with many different structures)</span></span></span>
 <span class="r-in"><span><span class="co"># Note: This is just for demonstration - in real use, you'd have </span></span></span>
 <span class="r-in"><span><span class="co"># genuinely different structures from your data</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># For datasets with &gt;100 unique structures:</span></span></span>
-<span class="r-in"><span><span class="co"># large_structures &lt;- your_large_glycan_dataset  # &gt;100 unique structures</span></span></span>
-<span class="r-in"><span><span class="co"># result_auto &lt;- smap_int(large_structures, igraph::vcount)  # Auto-parallel</span></span></span>
+<span class="r-in"><span><span class="co"># For large datasets, you can enable parallel processing manually:</span></span></span>
+<span class="r-in"><span><span class="co"># large_structures &lt;- your_large_glycan_dataset  # Many unique structures</span></span></span>
+<span class="r-in"><span><span class="co"># result_parallel &lt;- smap_int(large_structures, igraph::vcount, .parallel = TRUE)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Complex computation that benefits from parallelization</span></span></span>
 <span class="r-in"><span><span class="va">complex_analysis</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -193,8 +193,8 @@ than applying <code>.f</code> to each element individually when there are duplic
 <span class="r-in"><span><span class="co"># When processing large glycomics datasets:</span></span></span>
 <span class="r-in"><span><span class="co"># glycan_data &lt;- parse_glycan_file("large_dataset.txt")  # Many structures</span></span></span>
 <span class="r-in"><span><span class="co"># </span></span></span>
-<span class="r-in"><span><span class="co"># # Compute molecular properties - automatically parallel if &gt;100 unique</span></span></span>
-<span class="r-in"><span><span class="co"># molecular_weights &lt;- smap_dbl(glycan_data, calculate_molecular_weight)</span></span></span>
+<span class="r-in"><span><span class="co"># # Compute molecular properties - manually enable parallel if needed</span></span></span>
+<span class="r-in"><span><span class="co"># molecular_weights &lt;- smap_dbl(glycan_data, calculate_molecular_weight, .parallel = TRUE)</span></span></span>
 <span class="r-in"><span><span class="co"># </span></span></span>
 <span class="r-in"><span><span class="co"># # Force parallel for expensive computations even with fewer structures  </span></span></span>
 <span class="r-in"><span><span class="co"># complexity_scores &lt;- smap_dbl(glycan_data, expensive_complexity_analysis, </span></span></span>
