@@ -11,7 +11,7 @@ Similar to purrr mapping functions, but optimized for glycan structure vectors."
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,19 +42,19 @@ Similar to purrr mapping functions, but optimized for glycan structure vectors.<
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">smap</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">smap</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_vec</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .ptype <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu">smap_vec</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .ptype <span class="op">=</span> <span class="cn">NULL</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_lgl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">smap_lgl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_int</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">smap_int</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_dbl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">smap_dbl</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_chr</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">smap_chr</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">smap_structure</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">smap_structure</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.f</span>, <span class="va">...</span>, .parallel <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -72,6 +72,11 @@ Can be a function, purrr-style lambda (<code>~ .x$attr</code>), or a character s
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments passed to <code>.f</code>.</p></dd>
+
+
+<dt id="arg--parallel">.parallel<a class="anchor" aria-label="anchor" href="#arg--parallel"></a></dt>
+<dd><p>Logical; whether to use parallel processing. If <code>NULL</code> (default),
+parallel processing is automatically enabled when the number of unique structures &gt; 100.</p></dd>
 
 
 <dt id="arg--ptype">.ptype<a class="anchor" aria-label="anchor" href="#arg--ptype"></a></dt>
