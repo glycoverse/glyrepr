@@ -52,6 +52,11 @@ test_that("count_mono works when counting generic in concrete compositions", {
   expect_equal(count_mono(comp, "HexNAc"), 3)  # 2 GlcNAc + 1 GalNAc
 })
 
+test_that("count_mono returns NA when counting concrete in generic compositions", {
+  comp <- glycan_composition(c(Hex = 2, HexNAc = 1))
+  expect_equal(count_mono(comp, "GalNAc"), NA_integer_)
+})
+
 test_that("count_mono works with multiple compositions", {
   # Test with multiple compositions in a vector
   comp_vec <- glycan_composition(
