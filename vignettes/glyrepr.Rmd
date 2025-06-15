@@ -1,0 +1,218 @@
+---
+title: "Introduction to glyrepr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to glyrepr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Glycans are complex biological molecules that play a crucial role in various biological processes.
+However, analyzing and comparing glycan compositions and structures is challenging, especially the latter.
+Glycans have tree-like topologies, which makes them unable to be readily represented as a character string 
+like other linear biological molecules like peptides or nucleic acids, 
+and trying to analyzing these structures is even more challenging.
+
+The `glyrepr` package provides two important classes to represent glycans: 
+`glycan_structure()` and `glycan_composition()` 
+(formally, S3 classes `glyrepr_structure` and `glyrepr_composition`).
+It "teaches the computer" how to represent glycans in a way that is easy to analyze and compare.
+
+```{r setup}
+library(glyrepr)
+```
+
+## Nomenclature
+
+We use the following nomenclature throughout this package:
+
+- **composition**: number of each monosaccharide in a glycan
+- **structure**: a glycan structure, which is a tree-like graph, with linkages and substitutions
+- **monosaccharide**: a single sugar unit, e.g. Hex, HexNAc, Gal, GalNAc, etc, sometimes called "residue"
+- **linkage**: a bond between two monosaccharides, e.g. a1-3, b1-4, a2-?, etc
+- **substitution**: a modification of a monosaccharide, with positions, e.g. 9Ac, 3Me, etc
+- **anomers**: the anomeric form of the reducing end, e.g. a or b
+- **monosaccharide type**: 
+  - "generic": monosaccharides with unknown or undefined structures, e.g. Hex, HexNAc, dHex, etc
+  - "concrete": monosaccharides with defined structures, e.g. Gal, GalNAc, Fuc, etc
+
+## Compositions
+
+There are several ways to create a `glycan_composition()` object:
+
+- Using named integer vectors:
+```{r}
+glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, GalNAc = 1))
+```
+
+- Using a list of named integer vectors (handy for programmatically creating compositions):
+```{r}
+comp <- list(c(Hex = 5, HexNAc = 2), c(Gal = 1, GalNAc = 1))
+# use `as_glycan_composition()` to convert a list
+as_glycan_composition(comp)
+```
+
+- Parsing from a Byonic<sup>TM</sup>-style character vector:
+```{r}
+# use `as_glycan_composition()` to convert a character vector
+as_glycan_composition(c("Hex(5)HexNAc(2)", "Gal(1)GalNAc(1)"))
+```
+
+When you run the examples above in the R console, 
+you will find that the second composition (with concrete monosaccharides) is printed with colors.
+(Colors are not shown here for technical reasons.)
+The colors are rendered according to the [Symbol Nomenclature for Glycans (SNFG) standard](https://www.ncbi.nlm.nih.gov/glycans/snfg.html).
+For example, both Gal and GalNAc are yellow (255/212/0).
+
+We can also get the compositions of glycan structures (covered in the next section).
+
+`glyrepr` provides a useful function `count_mono()`:
+```{r}
+comp <- glycan_composition(
+  c(Hex = 5, HexNAc = 2),          # generic
+  c(Gal = 1, Man = 1, GalNAc = 1)  # concrete
+)
+count_mono(comp, "Gal")
+count_mono(comp, "Hex")
+```
+
+Note how `count_mono()` handles generic and concrete monosaccharides automatically.
+
+## Structures
+
+### Getting started
+
+Working with glycan compositions is straightforward.
+In fact you can do it yourself without using this package: regex is enough.
+The real power of this package is in working with glycan structures.
+Let's start with some examples.
+
+Here are some glycan structures represented by IUPAC-condensed format.
+They are human-readable, and rich enough to represent information like 
+topologies, linkages, substitutions, anomers, etc.
+
+To get more information about IUPAC-condensed format,
+please refer to [this paper](https://jcheminf.biomedcentral.com/articles/10.1186/s13321-023-00704-0).
+
+```{r}
+iupacs <- c(
+  "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",  # N-glycan core
+  "Gal(b1-3)GalNAc(a1-",  # O-glycan core 1
+  "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-",  # O-glycan core 2
+  "Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man",
+  "GlcNAc6Ac(b1-4)Glc3Me(a1-"
+)
+```
+
+`glyrepr` supports parsing IUPAC-condensed format into `glycan_structure()` objects.
+For more format support, i.e. IUPAC-extended, WURCS, etc, 
+use the [glyparse](https://github.com/glycoverse/glyparse) package.
+
+```{r}
+struc <- as_glycan_structure(iupacs)
+struc
+```
+
+You may notice that the printed structures look almost the same as the input strings.
+Indeed, `glycan_structure()` objects are printed as IUPAC-condensed format.
+However, inside the object, the real data is stored as a tree-like graph,
+ready for graph-based analysis.
+
+### Unique structure optimization
+A point of note is the "# Unique structures: 5" message above.
+The implementation of `glycan_structure()` is highly optimized for computation and memory efficiency.
+It only stores graphs of unique structures, so time-consuming operations on graphs will be much faster.
+Let's make this point clearer with an example.
+
+```{r}
+large_struc <- rep(struc, 1000)
+large_struc
+```
+
+You can see that the number of unique structures is still 5, as expected.
+
+Now let's perform some operations on both `struc` and `large_struc`.
+
+```{r}
+library(tictoc)
+
+tic("Counting monosaccharides in `struc`")
+convert_mono_type(struc, "generic")[1]
+toc()
+
+tic("Counting monosaccharides in `large_struc`")
+convert_mono_type(large_struc, "generic")[1]
+toc()
+```
+
+Hooray! The time taken is almost the same.
+Throughout `glycoverse` packages, this optimization enables efficient calculation on large datasets.
+The `glymotif` package intensively uses this optimization.
+
+**For advanced users:** Under the hood, `glycan_structure()` is a `vctrs_rcrd` subclass with a unique structure list attribute.
+The `glyrepr` package also defines a series of "smap" functions (just like `purrr::map()`) to apply functions to each unqiue structure,
+and then rescale the results to the original number of structures.
+
+### Structure manipulation
+
+Several helper functions are provided to manipulate glycan structures.
+
+- `convert_mono_type()`: as you have seen, this function converts the monosaccharide type of a structure.
+- `remove_linkages()`: remove all linkages from a structure.
+
+```{r}
+remove_linkages(struc)
+```
+
+- `remove_substituents()`: remove all substituents from a structure.
+
+```{r}
+struc[5]
+remove_substituents(struc[5])
+```
+
+## Type conversion
+
+You can convert a `glycan_structure()` object to a `glycan_composition()` object:
+
+```{r}
+comp <- as_glycan_composition(struc)
+comp
+```
+
+Finally, you can convert both `glycan_structure()` and `glycan_composition()` to a character vector:
+
+```{r}
+as.character(struc)
+as.character(comp)
+```
+
+## Used in a tibble
+
+`glycan_composition()` and `glycan_structure()` objects can be used in a tibble.
+
+```{r}
+suppressPackageStartupMessages(library(tibble))
+suppressPackageStartupMessages(library(dplyr))
+
+df <- tibble(
+  id = seq_along(struc),
+  structures = struc
+)
+df %>% 
+  mutate(n_man = count_mono(structures, "Man")) %>%
+  filter(n_man > 3)
+```
+
+## Session information
+
+```{r}
+sessionInfo()
+```

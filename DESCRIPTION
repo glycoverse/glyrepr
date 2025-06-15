@@ -11,7 +11,10 @@ License: MIT + file LICENSE
 Suggests: 
     testthat (>= 3.0.0),
     patrick,
-    tibble
+    tibble,
+    knitr,
+    rmarkdown,
+    tictoc
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -32,3 +35,4 @@ Imports:
     rstackdeque,
     stringr,
     vctrs (>= 0.6.5)
+VignetteBuilder: knitr
