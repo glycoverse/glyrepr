@@ -57,6 +57,8 @@ Similar to purrr map2 functions, but optimized for glycan structure vectors.
 These functions only compute \code{.f} once for each unique combination of structure and corresponding
 \code{.y} value, then map the results back to the original vector positions. This is much more efficient
 than applying \code{.f} to each element pair individually when there are duplicate structure-value combinations.
+
+\strong{Return Types:}
 \itemize{
 \item \code{smap2()}: Returns a list with the same length as \code{.x}
 \item \code{smap2_vec()}: Returns an atomic vector with the same length as \code{.x}

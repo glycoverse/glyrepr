@@ -39,7 +39,10 @@ Can be a function, purrr-style lambda (\code{~ paste(.x, .y)}), or a character s
 \itemize{
 \item \code{simap()}: A list
 \item \code{simap_vec()}: An atomic vector of type specified by \code{.ptype}
-\item \code{simap_lgl/int/dbl/chr()}: Atomic vectors of the corresponding type
+\item \code{simap_lgl()}: Returns a logical vector
+\item \code{simap_int()}: Returns an integer vector
+\item \code{simap_dbl()}: Returns a double vector
+\item \code{simap_chr()}: Returns a character vector
 \item \code{simap_structure()}: A new glyrepr_structure object
 }
 }
@@ -54,8 +57,16 @@ These functions only compute \code{.f} once for each unique combination of struc
 index/name, then map the results back to the original vector positions. This is much more efficient
 than applying \code{.f} to each element individually when there are duplicate structures.
 
+\strong{IMPORTANT PERFORMANCE NOTE:}
+Due to the inclusion of position indices, \code{simap} functions have \strong{O(total_structures)}
+time complexity because each position creates a unique combination, even with identical structures.
+
+\strong{Alternative:} Consider \code{smap()} functions if position information is not required.
+
 The index passed to \code{.f} is the position in the original vector (1-based).
 If the vector has names, the names are passed instead of indices.
+
+\strong{Return Types:}
 \itemize{
 \item \code{simap()}: Returns a list with the same length as \code{.x}
 \item \code{simap_vec()}: Returns an atomic vector with the same length as \code{.x}

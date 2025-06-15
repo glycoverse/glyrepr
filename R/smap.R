@@ -18,6 +18,8 @@
 #' the results back to the original vector positions. This is much more efficient
 #' than applying `.f` to each element individually when there are duplicate structures.
 #'
+#'
+#' **Return Types:**
 #' - `smap()`: Returns a list with the same length as `.x`
 #' - `smap_vec()`: Returns an atomic vector with the same length as `.x`
 #' - `smap_lgl()`: Returns a logical vector
@@ -148,9 +150,8 @@ NULL
   }
 }
 
-#' @rdname smap
-#' @export
-smap <- function(.x, .f, ..., .parallel = FALSE) {
+# Helper function for common smap logic
+.smap_base <- function(.x, .f, ..., .parallel = FALSE, .convert_fn = NULL) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
@@ -171,44 +172,61 @@ smap <- function(.x, .f, ..., .parallel = FALSE) {
   }, use_parallel = .parallel)
   names(unique_results) <- unique_codes
   
-  # Map results back to original vector positions
-  purrr::map(codes, ~ unique_results[[.x]])
+  # If no conversion function provided, return list (for smap)
+  if (is.null(.convert_fn)) {
+    # Optimized mapping: use match() instead of individual lookups
+    idx <- match(codes, unique_codes)
+    return(unname(unique_results[idx]))
+  }
+  
+  # Convert to target type and map back to original positions
+  unique_converted <- .convert_fn(unique_results)
+  names(unique_converted) <- unique_codes
+  
+  # Optimized mapping: use match() instead of individual lookups
+  idx <- match(codes, unique_codes)
+  unname(unique_converted[idx])
+}
+
+#' @rdname smap
+#' @export
+smap <- function(.x, .f, ..., .parallel = FALSE) {
+  .smap_base(.x, .f, ..., .parallel = .parallel, .convert_fn = NULL)
 }
 
 #' @rdname smap
 #' @export
 smap_vec <- function(.x, .f, ..., .ptype = NULL, .parallel = FALSE) {
-  # Extract .parallel from ... to avoid passing it to user function
-  results <- smap(.x, .f, ..., .parallel = .parallel)
-  vctrs::vec_c(!!!results, .ptype = .ptype)
+  .smap_base(.x, .f, ..., .parallel = .parallel,
+             .convert_fn = function(results) vctrs::vec_c(!!!results, .ptype = .ptype))
 }
 
 #' @rdname smap
 #' @export
 smap_lgl <- function(.x, .f, ..., .parallel = FALSE) {
-  # Extract .parallel from ... to avoid passing it to user function
-  smap_vec(.x, .f, ..., .ptype = logical(), .parallel = .parallel)
+  .smap_base(.x, .f, ..., .parallel = .parallel, 
+             .convert_fn = function(results) as.logical(unlist(results, use.names = FALSE)))
 }
 
 #' @rdname smap
 #' @export
 smap_int <- function(.x, .f, ..., .parallel = FALSE) {
-  # Extract .parallel from ... to avoid passing it to user function
-  smap_vec(.x, .f, ..., .ptype = integer(), .parallel = .parallel)
+  .smap_base(.x, .f, ..., .parallel = .parallel,
+             .convert_fn = function(results) as.integer(unlist(results, use.names = FALSE)))
 }
 
 #' @rdname smap
 #' @export
 smap_dbl <- function(.x, .f, ..., .parallel = FALSE) {
-  # Extract .parallel from ... to avoid passing it to user function
-  smap_vec(.x, .f, ..., .ptype = double(), .parallel = .parallel)
+  .smap_base(.x, .f, ..., .parallel = .parallel,
+             .convert_fn = function(results) as.double(unlist(results, use.names = FALSE)))
 }
 
 #' @rdname smap
 #' @export
 smap_chr <- function(.x, .f, ..., .parallel = FALSE) {
-  # Extract .parallel from ... to avoid passing it to user function
-  smap_vec(.x, .f, ..., .ptype = character(), .parallel = .parallel)
+  .smap_base(.x, .f, ..., .parallel = .parallel,
+             .convert_fn = function(results) as.character(unlist(results, use.names = FALSE)))
 }
 
 #' @rdname smap
@@ -217,31 +235,42 @@ smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
     rlang::abort("Input must be a glycan_structure vector.")
   }
-  
+
   .f <- rlang::as_function(.f)
-  
+
   data <- vctrs::vec_data(.x)
-  codes <- vctrs::field(data, "iupac")
+  iupacs <- vctrs::field(data, "iupac")
   structures <- attr(.x, "structures")
   
   # Extract dots without .parallel
   dots <- list(...)
   
   # Apply function only to unique structures
-  unique_codes <- names(structures)
-  transformed_structures <- .smap_apply(unique_codes, function(code) {
-    result <- do.call(.f, c(list(structures[[code]]), dots))
+  unique_iupacs <- names(structures)
+  new_structures <- .smap_apply(unique_iupacs, function(iupac) {
+    result <- do.call(.f, c(list(structures[[iupac]]), dots))
     if (!inherits(result, "igraph")) {
       rlang::abort("Function `.f` must return an igraph object when using `smap_structure()`.")
     }
     result
   }, use_parallel = .parallel)
   
-  # Create new glycan structure vector from transformed structures
-  # Map back to original positions
-  individual_structures <- purrr::map(codes, ~ transformed_structures[[which(unique_codes == .x)]])
+  # Get new IUPACs
+  new_unique_iupacs <- purrr::map_chr(new_structures, .structure_to_iupac_single)
+  names(new_structures) <- new_unique_iupacs
+  idx <- match(iupacs, unique_iupacs)
+  new_iupacs <- new_unique_iupacs[idx]
   
-  do.call(glycan_structure, individual_structures)
+  # Get new mono types
+  new_unique_mono_types <- unname(purrr::map_chr(new_structures, get_graph_mono_type))
+  new_mono_types <- new_unique_mono_types[idx]
+  
+  # Create result directly using vctrs::new_rcrd
+  vctrs::new_rcrd(
+    list(iupac = new_iupacs, mono_type = new_mono_types),
+    structures = new_structures,
+    class = "glyrepr_structure"
+  )
 }
 
 #' Apply Function to Unique Structures Only
@@ -251,6 +280,7 @@ smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
 #' returning results in the same order as the unique structures appear.
 #' This is useful when you need to perform expensive computations but only
 #' care about unique results.
+#'
 #'
 #' @param .x A glycan structure vector (glyrepr_structure).
 #' @param .f A function that takes an igraph object and returns a result. 
@@ -312,6 +342,8 @@ smap_unique <- function(.x, .f, ..., .parallel = FALSE) {
 #' much more efficient than applying `.p` to each element individually when there
 #' are duplicate structures.
 #' 
+#' 
+#' **Return Values:**
 #' - `ssome()`: Returns `TRUE` if at least one unique structure satisfies the predicate
 #' - `severy()`: Returns `TRUE` if all unique structures satisfy the predicate  
 #' - `snone()`: Returns `TRUE` if no unique structures satisfy the predicate
@@ -408,6 +440,8 @@ snone <- function(.x, .p, ...) {
 #' `.y` value, then map the results back to the original vector positions. This is much more efficient
 #' than applying `.f` to each element pair individually when there are duplicate structure-value combinations.
 #'
+#'
+#' **Return Types:**
 #' - `smap2()`: Returns a list with the same length as `.x`
 #' - `smap2_vec()`: Returns an atomic vector with the same length as `.x`
 #' - `smap2_lgl()`: Returns a logical vector
@@ -554,7 +588,7 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
   # Apply function only to unique combinations
-  transformed_structures <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
+  new_structures <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
     row <- unique_combinations_df[i, ]
     result <- .f(structures[[row$code]], row$y_val, ...)
     if (!inherits(result, "igraph")) {
@@ -562,13 +596,23 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
     }
     result
   }, use_parallel = .parallel)
-  names(transformed_structures) <- unique_combinations_df$combo_key
   
-  # Create new glycan structure vector from transformed structures
-  # Map back to original positions
-  individual_structures <- purrr::map(combinations_df$combo_key, ~ transformed_structures[[.x]])
+  # Get new IUPACs
+  new_unique_iupacs <- purrr::map_chr(new_structures, .structure_to_iupac_single)
+  names(new_structures) <- new_unique_iupacs
+  idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
+  new_iupacs <- new_unique_iupacs[idx]
+
+  # Get new mono types
+  new_unique_mono_types <- unname(purrr::map_chr(new_structures, get_graph_mono_type))
+  new_mono_types <- new_unique_mono_types[idx]
   
-  do.call(glycan_structure, individual_structures)
+  # Create result directly using vctrs::new_rcrd
+  vctrs::new_rcrd(
+    list(iupac = new_iupacs, mono_type = new_mono_types),
+    structures = new_structures,
+    class = "glyrepr_structure"
+  )
 }
 
 #' Map Functions Over Glycan Structure Vectors and Multiple Arguments
@@ -595,6 +639,13 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
 #' values from other vectors, then map the results back to the original vector positions. This is much more efficient
 #' than applying `.f` to each element combination individually when there are duplicate combinations.
 #'
+#' **Time Complexity Performance:**
+#' 
+#' Performance scales with unique combinations of all arguments rather than total vector length.
+#' When argument vectors are highly redundant, performance approaches O(unique_structures).
+#' Scaling factor shows time increase when vector size increases 20x.
+#'
+#' **Return Types:**
 #' - `spmap()`: Returns a list with the same length as the input vectors
 #' - `spmap_vec()`: Returns an atomic vector with the same length as the input vectors
 #' - `spmap_lgl()`: Returns a logical vector
@@ -765,7 +816,7 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
   # Apply function only to unique combinations
-  transformed_structures <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
+  new_structures <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
     row <- unique_combinations_df[i, ]
     # Build full argument list: first is structure, then other args
     args <- list(structures[[row$code]])
@@ -780,13 +831,23 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
     }
     result
   }, use_parallel = .parallel)
-  names(transformed_structures) <- unique_combinations_df$combo_key
   
-  # Create new glycan structure vector from transformed structures
-  # Map back to original positions
-  individual_structures <- purrr::map(combinations_df$combo_key, ~ transformed_structures[[.x]])
+  # Get new IUPACs
+  new_unique_iupacs <- purrr::map_chr(new_structures, .structure_to_iupac_single)
+  names(new_structures) <- new_unique_iupacs
+  idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
+  new_iupacs <- new_unique_iupacs[idx]
+
+  # Get new mono types
+  new_unique_mono_types <- unname(purrr::map_chr(new_structures, get_graph_mono_type))
+  new_mono_types <- new_unique_mono_types[idx]
   
-  do.call(glycan_structure, individual_structures)
+  # Create result directly using vctrs::new_rcrd
+  vctrs::new_rcrd(
+    list(iupac = new_iupacs, mono_type = new_mono_types),
+    structures = new_structures,
+    class = "glyrepr_structure"
+  )
 }
 
 #' Map Functions Over Glycan Structure Vectors with Indices
@@ -809,9 +870,16 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
 #' index/name, then map the results back to the original vector positions. This is much more efficient
 #' than applying `.f` to each element individually when there are duplicate structures.
 #'
+#' **IMPORTANT PERFORMANCE NOTE:**
+#' Due to the inclusion of position indices, `simap` functions have **O(total_structures)** 
+#' time complexity because each position creates a unique combination, even with identical structures.
+#'
+#' **Alternative:** Consider `smap()` functions if position information is not required.
+#'
 #' The index passed to `.f` is the position in the original vector (1-based).
 #' If the vector has names, the names are passed instead of indices.
 #'
+#' **Return Types:**
 #' - `simap()`: Returns a list with the same length as `.x`
 #' - `simap_vec()`: Returns an atomic vector with the same length as `.x`
 #' - `simap_lgl()`: Returns a logical vector
@@ -823,7 +891,10 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
 #' @return 
 #' - `simap()`: A list
 #' - `simap_vec()`: An atomic vector of type specified by `.ptype`
-#' - `simap_lgl/int/dbl/chr()`: Atomic vectors of the corresponding type
+#' - `simap_lgl()`: Returns a logical vector
+#' - `simap_int()`: Returns an integer vector  
+#' - `simap_dbl()`: Returns a double vector
+#' - `simap_chr()`: Returns a character vector
 #' - `simap_structure()`: A new glyrepr_structure object
 #'
 #' @examples
@@ -954,7 +1025,7 @@ simap_structure <- function(.x, .f, ...) {
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
   # Apply function only to unique combinations
-  transformed_structures <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
+  new_structures <- purrr::map(seq_len(nrow(unique_combinations_df)), function(i) {
     row <- unique_combinations_df[i, ]
     result <- .f(structures[[row$code]], row$index, ...)
     if (!inherits(result, "igraph")) {
@@ -962,11 +1033,21 @@ simap_structure <- function(.x, .f, ...) {
     }
     result
   })
-  names(transformed_structures) <- unique_combinations_df$combo_key
   
-  # Create new glycan structure vector from transformed structures
-  # Map back to original positions
-  individual_structures <- purrr::map(combinations_df$combo_key, ~ transformed_structures[[.x]])
+  # Get new IUPACs
+  new_unique_iupacs <- purrr::map_chr(new_structures, .structure_to_iupac_single)
+  names(new_structures) <- new_unique_iupacs
+  idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
+  new_iupacs <- new_unique_iupacs[idx]
+
+  # Get new mono types
+  new_unique_mono_types <- unname(purrr::map_chr(new_structures, get_graph_mono_type))
+  new_mono_types <- new_unique_mono_types[idx]
   
-  do.call(glycan_structure, individual_structures)
+  # Create result directly using vctrs::new_rcrd
+  vctrs::new_rcrd(
+    list(iupac = new_iupacs, mono_type = new_mono_types),
+    structures = new_structures,
+    class = "glyrepr_structure"
+  )
 }

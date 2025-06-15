@@ -33,6 +33,8 @@ Similar to purrr predicate functions, but optimized for glycan structure vectors
 These functions only evaluate \code{.p} once for each unique structure, making them
 much more efficient than applying \code{.p} to each element individually when there
 are duplicate structures.
+
+\strong{Return Values:}
 \itemize{
 \item \code{ssome()}: Returns \code{TRUE} if at least one unique structure satisfies the predicate
 \item \code{severy()}: Returns \code{TRUE} if all unique structures satisfy the predicate

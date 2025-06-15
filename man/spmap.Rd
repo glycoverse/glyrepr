@@ -58,6 +58,14 @@ Similar to purrr pmap functions, but optimized for glycan structure vectors.
 These functions only compute \code{.f} once for each unique combination of structure and corresponding
 values from other vectors, then map the results back to the original vector positions. This is much more efficient
 than applying \code{.f} to each element combination individually when there are duplicate combinations.
+
+\strong{Time Complexity Performance:}
+
+Performance scales with unique combinations of all arguments rather than total vector length.
+When argument vectors are highly redundant, performance approaches O(unique_structures).
+Scaling factor shows time increase when vector size increases 20x.
+
+\strong{Return Types:}
 \itemize{
 \item \code{spmap()}: Returns a list with the same length as the input vectors
 \item \code{spmap_vec()}: Returns an atomic vector with the same length as the input vectors

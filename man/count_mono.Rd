@@ -26,4 +26,15 @@ Get the number of monosaccharides in a glycan composition or glycan structure.
 When \code{mono} is "generic" (e.g. "Hex", "HexNAc"),
 it counts all "concrete" monosaccharides that match.
 For example, "Hex" will count all Glc, Man, Gal, etc.
+When \code{mono} is "concrete" (e.g. "Gal", "GalNAc"),
+NA is returned when the composition is "generic".
+}
+\examples{
+comp <- glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, Man = 1,GalNAc = 1))
+count_mono(comp, "Hex")
+count_mono(comp, "Gal")
+
+struct <- as_glycan_structure("Gal(b1-3)GlcNAc(b1-4)Glc(a1-")
+count_mono(struct, "Gal")
+
 }

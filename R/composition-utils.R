@@ -18,7 +18,7 @@
 #' count_mono(comp, "Hex")
 #' count_mono(comp, "Gal")
 #'
-#' struct <- glycan_structure("Gal(b1-3)GlcNAc(b1-4)Glc(a1-)")
+#' struct <- as_glycan_structure("Gal(b1-3)GlcNAc(b1-4)Glc(a1-")
 #' count_mono(struct, "Gal")
 #'
 #' @export

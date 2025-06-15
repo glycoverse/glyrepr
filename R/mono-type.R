@@ -98,39 +98,22 @@ convert_mono_type.glyrepr_structure <- function(x, to) {
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
   }
-  
+
   checkmate::assert_choice(to, c("concrete", "generic"))
+
+  # Get current mono types
+  from <- get_mono_type(x)
   
-  # Performance optimization: Batch type checking for the entire vector
-  types <- get_mono_type(x)
-  
-  # Early exit if all structures are already the target type
-  if (all(types == to)) {
-    return(x)
+  # Check for invalid conversion: generic -> concrete
+  if (any(from == "generic" & to == "concrete")) {
+    cli::cli_abort(c(
+      "Cannot convert from generic to concrete monosaccharides.",
+      "i" = "Conversion could only be done in this direction: concrete -> generic"
+    ), call = rlang::expr(convert_mono_type()))
   }
-  
-  # Validate conversion direction only once for unique types
-  unique_types <- unique(types)
-  for (from_type in unique_types) {
-    if (from_type != to) {
-      tryCatch(
-        valid_from_to(from_type, to, strict = FALSE),
-        error_backward_convert = function(e) {
-          cli::cli_abort(c(
-            "Cannot convert from {.val {from_type}} to {.val {to}}.",
-            "i" = "Can only convert in this order: concrete -> generic."
-          ),
-          call = rlang::expr(convert_mono_type()),
-          class = "error_backward_convert")
-        }
-      )
-    }
-  }
-  
-  # Use smap_structure with optimized lambda function
-  # Skip redundant type checking and validation since we already did it
-  smap_structure(x, function(graph) {
-    from <- get_graph_mono_type(graph)
+
+  # Use spmap_structure with optimized implementation
+  spmap_structure(list(x, from, to), function(graph, from, to) {
     if (from == to) {
       return(graph)
     }

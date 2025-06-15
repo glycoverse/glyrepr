@@ -54,6 +54,8 @@ Similar to purrr mapping functions, but optimized for glycan structure vectors.
 These functions only compute \code{.f} once for each unique structure, then map
 the results back to the original vector positions. This is much more efficient
 than applying \code{.f} to each element individually when there are duplicate structures.
+
+\strong{Return Types:}
 \itemize{
 \item \code{smap()}: Returns a list with the same length as \code{.x}
 \item \code{smap_vec()}: Returns an atomic vector with the same length as \code{.x}
