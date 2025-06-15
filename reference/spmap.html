@@ -13,7 +13,7 @@ Similar to purrr pmap functions, but optimized for glycan structure vectors."><m
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,12 @@ See examples in <code><a href="smap.html">smap</a></code> for how to set up and 
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>These functions only compute <code>.f</code> once for each unique combination of structure and corresponding
 values from other vectors, then map the results back to the original vector positions. This is much more efficient
-than applying <code>.f</code> to each element combination individually when there are duplicate combinations.</p><ul><li><p><code>spmap()</code>: Returns a list with the same length as the input vectors</p></li>
+than applying <code>.f</code> to each element combination individually when there are duplicate combinations.</p>
+<p><strong>Time Complexity Performance:</strong></p>
+<p>Performance scales with unique combinations of all arguments rather than total vector length.
+When argument vectors are highly redundant, performance approaches O(unique_structures).
+Scaling factor shows time increase when vector size increases 20x.</p>
+<p><strong>Return Types:</strong></p><ul><li><p><code>spmap()</code>: Returns a list with the same length as the input vectors</p></li>
 <li><p><code>spmap_vec()</code>: Returns an atomic vector with the same length as the input vectors</p></li>
 <li><p><code>spmap_lgl()</code>: Returns a logical vector</p></li>
 <li><p><code>spmap_int()</code>: Returns an integer vector</p></li>

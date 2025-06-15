@@ -13,7 +13,7 @@ Similar to purrr imap functions, but optimized for glycan structure vectors."><m
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,7 +87,10 @@ Can be a function, purrr-style lambda (<code>~ paste(.x, .y)</code>), or a chara
 
 <ul><li><p><code>simap()</code>: A list</p></li>
 <li><p><code>simap_vec()</code>: An atomic vector of type specified by <code>.ptype</code></p></li>
-<li><p><code>simap_lgl/int/dbl/chr()</code>: Atomic vectors of the corresponding type</p></li>
+<li><p><code>simap_lgl()</code>: Returns a logical vector</p></li>
+<li><p><code>simap_int()</code>: Returns an integer vector</p></li>
+<li><p><code>simap_dbl()</code>: Returns a double vector</p></li>
+<li><p><code>simap_chr()</code>: Returns a character vector</p></li>
 <li><p><code>simap_structure()</code>: A new glyrepr_structure object</p></li>
 </ul></div>
     <div class="section level2">
@@ -95,8 +98,13 @@ Can be a function, purrr-style lambda (<code>~ paste(.x, .y)</code>), or a chara
     <p>These functions only compute <code>.f</code> once for each unique combination of structure and corresponding
 index/name, then map the results back to the original vector positions. This is much more efficient
 than applying <code>.f</code> to each element individually when there are duplicate structures.</p>
+<p><strong>IMPORTANT PERFORMANCE NOTE:</strong>
+Due to the inclusion of position indices, <code>simap</code> functions have <strong>O(total_structures)</strong>
+time complexity because each position creates a unique combination, even with identical structures.</p>
+<p><strong>Alternative:</strong> Consider <code><a href="smap.html">smap()</a></code> functions if position information is not required.</p>
 <p>The index passed to <code>.f</code> is the position in the original vector (1-based).
-If the vector has names, the names are passed instead of indices.</p><ul><li><p><code>simap()</code>: Returns a list with the same length as <code>.x</code></p></li>
+If the vector has names, the names are passed instead of indices.</p>
+<p><strong>Return Types:</strong></p><ul><li><p><code>simap()</code>: Returns a list with the same length as <code>.x</code></p></li>
 <li><p><code>simap_vec()</code>: Returns an atomic vector with the same length as <code>.x</code></p></li>
 <li><p><code>simap_lgl()</code>: Returns a logical vector</p></li>
 <li><p><code>simap_int()</code>: Returns an integer vector</p></li>

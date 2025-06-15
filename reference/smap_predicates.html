@@ -11,7 +11,7 @@ Similar to purrr predicate functions, but optimized for glycan structure vectors
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,7 +74,8 @@ Can be a function, purrr-style lambda (<code>~ .x$attr</code>), or a character s
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>These functions only evaluate <code>.p</code> once for each unique structure, making them
 much more efficient than applying <code>.p</code> to each element individually when there
-are duplicate structures.</p><ul><li><p><code>ssome()</code>: Returns <code>TRUE</code> if at least one unique structure satisfies the predicate</p></li>
+are duplicate structures.</p>
+<p><strong>Return Values:</strong></p><ul><li><p><code>ssome()</code>: Returns <code>TRUE</code> if at least one unique structure satisfies the predicate</p></li>
 <li><p><code>severy()</code>: Returns <code>TRUE</code> if all unique structures satisfy the predicate</p></li>
 <li><p><code>snone()</code>: Returns <code>TRUE</code> if no unique structures satisfy the predicate</p></li>
 </ul></div>
