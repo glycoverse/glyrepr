@@ -14,16 +14,10 @@ status](https://www.r-pkg.org/badges/version/glyrepr)](https://CRAN.R-project.or
 coverage](https://codecov.io/gh/glycoverse/glyrepr/graph/badge.svg)](https://app.codecov.io/gh/glycoverse/glyrepr)
 <!-- badges: end -->
 
-This package is a wrapper of ‘igraph’ for representing glycan structures
-in R. It introduces a vectorized S3 class called “glyrepr_structure”
-along with a suite of functions to create and manipulate glycan
-structures efficiently.
-
-If you are a glycomics or glycoproteomics researcher, you likely won’t
-need to interact with this package directly. All you need to know is
-that it defines the “glyrepr_structure” S3 class to represent glycan
-structures in a vectorized manner, so you won’t be surprised if you
-encounter this name elsewhere in `glycoverse.`
+`glyrepr` provides two important representations of glycans: glycan
+compositions and glycan structures. This package is the core of
+`glycoverse` ecosystem, as it provides the basic data structures and
+functions for representing and manipulating glycans.
 
 In fact, the functions in this packages are heavily used by other
 `glycoverse` packages such as
@@ -45,60 +39,39 @@ pak::pak("glycoverse/glyrepr")
 
 ``` r
 library(glyrepr)
-library(igraph)
-#> 
-#> Attaching package: 'igraph'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     decompose, spectrum
-#> The following object is masked from 'package:base':
-#> 
-#>     union
 
 # Create glycan compositions
-comp <- glycan_composition(
+glycan_composition(
   c(Man = 5, GlcNAc = 2),
   c(Man = 3, Gal = 2, GlcNAc = 4, Fuc = 1, Neu5Ac = 2)
 )
-comp
 #> <glycan_composition[2]>
 #> [1] Man(5)GlcNAc(2)
 #> [2] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(2)
-
-# Create glycan structures
-# Here we manually create an igraph object and convert it to a glycan structure.
-# In practice, you should use the `glyparse` package to create glycan structures
-# from IUPAC names or other formats.
-graph <- make_graph(~ 1-+2, 2-+3)
-igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
-igraph::V(graph)$sub <- ""
-igraph::E(graph)$linkage <- c("b1-4", "b1-4")
-graph$anomer <- "a1"
-graph$alditol <- FALSE
-glycan <- glycan_structure(graph)
-glycan
-#> <glycan_structure[1]>
-#> [1] Glc(b1-4)Gal(b1-4)Glc(a1-
-#> # Unique structures: 1
 
 # Parse IUPAC-condensed glycan text representation
 # `glyrepr` supports IUPAC-condensed glycan text representation natively.
 # For other formats like WURCS or glycoCT, use the `glyparse` package.
 # For example, the following two glycan structures are equivalent:
-as_glycan_structure(c("GlcNAc(b1-4)GlcNAc", "Man(a1-2)GlcNAc"))
-#> <glycan_structure[2]>
-#> [1] GlcNAc(b1-4)GlcNAc(?1-
-#> [2] Man(a1-2)GlcNAc(?1-
-#> # Unique structures: 2
+structures <- as_glycan_structure(c("GlcNAc(b1-4)GlcNAc", "Man(a1-2)GlcNAc"))
 
 # Get the composition of a glycan structure
-as_glycan_composition(glycan)
-#> <glycan_composition[1]>
-#> [1] Glc(2)Gal(1)
+as_glycan_composition(structures)
+#> <glycan_composition[2]>
+#> [1] GlcNAc(2)
+#> [2] Man(1)GlcNAc(1)
 
 # Count the number of given residues
-count_mono(n_glycan_core(), "Hex")
-#> [1] 3
+count_mono(structures, "Hex")
+#> [1] 0 1
 count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
 #> [1] 5
 ```
+
+## Related work
+
+This package is inspired by two Python packages:
+[glypy](https://github.com/mobiusklein/glypy) and
+[glycowork](https://github.com/BojarLab/glycowork?tab=readme-ov-file).
+In R, `glyrepr` achieves the same functionality, but has been optimized
+for vectorized operations.
