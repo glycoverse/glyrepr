@@ -112,8 +112,10 @@ This is like going from knowing the ingredients to understanding the actual reci
 ### Your First Glycan Structures
 
 Let's work with some real glycan structures. 
-These strings might look cryptic, 
-but they're actually quite readable once you get the hang of it:
+These strings below are called the "IUPAC-condensed" glycan text representations.
+They might look cryptic, 
+but they're actually quite readable once you get the hang of it.
+To learn about them, check out [this article](https://glycoverse.github.io/glyrepr/articles/iupac.html).
 
 ```{r}
 iupacs <- c(
