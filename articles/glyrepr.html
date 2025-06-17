@@ -204,9 +204,11 @@ understanding the actual recipe and cooking method.</p>
 <div class="section level3">
 <h3 id="your-first-glycan-structures">Your First Glycan Structures<a class="anchor" aria-label="anchor" href="#your-first-glycan-structures"></a>
 </h3>
-<p>Let’s work with some real glycan structures. These strings might look
-cryptic, but they’re actually quite readable once you get the hang of
-it:</p>
+<p>Let’s work with some real glycan structures. These strings below are
+called the “IUPAC-condensed” glycan text representations. They might
+look cryptic, but they’re actually quite readable once you get the hang
+of it. To learn about them, check out <a href="https://glycoverse.github.io/glyrepr/articles/iupac.html">this
+article</a>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">iupacs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span>,  <span class="co"># The famous N-glycan core</span></span>
@@ -265,7 +267,7 @@ copy of each book, no matter how many people want to read it.</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_mono_type.html">convert_mono_type</a></span><span class="op">(</span><span class="va">struc</span>, <span class="st">"generic"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5 structures: 0.026 sec elapsed</span></span>
+<span><span class="co">#&gt; Converting 5 structures: 0.027 sec elapsed</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5,000 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_mono_type.html">convert_mono_type</a></span><span class="op">(</span><span class="va">large_struc</span>, <span class="st">"generic"</span><span class="op">)</span></span>
