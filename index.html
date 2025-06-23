@@ -72,6 +72,26 @@
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"glycoverse/glyrepr"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<ul>
+<li>🚀 Get started: <a href="https://glycoverse.github.io/glyrepr/articles/glyrepr.html">Here</a>
+</li>
+<li>🔧 Work with underlying igraph objects: <a href="https://glycoverse.github.io/glyrepr/articles/smap.html">Here</a>
+</li>
+<li>✏️ IUPAC-condensed glycan text representation: <a href="https://glycoverse.github.io/glyrepr/articles/iupac.html">Here</a>
+</li>
+<li>📚 Reference: <a href="https://glycoverse.github.io/glyrepr/reference/index.html">Here</a>
+</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="role-in-glycoverse">Role in <code>glycoverse</code>
+<a class="anchor" aria-label="anchor" href="#role-in-glycoverse"></a>
+</h2>
+<p>As the cornerstone of the <code>glycoverse</code> ecosystem, this package provides two fundamental data structures for representing glycans: <code><a href="reference/glycan_composition.html">glycan_composition()</a></code> and <code><a href="reference/glycan_structure.html">glycan_structure()</a></code>. These specialized data types are what distinguish <code>glycoverse</code> from other omics analysis frameworks, serving as the foundation for higher-level packages like <code>glymotif</code>, which build upon them to perform advanced glycan analysis.</p>
+</div>
+<div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -103,11 +123,6 @@
 <span><span class="co">#&gt; [1] 0 1</span></span>
 <span><span class="fu"><a href="reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="fu"><a href="reference/glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span>, Gal <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, <span class="st">"Hex"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="related-work">Related work<a class="anchor" aria-label="anchor" href="#related-work"></a>
-</h2>
-<p>This package is inspired by two Python packages: <a href="https://github.com/mobiusklein/glypy" class="external-link">glypy</a> and <a href="https://github.com/BojarLab/glycowork?tab=readme-ov-file" class="external-link">glycowork</a>. In R, <code>glyrepr</code> achieves the same functionality, but has been optimized for vectorized operations.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
