@@ -35,6 +35,26 @@ You can install the development version of glyrepr from
 pak::pak("glycoverse/glyrepr")
 ```
 
+## Documentation
+
+-   🚀 Get started:
+    [Here](https://glycoverse.github.io/glyrepr/articles/glyrepr.html)
+-   🔧 Work with underlying igraph objects:
+    [Here](https://glycoverse.github.io/glyrepr/articles/smap.html)
+-   ✏️ IUPAC-condensed glycan text representation:
+    [Here](https://glycoverse.github.io/glyrepr/articles/iupac.html)
+-   📚 Reference:
+    [Here](https://glycoverse.github.io/glyrepr/reference/index.html)
+
+## Role in `glycoverse`
+
+As the cornerstone of the `glycoverse` ecosystem, this package provides
+two fundamental data structures for representing glycans:
+`glycan_composition()` and `glycan_structure()`. These specialized data
+types are what distinguish `glycoverse` from other omics analysis
+frameworks, serving as the foundation for higher-level packages like
+`glymotif`, which build upon them to perform advanced glycan analysis.
+
 ## Example
 
 ``` r
@@ -67,11 +87,3 @@ count_mono(structures, "Hex")
 count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
 #> [1] 5
 ```
-
-## Related work
-
-This package is inspired by two Python packages:
-[glypy](https://github.com/mobiusklein/glypy) and
-[glycowork](https://github.com/BojarLab/glycowork?tab=readme-ov-file).
-In R, `glyrepr` achieves the same functionality, but has been optimized
-for vectorized operations.
