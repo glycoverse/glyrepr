@@ -11,7 +11,8 @@ is_glycan_composition(x)
 }
 \arguments{
 \item{...}{Named integer vectors.
-Names are monosaccharides, values are numbers of residues.}
+Names are monosaccharides or substituents, values are numbers of residues.
+Monosaccharides and substituents can be mixed in the same composition.}
 
 \item{x}{A list of named integer vectors.}
 }
@@ -20,6 +21,21 @@ A glyrepr_composition object.
 }
 \description{
 Create a glycan composition from a list of named integer vectors.
+Compositions can contain both monosaccharides and substituents.
+}
+\details{
+Compositions can contain:
+\itemize{
+\item Monosaccharides: either generic (e.g., "Hex", "HexNAc") or concrete
+(e.g., "Glc", "Gal"). All monosaccharides in a composition must be
+of the same type.
+\item Substituents: e.g., "Me", "Ac", "S". These can be mixed with either
+generic or concrete monosaccharides.
+}
+
+Components are automatically sorted with monosaccharides first (according to
+their order in the monosaccharides table), followed by substituents (according
+to their order in \code{available_substituents()}).
 }
 \examples{
 # A vector with one composition (generic monosaccharides)
@@ -32,5 +48,13 @@ glycan_composition(c(HexNAc = 1, Hex = 2))
 glycan_composition(c(Hex = 2, HexNAc = 1))
 # An example for concrete monosaccharides
 glycan_composition(c(Glc = 2, Gal = 1))
+# Compositions with substituents
+glycan_composition(c(Glc = 1, S = 1))
+glycan_composition(c(Hex = 3, HexNAc = 2, Me = 1, Ac = 1))
+# Substituents are sorted after monosaccharides
+glycan_composition(c(S = 1, Gal = 1, Ac = 1, Glc = 1))
 
+}
+\seealso{
+\code{available_monosaccharides()}, \code{available_substituents()}
 }

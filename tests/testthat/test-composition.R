@@ -13,12 +13,24 @@ test_that("concrete composition is valid", {
   expect_s3_class(comp, "glyrepr_composition")
 })
 
+test_that("compositions can contain substituents", {
+  comp <- glycan_composition(c(Glc = 1, S = 1))
+  expect_equal(as.character(comp), "Glc(1)S(1)")
+})
+
 test_that("compositions are sorted correctly", {
   # Hex should come before HexNAc based on the monosaccharides tibble
   comp <- glycan_composition(c(HexNAc = 1, Hex = 2))
   data <- vctrs::vec_data(comp)
   comp_data <- vctrs::field(data, "data")[[1]]
   expect_equal(names(comp_data), c("Hex", "HexNAc"))
+})
+
+test_that("substituents are located after monosaccharides", {
+  comp <- glycan_composition(c(S = 1, Gal = 1, Ac = 1, Glc = 1))
+  # 1. "Ac" and "S" are sorted after "Glc" and "Gal"
+  # 2. Order of "Ac" and "S" is according to `available_substituents()`
+  expect_equal(as.character(comp), "Glc(1)Gal(1)Ac(1)S(1)")
 })
 
 test_that("mixed types throw error", {
@@ -84,6 +96,22 @@ test_that("as_composition works for a glycan structure", {
 
   expect_s3_class(comp, "glyrepr_composition")
   expected_comp <- glycan_composition(c(Glc = 2L, Gal = 1L))
+  expect_equal(comp, expected_comp)
+})
+
+test_that("as_composition works for a glycan structure with substituents", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
+  igraph::V(graph)$sub <- c("", "", "3Me")
+  igraph::E(graph)$linkage <- c("b1-4", "b1-4")
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  glycan <- glycan_structure(graph)
+
+  comp <- as_glycan_composition(glycan)
+
+  expect_s3_class(comp, "glyrepr_composition")
+  expected_comp <- glycan_composition(c(Glc = 2L, Gal = 1L, Me = 1L))
   expect_equal(comp, expected_comp)
 })
 

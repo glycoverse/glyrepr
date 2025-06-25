@@ -1,12 +1,27 @@
 #' Create a Glycan Composition
 #'
 #' Create a glycan composition from a list of named integer vectors.
+#' Compositions can contain both monosaccharides and substituents.
 #'
 #' @param ... Named integer vectors.
-#'   Names are monosaccharides, values are numbers of residues.
+#'   Names are monosaccharides or substituents, values are numbers of residues.
+#'   Monosaccharides and substituents can be mixed in the same composition.
 #' @param x A list of named integer vectors.
 #'
 #' @return A glyrepr_composition object.
+#'
+#' @details
+#' Compositions can contain:
+#' 
+#' - Monosaccharides: either generic (e.g., "Hex", "HexNAc") or concrete 
+#'   (e.g., "Glc", "Gal"). All monosaccharides in a composition must be 
+#'   of the same type.
+#' - Substituents: e.g., "Me", "Ac", "S". These can be mixed with either 
+#'   generic or concrete monosaccharides.
+#' 
+#' Components are automatically sorted with monosaccharides first (according to 
+#' their order in the monosaccharides table), followed by substituents (according 
+#' to their order in `available_substituents()`).
 #'
 #' @examples
 #' # A vector with one composition (generic monosaccharides)
@@ -19,16 +34,22 @@
 #' glycan_composition(c(Hex = 2, HexNAc = 1))
 #' # An example for concrete monosaccharides
 #' glycan_composition(c(Glc = 2, Gal = 1))
+#' # Compositions with substituents
+#' glycan_composition(c(Glc = 1, S = 1))
+#' glycan_composition(c(Hex = 3, HexNAc = 2, Me = 1, Ac = 1))
+#' # Substituents are sorted after monosaccharides
+#' glycan_composition(c(S = 1, Gal = 1, Ac = 1, Glc = 1))
 #'
+#' @seealso `available_monosaccharides()`, `available_substituents()`
 #' @export
 glycan_composition <- function(...) {
   args <- list(...)
   x <- purrr::map(args, ~ {
     result <- as.integer(.x)
     names(result) <- names(.x)
-    # Sort by monosaccharides tibble order (top to bottom)
-    mono_order <- get_monosaccharide_order(names(result))
-    result <- result[order(mono_order)]
+    # Sort by monosaccharides tibble order (top to bottom), with substituents at the end
+    comp_order <- get_composition_component_order(names(result))
+    result <- result[order(comp_order)]
     result
   })
   x <- new_glycan_composition(x)
@@ -59,6 +80,11 @@ new_glycan_composition <- function(x) {
   vctrs::new_rcrd(list(data = x, mono_type = mono_types), class = "glyrepr_composition")
 }
 
+# Helper function to check if a name is a known composition component (monosaccharide or substituent)
+is_known_composition_component <- function(names) {
+  is_known_monosaccharide(names) | names %in% available_substituents()
+}
+
 valid_glycan_composition <- function(x) {
   valid_one <- function(x) {
     # Allow empty compositions (for conversion results)
@@ -70,21 +96,27 @@ valid_glycan_composition <- function(x) {
     if (is.null(names(x))) {
       cli::cli_abort("{.arg ...} must be named.")
     }
-    # Check if the composition has only known monosaccharides
-    if (!all(is_known_monosaccharide(names(x)))) {
+    # Check if the composition has only known monosaccharides and substituents
+    if (!all(is_known_composition_component(names(x)))) {
       cli::cli_abort(c(
         "{.arg ...} must have only known monosaccharides.",
         "i" = "Call {.fun available_monosaccharides} to see all known monosaccharides."
       ))
     }
-    # Check if all residues have the same type (generic or concrete)
+    # Check if all monosaccharides have the same type (generic or concrete)
+    # Substituents are allowed to mix with either type
     local({
-      mono_types <- get_mono_type(names(x))
-      if (length(unique(mono_types)) > 1) {
-        cli::cli_abort(c(
-          "{.arg ...} must have only one type of monosaccharide.",
-          "i" = "Call {.fun get_mono_type} to see the type of each monosaccharide."
-        ))
+      component_names <- names(x)
+      mono_names <- component_names[is_known_monosaccharide(component_names)]
+      
+      if (length(mono_names) > 0) {
+        mono_types <- get_mono_type(mono_names)
+        if (length(unique(mono_types)) > 1) {
+          cli::cli_abort(c(
+            "{.arg ...} must have only one type of monosaccharide.",
+            "i" = "Call {.fun get_mono_type} to see the type of each monosaccharide."
+          ))
+        }
       }
     })
     # Check if all numbers of residues are positive
@@ -101,7 +133,8 @@ valid_glycan_composition <- function(x) {
 
 #' Convert to Glycan Composition
 #'
-#' Convert an object to a glycan composition.
+#' Convert an object to a glycan composition. The resulting composition can 
+#' contain both monosaccharides and substituents.
 #'
 #' @param x An object to convert to a glycan composition.
 #'   Can be a named integer vector, a list of named integer vectors,
@@ -110,9 +143,18 @@ valid_glycan_composition <- function(x) {
 #'
 #' @return A glyrepr_composition object.
 #'
+#' @details
+#' When converting from glycan structures, both monosaccharides and substituents 
+#' are counted. Substituents are extracted from the `sub` attribute of each 
+#' vertex in the structure. For example, a vertex with `sub = "3Me"` 
+#' contributes one "Me" substituent to the composition.
+#'
 #' @examples
 #' # Convert a named vector
 #' as_glycan_composition(c(Hex = 5, HexNAc = 2))
+#' 
+#' # Convert a named vector with substituents
+#' as_glycan_composition(c(Glc = 2, Gal = 1, Me = 1, S = 1))
 #' 
 #' # Convert a list of named vectors
 #' as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
@@ -124,6 +166,9 @@ valid_glycan_composition <- function(x) {
 #' # Convert a glycan structure vector
 #' strucs <- c(n_glycan_core(), o_glycan_core_1())
 #' as_glycan_composition(strucs)
+#' 
+#' # Convert structures with substituents
+#' # (This will count both monosaccharides and any substituents present)
 #'
 #' @export
 as_glycan_composition <- function(x) {
@@ -135,6 +180,28 @@ as_glycan_composition.glyrepr_composition <- function(x) {
   x
 }
 
+# Helper function to extract substituent types from substituent strings
+extract_substituent_types <- function(sub_strings) {
+  # Extract substituent types from strings like "3Me", "6S", "4Ac,3Me"
+  all_subs <- character(0)
+  
+  for (sub_str in sub_strings) {
+    if (sub_str == "" || is.na(sub_str)) {
+      next
+    }
+    
+    # Split by commas for multiple substituents
+    individual_subs <- stringr::str_split(sub_str, ",")[[1]]
+    individual_subs <- individual_subs[individual_subs != ""]
+    
+    # Extract substituent names (remove position numbers)
+    sub_names <- stringr::str_extract(individual_subs, "[A-Za-z]+$")
+    all_subs <- c(all_subs, sub_names)
+  }
+  
+  all_subs
+}
+
 #' @export
 as_glycan_composition.glyrepr_structure <- function(x) {
   # Get mono_types directly from the structure data
@@ -143,13 +210,29 @@ as_glycan_composition.glyrepr_structure <- function(x) {
   
   # Use smap2 to convert each structure to composition with known mono_type
   compositions <- smap2(x, structure_mono_types, function(graph, mono_type) {
+    # Count monosaccharides
     monos <- igraph::V(graph)$mono
-    result_tb <- table(monos)
-    result <- as.integer(result_tb)
-    names(result) <- names(result_tb)
-    # Sort by monosaccharides tibble order using the known mono_type
-    mono_order <- get_monosaccharide_order_with_type(names(result), mono_type)
-    result <- result[order(mono_order)]
+    mono_tb <- table(monos)
+    mono_result <- as.integer(mono_tb)
+    names(mono_result) <- names(mono_tb)
+    
+    # Count substituents
+    subs <- igraph::V(graph)$sub
+    sub_types <- extract_substituent_types(subs)
+    if (length(sub_types) > 0) {
+      sub_tb <- table(sub_types)
+      sub_result <- as.integer(sub_tb)
+      names(sub_result) <- names(sub_tb)
+    } else {
+      sub_result <- integer(0)
+    }
+    
+    # Combine monosaccharides and substituents
+    result <- c(mono_result, sub_result)
+    
+    # Sort by composition component order (monosaccharides first, then substituents)
+    comp_order <- get_composition_component_order(names(result))
+    result <- result[order(comp_order)]
     result
   })
   
@@ -266,6 +349,54 @@ as_glycan_composition.default <- function(x) {
 #' @export
 as.character.glyrepr_composition <- function(x, ...) {
   format(x)
+}
+
+# Helper function to get the order of composition components (monosaccharides + substituents)
+get_composition_component_order <- function(component_names) {
+  if (length(component_names) == 0) {
+    return(integer(0))
+  }
+  
+  # Check if all components are known, if not, return original order
+  if (!all(is_known_composition_component(component_names))) {
+    # Return sequential order for unknown components
+    return(seq_along(component_names))
+  }
+  
+  # Separate monosaccharides and substituents
+  mono_mask <- is_known_monosaccharide(component_names)
+  mono_names <- component_names[mono_mask]
+  sub_names <- component_names[!mono_mask]
+  
+  # Get order for monosaccharides
+  if (length(mono_names) > 0) {
+    mono_type <- get_mono_type(mono_names[1])
+    mono_order <- get_monosaccharide_order_with_type(mono_names, mono_type)
+  } else {
+    mono_order <- integer(0)
+  }
+  
+  # Get order for substituents
+  if (length(sub_names) > 0) {
+    available_subs <- available_substituents()
+    sub_order <- purrr::map_int(sub_names, function(sub) {
+      idx <- which(available_subs == sub)
+      if (length(idx) > 0) {
+        return(1000 + idx)  # High numbers to put after monosaccharides
+      } else {
+        return(2000)  # Even higher for unknown substituents
+      }
+    })
+  } else {
+    sub_order <- integer(0)
+  }
+  
+  # Combine orders
+  result_order <- integer(length(component_names))
+  result_order[mono_mask] <- mono_order
+  result_order[!mono_mask] <- sub_order
+  
+  result_order
 }
 
 # Helper function to get the order of monosaccharides based on their position in the tibble
