@@ -205,7 +205,9 @@ seq_glycan <- function(glycan, node, depths) {
     if (sub == "") {
       return(mono)
     } else {
-      return(paste0(mono, sub))
+      # Remove commas to get IUPAC format
+      iupac_sub <- stringr::str_remove_all(sub, ",")
+      return(paste0(mono, iupac_sub))
     }
   }
   
@@ -269,11 +271,14 @@ seq_glycan <- function(glycan, node, depths) {
   current_sub <- igraph::vertex_attr(glycan, "sub", node)
   
   # Combine monosaccharide with substituent if present
-  # Format: mono + substituent (e.g., "Glc" + "3Me" = "Glc3Me")
+  # Convert comma-separated internal format to directly concatenated IUPAC format
+  # e.g., "3Me,6S" becomes "3Me6S"
   current_mono_with_sub <- if (current_sub == "") {
     current_mono
   } else {
-    paste0(current_mono, current_sub)
+    # Remove commas to get IUPAC format
+    iupac_sub <- stringr::str_remove_all(current_sub, ",")
+    paste0(current_mono, iupac_sub)
   }
   
   # Combine: backbone + (backbone_linkage) + branches + current_mono_with_sub

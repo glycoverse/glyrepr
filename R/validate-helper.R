@@ -51,9 +51,48 @@ mix_generic_concrete <- function(monos) {
 
 # Is a valid subtituent?
 valid_substituent <- function(sub) {
-  subs_pattern <- stringr::str_c(available_substituents(), collapse = "|")
-  pattern <- stringr::str_glue("[\\d\\?]({subs_pattern})")
-  sub == "" | stringr::str_detect(sub, pattern)
+  # Apply to each element if input is a vector
+  purrr::map_lgl(sub, function(single_sub) {
+    # Empty substituent is always valid
+    if (single_sub == "") {
+      return(TRUE)
+    }
+    
+    # Split by commas to handle multiple substituents
+    individual_subs <- stringr::str_split(single_sub, ",")[[1]]
+    
+    # Check if each individual substituent is valid
+    subs_pattern <- stringr::str_c(available_substituents(), collapse = "|")
+    pattern <- stringr::str_glue("^[\\d\\?]({subs_pattern})$")
+    
+    individual_valid <- purrr::map_lgl(individual_subs, ~ stringr::str_detect(.x, pattern))
+    
+    # All individual substituents must be valid
+    if (!all(individual_valid)) {
+      return(FALSE)
+    }
+    
+    # Check if substituents are properly sorted by position
+    # Extract positions from individual substituents
+    positions <- purrr::map_chr(individual_subs, ~ stringr::str_extract(.x, "^[\\d\\?]"))
+    
+    # For sorting, convert ? to a high numeric value
+    numeric_positions <- purrr::map_dbl(positions, function(pos) {
+      if (pos == "?") {
+        return(Inf)
+      } else {
+        return(as.numeric(pos))
+      }
+    })
+    
+    # Check if positions are sorted in ascending order
+    is_sorted <- all(numeric_positions == sort(numeric_positions))
+    
+    # Check for duplicate positions (not allowed)
+    has_duplicates <- any(duplicated(positions))
+    
+    return(is_sorted && !has_duplicates)
+  })
 }
 
 

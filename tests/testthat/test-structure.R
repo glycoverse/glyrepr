@@ -161,6 +161,51 @@ patrick::with_parameters_test_that("valid substituents", {
 }, sub = c("6S", "9Ac", "2P", "?S"))
 
 
+test_that("multiple substituents are supported", {
+  skip_on_old_win()
+  graph <- igraph::make_empty_graph(n = 1)
+  igraph::V(graph)$mono <- "Glc"
+  igraph::V(graph)$sub <- "3Me,4Ac"  # Multiple substituents
+  igraph::E(graph)$linkage <- character(0)
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  expect_no_error(glycan_structure(graph))
+})
+
+
+test_that("multiple substituents must be sorted by position", {
+  skip_on_old_win()
+  graph <- igraph::make_empty_graph(n = 1)
+  igraph::V(graph)$mono <- "Glc"
+  igraph::V(graph)$sub <- "4Ac,3Me"  # Wrong order - should be "3Me,4Ac"
+  igraph::E(graph)$linkage <- character(0)
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  expect_error(glycan_structure(graph), "Unknown substituent")
+})
+
+
+test_that("duplicate positions in substituents are not allowed", {
+  skip_on_old_win()
+  graph <- igraph::make_empty_graph(n = 1)
+  igraph::V(graph)$mono <- "Glc"
+  igraph::V(graph)$sub <- "3Me,3Ac"  # Same position (3) with different substituents
+  igraph::E(graph)$linkage <- character(0)
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  expect_error(glycan_structure(graph), "Unknown substituent")
+})
+
+
+test_that("normalize_substituents works correctly", {
+  expect_equal(normalize_substituents(""), "")
+  expect_equal(normalize_substituents("6S"), "6S")
+  expect_equal(normalize_substituents("4Ac,3Me"), "3Me,4Ac")
+  expect_equal(normalize_substituents("6P,2S,4Ac"), "2S,4Ac,6P")
+  expect_equal(normalize_substituents("?S,3Me"), "3Me,?S")
+})
+
+
 test_that("validating graph without linkage attribute", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "GlcNAc")

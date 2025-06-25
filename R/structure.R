@@ -25,8 +25,10 @@
 #' - Monosaccharide name must be known, either generic (Hex, HexNAc, etc.)
 #'   or concrete (Glc, Gal, etc.), but not a mixture of both.
 #'   NA is not allowed.
-#' - Substituent must be valid, in the form of "xY", where x is position
-#'   and Y is substituent name, e.g. "2Ac", "3S", etc.
+#' - Substituent must be valid. For single substituents, use the form "xY", 
+#'   where x is position and Y is substituent name, e.g. "2Ac", "3S", etc.
+#'   For multiple substituents, separate them with commas and order by position,
+#'   e.g. "3Me,4Ac", "2S,6P", etc. Empty string "" means no substituents.
 #' - Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
 #'   e.g. "b1-4", "a2-3", etc.
 #'   NA is not allowed.
