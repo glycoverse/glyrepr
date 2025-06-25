@@ -297,4 +297,10 @@ test_that("as_glycan_structure.character preserves complex substituent patterns"
   glycan2 <- as_glycan_structure("Man?S")
   graph2 <- get_structure_graphs(glycan2, 1)
   expect_equal(igraph::V(graph2)$sub, "?S")
-}) 
+})
+
+test_that("as_glycan_structure.character handles multiple substituents", {
+  glycan <- as_glycan_structure("Glc3Me6S(a1-")
+  graph <- get_structure_graphs(glycan, 1)
+  expect_equal(igraph::V(graph)$sub, "3Me,6S")
+})
