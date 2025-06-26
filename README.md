@@ -39,6 +39,8 @@ pak::pak("glycoverse/glyrepr")
 
 -   🚀 Get started:
     [Here](https://glycoverse.github.io/glyrepr/articles/glyrepr.html)
+-   🔍 Underlying graph representation:
+    [Here](https://glycoverse.github.io/glyrepr/articles/glycan-graph.html)
 -   🔧 Work with underlying igraph objects:
     [Here](https://glycoverse.github.io/glyrepr/articles/smap.html)
 -   ✏️ IUPAC-condensed glycan text representation:
