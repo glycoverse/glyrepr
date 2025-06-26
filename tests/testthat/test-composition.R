@@ -115,6 +115,22 @@ test_that("as_composition works for a glycan structure with substituents", {
   expect_equal(comp, expected_comp)
 })
 
+test_that("as_composition works for a glycan structure with multiple substituents", {
+  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
+  igraph::V(graph)$sub <- c("", "", "3Me,6S")
+  igraph::E(graph)$linkage <- c("b1-4", "b1-4")
+  graph$anomer <- "a1"
+  graph$alditol <- FALSE
+  glycan <- glycan_structure(graph)
+
+  comp <- as_glycan_composition(glycan)
+
+  expect_s3_class(comp, "glyrepr_composition")
+  expected_comp <- glycan_composition(c(Glc = 2L, Gal = 1L, Me = 1L, S = 1L))
+  expect_equal(comp, expected_comp)
+})
+
 # Tests for formatting ----------------------------------------------
 
 test_that("format works correctly", {
