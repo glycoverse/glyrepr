@@ -2,10 +2,11 @@ pandoc: 3.1.11
 pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
+  glycan-graph: glycan-graph.html
   glyrepr: glyrepr.html
   articles/iupac: iupac.html
   smap: smap.html
-last_built: 2025-06-25T15:06Z
+last_built: 2025-06-26T02:42Z
 urls:
   reference: https://glycoverse.github.io/glyrepr/reference
   article: https://glycoverse.github.io/glyrepr/articles

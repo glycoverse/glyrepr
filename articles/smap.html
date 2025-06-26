@@ -34,7 +34,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/iupac.html">Decoding Glycans: Your Guide to IUPAC-Condensed Format</a></li>
+<li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</a></li>
+    <li><a class="dropdown-item" href="../articles/iupac.html">Decoding Glycans: Your Guide to IUPAC-Condensed Format</a></li>
     <li><a class="dropdown-item" href="../articles/smap.html">Power User Guide: Efficient Glycan Manipulation</a></li>
   </ul>
 </li>
@@ -202,51 +203,51 @@ virtually all <code>purrr</code> functions:</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><code>map()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map()</a></code></td>
 <td><code><a href="../reference/smap.html">smap()</a></code></td>
-<td><code>map2()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2()</a></code></td>
 <td><code><a href="../reference/smap2.html">smap2()</a></code></td>
 </tr>
 <tr class="even">
-<td><code>map_lgl()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_lgl()</a></code></td>
 <td><code><a href="../reference/smap.html">smap_lgl()</a></code></td>
-<td><code>map2_lgl()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2_lgl()</a></code></td>
 <td><code><a href="../reference/smap2.html">smap2_lgl()</a></code></td>
 </tr>
 <tr class="odd">
-<td><code>map_int()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int()</a></code></td>
 <td><code><a href="../reference/smap.html">smap_int()</a></code></td>
-<td><code>map2_int()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2_int()</a></code></td>
 <td><code><a href="../reference/smap2.html">smap2_int()</a></code></td>
 </tr>
 <tr class="even">
-<td><code>map_dbl()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_dbl()</a></code></td>
 <td><code><a href="../reference/smap.html">smap_dbl()</a></code></td>
-<td><code>map2_dbl()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2_dbl()</a></code></td>
 <td><code><a href="../reference/smap2.html">smap2_dbl()</a></code></td>
 </tr>
 <tr class="odd">
-<td><code>map_chr()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr()</a></code></td>
 <td><code><a href="../reference/smap.html">smap_chr()</a></code></td>
-<td><code>map2_chr()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2_chr()</a></code></td>
 <td><code><a href="../reference/smap2.html">smap2_chr()</a></code></td>
 </tr>
 <tr class="even">
-<td><code>some()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/every.html" class="external-link">some()</a></code></td>
 <td><code><a href="../reference/smap_predicates.html">ssome()</a></code></td>
-<td><code>pmap()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/pmap.html" class="external-link">pmap()</a></code></td>
 <td><code><a href="../reference/spmap.html">spmap()</a></code></td>
 </tr>
 <tr class="odd">
-<td><code>every()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/every.html" class="external-link">every()</a></code></td>
 <td><code><a href="../reference/smap_predicates.html">severy()</a></code></td>
 <td><code>pmap_*()</code></td>
 <td><code>spmap_*()</code></td>
 </tr>
 <tr class="even">
-<td><code>none()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/every.html" class="external-link">none()</a></code></td>
 <td><code><a href="../reference/smap_predicates.html">snone()</a></code></td>
-<td><code>imap()</code></td>
+<td><code><a href="https://purrr.tidyverse.org/reference/imap.html" class="external-link">imap()</a></code></td>
 <td><code><a href="../reference/simap.html">simap()</a></code></td>
 </tr>
 <tr class="odd">
@@ -355,7 +356,7 @@ deduplication:</p>
 <span><span class="va">all_graphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">huge_struc</span><span class="op">)</span>  <span class="co"># Extracts all 25,000 graphs</span></span>
 <span><span class="va">vertex_counts_naive</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">all_graphs</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Naive approach (all graphs): 0.231 sec elapsed</span></span>
+<span><span class="co">#&gt; Naive approach (all graphs): 0.219 sec elapsed</span></span>
 <span></span>
 <span><span class="co"># Verify results are equivalent (though data types may differ)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">vertex_counts_optimized</span>, <span class="va">vertex_counts_naive</span><span class="op">)</span></span>
