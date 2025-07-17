@@ -62,7 +62,7 @@ normalize_substituents <- function(sub) {
 #' @export
 remove_substituents <- function(glycan) {
   if (!is_glycan_structure(glycan)) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "Input must be a glyrepr_structure vector.",
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))

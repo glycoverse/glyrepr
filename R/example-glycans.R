@@ -84,10 +84,10 @@ o_glycan_core_2 <- function(linkage = TRUE, mono_type = "concrete") {
 
 build_example_graph <- function(linkage, mono_type, builder) {
   if (!mono_type %in% c("generic", "concrete")) {
-    rlang::abort("Mono type must be 'generic' or 'concrete'.")
+    cli::cli_abort("Mono type must be 'generic' or 'concrete'.")
   }
   if (!is.logical(linkage) && length(linkage) != 1) {
-    rlang::abort("Linkage must be a single logical.")
+    cli::cli_abort("Linkage must be a single logical.")
   }
   glycan <- builder()
   if (!linkage) {

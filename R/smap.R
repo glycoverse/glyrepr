@@ -153,7 +153,7 @@ NULL
 # Helper function for common smap logic
 .smap_base <- function(.x, .f, ..., .parallel = FALSE, .convert_fn = NULL) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input must be a glycan_structure vector.")
+    cli::cli_abort("Input must be a glycan_structure vector.")
   }
   
   .f <- rlang::as_function(.f)
@@ -233,7 +233,7 @@ smap_chr <- function(.x, .f, ..., .parallel = FALSE) {
 #' @export
 smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input must be a glycan_structure vector.")
+    cli::cli_abort("Input must be a glycan_structure vector.")
   }
 
   .f <- rlang::as_function(.f)
@@ -250,7 +250,7 @@ smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
   new_structures <- .smap_apply(unique_iupacs, function(iupac) {
     result <- do.call(.f, c(list(structures[[iupac]]), dots))
     if (!inherits(result, "igraph")) {
-      rlang::abort("Function `.f` must return an igraph object when using `smap_structure()`.")
+      cli::cli_abort("Function `.f` must return an igraph object when using `smap_structure()`.")
     }
     result
   }, use_parallel = .parallel)
@@ -308,7 +308,7 @@ smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
 #' @export
 smap_unique <- function(.x, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input must be a glycan_structure vector.")
+    cli::cli_abort("Input must be a glycan_structure vector.")
   }
   
   .f <- rlang::as_function(.f)
@@ -377,7 +377,7 @@ NULL
 #' @export
 ssome <- function(.x, .p, ...) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input must be a glycan_structure vector.")
+    cli::cli_abort("Input must be a glycan_structure vector.")
   }
   
   .p <- rlang::as_function(.p)
@@ -392,7 +392,7 @@ ssome <- function(.x, .p, ...) {
 #' @export
 severy <- function(.x, .p, ...) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input must be a glycan_structure vector.")
+    cli::cli_abort("Input must be a glycan_structure vector.")
   }
   
   .p <- rlang::as_function(.p)
@@ -407,7 +407,7 @@ severy <- function(.x, .p, ...) {
 #' @export
 snone <- function(.x, .p, ...) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input must be a glycan_structure vector.")
+    cli::cli_abort("Input must be a glycan_structure vector.")
   }
   
   .p <- rlang::as_function(.p)
@@ -487,7 +487,7 @@ NULL
 #' @export
 smap2 <- function(.x, .y, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input `.x` must be a glycan_structure vector.")
+    cli::cli_abort("Input `.x` must be a glycan_structure vector.")
   }
   
   # Handle empty input
@@ -560,7 +560,7 @@ smap2_chr <- function(.x, .y, .f, ..., .parallel = FALSE) {
 #' @export
 smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input `.x` must be a glycan_structure vector.")
+    cli::cli_abort("Input `.x` must be a glycan_structure vector.")
   }
   
   # Handle empty input
@@ -592,7 +592,7 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
     row <- unique_combinations_df[i, ]
     result <- .f(structures[[row$code]], row$y_val, ...)
     if (!inherits(result, "igraph")) {
-      rlang::abort("Function `.f` must return an igraph object when using `smap2_structure()`.")
+      cli::cli_abort("Function `.f` must return an igraph object when using `smap2_structure()`.")
     }
     result
   }, use_parallel = .parallel)
@@ -686,11 +686,11 @@ NULL
 spmap <- function(.l, .f, ..., .parallel = FALSE) {
   # Check if it's actually a plain list, not a vctrs object that looks like a list
   if (!inherits(.l, "list") || inherits(.l, "vctrs_vctr") || length(.l) == 0) {
-    rlang::abort("Input `.l` must be a non-empty list.")
+    cli::cli_abort("Input `.l` must be a non-empty list.")
   }
   
   if (!is_glycan_structure(.l[[1]])) {
-    rlang::abort("First element of `.l` must be a glycan_structure vector.")
+    cli::cli_abort("First element of `.l` must be a glycan_structure vector.")
   }
   
   # Handle empty input
@@ -777,11 +777,11 @@ spmap_chr <- function(.l, .f, ..., .parallel = FALSE) {
 #' @export
 spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
   if (!is.list(.l) || length(.l) == 0) {
-    rlang::abort("Input `.l` must be a non-empty list.")
+    cli::cli_abort("Input `.l` must be a non-empty list.")
   }
   
   if (!is_glycan_structure(.l[[1]])) {
-    rlang::abort("First element of `.l` must be a glycan_structure vector.")
+    cli::cli_abort("First element of `.l` must be a glycan_structure vector.")
   }
   
   # Handle empty input
@@ -827,7 +827,7 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
     }
     result <- do.call(.f, c(args, list(...)))
     if (!inherits(result, "igraph")) {
-      rlang::abort("Function `.f` must return an igraph object when using `spmap_structure()`.")
+      cli::cli_abort("Function `.f` must return an igraph object when using `spmap_structure()`.")
     }
     result
   }, use_parallel = .parallel)
@@ -916,7 +916,7 @@ NULL
 #' @export
 simap <- function(.x, .f, ...) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input `.x` must be a glycan_structure vector.")
+    cli::cli_abort("Input `.x` must be a glycan_structure vector.")
   }
   
   # Handle empty input
@@ -993,7 +993,7 @@ simap_chr <- function(.x, .f, ...) {
 #' @export
 simap_structure <- function(.x, .f, ...) {
   if (!is_glycan_structure(.x)) {
-    rlang::abort("Input `.x` must be a glycan_structure vector.")
+    cli::cli_abort("Input `.x` must be a glycan_structure vector.")
   }
   
   # Handle empty input
@@ -1029,7 +1029,7 @@ simap_structure <- function(.x, .f, ...) {
     row <- unique_combinations_df[i, ]
     result <- .f(structures[[row$code]], row$index, ...)
     if (!inherits(result, "igraph")) {
-      rlang::abort("Function `.f` must return an igraph object when using `simap_structure()`.")
+      cli::cli_abort("Function `.f` must return an igraph object when using `simap_structure()`.")
     }
     result
   })

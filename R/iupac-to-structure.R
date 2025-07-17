@@ -8,23 +8,23 @@
 #' @keywords internal
 .parse_iupac_condensed_single <- function(x) {
   if (is.na(x) || nchar(x) == 0 || stringr::str_detect(x, "^\\s*$")) {
-    rlang::abort("Cannot parse empty or NA IUPAC-condensed string.")
+    cli::cli_abort("Cannot parse empty or NA IUPAC-condensed string.")
   }
   
   tryCatch({
     # Validate input string - no leading/trailing whitespace
     if (stringr::str_detect(x, "^\\s+|\\s+$")) {
-      rlang::abort("IUPAC-condensed string cannot have leading or trailing whitespace")
+      cli::cli_abort("IUPAC-condensed string cannot have leading or trailing whitespace")
     }
     
     # Validate no internal whitespace
     if (stringr::str_detect(x, "\\s")) {
-      rlang::abort("IUPAC-condensed string cannot contain whitespace")
+      cli::cli_abort("IUPAC-condensed string cannot contain whitespace")
     }
     
     # Validate proper bracket matching
     if (!.validate_brackets(x)) {
-      rlang::abort("Malformed brackets in IUPAC-condensed string")
+      cli::cli_abort("Malformed brackets in IUPAC-condensed string")
     }
     anomer <- .extract_anomer(x)  # may be NA
     if (!is.na(anomer)) {
@@ -94,7 +94,7 @@
     graph$alditol <- alditol
     return(graph)
   }, error = function(e) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "Could not parse IUPAC-condensed string: {.val {x}}",
       "i" = conditionMessage(e)
     ))
@@ -175,7 +175,7 @@
   # Check if we extracted the full string
   extracted_string <- paste(tokens, collapse = "")
   if (extracted_string != iupac) {
-    rlang::abort("Invalid characters or format in IUPAC-condensed string")
+    cli::cli_abort("Invalid characters or format in IUPAC-condensed string")
   }
   
   tokens <- stringr::str_replace(tokens, "\\[", "TEMP_LEFT")
@@ -192,7 +192,7 @@
   left_bracket_pos <- stringr::str_locate(token, "\\(")[1]
   
   if (is.na(left_bracket_pos)) {
-    rlang::abort("Missing linkage information in token")
+    cli::cli_abort("Missing linkage information in token")
   }
   
   mono <- stringr::str_sub(token, 1, left_bracket_pos - 1)
@@ -203,7 +203,7 @@
   
   # Validate linkage format
   if (!.validate_linkage(linkage)) {
-    rlang::abort(paste0("Invalid linkage format: ", linkage))
+    cli::cli_abort(paste0("Invalid linkage format: ", linkage))
   }
   
   c(mono = mono, sub = sub, linkage = linkage)
@@ -301,7 +301,7 @@
   
   # Validate that the monosaccharide is known
   if (!is_known_monosaccharide(result[["mono"]])) {
-    rlang::abort(paste0("Unknown monosaccharide: ", result[["mono"]]))
+    cli::cli_abort(paste0("Unknown monosaccharide: ", result[["mono"]]))
   }
   
   result

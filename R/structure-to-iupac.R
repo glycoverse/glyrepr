@@ -57,7 +57,7 @@
 #' @export
 structure_to_iupac <- function(glycan) {
   if (!is_glycan_structure(glycan)) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "Input must be a glyrepr_structure vector.",
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
@@ -72,7 +72,7 @@ structure_to_iupac <- function(glycan) {
   # Find root (node with in-degree 0)
   root <- which(igraph::degree(glycan, mode = "in") == 0)
   if (length(root) != 1) {
-    rlang::abort("Glycan structure must have exactly one root node.")
+    cli::cli_abort("Glycan structure must have exactly one root node.")
   }
   
   # Calculate depth for each node
@@ -97,7 +97,7 @@ parse_linkage <- function(linkage) {
   match <- stringr::str_match(linkage, pattern)
   
   if (is.na(match[1])) {
-    rlang::abort(glue::glue("Invalid linkage format: {linkage}"))
+    cli::cli_abort(glue::glue("Invalid linkage format: {linkage}"))
   }
   
   x <- match[2]  # anomeric configuration

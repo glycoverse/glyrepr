@@ -93,7 +93,7 @@ convert_mono_type.character <- function(x, to) {
 #' @rdname convert_mono_type
 convert_mono_type.glyrepr_structure <- function(x, to) {
   if (!is_glycan_structure(x)) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "Input must be a glyrepr_structure vector.",
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
@@ -125,7 +125,7 @@ convert_mono_type.glyrepr_structure <- function(x, to) {
 #' @rdname convert_mono_type
 convert_mono_type.glyrepr_composition <- function(x, to) {
   if (!is_glycan_composition(x)) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "Input must be a glyrepr_composition vector.",
       "i" = "Use `glycan_composition()` to create a glyrepr_composition from named vectors."
     ))
@@ -258,7 +258,7 @@ get_mono_type.character <- function(x) {
 #' @rdname get_mono_type
 get_mono_type.glyrepr_structure <- function(x) {
   if (!is_glycan_structure(x)) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "Input must be a glyrepr_structure vector.",
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
@@ -272,7 +272,7 @@ get_mono_type.glyrepr_structure <- function(x) {
 #' @rdname get_mono_type
 get_mono_type.glyrepr_composition <- function(x) {
   if (!is_glycan_composition(x)) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "Input must be a glyrepr_composition vector.",
       "i" = "Use `glycan_composition()` to create a glyrepr_composition from named vectors."
     ))
@@ -291,13 +291,15 @@ valid_from_to <- function(from, to, strict) {
 
   bad_order <- from < to
   if (any(bad_order)) {
-    rlang::abort(
+    cli::cli_abort(
+      "Cannot convert from generic to concrete monosaccharides.",
       class = "error_backward_convert",
       bad_index = which(bad_order)
     )
   }
   if (strict && any(from == to)) {
-    rlang::abort(
+    cli::cli_abort(
+      "Cannot convert monosaccharides of the same type.",
       class = "error_convert_self",
       bad_index = which(from == to)
     )

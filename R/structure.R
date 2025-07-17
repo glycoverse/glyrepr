@@ -69,7 +69,7 @@ glycan_structure <- function(...) {
     } else if (inherits(arg, "igraph")) {
       graphs <- c(graphs, list(arg))
     } else {
-      rlang::abort("All arguments must be igraph objects or glycan_structure vectors.")
+      cli::cli_abort("All arguments must be igraph objects or glycan_structure vectors.")
     }
   }
   
@@ -107,93 +107,93 @@ validate_single_glycan_structure <- function(glycan) {
 
   # Check if it is a directed graph
   if (!is_directed_graph(glycan)) {
-    rlang::abort("Glycan structure must be directed.")
+    cli::cli_abort("Glycan structure must be directed.")
   }
   
   # Check if it is an out tree
   if (!is_out_tree(glycan)) {
-    rlang::abort("Glycan structure must be an out tree.")
+    cli::cli_abort("Glycan structure must be an out tree.")
   }
   
   # Check if graph has a vertex attribute "mono"
   # This is the monosaccharide name, e.g. "GlcNAc", "Man", etc.
   if (!has_vertex_attrs(glycan, "mono")) {
-    rlang::abort("Glycan structure must have a vertex attribute 'mono'.")
+    cli::cli_abort("Glycan structure must have a vertex attribute 'mono'.")
   }
   
   # Check if no NA in vertex attribute "mono"
   mono_names <- igraph::vertex_attr(glycan, "mono")
   if (any(is.na(mono_names))) {
-    rlang::abort("Glycan structure must have no NA in vertex attribute 'mono'.")
+    cli::cli_abort("Glycan structure must have no NA in vertex attribute 'mono'.")
   }
   
   # Check if all monosaccharides are known
   if (!all(is_known_mono(mono_names))) {
     unknown_monos <- unique(igraph::V(glycan)$mono[!is_known_mono(igraph::V(glycan)$mono)])
     msg <- glue::glue("Unknown monosaccharide: {stringr::str_c(unknown_monos, collapse = ', ')}")
-    rlang::abort(msg, monos = unknown_monos)
+    cli::cli_abort(msg, monos = unknown_monos)
   }
   
   # Check if mixed use of generic and concrete monosaccharides
   if (mix_generic_concrete(mono_names)) {
-    rlang::abort("Monosaccharides must be either all generic or all concrete.")
+    cli::cli_abort("Monosaccharides must be either all generic or all concrete.")
   }
   
   # Check if graph has a vertex attribute "sub"
   # This is the substituent name, e.g. "Ac", "S", "P", or "" (no).
   if (!has_vertex_attrs(glycan, "sub")) {
-    rlang::abort("Glycan structure must have a vertex attribute 'sub'.")
+    cli::cli_abort("Glycan structure must have a vertex attribute 'sub'.")
   }
   
   # Check if no NA in vertex attribute "sub"
   subs <- igraph::vertex_attr(glycan, "sub")
   if (any(is.na(subs))) {
-    rlang::abort("Glycan structure must have no NA in vertex attribute 'sub'.")
+    cli::cli_abort("Glycan structure must have no NA in vertex attribute 'sub'.")
   }
   
   # Check if all substituents are valid
   if (!all(valid_substituent(subs))) {
     invalid_subs <- unique(subs[!valid_substituent(subs)])
     msg <- glue::glue("Unknown substituent: {stringr::str_c(invalid_subs, collapse = ', ')}")
-    rlang::abort(msg, subs = invalid_subs)
+    cli::cli_abort(msg, subs = invalid_subs)
   }
   
   # Check if graph has an edge attribute "linkage"
   if (!has_edge_attrs(glycan, "linkage")) {
-    rlang::abort("Glycan structure must have an edge attribute 'linkage'.")
+    cli::cli_abort("Glycan structure must have an edge attribute 'linkage'.")
   }
   
   # Check if no NA in edge attribute "linkage"
   linkages <- igraph::edge_attr(glycan, "linkage")
   if (any(is.na(linkages))) {
-    rlang::abort("Glycan structure must have no NA in edge attribute 'linkage'.")
+    cli::cli_abort("Glycan structure must have no NA in edge attribute 'linkage'.")
   }
   
   # Check if all linkages are valid
   if (!all(valid_linkages(linkages))) {
     invalid_linkages <- unique(linkages[!valid_linkages(linkages)])
     msg <- glue::glue("Invalid linkage: {stringr::str_c(invalid_linkages, collapse = ', ')}")
-    rlang::abort(msg, linkages = invalid_linkages)
+    cli::cli_abort(msg, linkages = invalid_linkages)
   }
   
   # Check if "anomer" attribute exists
   if (is.null(glycan$anomer)) {
-    rlang::abort("Glycan structure must have a graph attribute 'anomer'.")
+    cli::cli_abort("Glycan structure must have a graph attribute 'anomer'.")
   }
   
   # Check if "anomer" attribute is valid
   if (!valid_anomer(glycan$anomer)) {
-    rlang::abort(glue::glue("Invalid anomer: {glycan$anomer}"))
+    cli::cli_abort(glue::glue("Invalid anomer: {glycan$anomer}"))
   }
   
   # Check if "alditol" attribute exists
   if (is.null(glycan$alditol)) {
-    rlang::abort("Glycan structure must have a graph attribute 'alditol'.")
+    cli::cli_abort("Glycan structure must have a graph attribute 'alditol'.")
   }
   
   # Check if "alditol" attribute is valid
   if (!is.logical(glycan$alditol)) {
-    rlang::abort("Glycan structure attribute 'alditol' must be logical.")
+    cli::cli_abort("Glycan structure attribute 'alditol' must be logical.")
   }
 
   glycan
@@ -211,7 +211,7 @@ new_glycan_structure <- function(iupac = character(), mono_type = character(), s
 # Helper function to extract structures from existing vector
 get_structures_from_vector <- function(x) {
   if (!is_glycan_structure(x)) {
-    rlang::abort("Input must be a glycan_structure vector.")
+    cli::cli_abort("Input must be a glycan_structure vector.")
   }
   
   data <- vctrs::vec_data(x)
@@ -286,7 +286,7 @@ as_glycan_structure.igraph <- function(x) {
 as_glycan_structure.list <- function(x) {
   # Validate that all elements are igraph objects
   if (!all(purrr::map_lgl(x, ~ inherits(.x, "igraph")))) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "All elements in the list must be igraph objects.",
       "i" = "Each graph in the list should be a valid glycan structure."
     ))
@@ -308,7 +308,7 @@ as_glycan_structure.character <- function(x) {
 
 #' @export
 as_glycan_structure.default <- function(x) {
-  rlang::abort(c(
+  cli::cli_abort(c(
     "Cannot convert object of class {.cls {class(x)}} to glyrepr_structure.",
     "i" = "Supported types: igraph object, list of igraph objects, character vector (IUPAC-condensed), or existing glyrepr_structure."
   ))
@@ -467,7 +467,7 @@ as.character.glyrepr_structure <- function(x, ...) {
 #' @export
 get_structure_graphs <- function(x, i = NULL) {
   if (!is_glycan_structure(x)) {
-    rlang::abort("Input must be a glycan_structure vector.")
+    cli::cli_abort("Input must be a glycan_structure vector.")
   }
   
   data <- vctrs::vec_data(x)

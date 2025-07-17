@@ -24,7 +24,7 @@
 #' @export
 has_linkages <- function(glycan) {
   if (!is_glycan_structure(glycan)) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "Input must be a glyrepr_structure vector.",
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
@@ -86,7 +86,7 @@ possible_linkages <- function(
 
   # Check if the linkage is valid
   if (!valid_linkages(linkage)) {
-    rlang::abort("Invalid linkage format.")
+    cli::cli_abort("Invalid linkage format.")
   }
 
   # Add unknown elements
@@ -135,7 +135,7 @@ possible_linkages <- function(
 #' @export
 remove_linkages <- function(glycan) {
   if (!is_glycan_structure(glycan)) {
-    rlang::abort(c(
+    cli::cli_abort(c(
       "Input must be a glyrepr_structure vector.",
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))

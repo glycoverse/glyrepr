@@ -21,11 +21,10 @@ test_that("converting character vectors from concrete to generic", {
 
 
 test_that("converting character vectors from generic to concrete fails", {
-  result <- tryCatch(
+  expect_error(
     convert_mono_type(c("Hex", "HexNAc"), to = "concrete"),
-    error = function(e) e$message
+    "cannot be converted"
   )
-  expect_match(result, "cannot be converted")
 })
 
 
