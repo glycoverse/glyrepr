@@ -5,7 +5,7 @@
     Output
       # A tibble: 3 x 2
         struc                      a
-        <structure>            <dbl>
+        <struct>               <dbl>
       1 Man(a1-3)[Man(a1-6)]M~     1
       2 Man(a1-3)[Man(a1-6)]M~     1
       3 Man(a1-3)[Man(a1-6)]M~     1

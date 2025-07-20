@@ -518,7 +518,7 @@ test_that("truncation works in tibble", {
 
 test_that("vec_ptype_abbr.glyrepr_structure returns correct abbreviation", {
   sv <- glycan_structure()
-  expect_equal(vctrs::vec_ptype_abbr(sv), "structure")
+  expect_equal(vctrs::vec_ptype_abbr(sv), "struct")
 })
 
 test_that("vec_ptype_full.glyrepr_structure returns correct full type", {

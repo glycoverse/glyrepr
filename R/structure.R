@@ -318,7 +318,7 @@ as_glycan_structure.default <- function(x) {
 vec_ptype_full.glyrepr_structure <- function(x, ...) "glycan_structure"
 
 #' @export
-vec_ptype_abbr.glyrepr_structure <- function(x, ...) "structure"
+vec_ptype_abbr.glyrepr_structure <- function(x, ...) "struct"
 
 #' @export
 format.glyrepr_structure <- function(x, ...) {
