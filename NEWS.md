@@ -1,3 +1,10 @@
+# glyrepr 0.5.2
+
+## Minor improvements and bug fixes
+
+* Fix some error message format errors.
+* Update the abbreviated type name of `glyrepr_structure` from `structure` to `struct`.
+
 # glyrepr 0.5.0
 
 ## Major changes
