@@ -13,7 +13,7 @@ this function will return TRUE.'><meta property="og:image" content="https://glyc
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,7 +21,15 @@ this function will return TRUE.'><meta property="og:image" content="https://glyc
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/glyrepr.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</a></li>
+    <li><a class="dropdown-item" href="../articles/iupac.html">Decoding Glycans: Your Guide to IUPAC-Condensed Format</a></li>
+    <li><a class="dropdown-item" href="../articles/smap.html">Power User Guide: Efficient Glycan Manipulation</a></li>
+  </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul></div>
@@ -53,12 +61,12 @@ this function will return <code>TRUE</code>.</p>
 
 
 <dl><dt id="arg-glycan">glycan<a class="anchor" aria-label="anchor" href="#arg-glycan"></a></dt>
-<dd><p>A glycan structure.</p></dd>
+<dd><p>A glyrepr_structure vector.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A logical value indicating if the glycan structure has linkages.</p>
+    <p>A logical vector indicating if each glycan structure has linkages.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -71,21 +79,17 @@ this function will return <code>TRUE</code>.</p>
 <span class="r-in"><span><span class="fu">has_linkages</span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Glycan Structure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Gal(1)GalNAc(1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #FFD700;">GalNAc</span> (a1-)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─<span style="color: #FFD700;">Gal</span> (b1-3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[1]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="remove_linkages.html">remove_linkages</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">has_linkages</span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Glycan Structure</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Gal(1)GalNAc(1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #FFD700;">GalNAc</span> (a1-)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> └─<span style="color: #FFD700;">Gal</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[1]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FFD700;">Gal</span>(??-?)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

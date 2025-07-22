@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,7 +32,17 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/glyrepr.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/glycan-graph.html">Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</a></li>
+    <li><a class="dropdown-item" href="articles/iupac.html">Decoding Glycans: Your Guide to IUPAC-Condensed Format</a></li>
+    <li><a class="dropdown-item" href="articles/smap.html">Power User Guide: Efficient Glycan Manipulation</a></li>
+  </ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -53,8 +63,7 @@
 </div>
 <!-- badges: start -->
 
-<p>This package is a wrapper of ‘igraph’ for representing glycan structures in R. It introduces an S3 class called “glycan_structure” along with a suite of functions to create and manipulate glycan structures.</p>
-<p>If you are a glycomics or glycoproteomics researcher, you likely won’t need to interact with this package directly. All you need to know is that it defines the “glycan_structure” S3 class to represent glycan structures, so you won’t be surprised if you encounter this name elsewhere in <code>glycoverse.</code></p>
+<p><code>glyrepr</code> provides two important representations of glycans: glycan compositions and glycan structures. This package is the core of <code>glycoverse</code> ecosystem, as it provides the basic data structures and functions for representing and manipulating glycans.</p>
 <p>In fact, the functions in this packages are heavily used by other <code>glycoverse</code> packages such as <a href="https://github.com/glycoverse/glyparse" class="external-link">glyparse</a> and <a href="https://github.com/glycoverse/glymotif" class="external-link">glymotif</a>, which you are probably already using or will use.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -65,21 +74,59 @@
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"glycoverse/glyrepr"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<ul>
+<li>🚀 Get started: <a href="https://glycoverse.github.io/glyrepr/articles/glyrepr.html">Here</a>
+</li>
+<li>🔍 Underlying graph representation: <a href="https://glycoverse.github.io/glyrepr/articles/glycan-graph.html">Here</a>
+</li>
+<li>🔧 Faster structure operations: <a href="https://glycoverse.github.io/glyrepr/articles/smap.html">Here</a>
+</li>
+<li>✏️ IUPAC-condensed glycan text representation: <a href="https://glycoverse.github.io/glyrepr/articles/iupac.html">Here</a>
+</li>
+<li>📚 Reference: <a href="https://glycoverse.github.io/glyrepr/reference/index.html">Here</a>
+</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="role-in-glycoverse">Role in <code>glycoverse</code>
+<a class="anchor" aria-label="anchor" href="#role-in-glycoverse"></a>
+</h2>
+<p>As the cornerstone of the <code>glycoverse</code> ecosystem, this package provides two fundamental data structures for representing glycans: <code><a href="reference/glycan_composition.html">glycan_composition()</a></code> and <code><a href="reference/glycan_structure.html">glycan_structure()</a></code>. These specialized data types are what distinguish <code>glycoverse</code> from other omics analysis frameworks, serving as the foundation for higher-level packages like <code>glymotif</code>, which build upon them to perform advanced glycan analysis.</p>
+</div>
+<div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glycoverse.github.io/glyrepr/">glyrepr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">glycan</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Glycan Structure (NE)</span></span>
-<span><span class="co">#&gt; GlcNAc: 2, Man: 3</span></span>
-<span><span class="co">#&gt; ------------------</span></span>
-<span><span class="co">#&gt; GlcNAc (?1-)</span></span>
-<span><span class="co">#&gt; └─GlcNAc (b1-4)</span></span>
-<span><span class="co">#&gt;   └─Man (b1-4)</span></span>
-<span><span class="co">#&gt;     ├─Man (a1-3)</span></span>
-<span><span class="co">#&gt;     └─Man (a1-6)</span></span></code></pre></div>
+<span><span class="co"># Create glycan compositions</span></span>
+<span><span class="fu"><a href="reference/glycan_composition.html">glycan_composition</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">5</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, Gal <span class="op">=</span> <span class="fl">2</span>, GlcNAc <span class="op">=</span> <span class="fl">4</span>, Fuc <span class="op">=</span> <span class="fl">1</span>, Neu5Ac <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] Man(5)GlcNAc(2)</span></span>
+<span><span class="co">#&gt; [2] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(2)</span></span>
+<span></span>
+<span><span class="co"># Parse IUPAC-condensed glycan text representation</span></span>
+<span><span class="co"># `glyrepr` supports IUPAC-condensed glycan text representation natively.</span></span>
+<span><span class="co"># For other formats like WURCS or glycoCT, use the `glyparse` package.</span></span>
+<span><span class="co"># For example, the following two glycan structures are equivalent:</span></span>
+<span><span class="va">structures</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GlcNAc(b1-4)GlcNAc"</span>, <span class="st">"Man(a1-2)GlcNAc"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get the composition of a glycan structure</span></span>
+<span><span class="fu"><a href="reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="va">structures</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] GlcNAc(2)</span></span>
+<span><span class="co">#&gt; [2] Man(1)GlcNAc(1)</span></span>
+<span></span>
+<span><span class="co"># Count the number of given residues</span></span>
+<span><span class="fu"><a href="reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">structures</span>, <span class="st">"Hex"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0 1</span></span>
+<span><span class="fu"><a href="reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="fu"><a href="reference/glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span>, Gal <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span>, <span class="st">"Hex"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
