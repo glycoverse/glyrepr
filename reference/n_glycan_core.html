@@ -9,7 +9,7 @@ Includes N-glycan core and O-glycan core 1 and core 2."><meta property="og:image
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,15 +17,7 @@ Includes N-glycan core and O-glycan core 1 and core 2."><meta property="og:image
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/glyrepr.html">Get started</a></li>
-<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</a></li>
-    <li><a class="dropdown-item" href="../articles/iupac.html">Decoding Glycans: Your Guide to IUPAC-Condensed Format</a></li>
-    <li><a class="dropdown-item" href="../articles/smap.html">Power User Guide: Efficient Glycan Manipulation</a></li>
-  </ul></li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul></div>
@@ -65,13 +57,13 @@ Default is <code>TRUE</code>.</p></dd>
 
 <dt id="arg-mono-type">mono_type<a class="anchor" aria-label="anchor" href="#arg-mono-type"></a></dt>
 <dd><p>A character string specifying the type of monosaccharides.
-Can be "generic" (Hex, HexNAc, dHex, NeuAc, etc.)
+Can be "simple" (H, N, F, S), "generic" (Hex, HexNAc, dHex, NeuAc, etc.),
 or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A glycan structure (igraph) object.</p>
+    <p>A glycan structure object.</p>
     </div>
     <div class="section level2">
     <h2 id="n-glycan-core">N-Glycan Core<a class="anchor" aria-label="anchor" href="#n-glycan-core"></a></h2>
@@ -110,13 +102,20 @@ and are found throughout the body.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">n_glycan_core</span><span class="op">(</span><span class="op">)</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[1]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">?1-</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Glycan Structure</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Man(3)GlcNAc(2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0087D7;">GlcNAc</span> (?1-)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> └─<span style="color: #0087D7;">GlcNAc</span> (b1-4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   └─<span style="color: #00AF5F;">Man</span> (b1-4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ├─<span style="color: #00AF5F;">Man</span> (a1-3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     └─<span style="color: #00AF5F;">Man</span> (a1-6)</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">o_glycan_core_1</span><span class="op">(</span><span class="op">)</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[1]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Glycan Structure</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Gal(1)GalNAc(1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #FFD700;">GalNAc</span> (a1-)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> └─<span style="color: #FFD700;">Gal</span> (b1-3)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
