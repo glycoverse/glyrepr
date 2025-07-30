@@ -26,26 +26,18 @@
     if (!.validate_brackets(x)) {
       cli::cli_abort("Malformed brackets in IUPAC-condensed string")
     }
-    anomer <- .extract_anomer(x)  # may be NA
-    if (!is.na(anomer)) {
-      x <- stringr::str_sub(x, 1, -stringr::str_length(anomer)-3)
-    }
-    
+    anomer <- .extract_anomer(x)
+    x <- stringr::str_sub(x, 1, -stringr::str_length(anomer)-3)
+
     alditol <- .extract_alditol(x)
     if (alditol) {
       x <- stringr::str_replace(x, "-ol", "")
     }
-    
+
     tokens <- .tokenize_iupac(x)
-    
-    # Deal with missing anomer
+
+    # Require anomer information - no longer auto-supplement
     first_mono_sub_res <- .extract_substituent(tokens[[1]])
-    if (is.na(anomer)) {
-      anomer <- local({
-        anomer_pos <- .decide_anomer_pos(first_mono_sub_res[["mono"]])
-        paste0("?", anomer_pos)
-      })
-    }
     
     # Create a new graph and add the first node
     graph <- igraph::make_empty_graph()
@@ -131,14 +123,17 @@
 # Extract anomer from IUPAC condensed string
 .extract_anomer <- function(iupac) {
   # e.g. "Neu5Ac(a2-" -> "a2"  (ending anomer specification)
-  # e.g. "Neu5Ac" -> NA
   p <- "\\(([ab\\?][12\\?])-$"
   if (stringr::str_detect(iupac, p)) {
     # Check if it's a complete IUPAC string ending with anomer specification
     # This should be allowed for standalone monosaccharides like "Neu5Ac(a2-"
     stringr::str_extract(iupac, p, group = 1)
   } else {
-    NA_character_
+    cli::cli_abort(c(
+      "Can't extract anomer information.",
+      "i" = "Anomer information is required for the reducing-end monosaccharide.",
+      "i" = "For example, use 'Man(a1-' instead of 'Man'."
+    ))
   }
 }
 
@@ -307,11 +302,3 @@
   result
 }
 
-# Decide anomer position for known monosaccharides
-.decide_anomer_pos <- function(mono) {
-  anomer_on_pos2 <- c(
-    "Neu5Ac", "Neu5Gc", "Neu", "Kdn", "Pse", "Leg", "Aci",
-    "4eLeg", "Kdo", "Dha", "Fru", "Tag", "Sor", "Psi"
-  )
-  dplyr::if_else(mono %in% anomer_on_pos2, "2", "1")
-} 

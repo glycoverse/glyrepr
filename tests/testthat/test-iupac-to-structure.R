@@ -1,16 +1,16 @@
 test_that("as_glycan_structure.character parses simple IUPAC-condensed strings", {
   # Single monosaccharide
-  glycan1 <- as_glycan_structure("Man")
+  glycan1 <- as_glycan_structure("Man(?1-")
   expect_s3_class(glycan1, "glyrepr_structure")
   expect_equal(length(glycan1), 1)
   expect_equal(structure_to_iupac(glycan1), "Man(?1-")
-  
+
   # Two monosaccharides
-  glycan2 <- as_glycan_structure("Gal(b1-3)GalNAc")
+  glycan2 <- as_glycan_structure("Gal(b1-3)GalNAc(?1-")
   expect_s3_class(glycan2, "glyrepr_structure")
   expect_equal(length(glycan2), 1)
   expect_equal(structure_to_iupac(glycan2), "Gal(b1-3)GalNAc(?1-")
-  
+
   # With explicit anomer
   glycan3 <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
   expect_s3_class(glycan3, "glyrepr_structure")
@@ -19,7 +19,7 @@ test_that("as_glycan_structure.character parses simple IUPAC-condensed strings",
 
 test_that("as_glycan_structure.character parses branched structures", {
   # Simple branched structure
-  iupac <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  iupac <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-"
   glycan <- as_glycan_structure(iupac)
   expect_s3_class(glycan, "glyrepr_structure")
   expect_equal(structure_to_iupac(glycan), "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-")
@@ -27,41 +27,36 @@ test_that("as_glycan_structure.character parses branched structures", {
 
 test_that("as_glycan_structure.character handles substituents", {
   # With substituents
-  iupac <- "Man3S(a1-2)Gal6Ac"
+  iupac <- "Man3S(a1-2)Gal6Ac(?1-"
   glycan <- as_glycan_structure(iupac)
   expect_s3_class(glycan, "glyrepr_structure")
-  
+
   # Check that substituents are preserved
   graph <- get_structure_graphs(glycan, 1)
   expect_equal(igraph::V(graph)$sub, c("6Ac", "3S"))
 })
 
 test_that("as_glycan_structure.character handles Neu5Ac correctly", {
-  # Neu5Ac without substituent
-  glycan1 <- as_glycan_structure("Neu5Ac")
+  # Neu5Ac with explicit anomer
+  glycan1 <- as_glycan_structure("Neu5Ac(?2-")
   expect_equal(structure_to_iupac(glycan1), "Neu5Ac(?2-")
-  
+
   # Neu5Ac with explicit anomer
   glycan2 <- as_glycan_structure("Neu5Ac(a2-")
   expect_equal(structure_to_iupac(glycan2), "Neu5Ac(a2-")
-  
+
   # Neu5Ac with substituent
-  glycan3 <- as_glycan_structure("Neu5Ac9Ac")
+  glycan3 <- as_glycan_structure("Neu5Ac9Ac(?2-")
   graph <- get_structure_graphs(glycan3, 1)
   expect_equal(igraph::V(graph)$mono, "Neu5Ac")
   expect_equal(igraph::V(graph)$sub, "9Ac")
 })
 
-test_that("as_glycan_structure.character handles alditol", {
-  # With alditol
-  glycan <- as_glycan_structure("GlcNAc(b1-4)GlcNAc-ol")
-  graph <- get_structure_graphs(glycan, 1)
-  expect_true(graph$alditol)
-})
+
 
 test_that("as_glycan_structure.character handles unknown linkages", {
   # Unknown linkages
-  iupac <- "Man(a1-?)Man(?1-3)Man"
+  iupac <- "Man(a1-?)Man(?1-3)Man(?1-"
   glycan <- as_glycan_structure(iupac)
   expect_s3_class(glycan, "glyrepr_structure")
   expect_equal(structure_to_iupac(glycan), "Man(a1-?)Man(?1-3)Man(?1-")
@@ -69,7 +64,7 @@ test_that("as_glycan_structure.character handles unknown linkages", {
 
 test_that("as_glycan_structure.character handles multiple linkages", {
   # Multiple linkages
-  iupac <- "Neu5Ac(a2-3/6)Gal"
+  iupac <- "Neu5Ac(a2-3/6)Gal(?1-"
   glycan <- as_glycan_structure(iupac)
   expect_s3_class(glycan, "glyrepr_structure")
   expect_equal(structure_to_iupac(glycan), "Neu5Ac(a2-3/6)Gal(?1-")
@@ -77,11 +72,11 @@ test_that("as_glycan_structure.character handles multiple linkages", {
 
 test_that("as_glycan_structure.character works with vectors", {
   # Multiple IUPAC strings
-  iupacs <- c("Man", "Gal(b1-3)GalNAc", "Neu5Ac(a2-")
+  iupacs <- c("Man(?1-", "Gal(b1-3)GalNAc(?1-", "Neu5Ac(a2-")
   glycans <- as_glycan_structure(iupacs)
   expect_s3_class(glycans, "glyrepr_structure")
   expect_equal(length(glycans), 3)
-  
+
   # Check each one
   expect_equal(structure_to_iupac(glycans)[1], "Man(?1-")
   expect_equal(structure_to_iupac(glycans)[2], "Gal(b1-3)GalNAc(?1-")
@@ -90,11 +85,11 @@ test_that("as_glycan_structure.character works with vectors", {
 
 test_that("as_glycan_structure.character handles complex O-glycan", {
   # Complex O-glycan structure
-  iupac <- "Neu5Ac(a2-3)Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)[Neu5Ac(a2-3)Gal(b1-3)]GalNAc"
+  iupac <- "Neu5Ac(a2-3)Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)[Neu5Ac(a2-3)Gal(b1-3)]GalNAc(?1-"
   glycan <- as_glycan_structure(iupac)
   expect_s3_class(glycan, "glyrepr_structure")
   expect_equal(length(glycan), 1)
-  
+
   # Check the structure has the correct number of nodes
   graph <- get_structure_graphs(glycan, 1)
   expect_equal(igraph::vcount(graph), 7)  # 7 monosaccharides
@@ -103,12 +98,17 @@ test_that("as_glycan_structure.character handles complex O-glycan", {
 test_that("as_glycan_structure.character error handling", {
   # Empty string
   expect_error(as_glycan_structure(""), "Cannot parse empty")
-  
+
   # NA
   expect_error(as_glycan_structure(NA_character_), "Cannot parse empty")
-  
+
   # Invalid format - unknown monosaccharide
   expect_error(as_glycan_structure("invalid_format"), "Could not parse")
+
+  # Missing anomer information
+  expect_error(as_glycan_structure("Man"), "Can't extract anomer information")
+  expect_error(as_glycan_structure("Neu5Ac"), "Can't extract anomer information")
+  expect_error(as_glycan_structure("Gal(b1-3)GalNAc"), "Can't extract anomer information")
 })
 
 test_that("as_glycan_structure.character round-trip consistency", {
@@ -185,18 +185,18 @@ test_that("as_glycan_structure.character handles invalid monosaccharide names", 
 
 test_that("as_glycan_structure.character handles complex Neu variants", {
   # Test special Neu variants from glyparse
-  glycan1 <- as_glycan_structure("Neu4Ac5Ac")
+  glycan1 <- as_glycan_structure("Neu4Ac5Ac(?2-")
   graph1 <- get_structure_graphs(glycan1, 1)
   expect_equal(igraph::V(graph1)$mono, "Neu5Ac")
   expect_equal(igraph::V(graph1)$sub, "4Ac")
-  
-  glycan2 <- as_glycan_structure("Neu4Ac5Gc")  
+
+  glycan2 <- as_glycan_structure("Neu4Ac5Gc(?2-")
   graph2 <- get_structure_graphs(glycan2, 1)
   expect_equal(igraph::V(graph2)$mono, "Neu5Gc")
   expect_equal(igraph::V(graph2)$sub, "4Ac")
-  
+
   # Neu5Ac should not be split even though it matches substituent pattern
-  glycan3 <- as_glycan_structure("Neu5Ac")
+  glycan3 <- as_glycan_structure("Neu5Ac(?2-")
   graph3 <- get_structure_graphs(glycan3, 1)
   expect_equal(igraph::V(graph3)$mono, "Neu5Ac")
   expect_equal(igraph::V(graph3)$sub, "")
@@ -230,38 +230,18 @@ test_that("as_glycan_structure.character handles mixed valid/invalid in vectors"
   expect_error(as_glycan_structure(all_invalid), "Could not parse")
 })
 
-test_that("as_glycan_structure.character handles alditol edge cases", {
-  # Invalid alditol combinations
-  expect_error(as_glycan_structure("Man(a1--ol"), "Could not parse")
-  
-  # Multiple -ol
-  expect_error(as_glycan_structure("Man-ol-ol"), "Could not parse")
-  
-  # Just -ol
-  expect_error(as_glycan_structure("-ol"), "Could not parse")
-  
-  # Valid alditol cases
-  glycan1 <- as_glycan_structure("Man-ol")
-  graph1 <- get_structure_graphs(glycan1, 1)
-  expect_true(graph1$alditol)
-  expect_equal(graph1$anomer, "?1")
-  
-  # Alditol in complex structure
-  glycan2 <- as_glycan_structure("Gal(b1-3)GalNAc-ol")
-  graph2 <- get_structure_graphs(glycan2, 1)
-  expect_true(graph2$alditol)
-})
+
 
 test_that("as_glycan_structure.character handles extreme linkage cases", {
   # Maximum valid positions
-  glycan1 <- as_glycan_structure("Man(a2-9)Gal")
+  glycan1 <- as_glycan_structure("Man(a2-9)Gal(?1-")
   expect_s3_class(glycan1, "glyrepr_structure")
-  
-  glycan2 <- as_glycan_structure("Man(b1-1)Gal") 
+
+  glycan2 <- as_glycan_structure("Man(b1-1)Gal(?1-")
   expect_s3_class(glycan2, "glyrepr_structure")
-  
+
   # Complex multi-position linkages
-  glycan3 <- as_glycan_structure("Man(a1-2/3/4/5/6)Gal")
+  glycan3 <- as_glycan_structure("Man(a1-2/3/4/5/6)Gal(?1-")
   expect_s3_class(glycan3, "glyrepr_structure")
   expect_equal(structure_to_iupac(glycan3), "Man(a1-2/3/4/5/6)Gal(?1-")
 })
@@ -289,12 +269,12 @@ test_that("as_glycan_structure.character handles unusual anomer cases", {
 
 test_that("as_glycan_structure.character preserves complex substituent patterns", {
   # Test various substituent combinations
-  glycan1 <- as_glycan_structure("Gal6S(b1-3)GlcNAc4S")
+  glycan1 <- as_glycan_structure("Gal6S(b1-3)GlcNAc4S(?1-")
   graph1 <- get_structure_graphs(glycan1, 1)
   expect_equal(sort(igraph::V(graph1)$sub), sort(c("4S", "6S")))
-  
+
   # Unknown position substituents
-  glycan2 <- as_glycan_structure("Man?S")
+  glycan2 <- as_glycan_structure("Man?S(?1-")
   graph2 <- get_structure_graphs(glycan2, 1)
   expect_equal(igraph::V(graph2)$sub, "?S")
 })

@@ -56,7 +56,7 @@ iupacs <- c(
   "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",  # N-glycan core
   "Gal(b1-3)GalNAc(a1-",                                    # O-glycan core 1
   "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-",                     # O-glycan core 2
-  "Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man",          # Branched mannose
+  "Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-",          # Branched mannose
   "GlcNAc6Ac(b1-4)Glc3Me(a1-"                              # With decorations
 )
 

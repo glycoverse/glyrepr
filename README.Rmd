@@ -72,7 +72,7 @@ glycan_composition(
 # `glyrepr` supports IUPAC-condensed glycan text representation natively.
 # For other formats like WURCS or glycoCT, use the `glyparse` package.
 # For example, the following two glycan structures are equivalent:
-structures <- as_glycan_structure(c("GlcNAc(b1-4)GlcNAc", "Man(a1-2)GlcNAc"))
+structures <- as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(?1-", "Man(a1-2)GlcNAc(?1-"))
 
 # Get the composition of a glycan structure
 as_glycan_composition(structures)
