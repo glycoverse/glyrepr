@@ -79,7 +79,6 @@ Therefore, <code>sloop::s3_class()</code> of a glycan structure vector is
 <code>c("glyrepr_structure", "vctrs_rcrd")</code>.</p>
 <p>Constraints for individual structures:</p><ul><li><p>The graph must be directed and an outward tree (reducing end as root).</p></li>
 <li><p>The graph must have a graph attribute <code>anomer</code>, in the form of "a1".</p></li>
-<li><p>The graph must have a graph attribute <code>alditol</code>, a logical value.</p></li>
 <li><p>The graph must have a vertex attribute <code>mono</code> for monosaccharide names.</p></li>
 <li><p>The graph must have a vertex attribute <code>sub</code> for substituents.</p></li>
 <li><p>The graph must have an edge attribute <code>linkage</code> for linkages.</p></li>
@@ -105,7 +104,6 @@ NA is not allowed.</p></li>
 <span class="r-in"><span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span><span class="op">$</span><span class="va">sub</span> <span class="op">&lt;-</span> <span class="st">""</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://r.igraph.org/reference/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span><span class="op">$</span><span class="va">linkage</span> <span class="op">&lt;-</span> <span class="st">"b1-4"</span></span></span>
 <span class="r-in"><span><span class="va">graph</span><span class="op">$</span><span class="va">anomer</span> <span class="op">&lt;-</span> <span class="st">"a1"</span></span></span>
-<span class="r-in"><span><span class="va">graph</span><span class="op">$</span><span class="va">alditol</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create glycan structure vector</span></span></span>
 <span class="r-in"><span><span class="fu">glycan_structure</span><span class="op">(</span><span class="va">graph</span><span class="op">)</span></span></span>

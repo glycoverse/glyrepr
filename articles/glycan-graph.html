@@ -121,10 +121,10 @@ Instead, let’s extract the underlying graph using
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span>
 <span><span class="va">graph</span></span>
-<span><span class="co">#&gt; IGRAPH ab4318b DN-- 5 4 -- </span></span>
+<span><span class="co">#&gt; IGRAPH aab982e DN-- 5 4 -- </span></span>
 <span><span class="co">#&gt; + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),</span></span>
 <span><span class="co">#&gt; | linkage (e/c)</span></span>
-<span><span class="co">#&gt; + edges from ab4318b (vertex names):</span></span>
+<span><span class="co">#&gt; + edges from aab982e (vertex names):</span></span>
 <span><span class="co">#&gt; [1] 1-&gt;2 2-&gt;3 3-&gt;4 3-&gt;5</span></span></code></pre></div>
 <p>Let’s decode what we’re seeing here 🕵️:</p>
 <p><strong>First line:</strong> Directed Named (“DN”) graph with 5
@@ -135,9 +135,6 @@ with 5 people and 4 relationships.</p>
 <li>
 <code>anomer</code> 🔄: The anomeric configuration of the reducing
 end (the “root” of our tree)</li>
-<li>
-<code>alditol</code> 🧪: Whether the reducing end is an alditol
-(spoiler: usually it’s not!)</li>
 </ul>
 <p><strong>Vertex attributes (the sugar units themselves):</strong></p>
 <ul>
@@ -231,13 +228,9 @@ notation perfectly.</p>
 </h3>
 <p><strong>🔄 Anomer:</strong> The anomeric configuration of the
 reducing end (the “root” sugar that doesn’t link to anything else)</p>
-<p><strong>🧪 Alditol:</strong> Whether the reducing end is an alditol
-(rarely used in omics, but included for database compatibility)</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">graph</span><span class="op">$</span><span class="va">anomer</span></span>
-<span><span class="co">#&gt; [1] "?1"</span></span>
-<span><span class="va">graph</span><span class="op">$</span><span class="va">alditol</span></span>
-<span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "?1"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -258,7 +251,7 @@ search:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bfs_result</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/bfs.html" class="external-link">bfs</a></span><span class="op">(</span><span class="va">graph</span>, root <span class="op">=</span> <span class="fl">1</span>, mode <span class="op">=</span> <span class="st">"out"</span><span class="op">)</span></span>
 <span><span class="va">bfs_result</span><span class="op">$</span><span class="va">order</span></span>
-<span><span class="co">#&gt; + 5/5 vertices, named, from ab4318b:</span></span>
+<span><span class="co">#&gt; + 5/5 vertices, named, from aab982e:</span></span>
 <span><span class="co">#&gt; [1] 1 2 3 4 5</span></span></code></pre></div>
 </div>
 <div class="section level3">

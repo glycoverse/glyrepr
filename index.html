@@ -114,7 +114,7 @@
 <span><span class="co"># `glyrepr` supports IUPAC-condensed glycan text representation natively.</span></span>
 <span><span class="co"># For other formats like WURCS or glycoCT, use the `glyparse` package.</span></span>
 <span><span class="co"># For example, the following two glycan structures are equivalent:</span></span>
-<span><span class="va">structures</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GlcNAc(b1-4)GlcNAc"</span>, <span class="st">"Man(a1-2)GlcNAc"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">structures</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GlcNAc(b1-4)GlcNAc(?1-"</span>, <span class="st">"Man(a1-2)GlcNAc(?1-"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get the composition of a glycan structure</span></span>
 <span><span class="fu"><a href="reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="va">structures</span><span class="op">)</span></span>

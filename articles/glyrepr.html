@@ -214,10 +214,10 @@ article</a>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">iupacs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span>,  <span class="co"># The famous N-glycan core</span></span>
-<span>  <span class="st">"Gal(b1-3)GalNAc(a1-"</span>,                                    <span class="co"># O-glycan core 1</span></span>
-<span>  <span class="st">"Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"</span>,                     <span class="co"># O-glycan core 2</span></span>
-<span>  <span class="st">"Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man"</span>,          <span class="co"># A branched mannose tree</span></span>
-<span>  <span class="st">"GlcNAc6Ac(b1-4)Glc3Me(a1-"</span>                              <span class="co"># With some decorations</span></span>
+<span>  <span class="st">"Gal(b1-3)GalNAc(a1-"</span>,                                  <span class="co"># O-glycan core 1</span></span>
+<span>  <span class="st">"Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"</span>,                    <span class="co"># O-glycan core 2</span></span>
+<span>  <span class="st">"Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-"</span>,      <span class="co"># A branched mannose tree</span></span>
+<span>  <span class="st">"GlcNAc6Ac(b1-4)Glc3Me(a1-"</span>                             <span class="co"># With some decorations</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">struc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="va">iupacs</span><span class="op">)</span></span>
@@ -226,7 +226,7 @@ article</a>.</p>
 <span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
 <span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; [3] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">?1-</span></span></span>
+<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; [5] GlcNAc6Ac(<span style="color: #B2B2B2;">b1-4</span>)Glc3Me(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; # Unique structures: 5</span></span></code></pre></div>
 </div>
@@ -245,12 +245,12 @@ key to lightning-fast performance.</p>
 <span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
 <span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; [3] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">?1-</span></span></span>
+<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; [5] GlcNAc6Ac(<span style="color: #B2B2B2;">b1-4</span>)Glc3Me(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; [6] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
 <span><span class="co">#&gt; [7] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; [8] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [9] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">?1-</span></span></span>
+<span><span class="co">#&gt; [9] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; [10] GlcNAc6Ac(<span style="color: #B2B2B2;">b1-4</span>)Glc3Me(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; ... (4990 more not shown)</span></span>
 <span><span class="co">#&gt; # Unique structures: 5</span></span></code></pre></div>
@@ -274,7 +274,7 @@ copy of each book, no matter how many people want to read it.</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5,000 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_mono_type.html">convert_mono_type</a></span><span class="op">(</span><span class="va">large_struc</span>, <span class="st">"generic"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5,000 structures: 0.024 sec elapsed</span></span></code></pre></div>
+<span><span class="co">#&gt; Converting 5,000 structures: 0.025 sec elapsed</span></span></code></pre></div>
 <p><strong>Mind = blown!</strong> 🤯 The performance is nearly identical
 because <code>glyrepr</code> only processes each unique structure once,
 then cleverly expands the results.</p>
@@ -291,7 +291,7 @@ manipulation:</p>
 <span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(??-?)[<span style="color: #00AF5F;">Man</span>(??-?)]<span style="color: #00AF5F;">Man</span>(??-?)<span style="color: #0087D7;">GlcNAc</span>(??-?)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
 <span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(??-?)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; [3] <span style="color: #0087D7;">GlcNAc</span>(??-?)[<span style="color: #FFD700;">Gal</span>(??-?)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(??-?)[<span style="color: #00AF5F;">Man</span>(??-?)]<span style="color: #00AF5F;">Man</span>(??-?)[<span style="color: #00AF5F;">Man</span>(??-?)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">?1-</span></span></span>
+<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(??-?)[<span style="color: #00AF5F;">Man</span>(??-?)]<span style="color: #00AF5F;">Man</span>(??-?)[<span style="color: #00AF5F;">Man</span>(??-?)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; [5] GlcNAc6Ac(??-?)Glc3Me(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; # Unique structures: 5</span></span></code></pre></div>
 <p><strong>Remove the decorations:</strong></p>
@@ -336,7 +336,7 @@ manipulation:</p>
 <span><span class="co">#&gt; [1] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span></span>
 <span><span class="co">#&gt; [2] "Gal(b1-3)GalNAc(a1-"                                </span></span>
 <span><span class="co">#&gt; [3] "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"                  </span></span>
-<span><span class="co">#&gt; [4] "Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(?1-"    </span></span>
+<span><span class="co">#&gt; [4] "Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-"    </span></span>
 <span><span class="co">#&gt; [5] "GlcNAc6Ac(b1-4)Glc3Me(a1-"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">comp</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Man(3)GlcNAc(2)"           "Gal(1)GalNAc(1)"          </span></span>
@@ -365,7 +365,7 @@ tidyverse:</p>
 <span><span class="co">#&gt;      id structures                                          names         n_man</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;struct&gt;</span>                                            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1- N-glycan core     3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     4 Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(?1-     Branched Man      5</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     4 Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-     Branched Man      5</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
