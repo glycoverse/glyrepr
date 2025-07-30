@@ -109,7 +109,6 @@ n_glycan_core_base <- function() {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
   graph$anomer <- "?1"
-  graph$alditol <- FALSE
   graph
 }
 
@@ -120,7 +119,6 @@ o_glycan_core_1_base <- function() {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-3"
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   graph
 }
 
@@ -131,7 +129,6 @@ o_glycan_core_2_base <- function() {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-3", "b1-6")
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   graph
 }
 
