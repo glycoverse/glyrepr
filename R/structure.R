@@ -18,7 +18,6 @@
 #' Constraints for individual structures:
 #' - The graph must be directed and an outward tree (reducing end as root).
 #' - The graph must have a graph attribute `anomer`, in the form of "a1".
-#' - The graph must have a graph attribute `alditol`, a logical value.
 #' - The graph must have a vertex attribute `mono` for monosaccharide names.
 #' - The graph must have a vertex attribute `sub` for substituents.
 #' - The graph must have an edge attribute `linkage` for linkages.
@@ -47,7 +46,6 @@
 #' V(graph)$sub <- ""
 #' E(graph)$linkage <- "b1-4"
 #' graph$anomer <- "a1"
-#' graph$alditol <- FALSE
 #' 
 #' # Create glycan structure vector
 #' glycan_structure(graph)
@@ -186,15 +184,7 @@ validate_single_glycan_structure <- function(glycan) {
     cli::cli_abort(glue::glue("Invalid anomer: {glycan$anomer}"))
   }
   
-  # Check if "alditol" attribute exists
-  if (is.null(glycan$alditol)) {
-    cli::cli_abort("Glycan structure must have a graph attribute 'alditol'.")
-  }
-  
-  # Check if "alditol" attribute is valid
-  if (!is.logical(glycan$alditol)) {
-    cli::cli_abort("Glycan structure attribute 'alditol' must be logical.")
-  }
+
 
   glycan
 }
@@ -256,7 +246,6 @@ is_glycan_structure <- function(x) {
 #' V(graph)$sub <- ""
 #' E(graph)$linkage <- "b1-4"
 #' graph$anomer <- "a1"
-#' graph$alditol <- FALSE
 #' as_glycan_structure(graph)
 #' 
 #' # Convert a list of igraphs

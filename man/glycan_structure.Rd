@@ -36,7 +36,6 @@ Constraints for individual structures:
 \itemize{
 \item The graph must be directed and an outward tree (reducing end as root).
 \item The graph must have a graph attribute \code{anomer}, in the form of "a1".
-\item The graph must have a graph attribute \code{alditol}, a logical value.
 \item The graph must have a vertex attribute \code{mono} for monosaccharide names.
 \item The graph must have a vertex attribute \code{sub} for substituents.
 \item The graph must have an edge attribute \code{linkage} for linkages.
@@ -62,7 +61,6 @@ V(graph)$mono <- c("GlcNAc", "GlcNAc")
 V(graph)$sub <- ""
 E(graph)$linkage <- "b1-4"
 graph$anomer <- "a1"
-graph$alditol <- FALSE
 
 # Create glycan structure vector
 glycan_structure(graph)

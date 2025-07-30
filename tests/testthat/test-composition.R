@@ -89,7 +89,6 @@ test_that("as_composition works for a glycan structure", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
 
   comp <- as_glycan_composition(glycan)
@@ -105,7 +104,6 @@ test_that("as_composition works for a glycan structure with substituents", {
   igraph::V(graph)$sub <- c("", "", "3Me")
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
 
   comp <- as_glycan_composition(glycan)
@@ -121,7 +119,6 @@ test_that("as_composition works for a glycan structure with multiple substituent
   igraph::V(graph)$sub <- c("", "", "3Me,6S")
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
 
   comp <- as_glycan_composition(glycan)

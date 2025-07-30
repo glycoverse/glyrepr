@@ -11,7 +11,6 @@ test_that("structure_to_iupac works with basic linear structures", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-3")
   graph$anomer <- "?1"
-  graph$alditol <- FALSE
   glycan2 <- glycan_structure(graph)
   
   result2 <- structure_to_iupac(glycan2)
@@ -37,7 +36,6 @@ test_that("structure_to_iupac handles single node structures", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- character(0)  # Empty linkage for no edges
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)
@@ -51,7 +49,6 @@ test_that("structure_to_iupac handles two-node structures", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "a1-3"
   graph$anomer <- "b1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)
@@ -137,7 +134,6 @@ test_that("structure_to_iupac handles complex branched structures", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "a1-3", "a1-2", "a1-6", "b1-3")
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)
@@ -154,7 +150,6 @@ test_that("structure_to_iupac selects correct backbone based on depth", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "a1-3", "a1-6", "b1-2")
   graph$anomer <- "?1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)
@@ -173,7 +168,6 @@ test_that("structure_to_iupac selects backbone by linkage when depths are equal"
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "a1-3", "a1-6")
   graph$anomer <- "b2"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)
@@ -191,7 +185,6 @@ test_that("structure_to_iupac handles different anomer values", {
     igraph::V(graph)$sub <- ""
     igraph::E(graph)$linkage <- "b1-4"
     graph$anomer <- anomer
-    graph$alditol <- FALSE
     glycan <- glycan_structure(graph)
     
     result <- structure_to_iupac(glycan)
@@ -210,7 +203,6 @@ test_that("structure_to_iupac handles multiple branches correctly", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "a1-2", "a1-3", "a1-6")
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)
@@ -258,7 +250,6 @@ test_that("structure_to_iupac throws appropriate errors", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "a1-3"
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   # Test the internal function directly with an invalid structure (multiple roots)
@@ -267,7 +258,6 @@ test_that("structure_to_iupac throws appropriate errors", {
   igraph::V(invalid_graph)$sub <- ""
   igraph::E(invalid_graph)$linkage <- c("a1-3", "b1-4")
   invalid_graph$anomer <- "a1"
-  invalid_graph$alditol <- FALSE
   
   # Test the internal function .structure_to_iupac_single
   expect_error(glyrepr:::.structure_to_iupac_single(invalid_graph), "exactly one root")
@@ -295,7 +285,6 @@ test_that("structure_to_iupac handles edge cases with linkages", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "?2-?"
   graph$anomer <- "??"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)
@@ -321,7 +310,6 @@ test_that("structure_to_iupac supports substituents", {
   igraph::V(graph)$sub <- "3Me"  # 3号位置有Me修饰
   igraph::E(graph)$linkage <- character(0)
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)
@@ -349,7 +337,6 @@ test_that("structure_to_iupac handles empty substituents", {
   igraph::V(graph)$sub <- c("", "")  # No substituents
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)
@@ -364,7 +351,6 @@ test_that("structure_to_iupac handles mixed substituents", {
   igraph::V(graph)$sub <- c("3Me", "", "6S")  # Mixed substituents
   igraph::E(graph)$linkage <- c("b1-4", "b1-3")
   graph$anomer <- "a1"
-  graph$alditol <- FALSE
   glycan <- glycan_structure(graph)
   
   result <- structure_to_iupac(glycan)

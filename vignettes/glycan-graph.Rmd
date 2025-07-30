@@ -81,7 +81,6 @@ Think of it as a family tree with 5 people and 4 relationships.
 **Graph-level attributes:**
 
 - `anomer` 🔄: The anomeric configuration of the reducing end (the "root" of our tree)
-- `alditol` 🧪: Whether the reducing end is an alditol (spoiler: usually it's not!)
 
 **Vertex attributes (the sugar units themselves):**
 
@@ -179,12 +178,8 @@ igraph::E(graph3)$linkage
 
 **🔄 Anomer:** The anomeric configuration of the reducing end (the "root" sugar that doesn't link to anything else)
 
-**🧪 Alditol:** Whether the reducing end is an alditol (rarely used in omics, 
-but included for database compatibility)
-
 ```{r}
 graph$anomer
-graph$alditol
 ```
 
 ## Now for the Fun Part: What Can You Do? 🎉

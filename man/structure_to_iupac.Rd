@@ -57,7 +57,6 @@ igraph::V(graph)$mono <- c("Glc", "GlcNAc")
 igraph::V(graph)$sub <- c("3Me", "6Ac")
 igraph::E(graph)$linkage <- "b1-4"
 graph$anomer <- "a1"
-graph$alditol <- FALSE
 glycan <- glycan_structure(graph)
 structure_to_iupac(glycan)  # Returns "GlcNAc6Ac(b1-4)Glc3Me(a1-"
 

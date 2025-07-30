@@ -29,11 +29,6 @@
     anomer <- .extract_anomer(x)
     x <- stringr::str_sub(x, 1, -stringr::str_length(anomer)-3)
 
-    alditol <- .extract_alditol(x)
-    if (alditol) {
-      x <- stringr::str_replace(x, "-ol", "")
-    }
-
     tokens <- .tokenize_iupac(x)
 
     # Require anomer information - no longer auto-supplement
@@ -50,7 +45,6 @@
     if (length(tokens) == 1) {
       graph <- igraph::set_edge_attr(graph, "linkage", value = character(0))
       graph$anomer <- anomer
-      graph$alditol <- alditol
       return(graph)
     }
     
@@ -83,7 +77,6 @@
     }
     
     graph$anomer <- anomer
-    graph$alditol <- alditol
     return(graph)
   }, error = function(e) {
     cli::cli_abort(c(
@@ -137,10 +130,7 @@
   }
 }
 
-# Extract alditol from IUPAC condensed string
-.extract_alditol <- function(iupac) {
-  stringr::str_detect(iupac, "-ol")
-}
+
 
 # Tokenize IUPAC condensed string
 .tokenize_iupac <- function(iupac) {

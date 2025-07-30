@@ -27,7 +27,6 @@ V(graph)$mono <- c("GlcNAc", "GlcNAc")
 V(graph)$sub <- ""
 E(graph)$linkage <- "b1-4"
 graph$anomer <- "a1"
-graph$alditol <- FALSE
 as_glycan_structure(graph)
 
 # Convert a list of igraphs
