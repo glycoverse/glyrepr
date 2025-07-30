@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,15 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>Remove the “alditol” attribute from <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> objects. This information is rarely used in glycomics and glycoproteomics data analysis. It is removed according to the razor principle.</li>
+<li>
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> now doesn’t allow the input IUPAC-condensed strings to omit the anomer information. Previously, something like “Glc(a1-3)GlcNAc” is valid. <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> assumed that the core “GlcNAc” has a “?1-” anomer and added it automatically. The problem is that this behavior was not easily awared by users and might cause confusion. Again, less is more, so we remove it.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.2" id="glyrepr-052">glyrepr 0.5.2<a class="anchor" aria-label="anchor" href="#glyrepr-052"></a></h2>
 <div class="section level3">
