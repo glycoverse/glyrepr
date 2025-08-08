@@ -4,7 +4,7 @@
       print(glycan, verbose = TRUE)
     Output
       <glycan_structure[1]>
-      [1] Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-
+      [1] Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
       # Unique structures: 1
 
 # N-glycan core structure without linkages
@@ -13,7 +13,7 @@
       print(glycan, verbose = TRUE)
     Output
       <glycan_structure[1]>
-      [1] Man(??-?)[Man(??-?)]Man(??-?)GlcNAc(??-?)GlcNAc(?1-
+      [1] Man(??-?)[Man(??-?)]Man(??-?)GlcNAc(??-?)GlcNAc(b1-
       # Unique structures: 1
 
 # N-glycan core structure with generic monosaccharides
@@ -22,7 +22,7 @@
       print(glycan, verbose = TRUE)
     Output
       <glycan_structure[1]>
-      [1] Hex(a1-3)[Hex(a1-6)]Hex(b1-4)HexNAc(b1-4)HexNAc(?1-
+      [1] Hex(a1-3)[Hex(a1-6)]Hex(b1-4)HexNAc(b1-4)HexNAc(b1-
       # Unique structures: 1
 
 # O-glycan core 1

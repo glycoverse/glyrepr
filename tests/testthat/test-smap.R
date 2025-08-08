@@ -93,7 +93,7 @@ test_that("get_anomer function works correctly", {
   result <- get_anomer(x)
   expect_type(result, "character")
   expect_equal(length(result), 1)
-  expect_equal(result, "?1")
+  expect_equal(result, "b1")
   
   # Test that it's equivalent to purrr lambda style
   result_lambda <- smap_chr(x, ~ .x$anomer)

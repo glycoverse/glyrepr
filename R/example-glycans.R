@@ -17,8 +17,8 @@
 #'
 #' ```
 #'     Man
-#'   a1-6 \   b1-4      b1-4
-#'         Man -- GlcNAc -- GlcNAc
+#'   a1-6 \   b1-4      b1-4      b1-
+#'         Man -- GlcNAc -- GlcNAc -
 #'   a1-3 /
 #'     Man
 #' ```
@@ -33,7 +33,8 @@
 #'
 #' **core 1**:
 #' ```
-#'     GalNAc
+#'           a1-
+#'     GalNAc -
 #'    / b1-3
 #' Gal
 #' ```
@@ -41,8 +42,8 @@
 #' **core 2**:
 #' ```
 #' GlcNAc
-#'       \ b1-6
-#'        GalNAc
+#'       \ b1-6 a1-
+#'        GalNAc -
 #'       / b1-3
 #'    Gal
 #' ```
@@ -108,7 +109,7 @@ n_glycan_core_base <- function() {
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
-  graph$anomer <- "?1"
+  graph$anomer <- "b1"
   graph
 }
 

@@ -37,8 +37,8 @@ The mannose residue is branched and connected via α1,3- and α1,6-glycosidic
 linkages to the two other mannose building blocks.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{    Man
-  a1-6 \\   b1-4      b1-4
-        Man -- GlcNAc -- GlcNAc
+  a1-6 \\   b1-4      b1-4      b1-
+        Man -- GlcNAc -- GlcNAc -
   a1-3 /
     Man
 }\if{html}{\out{</div>}}
@@ -53,7 +53,8 @@ and are found throughout the body.
 
 \strong{core 1}:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{    GalNAc
+\if{html}{\out{<div class="sourceCode">}}\preformatted{          a1-
+    GalNAc -
    / b1-3
 Gal
 }\if{html}{\out{</div>}}
@@ -61,8 +62,8 @@ Gal
 \strong{core 2}:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{GlcNAc
-      \\ b1-6
-       GalNAc
+      \\ b1-6 a1-
+       GalNAc -
       / b1-3
    Gal
 }\if{html}{\out{</div>}}

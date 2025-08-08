@@ -21,7 +21,7 @@ test_that("structure_to_iupac works with branched structures", {
   # Test with N-glycan core
   glycan <- n_glycan_core()
   result <- structure_to_iupac(glycan)
-  expect_equal(result, "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-")
+  expect_equal(result, "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
   
   # Test with O-glycan core 2
   glycan2 <- o_glycan_core_2()

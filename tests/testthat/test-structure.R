@@ -441,7 +441,7 @@ test_that("format.glyrepr_structure displays correct IUPAC sequences", {
   expect_type(formatted, "character")
   expect_length(formatted, 2)
   expect_true("Gal(b1-3)GalNAc(a1-" %in% formatted)
-  expect_true("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-" %in% formatted)
+  expect_true("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-" %in% formatted)
 })
 
 test_that("format.glyrepr_structure handles empty vector", {
@@ -585,7 +585,7 @@ test_that("c() combines glycan_structure vectors correctly", {
   
   # Check that both structures are preserved
   formatted <- format(combined)
-  expect_true("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-" %in% formatted)
+  expect_true("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-" %in% formatted)
   expect_true("Gal(b1-3)GalNAc(a1-" %in% formatted)
 })
 
@@ -630,7 +630,7 @@ test_that("c() combines multiple structure vectors efficiently", {
   # Check all elements are present
   formatted <- format(combined)
   expect_equal(sum(formatted == "Gal(b1-3)GalNAc(a1-"), 2)  # o_glycan_core_1 appears twice
-  expect_equal(sum(formatted == "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-"), 2)  # n_glycan_core appears twice
+  expect_equal(sum(formatted == "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"), 2)  # n_glycan_core appears twice
 })
 
 test_that("c() preserves structure integrity across combinations", {
