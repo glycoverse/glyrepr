@@ -36,6 +36,7 @@ Constraints for individual structures:
 \itemize{
 \item The graph must be directed and an outward tree (reducing end as root).
 \item The graph must have a graph attribute \code{anomer}, in the form of "a1".
+Unknown parts can be "?", e.g. "?1", "a?", "??".
 \item The graph must have a vertex attribute \code{mono} for monosaccharide names.
 \item The graph must have a vertex attribute \code{sub} for substituents.
 \item The graph must have an edge attribute \code{linkage} for linkages.
@@ -48,6 +49,9 @@ For multiple substituents, separate them with commas and order by position,
 e.g. "3Me,4Ac", "2S,6P", etc. Empty string "" means no substituents.
 \item Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
 e.g. "b1-4", "a2-3", etc.
+Any position can be unknown ("?") or partially unknown (e.g. "3/6").
+For example, the following linkages are all valid:
+"a1-?", "b?-3", "a1-3/6", "??-3", "a1-3/6/9", "??-?".
 NA is not allowed.
 }
 }

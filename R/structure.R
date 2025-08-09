@@ -18,18 +18,22 @@
 #' Constraints for individual structures:
 #' - The graph must be directed and an outward tree (reducing end as root).
 #' - The graph must have a graph attribute `anomer`, in the form of "a1".
+#'   Unknown parts can be "?", e.g. "?1", "a?", "??".
 #' - The graph must have a vertex attribute `mono` for monosaccharide names.
 #' - The graph must have a vertex attribute `sub` for substituents.
 #' - The graph must have an edge attribute `linkage` for linkages.
 #' - Monosaccharide name must be known, either generic (Hex, HexNAc, etc.)
 #'   or concrete (Glc, Gal, etc.), but not a mixture of both.
 #'   NA is not allowed.
-#' - Substituent must be valid. For single substituents, use the form "xY", 
+#' - Substituent must be valid. For single substituents, use the form "xY",
 #'   where x is position and Y is substituent name, e.g. "2Ac", "3S", etc.
 #'   For multiple substituents, separate them with commas and order by position,
 #'   e.g. "3Me,4Ac", "2S,6P", etc. Empty string "" means no substituents.
 #' - Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
 #'   e.g. "b1-4", "a2-3", etc.
+#'   Any position can be unknown ("?") or partially unknown (e.g. "3/6").
+#'   For example, the following linkages are all valid:
+#'   "a1-?", "b?-3", "a1-3/6", "??-3", "a1-3/6/9", "??-?".
 #'   NA is not allowed.
 #'
 #' @param ... igraph graph objects to be converted to glycan structures, or existing glycan structure vectors.
