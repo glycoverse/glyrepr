@@ -1,3 +1,14 @@
+# glyrepr 0.6.1
+
+## Minor improvements and bug fixes
+
+* `n_glycan_core()` now has a "b1" reducing end anomer, not "?1".
+* Add validation to `glycan_structure()` to ensure no duplicated linkage positions. For example, "Gal(b1-3)[Fuc(a1-3)]GalNAc(b1-" is invalid now becuase both "Gal" and "Fuc" are linked to "GalNAc" at position 3.
+* Add descriptions about ambiguous linkages and anomers in `glycan_structure()` documentation.
+* `remove_linkages()` now also removes reducing end anomers.
+* `n_glycan_core()`, `o_glycan_core_1()`, and `o_glycan_core_2()` now have "??" anomers when `linkage = FALSE`.
+* Fix a bug in `smap_structure()`, `smap2_structure()`, `spmap_structure()`, and `simap_structure()` where modifying the structures can create identical structures, but the unique structures are not updated correctly. This automatically fixes a similar bug in `remove_linkages()`.
+
 # glyrepr 0.6.0
 
 ## Breaking changes
