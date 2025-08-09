@@ -124,6 +124,29 @@
 #' @name smap
 NULL
 
+# Helper function to rebuild glycan_structure with proper deduplication
+# after modifications that may create identical structures
+.rebuild_structure_with_dedup <- function(modified_structures, idx_mapping) {
+  # Get new IUPACs for all modified structures
+  new_unique_iupacs <- purrr::map_chr(modified_structures, .structure_to_iupac_single)
+  new_iupacs <- new_unique_iupacs[idx_mapping]
+
+  # Get new mono types for all modified structures
+  new_unique_mono_types <- unname(purrr::map_chr(modified_structures, get_graph_mono_type))
+  new_mono_types <- new_unique_mono_types[idx_mapping]
+
+  # Re-deduplicate structures based on new IUPACs to handle cases where
+  # modifications create identical structures
+  unique_new_indices <- which(!duplicated(new_unique_iupacs))
+  final_unique_structures <- modified_structures[unique_new_indices]
+  final_unique_iupacs <- new_unique_iupacs[unique_new_indices]
+  names(final_unique_structures) <- final_unique_iupacs
+
+  # Create result using the standard glycan_structure constructor to ensure
+  # proper deduplication and validation
+  new_glycan_structure(new_iupacs, new_mono_types, final_unique_structures)
+}
+
 # Helper function for parallel processing
 .smap_apply <- function(data_list, func, use_parallel = FALSE, auto_threshold = 100, ...) {
   n_tasks <- length(data_list)
@@ -255,22 +278,9 @@ smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
     result
   }, use_parallel = .parallel)
   
-  # Get new IUPACs
-  new_unique_iupacs <- purrr::map_chr(new_structures, .structure_to_iupac_single)
-  names(new_structures) <- new_unique_iupacs
+  # Rebuild glycan_structure with proper deduplication
   idx <- match(iupacs, unique_iupacs)
-  new_iupacs <- new_unique_iupacs[idx]
-  
-  # Get new mono types
-  new_unique_mono_types <- unname(purrr::map_chr(new_structures, get_graph_mono_type))
-  new_mono_types <- new_unique_mono_types[idx]
-  
-  # Create result directly using vctrs::new_rcrd
-  vctrs::new_rcrd(
-    list(iupac = new_iupacs, mono_type = new_mono_types),
-    structures = new_structures,
-    class = "glyrepr_structure"
-  )
+  .rebuild_structure_with_dedup(new_structures, idx)
 }
 
 #' Apply Function to Unique Structures Only
@@ -597,22 +607,9 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
     result
   }, use_parallel = .parallel)
   
-  # Get new IUPACs
-  new_unique_iupacs <- purrr::map_chr(new_structures, .structure_to_iupac_single)
-  names(new_structures) <- new_unique_iupacs
+  # Rebuild glycan_structure with proper deduplication
   idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
-  new_iupacs <- new_unique_iupacs[idx]
-
-  # Get new mono types
-  new_unique_mono_types <- unname(purrr::map_chr(new_structures, get_graph_mono_type))
-  new_mono_types <- new_unique_mono_types[idx]
-  
-  # Create result directly using vctrs::new_rcrd
-  vctrs::new_rcrd(
-    list(iupac = new_iupacs, mono_type = new_mono_types),
-    structures = new_structures,
-    class = "glyrepr_structure"
-  )
+  .rebuild_structure_with_dedup(new_structures, idx)
 }
 
 #' Map Functions Over Glycan Structure Vectors and Multiple Arguments
@@ -832,22 +829,9 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
     result
   }, use_parallel = .parallel)
   
-  # Get new IUPACs
-  new_unique_iupacs <- purrr::map_chr(new_structures, .structure_to_iupac_single)
-  names(new_structures) <- new_unique_iupacs
+  # Rebuild glycan_structure with proper deduplication
   idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
-  new_iupacs <- new_unique_iupacs[idx]
-
-  # Get new mono types
-  new_unique_mono_types <- unname(purrr::map_chr(new_structures, get_graph_mono_type))
-  new_mono_types <- new_unique_mono_types[idx]
-  
-  # Create result directly using vctrs::new_rcrd
-  vctrs::new_rcrd(
-    list(iupac = new_iupacs, mono_type = new_mono_types),
-    structures = new_structures,
-    class = "glyrepr_structure"
-  )
+  .rebuild_structure_with_dedup(new_structures, idx)
 }
 
 #' Map Functions Over Glycan Structure Vectors with Indices
@@ -1034,20 +1018,7 @@ simap_structure <- function(.x, .f, ...) {
     result
   })
   
-  # Get new IUPACs
-  new_unique_iupacs <- purrr::map_chr(new_structures, .structure_to_iupac_single)
-  names(new_structures) <- new_unique_iupacs
+  # Rebuild glycan_structure with proper deduplication
   idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
-  new_iupacs <- new_unique_iupacs[idx]
-
-  # Get new mono types
-  new_unique_mono_types <- unname(purrr::map_chr(new_structures, get_graph_mono_type))
-  new_mono_types <- new_unique_mono_types[idx]
-  
-  # Create result directly using vctrs::new_rcrd
-  vctrs::new_rcrd(
-    list(iupac = new_iupacs, mono_type = new_mono_types),
-    structures = new_structures,
-    class = "glyrepr_structure"
-  )
+  .rebuild_structure_with_dedup(new_structures, idx)
 }

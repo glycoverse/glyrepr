@@ -849,4 +849,74 @@ test_that("smap parallel parameter validation", {
     smap_int(structures, igraph::vcount, .parallel = "invalid"),
     "invalid 'x' type"
   )
-}) 
+})
+
+test_that("smap_structure correctly updates unique structures count when modifications create duplicates", {
+  # Create structures that will become identical after modification
+  glycans <- c("Gal(a1-3)GalNAc(a1-", "Gal(a1-4)GalNAc(a1-")
+  structures <- as_glycan_structure(glycans)
+
+  # Before modification: should have 2 unique structures
+  expect_equal(length(attr(structures, "structures")), 2)
+
+  # Remove linkages - both structures should become identical
+  result <- remove_linkages(structures)
+
+  # After modification: should have only 1 unique structure
+  expect_equal(length(attr(result, "structures")), 1)
+
+  # Both elements should have the same IUPAC code
+  expect_equal(as.character(result)[1], as.character(result)[2])
+  expect_equal(as.character(result)[1], "Gal(??-?)GalNAc(??-")
+})
+
+test_that("smap2_structure correctly updates unique structures count when modifications create duplicates", {
+  # Create structures that will become identical after modification
+  glycans <- c("Gal(a1-3)GalNAc(a1-", "Gal(a1-4)GalNAc(a1-")
+  structures <- as_glycan_structure(glycans)
+  values <- c("test1", "test2")
+
+  # Before modification: should have 2 unique structures
+  expect_equal(length(attr(structures, "structures")), 2)
+
+  # Function that removes linkages regardless of second argument
+  remove_linkages_func <- function(g, val) {
+    igraph::set_edge_attr(g, "linkage", value = "??-?") |>
+      igraph::set_graph_attr("anomer", value = "??")
+  }
+
+  result <- smap2_structure(structures, values, remove_linkages_func)
+
+  # After modification: should have only 1 unique structure
+  expect_equal(length(attr(result, "structures")), 1)
+
+  # Both elements should have the same IUPAC code
+  expect_equal(as.character(result)[1], as.character(result)[2])
+  expect_equal(as.character(result)[1], "Gal(??-?)GalNAc(??-")
+})
+
+test_that("spmap_structure correctly updates unique structures count when modifications create duplicates", {
+  # Create structures that will become identical after modification
+  glycans <- c("Gal(a1-3)GalNAc(a1-", "Gal(a1-4)GalNAc(a1-")
+  structures <- as_glycan_structure(glycans)
+  values1 <- c("test1", "test2")
+  values2 <- c(1, 2)
+
+  # Before modification: should have 2 unique structures
+  expect_equal(length(attr(structures, "structures")), 2)
+
+  # Function that removes linkages regardless of other arguments
+  remove_linkages_func <- function(g, val1, val2) {
+    igraph::set_edge_attr(g, "linkage", value = "??-?") |>
+      igraph::set_graph_attr("anomer", value = "??")
+  }
+
+  result <- spmap_structure(list(structures, values1, values2), remove_linkages_func)
+
+  # After modification: should have only 1 unique structure
+  expect_equal(length(attr(result, "structures")), 1)
+
+  # Both elements should have the same IUPAC code
+  expect_equal(as.character(result)[1], as.character(result)[2])
+  expect_equal(as.character(result)[1], "Gal(??-?)GalNAc(??-")
+})
