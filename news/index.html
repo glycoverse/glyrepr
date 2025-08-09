@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,21 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.1" id="glyrepr-061">glyrepr 0.6.1<a class="anchor" aria-label="anchor" href="#glyrepr-061"></a></h2>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-0-6-1">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-6-1"></a></h3>
+<ul><li>
+<code><a href="../reference/n_glycan_core.html">n_glycan_core()</a></code> now has a “b1” reducing end anomer, not “?1”.</li>
+<li>Add validation to <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> to ensure no duplicated linkage positions. For example, “Gal(b1-3)[Fuc(a1-3)]GalNAc(b1-” is invalid now becuase both “Gal” and “Fuc” are linked to “GalNAc” at position 3.</li>
+<li>Add descriptions about ambiguous linkages and anomers in <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> documentation.</li>
+<li>
+<code><a href="../reference/remove_linkages.html">remove_linkages()</a></code> now also removes reducing end anomers.</li>
+<li>
+<code><a href="../reference/n_glycan_core.html">n_glycan_core()</a></code>, <code><a href="../reference/n_glycan_core.html">o_glycan_core_1()</a></code>, and <code><a href="../reference/n_glycan_core.html">o_glycan_core_2()</a></code> now have “??” anomers when <code>linkage = FALSE</code>.</li>
+<li>Fix a bug in <code><a href="../reference/smap.html">smap_structure()</a></code>, <code><a href="../reference/smap2.html">smap2_structure()</a></code>, <code><a href="../reference/spmap.html">spmap_structure()</a></code>, and <code><a href="../reference/simap.html">simap_structure()</a></code> where modifying the structures can create identical structures, but the unique structures are not updated correctly. This automatically fixes a similar bug in <code><a href="../reference/remove_linkages.html">remove_linkages()</a></code>.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.0" id="glyrepr-060">glyrepr 0.6.0<a class="anchor" aria-label="anchor" href="#glyrepr-060"></a></h2>
 <div class="section level3">
