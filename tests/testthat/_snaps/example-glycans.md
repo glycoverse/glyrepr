@@ -13,7 +13,7 @@
       print(glycan, verbose = TRUE)
     Output
       <glycan_structure[1]>
-      [1] Man(??-?)[Man(??-?)]Man(??-?)GlcNAc(??-?)GlcNAc(b1-
+      [1] Man(??-?)[Man(??-?)]Man(??-?)GlcNAc(??-?)GlcNAc(??-
       # Unique structures: 1
 
 # N-glycan core structure with generic monosaccharides

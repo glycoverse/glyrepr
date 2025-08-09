@@ -93,6 +93,7 @@ build_example_graph <- function(linkage, mono_type, builder) {
   glycan <- builder()
   if (!linkage) {
     igraph::E(glycan)$linkage <- "??-?"
+    glycan$anomer <- "??"
   }
   if (mono_type == "generic") {
     # Convert the igraph to glyrepr_structure first, then convert mono type
