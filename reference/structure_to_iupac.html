@@ -96,7 +96,7 @@ the same rule applies recursively.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Branched structure  </span></span></span>
 <span class="r-in"><span><span class="fu">structure_to_iupac</span><span class="op">(</span><span class="fu"><a href="n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Structure with substituents</span></span></span>
 <span class="r-in"><span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">make_graph</a></span><span class="op">(</span><span class="op">~</span> <span class="fl">1</span><span class="op">-</span><span class="op">+</span><span class="fl">2</span><span class="op">)</span></span></span>
@@ -112,7 +112,7 @@ the same rule applies recursively.</p>
 <span class="r-in"><span><span class="va">structs</span> <span class="op">&lt;-</span> <span class="fu"><a href="glycan_structure.html">glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="n_glycan_core.html">o_glycan_core_1</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">structure_to_iupac</span><span class="op">(</span><span class="va">structs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Gal(b1-3)GalNAc(a1-"                                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
