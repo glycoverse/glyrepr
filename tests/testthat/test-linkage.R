@@ -109,8 +109,10 @@ test_that("include unknown", {
 
 
 # Tests for remove_linkages() function
-test_that("works for glycans", {
+test_that("remove_linkages works", {
   glycan <- o_glycan_core_2(linkage = TRUE)
   glycan <- remove_linkages(glycan)
-  expect_false(has_linkages(glycan))
+  graph <- get_structure_graphs(glycan)
+  expect_equal(igraph::E(graph)$linkage, c("??-?", "??-?"))
+  expect_equal(igraph::graph_attr(graph, "anomer"), "??")
 })

@@ -121,7 +121,8 @@ possible_linkages <- function(
 
 #' Remove All Linkages from a Glycan
 #'
-#' This function replaces all linkages in a glycan structure with "??-?".
+#' This function replaces all linkages in a glycan structure with "??-?",
+#' as well as the reducing end anomer with "??-".
 #'
 #' @param glycan A glyrepr_structure vector.
 #'
@@ -146,5 +147,7 @@ remove_linkages <- function(glycan) {
 
 # Internal function to remove linkages from a single igraph
 .remove_linkages_single <- function(glycan) {
-  igraph::set_edge_attr(glycan, "linkage", value = "??-?")
+  res <- igraph::set_edge_attr(glycan, "linkage", value = "??-?")
+  res <- igraph::set_graph_attr(res, "anomer", value = "??")
+  res
 }
