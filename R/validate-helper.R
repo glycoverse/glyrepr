@@ -132,3 +132,19 @@ valid_linkages <- function(linkages) {
   linkage_pattern <- stringr::str_glue("^{anomer_p}{pos1_p}-{pos2_p}$")
   stringr::str_detect(linkages, linkage_pattern)
 }
+
+
+# Check if any duplicated linkage positions exist.
+# This means the same position of one residue can not be connected to multiple other residues.
+any_dup_linkage_pos <- function(glycan) {
+  for (v in igraph::V(glycan)) {
+    links <- igraph::incident(glycan, v, mode = "out")$linkage
+    pos2 <- stringr::str_split_i(links, stringr::fixed("-"), 2)
+    pos2 <- pos2[pos2 != "?"]
+    pos2 <- pos2[!stringr::str_detect(pos2, stringr::fixed("/"))]
+    if (any(duplicated(pos2))) {
+      return(TRUE)
+    }
+  }
+  return(FALSE)
+}

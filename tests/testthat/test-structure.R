@@ -75,7 +75,7 @@ test_that("glycan structure class", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "GlcNAc")
   igraph::V(graph)$sub <- ""
-  igraph::E(graph)$linkage <- c("b1-4", "b1-4")
+  igraph::E(graph)$linkage <- c("b1-4", "b1-3")
   graph$anomer <- "a1"
   glycan <- glycan_structure(graph)
   expect_s3_class(glycan, c("glyrepr_structure"))
@@ -283,6 +283,39 @@ test_that("validating NA linkages", {
 })
 
 
+test_that("validating duplicated linkage positions", {
+  graph <- igraph::make_graph(~ 1-+2, 1-+3)
+  igraph::V(graph)$mono <- c("GalNAc", "Gal", "Neu5Ac")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- c("b1-3", "a2-3")
+  graph$anomer <- "a1"
+
+  expect_error(glycan_structure(graph), "Duplicated linkage positions")
+})
+
+
+test_that("duplicated ? linkages are OK", {
+  graph <- igraph::make_graph(~ 1-+2, 1-+3)
+  igraph::V(graph)$mono <- c("GalNAc", "Gal", "Neu5Ac")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- c("b1-?", "a2-?")
+  graph$anomer <- "a1"
+
+  expect_no_error(glycan_structure(graph))
+})
+
+
+test_that("duplicated x/y linkages are OK", {
+  graph <- igraph::make_graph(~ 1-+2, 1-+3)
+  igraph::V(graph)$mono <- c("GalNAc", "Gal", "Neu5Ac")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- c("b1-3/6", "a2-3/6")
+  graph$anomer <- "a1"
+
+  expect_no_error(glycan_structure(graph))
+})
+
+
 test_that("validating mixed generic and concrete monosaccharides", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("Hex", "GlcNAc", "Hex")
@@ -298,7 +331,7 @@ test_that("missing anomer attr", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
   igraph::V(graph)$sub <- ""
-  igraph::E(graph)$linkage <- "b1-4"
+  igraph::E(graph)$linkage <- c("a1-3", "b1-4")
 
   expect_error(glycan_structure(graph), "Glycan structure must have a graph attribute 'anomer'")
 })
@@ -308,13 +341,11 @@ test_that("invalid anomer attr", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
   igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
   igraph::V(graph)$sub <- ""
-  igraph::E(graph)$linkage <- "b1-4"
+  igraph::E(graph)$linkage <- c("a1-3", "b1-4")
   graph$anomer <- "a"
 
   expect_error(glycan_structure(graph), "Invalid anomer: a")
 })
-
-
 
 
 # Tests for glycan_structure vector functions

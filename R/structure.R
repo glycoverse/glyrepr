@@ -173,6 +173,11 @@ validate_single_glycan_structure <- function(glycan) {
     msg <- glue::glue("Invalid linkage: {stringr::str_c(invalid_linkages, collapse = ', ')}")
     cli::cli_abort(msg, linkages = invalid_linkages)
   }
+
+  # Check if any duplicated linkage positions exist
+  if (any_dup_linkage_pos(glycan)) {
+    cli::cli_abort("Duplicated linkage positions.")
+  }
   
   # Check if "anomer" attribute exists
   if (is.null(glycan$anomer)) {

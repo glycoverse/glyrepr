@@ -211,7 +211,7 @@ test_that("as_glycan_structure.character handles invalid substituents", {
 
 test_that("as_glycan_structure.character handles deeply nested structures", {
   # Very deep nesting
-  deep_structure <- "Man(a1-2)[Man(a1-3)[Man(a1-4)[Man(a1-5)Man(a1-2)]Man(a1-3)]Man(a1-4)]Man(a1-"
+  deep_structure <- "Man(a1-2)[Man(a1-4)[Man(a1-4)[Man(a1-5)Man(a1-2)]Man(a1-3)]Man(a1-4)]Man(a1-"
   glycan <- as_glycan_structure(deep_structure)
   expect_s3_class(glycan, "glyrepr_structure")
   
