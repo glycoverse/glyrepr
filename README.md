@@ -27,11 +27,17 @@ probably already using or will use.
 
 ## Installation
 
-You can install the development version of glyrepr from
+You can install the latest release of glyrepr from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("pak")
+pak::pak("glycoverse/glyrepr@*release")
+```
+
+Or install the development version:
+
+``` r
 pak::pak("glycoverse/glyrepr")
 ```
 
