@@ -266,7 +266,7 @@ test_that("structure_to_iupac throws appropriate errors", {
 test_that("depth calculation works correctly", {
   # Test depth calculation on n_glycan_core - need to extract the igraph
   glycan_vector <- n_glycan_core()
-  glycan <- get_structure_graphs(glycan_vector, 1)  # Get the first (and only) structure
+  glycan <- get_structure_graphs(glycan_vector, return_list = FALSE)  # Get the first (and only) structure
   root <- which(igraph::degree(glycan, mode = "in") == 0)
   depths <- calculate_depths(glycan, root)
   

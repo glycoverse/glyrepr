@@ -4,9 +4,6 @@
       print(tibble, width = 30)
     Output
       # A tibble: 3 x 2
-        struc                      a
-        <struct>               <dbl>
-      1 Man(a1-3)[Man(a1-6)]M~     1
-      2 Man(a1-3)[Man(a1-6)]M~     1
-      3 Man(a1-3)[Man(a1-6)]M~     1
+      # i 2 more variables:
+      #   struc <struct>, a <dbl>
 

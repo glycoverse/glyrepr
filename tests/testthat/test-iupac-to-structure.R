@@ -32,7 +32,7 @@ test_that("as_glycan_structure.character handles substituents", {
   expect_s3_class(glycan, "glyrepr_structure")
 
   # Check that substituents are preserved
-  graph <- get_structure_graphs(glycan, 1)
+  graph <- get_structure_graphs(glycan, return_list = FALSE)
   expect_equal(igraph::V(graph)$sub, c("6Ac", "3S"))
 })
 
@@ -47,7 +47,7 @@ test_that("as_glycan_structure.character handles Neu5Ac correctly", {
 
   # Neu5Ac with substituent
   glycan3 <- as_glycan_structure("Neu5Ac9Ac(?2-")
-  graph <- get_structure_graphs(glycan3, 1)
+  graph <- get_structure_graphs(glycan3, return_list = FALSE)
   expect_equal(igraph::V(graph)$mono, "Neu5Ac")
   expect_equal(igraph::V(graph)$sub, "9Ac")
 })
@@ -91,7 +91,7 @@ test_that("as_glycan_structure.character handles complex O-glycan", {
   expect_equal(length(glycan), 1)
 
   # Check the structure has the correct number of nodes
-  graph <- get_structure_graphs(glycan, 1)
+  graph <- get_structure_graphs(glycan, return_list = FALSE)
   expect_equal(igraph::vcount(graph), 7)  # 7 monosaccharides
 })
 
@@ -186,18 +186,18 @@ test_that("as_glycan_structure.character handles invalid monosaccharide names", 
 test_that("as_glycan_structure.character handles complex Neu variants", {
   # Test special Neu variants from glyparse
   glycan1 <- as_glycan_structure("Neu4Ac5Ac(?2-")
-  graph1 <- get_structure_graphs(glycan1, 1)
+  graph1 <- get_structure_graphs(glycan1, return_list = FALSE)
   expect_equal(igraph::V(graph1)$mono, "Neu5Ac")
   expect_equal(igraph::V(graph1)$sub, "4Ac")
 
   glycan2 <- as_glycan_structure("Neu4Ac5Gc(?2-")
-  graph2 <- get_structure_graphs(glycan2, 1)
+  graph2 <- get_structure_graphs(glycan2, return_list = FALSE)
   expect_equal(igraph::V(graph2)$mono, "Neu5Gc")
   expect_equal(igraph::V(graph2)$sub, "4Ac")
 
   # Neu5Ac should not be split even though it matches substituent pattern
   glycan3 <- as_glycan_structure("Neu5Ac(?2-")
-  graph3 <- get_structure_graphs(glycan3, 1)
+  graph3 <- get_structure_graphs(glycan3, return_list = FALSE)
   expect_equal(igraph::V(graph3)$mono, "Neu5Ac")
   expect_equal(igraph::V(graph3)$sub, "")
 })
@@ -216,7 +216,7 @@ test_that("as_glycan_structure.character handles deeply nested structures", {
   expect_s3_class(glycan, "glyrepr_structure")
   
   # Verify the graph has correct number of nodes
-  graph <- get_structure_graphs(glycan, 1)
+  graph <- get_structure_graphs(glycan, return_list = FALSE)
   expect_equal(igraph::vcount(graph), 8)
 })
 
@@ -270,18 +270,18 @@ test_that("as_glycan_structure.character handles unusual anomer cases", {
 test_that("as_glycan_structure.character preserves complex substituent patterns", {
   # Test various substituent combinations
   glycan1 <- as_glycan_structure("Gal6S(b1-3)GlcNAc4S(?1-")
-  graph1 <- get_structure_graphs(glycan1, 1)
+  graph1 <- get_structure_graphs(glycan1, return_list = FALSE)
   expect_equal(sort(igraph::V(graph1)$sub), sort(c("4S", "6S")))
 
   # Unknown position substituents
   glycan2 <- as_glycan_structure("Man?S(?1-")
-  graph2 <- get_structure_graphs(glycan2, 1)
+  graph2 <- get_structure_graphs(glycan2, return_list = FALSE)
   expect_equal(igraph::V(graph2)$sub, "?S")
 })
 
 test_that("as_glycan_structure.character handles multiple substituents", {
   glycan <- as_glycan_structure("Glc3Me6S(a1-")
-  graph <- get_structure_graphs(glycan, 1)
+  graph <- get_structure_graphs(glycan, return_list = FALSE)
   expect_equal(igraph::V(graph)$sub, "3Me,6S")
 })
 
