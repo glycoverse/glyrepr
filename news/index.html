@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,29 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>
+<code>convert_mono_type()</code> is now replaced by <code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code>. <code>convert_mono_type()</code> was created when three monosaccharide types existed: “concrete”, “generic”, and “simple”. When “simple” was removed, the old <code>convert_mono_type()</code> seems redundant, as the only valid conversion is from “concrete” to “generic” now. Therefore, we remove this function now and add a more straightforward <code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code>.</li>
+<li>
+<code><a href="../reference/get_structure_graphs.html">get_structure_graphs()</a></code> is redesigned.
+<ul><li>The <code>i</code> parameter is removed, as indexed can be done manually on the input <code>glyrepr_structure</code> vector of on the returned list easily.</li>
+<li>Add a <code>return_list</code> parameter to control the return type. This parameter makes this function “type-stable”.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>
+<code>glyrepr_structure</code> has colors now in tibbles when printed to console.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<ul><li>Fix the bug that monosaccharides with substituents are not colored when a <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> is printed in the console. For example, the “Neu5Ac” part in “Neu5Ac9Ac(a2-” was printed in black. Now it is printed in purple, while the “9Ac” part remains in black.</li>
+<li>Fix the bug that Neu5Ac and Neu5Gc with substituents at position 2, 3, or 4 could not be correctly parsed. Now, complex patterns like “Neu4Ac5Ac9Ac” can be properly handled, into a “Neu5Ac” monosaccharide with “4Ac,9Ac” as substituents.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.1" id="glyrepr-061">glyrepr 0.6.1<a class="anchor" aria-label="anchor" href="#glyrepr-061"></a></h2>
 <div class="section level3">

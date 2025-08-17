@@ -22,8 +22,9 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/calculate_depths.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/colorize_iupac_string.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/compare_linkages.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/reference/convert_mono_type.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/convert_to_generic.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/count_mono.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/dot-extract_base_mono.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/dot-parse_iupac_condensed_single.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/format_glycan_structure_subset.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/get_anomer.html</loc></url>

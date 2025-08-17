@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_structure_graphs</span><span class="op">(</span><span class="va">x</span>, i <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_structure_graphs</span><span class="op">(</span><span class="va">x</span>, return_list <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -55,34 +55,44 @@
 <dd><p>A glycan structure vector.</p></dd>
 
 
-<dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
-<dd><p>Index or indices of structures to extract.</p></dd>
+<dt id="arg-return-list">return_list<a class="anchor" aria-label="anchor" href="#arg-return-list"></a></dt>
+<dd><p>If <code>TRUE</code>, always returns a list.
+If <code>FALSE</code> and <code>x</code> has a length of 1, return the igraph object directly.
+If not provided (default), <code>FALSE</code> when <code>x</code> has a length of 1 and <code>TRUE</code> otherwise.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list of glycan_structure (igraph) objects.</p>
+    <p>A list of igraph objects or an igraph object directly (see <code>return_list</code> parameter).</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">structures</span> <span class="op">&lt;-</span> <span class="fu"><a href="glycan_structure.html">glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="n_glycan_core.html">o_glycan_core_1</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">get_structure_graphs</span><span class="op">(</span><span class="va">structures</span>, <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH c51e24a DN-- 2 1 -- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edge from c51e24a (vertex names):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1-&gt;2</span>
-<span class="r-in"><span><span class="fu">get_structure_graphs</span><span class="op">(</span><span class="va">structures</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">get_structure_graphs</span><span class="op">(</span><span class="va">structures</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH c51e24a DN-- 2 1 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 58f3809 DN-- 2 1 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edge from c51e24a (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edge from 58f3809 (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1-&gt;2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH e848579 DN-- 5 4 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 9d0c64e DN-- 5 4 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from e848579 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 9d0c64e (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1-&gt;2 2-&gt;3 3-&gt;4 3-&gt;5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu">get_structure_graphs</span><span class="op">(</span><span class="va">structures</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 58f3809 DN-- 2 1 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edge from 58f3809 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1-&gt;2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 9d0c64e DN-- 5 4 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 9d0c64e (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1-&gt;2 2-&gt;3 3-&gt;4 3-&gt;5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
