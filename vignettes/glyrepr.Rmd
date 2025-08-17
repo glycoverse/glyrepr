@@ -158,11 +158,11 @@ Let's put this to the test:
 library(tictoc)
 
 tic("Converting 5 structures")
-result_small <- convert_mono_type(struc, "generic")
+result_small <- convert_to_generic(struc)
 toc()
 
 tic("Converting 5,000 structures")
-result_large <- convert_mono_type(large_struc, "generic")
+result_large <- convert_to_generic(large_struc)
 toc()
 ```
 
