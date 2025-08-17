@@ -1,11 +1,14 @@
 #' Get Color for Concrete Monosaccharides
 #'
-#' @param mono A monosaccharide name (character)
+#' @param mono A monosaccharide name (character), potentially with substituents
 #' @return A color code (character)
 #' @keywords internal
 get_mono_color <- function(mono) {
+  # Extract base monosaccharide name (without substituents)
+  base_mono <- .extract_base_mono(mono)
+
   dplyr::case_match(
-    mono,
+    base_mono,
     c("Glc", "GlcNAc", "GlcN", "GlcA", "Qui", "QuiNAc", "Oli", "Bac", "Api") ~ "#0072BC",
     c("Man", "ManNAc", "ManN", "ManA", "Rha", "RhaNAc", "Tyv", "Ara", "Kdn", "Pse", "LDmanHep", "Fru") ~ "#00A651",
     c("Gal", "GalNAc", "GalN", "GalA", "Lyx", "Leg", "Kdo", "Tag") ~ "#FFD400",
@@ -48,16 +51,27 @@ replace_monos_with_colored <- function(text, mono_names) {
   unique_monos <- unique(mono_names)
   colored_monos <- add_colors(unique_monos, colored = TRUE)
   names(colored_monos) <- unique_monos
-  
+
   # Replace each monosaccharide in the text with its colored version
   result <- text
   for (i in seq_along(unique_monos)) {
     mono <- unique_monos[i]
     colored_mono <- colored_monos[i]
-    # Use word boundaries to avoid partial matches
-    result <- stringr::str_replace_all(result, paste0("\\b", mono, "\\b"), colored_mono)
+
+    # Special handling for monosaccharides that might have substituents
+    # For example, "Neu5Ac" should match in "Neu5Ac9Ac"
+    if (mono %in% c("Neu5Ac", "Neu5Gc", "Neu")) {
+      # For sialic acids, match the base name followed by optional substituents
+      pattern <- paste0("\\b", mono, "(?=[0-9]|\\(|$)")
+      result <- stringr::str_replace_all(result, pattern, colored_mono)
+    } else {
+      # For other monosaccharides, use more flexible matching
+      # Match the mono name followed by optional substituents (digits + letters)
+      pattern <- paste0("\\b", mono, "(?=[0-9]|\\(|$)")
+      result <- stringr::str_replace_all(result, pattern, colored_mono)
+    }
   }
-  
+
   result
 }
 
@@ -103,4 +117,43 @@ colorize_iupac_string <- function(iupac_text, mono_names) {
   result <- add_gray_linkages(result)
   
   result
-} 
+}
+
+#' Extract Base Monosaccharide Name (Without Substituents)
+#'
+#' @param mono A monosaccharide name (character), potentially with substituents
+#' @return The base monosaccharide name without substituents
+#' @keywords internal
+.extract_base_mono <- function(mono) {
+  # Use a simplified version of the substituent extraction logic
+  # This avoids circular dependency with iupac-to-structure.R
+
+  # Handle special cases first
+  if (mono == "Neu5Ac") {
+    return("Neu5Ac")
+  } else if (stringr::str_starts(mono, "Neu5Ac") && nchar(mono) > 6) {
+    return("Neu5Ac")
+  } else if (mono == "Neu4Ac5Ac") {
+    return("Neu5Ac")
+  } else if (mono == "Neu4Ac5Gc") {
+    return("Neu5Gc")
+  }
+
+  # For other monosaccharides, remove substituents
+  subs_pattern <- stringr::str_c(available_substituents(), collapse = "|")
+  single_sub_pattern <- stringr::str_glue("[1-9\\?]({subs_pattern})")
+
+  # Find all substituents
+  all_subs <- stringr::str_extract_all(mono, single_sub_pattern)[[1]]
+
+  if (length(all_subs) > 0) {
+    # Remove all substituents to get base monosaccharide
+    clean_mono <- mono
+    for (sub in all_subs) {
+      clean_mono <- stringr::str_remove(clean_mono, stringr::fixed(sub))
+    }
+    return(clean_mono)
+  } else {
+    return(mono)
+  }
+}
