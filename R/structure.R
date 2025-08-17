@@ -248,7 +248,7 @@ is_glycan_structure <- function(x) {
 #'
 #' @examples
 #' library(igraph)
-#' 
+#'
 #' # Convert a single igraph
 #' graph <- make_graph(~ 1-+2)
 #' V(graph)$mono <- c("GlcNAc", "GlcNAc")
@@ -256,12 +256,12 @@ is_glycan_structure <- function(x) {
 #' E(graph)$linkage <- "b1-4"
 #' graph$anomer <- "a1"
 #' as_glycan_structure(graph)
-#' 
+#'
 #' # Convert a list of igraphs
 #' o_glycan_vec <- o_glycan_core_1()
-#' o_glycan_graph <- get_structure_graphs(o_glycan_vec, 1)
+#' o_glycan_graph <- get_structure_graphs(o_glycan_vec)
 #' as_glycan_structure(list(graph, o_glycan_graph))
-#' 
+#'
 #' # Convert a character vector of IUPAC-condensed strings
 #' as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
 #'

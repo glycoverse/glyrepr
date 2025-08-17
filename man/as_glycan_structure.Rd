@@ -31,7 +31,7 @@ as_glycan_structure(graph)
 
 # Convert a list of igraphs
 o_glycan_vec <- o_glycan_core_1()
-o_glycan_graph <- get_structure_graphs(o_glycan_vec, 1)
+o_glycan_graph <- get_structure_graphs(o_glycan_vec)
 as_glycan_structure(list(graph, o_glycan_graph))
 
 # Convert a character vector of IUPAC-condensed strings
