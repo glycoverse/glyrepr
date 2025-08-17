@@ -56,5 +56,5 @@ get_mono_type(comp)
 
 }
 \seealso{
-\code{\link[=convert_mono_type]{convert_mono_type()}}
+\code{\link[=convert_to_generic]{convert_to_generic()}}
 }

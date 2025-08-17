@@ -98,7 +98,7 @@ build_example_graph <- function(linkage, mono_type, builder) {
   if (mono_type == "generic") {
     # Convert the igraph to glyrepr_structure first, then convert mono type
     glycan_struct <- glycan_structure(glycan)
-    glycan_struct <- convert_mono_type(glycan_struct, mono_type)
+    glycan_struct <- convert_to_generic(glycan_struct)
     return(glycan_struct)
   }
   glycan_structure(glycan)

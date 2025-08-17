@@ -1,9 +1,9 @@
-#' Convert Monosaccharide Types
+#' Convert Monosaccharides to Generic Type
 #'
 #' This function converts monosaccharide types of monosaccharide characters,
-#' glycan compositions, or glycan structures.
-#' Supported types: "concrete" and "generic" (see details below).
-#' The conversion can only be done from "concrete" to "generic".
+#' glycan compositions, or glycan structures from concrete to generic type.
+#' This is a simplified version that only supports conversion from "concrete"
+#' to "generic" monosaccharides.
 #'
 #' @details
 #'
@@ -14,75 +14,58 @@
 #' - generic: e.g. "Hex", "HexNAc", "HexA", "HexN", etc.
 #'
 #' For the full list of monosaccharides, use [available_monosaccharides()].
-#' 
+#'
 #' @param x Either of these objects:
 #'   - A character of monosaccharide;
 #'   - A glycan composition vector ("glyrepr_composition" object);
 #'   - A glycan structure vector ("glyrepr_structure" object).
-#' @param to A character string specifying the target monosaccharide type.
 #'
-#' @returns A new object of the same class as `x` 
-#' with monosaccharides converted to the target type.
+#' @returns A new object of the same class as `x`
+#' with monosaccharides converted to generic type.
 #'
 #' @examples
-#' # Allowed
-#' convert_mono_type(c("Gal", "GlcNAc"), to = "generic")  # concrete -> generic
-#' 
-#' # Not allowed
-#' \dontrun{
-#' convert_mono_type(c("Hex", "HexNAc"), to = "concrete")  # generic -> concrete
-#' }
+#' # Convert character vectors
+#' convert_to_generic(c("Gal", "GlcNAc"))
 #'
 #' # Convert glycan compositions
 #' comps <- glycan_composition(
-#'   c(Hex = 5, HexNAc = 2),
-#'   c(Hex = 5, HexNAc = 4, dHex = 1)
+#'   c(Gal = 5, GlcNAc = 2),
+#'   c(Glc = 5, GalNAc = 4, Fuc = 1)
 #' )
-#' convert_mono_type(comps, to = "generic")
-#' 
+#' convert_to_generic(comps)
+#'
 #' # Convert glycan structures
 #' strucs <- glycan_structure(
 #'   n_glycan_core(),
 #'   o_glycan_core_1()
 #' )
-#' convert_mono_type(strucs, to = "generic")
+#' convert_to_generic(strucs)
 #'
 #' @export
-convert_mono_type <- function(x, to) {
-  UseMethod("convert_mono_type")
+convert_to_generic <- function(x) {
+  UseMethod("convert_to_generic")
 }
 
 #' @export
-#' @rdname convert_mono_type
-convert_mono_type.character <- function(x, to) {
+#' @rdname convert_to_generic
+convert_to_generic.character <- function(x) {
   checkmate::assert_character(x)
-  checkmate::assert_choice(to, c("concrete", "generic"))
 
   from <- get_mono_type(x)
-  
+
   # Check if conversion is valid (no backward conversion)
-  tryCatch(
-    valid_from_to(from, to, strict = FALSE),
-    error_backward_convert = function(e) {
-      cli::cli_abort(c(
-        "These monosaccharides cannot be converted to {.val {to}}: {.val {x[e$bad_index]}}",
-        "i" = "Conversion could only be done in this direction: concrete -> generic"
-      ), call = rlang::expr(convert_mono_type()))
-    }
-  )
-  
-  # If already the target type, return as-is
-  if (all(from == to)) {
+  if (any(from == "generic")) {
+    # Already generic, return as-is
     return(x)
   }
-  
-  res <- convert_mono_type_(x, from, to)
+
+  res <- convert_mono_type_(x, from, "generic")
 
   bad_monos <- x[is.na(res)]
   if (length(bad_monos) > 0) {
     cli::cli_warn(
-      "Some monosaccharides cannot be converted to {.val {to}}: {.val {bad_monos}}.",
-      call = rlang::expr(convert_mono_type())
+      "Some monosaccharides cannot be converted to generic: {.val {bad_monos}}.",
+      call = rlang::expr(convert_to_generic())
     )
   }
 
@@ -90,8 +73,8 @@ convert_mono_type.character <- function(x, to) {
 }
 
 #' @export
-#' @rdname convert_mono_type
-convert_mono_type.glyrepr_structure <- function(x, to) {
+#' @rdname convert_to_generic
+convert_to_generic.glyrepr_structure <- function(x) {
   if (!is_glycan_structure(x)) {
     cli::cli_abort(c(
       "Input must be a glyrepr_structure vector.",
@@ -99,81 +82,58 @@ convert_mono_type.glyrepr_structure <- function(x, to) {
     ))
   }
 
-  checkmate::assert_choice(to, c("concrete", "generic"))
-
   # Get current mono types
   from <- get_mono_type(x)
-  
-  # Check for invalid conversion: generic -> concrete
-  if (any(from == "generic" & to == "concrete")) {
-    cli::cli_abort(c(
-      "Cannot convert from generic to concrete monosaccharides.",
-      "i" = "Conversion could only be done in this direction: concrete -> generic"
-    ), call = rlang::expr(convert_mono_type()))
-  }
 
   # Use spmap_structure with optimized implementation
-  spmap_structure(list(x, from, to), function(graph, from, to) {
-    if (from == to) {
+  spmap_structure(list(x, from), function(graph, from) {
+    if (from == "generic") {
       return(graph)
     }
-    convert_glycan_mono_type_impl(graph, from, to)
+    convert_glycan_mono_type_impl(graph, from, "generic")
   })
 }
 
 #' @export
-#' @rdname convert_mono_type
-convert_mono_type.glyrepr_composition <- function(x, to) {
+#' @rdname convert_to_generic
+convert_to_generic.glyrepr_composition <- function(x) {
   if (!is_glycan_composition(x)) {
     cli::cli_abort(c(
       "Input must be a glyrepr_composition vector.",
       "i" = "Use `glycan_composition()` to create a glyrepr_composition from named vectors."
     ))
   }
-  
-  checkmate::assert_choice(to, c("concrete", "generic"))
-  
+
   # Get current mono types
   data <- vctrs::vec_data(x)
   current_types <- vctrs::field(data, "mono_type")
-  
-  # Check if all are already the target type
-  if (all(current_types == to)) {
+
+  # Check if all are already generic
+  if (all(current_types == "generic")) {
     return(x)
   }
-  
+
   # Convert each composition
   compositions <- vctrs::field(data, "data")
   new_compositions <- purrr::map2(compositions, current_types, function(comp, from_type) {
-    # Check if conversion is valid
-    tryCatch(
-      valid_from_to(from_type, to, strict = FALSE),
-      error_backward_convert = function(e) {
-        cli::cli_abort(c(
-          "Cannot convert composition from {.val {from_type}} to {.val {to}}.",
-          "i" = "Conversion could only be done in this direction: concrete -> generic"
-        ), call = rlang::expr(convert_mono_type()))
-      }
-    )
-    
-    # If already target type, return as-is
-    if (from_type == to) {
+    # If already generic, return as-is
+    if (from_type == "generic") {
       return(comp)
     }
-    
+
     # Convert monosaccharide names
     old_names <- names(comp)
-    new_names <- convert_mono_type_(old_names, from_type, to)
-    
+    new_names <- convert_mono_type_(old_names, from_type, "generic")
+
     # Check for unconvertible monosaccharides
     bad_names <- old_names[is.na(new_names)]
     if (length(bad_names) > 0) {
       cli::cli_abort(
-        "Some monosaccharides in composition cannot be converted to {.val {to}}: {.val {bad_names}}.",
-        call = rlang::expr(convert_mono_type())
+        "Some monosaccharides in composition cannot be converted to generic: {.val {bad_names}}.",
+        call = rlang::expr(convert_to_generic())
       )
     }
-    
+
     # Create new composition with converted names, aggregating counts for duplicates
     if (length(comp) == 0) {
       # Handle empty composition
@@ -184,15 +144,15 @@ convert_mono_type.glyrepr_composition <- function(x, to) {
       result_names <- names(result)  # Save names before conversion
       result <- as.integer(result)
       names(result) <- result_names  # Restore names
-      
+
       # Sort by monosaccharide order
       mono_order <- get_monosaccharide_order(names(result))
       result <- result[order(mono_order)]
     }
-    
+
     result
   })
-  
+
   # Create new composition vector
   do.call(glycan_composition, new_compositions)
 }
@@ -233,7 +193,7 @@ convert_mono_type.glyrepr_composition <- function(x, to) {
 #' comp <- glycan_composition(c(Glc = 2, GalNAc = 1))
 #' get_mono_type(comp)
 #'
-#' @seealso [convert_mono_type()]
+#' @seealso [convert_to_generic()]
 #'
 #' @export
 get_mono_type <- function(x) {
@@ -282,30 +242,6 @@ get_mono_type.glyrepr_composition <- function(x) {
   vctrs::field(data, "mono_type")
 }
 
-valid_from_to <- function(from, to, strict) {
-  factorize_types <- function(types) {
-    factor(types, levels = c("generic", "concrete"), ordered = TRUE)
-  }
-  from <- factorize_types(from)
-  to <- factorize_types(to)
-
-  bad_order <- from < to
-  if (any(bad_order)) {
-    cli::cli_abort(
-      "Cannot convert from generic to concrete monosaccharides.",
-      class = "error_backward_convert",
-      bad_index = which(bad_order)
-    )
-  }
-  if (strict && any(from == to)) {
-    cli::cli_abort(
-      "Cannot convert monosaccharides of the same type.",
-      class = "error_convert_self",
-      bad_index = which(from == to)
-    )
-  }
-}
-
 get_graph_mono_type <- function(graph) {
   # This function is the implementation of get_mono_type for a single glycan graph.
   first_mono <- igraph::vertex_attr(graph, "mono")[[1]]
@@ -334,7 +270,7 @@ raise_error_for_na <- function(old_names, new_names, to) {
   if (length(bad_names) > 0) {
     cli::cli_abort(
       "Some monosaccharides cannot be converted to {.val {to}}: {.val {bad_names}}.",
-      call = rlang::expr(convert_mono_type())
+      call = rlang::expr(convert_to_generic())
     )
   }
 }

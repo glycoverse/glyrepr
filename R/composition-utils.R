@@ -39,7 +39,7 @@ count_mono.glyrepr_composition <- function(x, mono) {
   .check_mono_arg(mono)
   mono_type <- get_mono_type(mono)
   if (mono_type == "generic") {
-    x <- convert_mono_type(x, "generic")
+    x <- convert_to_generic(x)
   }
   data <- vctrs::field(vctrs::vec_data(x), "data")
   count_one <- function(one_mono, mono) {
