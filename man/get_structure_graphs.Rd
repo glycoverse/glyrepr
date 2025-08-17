@@ -4,22 +4,24 @@
 \alias{get_structure_graphs}
 \title{Access Individual Glycan Structures}
 \usage{
-get_structure_graphs(x, i = NULL)
+get_structure_graphs(x, return_list = NULL)
 }
 \arguments{
 \item{x}{A glycan structure vector.}
 
-\item{i}{Index or indices of structures to extract.}
+\item{return_list}{If \code{TRUE}, always returns a list.
+If \code{FALSE} and \code{x} has a length of 1, return the igraph object directly.
+If not provided (default), \code{FALSE} when \code{x} has a length of 1 and \code{TRUE} otherwise.}
 }
 \value{
-A list of glycan_structure (igraph) objects.
+A list of igraph objects or an igraph object directly (see \code{return_list} parameter).
 }
 \description{
 Extract individual glycan structure graphs from a glycan structure vector.
 }
 \examples{
 structures <- glycan_structure(o_glycan_core_1(), n_glycan_core())
-get_structure_graphs(structures, 1)
-get_structure_graphs(structures, c(1, 2))
+get_structure_graphs(structures)
+get_structure_graphs(structures)
 
 }
