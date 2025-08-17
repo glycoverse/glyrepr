@@ -56,7 +56,7 @@ test_that("convert_to_generic works with glycan structures", {
   glycan_generic <- convert_to_generic(glycan)
 
   expect_true(is_glycan_structure(glycan_generic))
-  graph <- get_structure_graphs(glycan_generic, 1)
+  graph <- get_structure_graphs(glycan_generic, return_list = FALSE)
   expect_equal(igraph::V(graph)$mono, c("HexNAc", "HexNAc", "Hex", "Hex", "Hex"))
 })
 

@@ -7,7 +7,7 @@ test_that("`has_linkages()` works for glycans with intact linkages", {
 
 test_that("`has_linkages()` works for glycan with partial linkages", {
   glycan_vec <- o_glycan_core_2(linkage = TRUE)
-  glycan <- get_structure_graphs(glycan_vec, 1)  # Extract the igraph
+  glycan <- get_structure_graphs(glycan_vec, return_list = FALSE)  # Extract the igraph
   glycan <- igraph::set_edge_attr(glycan, "linkage", value = c("??-?", "b1-6"))
   
   # Create a new vectorized structure with the modified graph
@@ -112,7 +112,7 @@ test_that("include unknown", {
 test_that("remove_linkages works", {
   glycan <- o_glycan_core_2(linkage = TRUE)
   glycan <- remove_linkages(glycan)
-  graph <- get_structure_graphs(glycan)
+  graph <- get_structure_graphs(glycan, return_list = FALSE)
   expect_equal(igraph::E(graph)$linkage, c("??-?", "??-?"))
   expect_equal(igraph::graph_attr(graph, "anomer"), "??")
 })
