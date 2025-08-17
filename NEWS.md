@@ -1,3 +1,21 @@
+# glyrepr (development version)
+
+## Breaking changes
+
+* `convert_mono_type()` is now replaced by `convert_to_generic()`. `convert_mono_type()` was created when three monosaccharide types existed: "concrete", "generic", and "simple". When "simple" was removed, the old `convert_mono_type()` seems redundant, as the only valid conversion is from "concrete" to "generic" now. Therefore, we remove this function now and add a more straightforward `convert_to_generic()`.
+* `get_structure_graphs()` is redesigned.
+  - The `i` parameter is removed, as indexed can be done manually on the input `glyrepr_structure` vector of on the returned list easily.
+  - Add a `return_list` parameter to control the return type. This parameter makes this function "type-stable".
+
+## New features
+
+* `glyrepr_structure` has colors now in tibbles when printed to console.
+
+## Minor improvements and bug fixes
+
+* Fix the bug that monosaccharides with substituents are not colored when a `glycan_structure()` is printed in the console. For example, the "Neu5Ac" part in "Neu5Ac9Ac(a2-" was printed in black. Now it is printed in purple, while the "9Ac" part remains in black.
+* Fix the bug that Neu5Ac and Neu5Gc with substituents at position 2, 3, or 4 could not be correctly parsed. Now, complex patterns like "Neu4Ac5Ac9Ac" can be properly handled, into a "Neu5Ac" monosaccharide with "4Ac,9Ac" as substituents.
+
 # glyrepr 0.6.1
 
 ## Minor improvements and bug fixes
