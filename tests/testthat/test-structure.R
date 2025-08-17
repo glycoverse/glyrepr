@@ -29,7 +29,7 @@ test_that("vertex names are added if missing", {
   graph <- igraph::delete_vertex_attr(graph, "name")
 
   glycan_vec <- glycan_structure(graph)
-  glycan <- get_structure_graphs(glycan_vec, 1)
+  glycan <- get_structure_graphs(glycan_vec, return_list = FALSE)
 
   expect_true("name" %in% igraph::vertex_attr_names(glycan))
 })
@@ -542,16 +542,54 @@ test_that("get_structure_graphs extracts individual structures correctly", {
   graph1 <- o_glycan_core_1()
   graph2 <- n_glycan_core()
   sv <- glycan_structure(graph1, graph2)
-  
+
   # Check that we can retrieve the original structures
-  extracted_1 <- get_structure_graphs(sv, 1)
-  extracted_2 <- get_structure_graphs(sv, 2)
   extracted_all <- get_structure_graphs(sv)
-  
-  expect_s3_class(extracted_1, "igraph")
-  expect_s3_class(extracted_2, "igraph") 
+  extracted_single <- get_structure_graphs(sv[1], return_list = FALSE)
+
   expect_type(extracted_all, "list")
   expect_length(extracted_all, 2)
+  expect_s3_class(extracted_all[[1]], "igraph")
+  expect_s3_class(extracted_all[[2]], "igraph")
+  expect_s3_class(extracted_single, "igraph")
+})
+
+test_that("get_structure_graphs return_list parameter works correctly", {
+  graph1 <- o_glycan_core_1()
+  graph2 <- n_glycan_core()
+  sv <- glycan_structure(graph1, graph2)
+
+  # Test default behavior (NULL return_list)
+  # For multiple structures, should return list
+  result_default_multi <- get_structure_graphs(sv)
+  expect_type(result_default_multi, "list")
+  expect_length(result_default_multi, 2)
+
+  # For single structure, should return igraph directly
+  result_default_single <- get_structure_graphs(sv[1])
+  expect_s3_class(result_default_single, "igraph")
+
+  # Test explicit return_list = TRUE
+  result_list_true <- get_structure_graphs(sv[1], return_list = TRUE)
+  expect_type(result_list_true, "list")
+  expect_length(result_list_true, 1)
+  expect_s3_class(result_list_true[[1]], "igraph")
+
+  # Test explicit return_list = FALSE
+  result_list_false <- get_structure_graphs(sv[1], return_list = FALSE)
+  expect_s3_class(result_list_false, "igraph")
+})
+
+test_that("get_structure_graphs validates return_list parameter", {
+  graph1 <- o_glycan_core_1()
+  graph2 <- n_glycan_core()
+  sv <- glycan_structure(graph1, graph2)
+
+  # Should error when return_list = FALSE but length > 1
+  expect_error(
+    get_structure_graphs(sv, return_list = FALSE),
+    "return_list.*must be.*TRUE.*NULL.*length greater than 1"
+  )
 })
 
 # Integration tests -----------------------------------------------------------
@@ -944,7 +982,7 @@ test_that("tibble operations preserve structure content integrity", {
   subset_df <- df %>% dplyr::filter(id == 1)
   
   # Extract the structure and verify it's correct
-  structure_graph <- get_structure_graphs(subset_df$structure, 1)
+  structure_graph <- get_structure_graphs(subset_df$structure, return_list = FALSE)
   expect_s3_class(structure_graph, "igraph")
   
   # Verify structure content (o_glycan_core_1 has GalNAc and Gal)

@@ -453,35 +453,39 @@ as.character.glyrepr_structure <- function(x, ...) {
 #' Extract individual glycan structure graphs from a glycan structure vector.
 #'
 #' @param x A glycan structure vector.
-#' @param i Index or indices of structures to extract.
+#' @param return_list If `TRUE`, always returns a list.
+#'   If `FALSE` and `x` has a length of 1, return the igraph object directly.
+#'   If not provided (default), `FALSE` when `x` has a length of 1 and `TRUE` otherwise.
 #'
-#' @return A list of glycan_structure (igraph) objects.
+#' @return A list of igraph objects or an igraph object directly (see `return_list` parameter).
 #'
 #' @examples
 #' structures <- glycan_structure(o_glycan_core_1(), n_glycan_core())
-#' get_structure_graphs(structures, 1)
-#' get_structure_graphs(structures, c(1, 2))
+#' get_structure_graphs(structures)
+#' get_structure_graphs(structures)
 #'
 #' @export
-get_structure_graphs <- function(x, i = NULL) {
-  if (!is_glycan_structure(x)) {
-    cli::cli_abort("Input must be a glycan_structure vector.")
-  }
-  
-  data <- vctrs::vec_data(x)
-  codes <- vctrs::field(data, "iupac")
-  structures <- attr(x, "structures")
-  
-  if (is.null(i)) {
-    i <- seq_along(codes)
-  }
-  
-  selected_codes <- codes[i]
-  result <- purrr::map(selected_codes, ~ structures[[.x]])
-  
-  if (length(result) == 1) {
-    return(result[[1]])
+get_structure_graphs <- function(x, return_list = NULL) {
+  checkmate::assert_class(x, "glyrepr_structure")
+  checkmate::assert_flag(return_list, null.ok = TRUE)
+
+  if (is.null(return_list)) {
+    return_list <- length(x) > 1
   } else {
-    return(result)
+    if (!return_list && length(x) > 1) {
+      cli::cli_abort(c(
+        "{.arg return_list} must be `TRUE` or `NULL` if {.arg x} has a length greater than 1.",
+        "i" = "Length of {.arg x}: {.val {length(x)}}"
+      ))
+    }
   }
+
+  data <- vctrs::vec_data(x)
+  iupacs <- vctrs::field(data, "iupac")
+  structures <- attr(x, "structures")
+  res <- purrr::map(iupacs, ~ structures[[.x]])
+  if (!return_list) {
+    res <- res[[1]]
+  }
+  res
 }
