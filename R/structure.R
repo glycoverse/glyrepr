@@ -387,7 +387,26 @@ obj_print_data.glyrepr_structure <- function(x, ..., max_n = 10, colored = TRUE)
 #' @importFrom pillar pillar_shaft
 #' @export
 pillar_shaft.glyrepr_structure <- function(x, ...) {
-  pillar::pillar_shaft(format(x))
+  if (length(x) == 0) {
+    return(pillar::pillar_shaft(character()))
+  }
+
+  # Get formatted strings with colors
+  data <- vctrs::vec_data(x)
+  codes <- vctrs::field(data, "iupac")
+  mono_types <- vctrs::field(data, "mono_type")
+  structures <- attr(x, "structures")
+
+  # For each structure, add colors if concrete type
+  formatted <- purrr::map2_chr(codes, mono_types, function(code, mono_type) {
+    structure <- structures[[code]]
+    mono_names <- igraph::V(structure)$mono
+
+    # Add colors to monosaccharides and gray linkages
+    colorize_iupac_string(code, mono_names)
+  })
+
+  pillar::new_pillar_shaft_simple(formatted, align = "left")
 }
 
 #' @export
