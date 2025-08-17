@@ -7,7 +7,7 @@
 get_mono_color(mono)
 }
 \arguments{
-\item{mono}{A monosaccharide name (character)}
+\item{mono}{A monosaccharide name (character), potentially with substituents}
 }
 \value{
 A color code (character)

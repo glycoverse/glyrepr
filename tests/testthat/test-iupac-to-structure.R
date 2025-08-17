@@ -284,3 +284,57 @@ test_that("as_glycan_structure.character handles multiple substituents", {
   graph <- get_structure_graphs(glycan, 1)
   expect_equal(igraph::V(graph)$sub, "3Me,6S")
 })
+
+test_that("Neu monosaccharides with 5Ac are correctly parsed as Neu5Ac", {
+  # Test cases where 5Ac should result in Neu5Ac base monosaccharide
+  expect_equal(.extract_substituent("Neu3Me5Ac"), c(mono = "Neu5Ac", sub = "3Me"))
+  expect_equal(.extract_substituent("Neu4Ac5Ac"), c(mono = "Neu5Ac", sub = "4Ac"))
+  expect_equal(.extract_substituent("Neu4Ac5Ac9Ac"), c(mono = "Neu5Ac", sub = "4Ac,9Ac"))
+  expect_equal(.extract_substituent("Neu7S5Ac"), c(mono = "Neu5Ac", sub = "7S"))
+})
+
+test_that("Neu monosaccharides with 5Gc are correctly parsed as Neu5Gc", {
+  # Test cases where 5Gc should result in Neu5Gc base monosaccharide
+  expect_equal(.extract_substituent("Neu3Me5Gc"), c(mono = "Neu5Gc", sub = "3Me"))
+  expect_equal(.extract_substituent("Neu4Ac5Gc"), c(mono = "Neu5Gc", sub = "4Ac"))
+  expect_equal(.extract_substituent("Neu7S5Gc"), c(mono = "Neu5Gc", sub = "7S"))
+})
+
+test_that("Neu monosaccharides without 5Ac or 5Gc remain as Neu", {
+  # Test cases where no 5Ac or 5Gc should result in Neu base monosaccharide
+  expect_equal(.extract_substituent("Neu"), c(mono = "Neu", sub = ""))
+  expect_equal(.extract_substituent("Neu7Ac"), c(mono = "Neu", sub = "7Ac"))
+  expect_equal(.extract_substituent("Neu3Me7Ac"), c(mono = "Neu", sub = "3Me,7Ac"))
+})
+
+test_that("Neu5Ac and Neu5Gc exact matches work correctly", {
+  # Test exact matches
+  expect_equal(.extract_substituent("Neu5Ac"), c(mono = "Neu5Ac", sub = ""))
+  expect_equal(.extract_substituent("Neu5Gc"), c(mono = "Neu5Gc", sub = ""))
+})
+
+test_that("Neu5Ac and Neu5Gc with additional substituents work correctly", {
+  # Test Neu5Ac/Neu5Gc with additional substituents
+  expect_equal(.extract_substituent("Neu5Ac9Ac"), c(mono = "Neu5Ac", sub = "9Ac"))
+  expect_equal(.extract_substituent("Neu5Gc9Ac"), c(mono = "Neu5Gc", sub = "9Ac"))
+  expect_equal(.extract_substituent("Neu5Ac7S9Ac"), c(mono = "Neu5Ac", sub = "7S,9Ac"))
+})
+
+test_that("Error is thrown for monosaccharides with both 5Ac and 5Gc", {
+  # This should be an error case
+  expect_error(.extract_substituent("Neu5Ac5Gc"), "cannot have both 5Ac and 5Gc")
+  expect_error(.extract_substituent("Neu5Gc5Ac"), "cannot have both 5Ac and 5Gc")
+})
+
+test_that("Full IUPAC parsing works with corrected Neu substituents", {
+  # Test full IUPAC parsing
+  result1 <- suppressMessages(as_glycan_structure("Neu3Me5Ac(a2-3)Gal(b1-4)Glc(a1-"))
+  expect_true(is_glycan_structure(result1))
+  
+  result2 <- suppressMessages(as_glycan_structure("Neu4Ac5Gc(a2-3)Gal(b1-4)Glc(a1-"))
+  expect_true(is_glycan_structure(result2))
+  
+  # Check that the output contains the correct monosaccharide names
+  expect_match(as.character(result1), "Neu5Ac3Me")
+  expect_match(as.character(result2), "Neu5Gc4Ac")
+})

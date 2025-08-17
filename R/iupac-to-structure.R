@@ -214,81 +214,112 @@
 .extract_substituent <- function(mono) {
   subs_pattern <- stringr::str_c(available_substituents(), collapse = "|")
   single_sub_pattern <- stringr::str_glue("[1-9\\?]({subs_pattern})")  # Pattern for a single substituent
-  
-  result <- if (mono == "Neu5Ac") {
-    # "Neu5Ac" is special that it satisfies the regex below,
-    # but should not be split.
-    c(mono = mono, sub = "")
-  } else if (stringr::str_starts(mono, "Neu5Ac") && nchar(mono) > 6) {
-    # Handle "Neu5Ac" with additional substituents, e.g., "Neu5Ac9Ac"
-    # Extract everything after "Neu5Ac" as substituents
-    sub_part <- stringr::str_sub(mono, 7, -1)  # Everything after "Neu5Ac"
-    
-    # Parse the substituent part
-    all_subs <- stringr::str_extract_all(sub_part, single_sub_pattern)[[1]]
-    
-    if (length(all_subs) > 0) {
-      # Sort substituents by position
-      positions <- purrr::map_chr(all_subs, ~ stringr::str_extract(.x, "^[1-9\\?]"))
-      numeric_positions <- purrr::map_dbl(positions, function(pos) {
-        if (pos == "?") Inf else as.numeric(pos)
-      })
-      
-      sorted_indices <- order(numeric_positions)
-      sorted_subs <- all_subs[sorted_indices]
-      
-      sub_string <- stringr::str_c(sorted_subs, collapse = ",")
-      c(mono = "Neu5Ac", sub = sub_string)
-    } else {
-      c(mono = "Neu5Ac", sub = "")
-    }
-  } else if (mono == "Neu4Ac5Ac") {
-    # Special case: Neu4Ac5Ac -> Neu5Ac + 4Ac (5Ac is absorbed into the mono name)
-    c(mono = "Neu5Ac", sub = "4Ac")
-  } else if (mono == "Neu4Ac5Gc") {
-    # Special case: Neu4Ac5Gc -> Neu5Gc + 4Ac (5Gc is absorbed into the mono name)
-    c(mono = "Neu5Gc", sub = "4Ac")
+
+  # Handle different types of monosaccharides
+  result <- if (stringr::str_starts(mono, "Neu")) {
+    # Handle all Neu-based monosaccharides
+    .handle_neu_monosaccharide(mono, single_sub_pattern)
   } else {
-    # Try to find all substituents in the monosaccharide name
-    # Substituents are directly concatenated in IUPAC, e.g., "Glc3Me6S"
-    all_subs <- stringr::str_extract_all(mono, single_sub_pattern)[[1]]
-    
-    if (length(all_subs) > 0) {
-      # Remove all substituents from the mono name to get the base monosaccharide
-      clean_mono <- mono
-      for (sub in all_subs) {
-        clean_mono <- stringr::str_remove(clean_mono, stringr::fixed(sub))
-      }
-      
-      # Sort substituents by position
-      # Extract positions for sorting
-      positions <- purrr::map_chr(all_subs, ~ stringr::str_extract(.x, "^[1-9\\?]"))
-      numeric_positions <- purrr::map_dbl(positions, function(pos) {
-        if (pos == "?") Inf else as.numeric(pos)
-      })
-      
-      # Sort substituents by position
-      sorted_indices <- order(numeric_positions)
-      sorted_subs <- all_subs[sorted_indices]
-      
-      # Combine into comma-separated string for internal storage
-      sub_string <- if (length(sorted_subs) > 0) {
-        stringr::str_c(sorted_subs, collapse = ",")
-      } else {
-        ""
-      }
-      
-      c(mono = clean_mono, sub = sub_string)
-    } else {
-      c(mono = mono, sub = "")
-    }
+    # Handle non-Neu monosaccharides
+    .handle_general_monosaccharide(mono, single_sub_pattern)
   }
-  
+
   # Validate that the monosaccharide is known
   if (!is_known_monosaccharide(result[["mono"]])) {
     cli::cli_abort(paste0("Unknown monosaccharide: ", result[["mono"]]))
   }
-  
+
   result
 }
 
+# Handle Neu-based monosaccharides with substituents
+# This function determines the correct base monosaccharide (Neu5Ac, Neu5Gc, or Neu)
+# based on the presence of 5Ac or 5Gc substituents
+.handle_neu_monosaccharide <- function(mono, single_sub_pattern) {
+  # Check for conflicting 5Ac5Gc pattern
+  if (stringr::str_detect(mono, "5Gc") && stringr::str_detect(mono, "5Ac")) {
+    cli::cli_abort("Monosaccharide cannot have both 5Ac and 5Gc substituents: {mono}")
+  }
+
+  # Handle all Neu variants containing 5Ac
+  if (stringr::str_detect(mono, "Neu.*5Ac")) {
+    return(.handle_neu5ac_variant(mono, single_sub_pattern))
+  }
+
+  # Handle all Neu variants containing 5Gc
+  if (stringr::str_detect(mono, "Neu.*5Gc")) {
+    return(.handle_neu5gc_variant(mono, single_sub_pattern))
+  }
+
+  # Handle other Neu-based monosaccharides (no 5Ac or 5Gc)
+  .handle_general_monosaccharide(mono, single_sub_pattern)
+}
+
+# Handle general (non-Neu) monosaccharides with substituents
+.handle_general_monosaccharide <- function(mono, single_sub_pattern) {
+  # Try to find all substituents in the monosaccharide name
+  # Substituents are directly concatenated in IUPAC, e.g., "Glc3Me6S"
+  all_subs <- stringr::str_extract_all(mono, single_sub_pattern)[[1]]
+
+  if (length(all_subs) > 0) {
+    # Remove all substituents from the mono name to get the base monosaccharide
+    clean_mono <- mono
+    for (sub in all_subs) {
+      clean_mono <- stringr::str_remove(clean_mono, stringr::fixed(sub))
+    }
+
+    # Sort substituents by position
+    sub_string <- .sort_substituents(all_subs)
+
+    c(mono = clean_mono, sub = sub_string)
+  } else {
+    c(mono = mono, sub = "")
+  }
+}
+
+# Helper function to sort substituents by position
+.sort_substituents <- function(subs) {
+  if (length(subs) == 0) {
+    return("")
+  }
+
+  # Extract positions for sorting
+  positions <- purrr::map_chr(subs, ~ stringr::str_extract(.x, "^[1-9\\?]"))
+  numeric_positions <- purrr::map_dbl(positions, function(pos) {
+    if (pos == "?") Inf else as.numeric(pos)
+  })
+
+  # Sort substituents by position
+  sorted_indices <- order(numeric_positions)
+  sorted_subs <- subs[sorted_indices]
+
+  stringr::str_c(sorted_subs, collapse = ",")
+}
+
+# Handle all Neu variants containing 5Ac
+.handle_neu5ac_variant <- function(mono, single_sub_pattern) {
+  .handle_neu_with_marker(mono, single_sub_pattern, "5Ac", "Neu5Ac")
+}
+
+# Handle all Neu variants containing 5Gc
+.handle_neu5gc_variant <- function(mono, single_sub_pattern) {
+  .handle_neu_with_marker(mono, single_sub_pattern, "5Gc", "Neu5Gc")
+}
+
+# Generic helper function for handling Neu variants with specific markers
+.handle_neu_with_marker <- function(mono, single_sub_pattern, marker, base_mono) {
+  # Remove the marker from the monosaccharide name to get the remaining part
+  mono_without_marker <- stringr::str_remove(mono, marker)
+
+  # Extract all substituents from the remaining part using normal logic
+  all_subs <- stringr::str_extract_all(mono_without_marker, single_sub_pattern)[[1]]
+
+  # Sort substituents by position
+  sub_string <- if (length(all_subs) > 0) {
+    .sort_substituents(all_subs)
+  } else {
+    ""
+  }
+
+  c(mono = base_mono, sub = sub_string)
+}
