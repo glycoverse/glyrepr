@@ -4,7 +4,7 @@
 
 * `convert_mono_type()` is now replaced by `convert_to_generic()`. `convert_mono_type()` was created when three monosaccharide types existed: "concrete", "generic", and "simple". When "simple" was removed, the old `convert_mono_type()` seems redundant, as the only valid conversion is from "concrete" to "generic" now. Therefore, we remove this function now and add a more straightforward `convert_to_generic()`.
 * `get_structure_graphs()` is redesigned.
-  - The `i` parameter is removed, as indexed can be done manually on the input `glyrepr_structure` vector of on the returned list easily.
+  - The `i` parameter is removed, as indexing can be done manually on the input `glyrepr_structure` vector or on the returned list easily.
   - Add a `return_list` parameter to control the return type. This parameter makes this function "type-stable".
 * `glycan_structure()` and `as_glycan_structure()` now reorder the underlying graphs to be in line with the IUPAC-style sequence. For example, the vertex order of "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(b1-" is always 1. Gal, 2. GlcNAc, 3. GalNAc, and edges b1-3, b1-6, no matter what the original graphs are. Users can assign the indices of vertices and edges easily by printing the structure to console. This update makes `glymotif::match_motif()` more meaningful. 
 
