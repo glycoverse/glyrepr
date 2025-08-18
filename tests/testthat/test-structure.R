@@ -1001,3 +1001,29 @@ test_that("converting to character", {
   sv <- glycan_structure(o_glycan_core_1())
   expect_equal(as.character(sv), "Gal(b1-3)GalNAc(a1-")
 })
+
+# Tests for vertex and edge reordering -------------------------
+test_that("vertices and edges are reordered correctly", {
+  graph1 <- igraph::make_graph(~ 1-+2, 1-+3)
+  igraph::V(graph1)$mono <- c("GalNAc", "Gal", "GlcNAc")
+  igraph::V(graph1)$sub <- ""
+  igraph::E(graph1)$linkage <- c("b1-3", "b1-6")
+  graph1$anomer <- "a1"
+
+  graph2 <- igraph::make_graph(~ 1-+2, 1-+3)
+  igraph::V(graph2)$mono <- c("GalNAc", "GlcNAc", "Gal")
+  igraph::V(graph2)$sub <- ""
+  igraph::E(graph2)$linkage <- c("b1-6", "b1-3")
+  graph2$anomer <- "a1"
+
+  sv1 <- glycan_structure(graph1)
+  sv2 <- glycan_structure(graph2)
+  graph1 <- get_structure_graphs(sv1, return_list = FALSE)
+  graph2 <- get_structure_graphs(sv2, return_list = FALSE)
+
+  expect_equal(igraph::V(graph1)$mono, c("Gal", "GlcNAc", "GalNAc"))
+  expect_equal(igraph::V(graph2)$mono, c("Gal", "GlcNAc", "GalNAc"))
+
+  expect_equal(igraph::E(graph1)$linkage, c("b1-3", "b1-6"))
+  expect_equal(igraph::E(graph2)$linkage, c("b1-3", "b1-6"))
+})

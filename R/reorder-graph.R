@@ -26,7 +26,11 @@ reorder_graphs <- function(x) {
   # Reorder the vertices
   vertices <- stringr::str_extract_all(pseudo_seq, "V(\\d+)")[[1]]
   vertices <- stringr::str_sub(vertices, 2L, -1L)
-  graph <- igraph::permute(graph, match(vertices, igraph::V(graph)$name))
+  # Fix: Use the correct permutation vector
+  # vertices contains the desired order, we need the inverse permutation
+  target_order <- as.numeric(vertices)
+  permutation <- order(target_order)
+  graph <- igraph::permute(graph, permutation)
   igraph::V(graph)$name <- as.character(1:igraph::vcount(graph))
 
   # Reorder the edges
