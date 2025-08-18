@@ -33,7 +33,7 @@ test_that("as_glycan_structure.character handles substituents", {
 
   # Check that substituents are preserved
   graph <- get_structure_graphs(glycan, return_list = FALSE)
-  expect_equal(igraph::V(graph)$sub, c("6Ac", "3S"))
+  expect_equal(igraph::V(graph)$sub, c("3S", "6Ac"))
 })
 
 test_that("as_glycan_structure.character handles Neu5Ac correctly", {
@@ -337,4 +337,12 @@ test_that("Full IUPAC parsing works with corrected Neu substituents", {
   # Check that the output contains the correct monosaccharide names
   expect_match(as.character(result1), "Neu5Ac3Me")
   expect_match(as.character(result2), "Neu5Gc4Ac")
+})
+
+test_that("as_glycan_structure.character makes order of vertices and edges consistent with IUPAC-condensed", {
+  glycan <- as_glycan_structure("GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-3)]GlcNAc(b1-")
+  graph <- get_structure_graphs(glycan, return_list = FALSE)
+
+  expect_equal(igraph::V(graph)$mono, c("GlcNAc", "Man", "GlcNAc", "Man", "Man", "GlcNAc", "Fuc", "GlcNAc"))
+  expect_equal(igraph::E(graph)$linkage, c("b1-2", "a1-3", "b1-2", "a1-6", "b1-4", "b1-4", "a1-3"))
 })

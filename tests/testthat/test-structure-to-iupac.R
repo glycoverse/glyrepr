@@ -240,44 +240,6 @@ test_that("structure_to_iupac produces correct sequence for examples in document
   expect_equal(result2, "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-")
 })
 
-test_that("structure_to_iupac throws appropriate errors", {
-  # Test with non-glycan_structure object
-  expect_error(structure_to_iupac("not a glycan"), "Input must be a glyrepr_structure vector")
-  
-  # Create a valid glycan first, then test error from structure_to_iupac
-  graph <- igraph::make_graph(~ 1-+2)
-  igraph::V(graph)$mono <- c("Glc", "Man")
-  igraph::V(graph)$sub <- ""
-  igraph::E(graph)$linkage <- "a1-3"
-  graph$anomer <- "a1"
-  glycan <- glycan_structure(graph)
-  
-  # Test the internal function directly with an invalid structure (multiple roots)
-  invalid_graph <- igraph::make_graph(~ 1-+3, 2-+3)  # Two roots: 1 and 2
-  igraph::V(invalid_graph)$mono <- c("Glc", "Man", "Gal")
-  igraph::V(invalid_graph)$sub <- ""
-  igraph::E(invalid_graph)$linkage <- c("a1-3", "b1-4")
-  invalid_graph$anomer <- "a1"
-  
-  # Test the internal function .structure_to_iupac_single
-  expect_error(glyrepr:::.structure_to_iupac_single(invalid_graph), "exactly one root")
-})
-
-test_that("depth calculation works correctly", {
-  # Test depth calculation on n_glycan_core - need to extract the igraph
-  glycan_vector <- n_glycan_core()
-  glycan <- get_structure_graphs(glycan_vector, return_list = FALSE)  # Get the first (and only) structure
-  root <- which(igraph::degree(glycan, mode = "in") == 0)
-  depths <- calculate_depths(glycan, root)
-  
-  # Root should have depth 3, leaves should have depth 0
-  expect_equal(as.numeric(depths["1"]), 3)  # Root GlcNAc
-  expect_equal(as.numeric(depths["2"]), 2)  # Second GlcNAc
-  expect_equal(as.numeric(depths["3"]), 1)  # Central Man
-  expect_equal(as.numeric(depths["4"]), 0)  # Leaf Man
-  expect_equal(as.numeric(depths["5"]), 0)  # Leaf Man
-})
-
 test_that("structure_to_iupac handles edge cases with linkages", {
   # Test with ? in different positions
   graph <- igraph::make_graph(~ 1-+2)

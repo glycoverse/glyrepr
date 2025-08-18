@@ -58,7 +58,7 @@ test_that("remove_substituents works on glycan structures", {
   # Check that substituents are removed
   clean_graph <- get_structure_graphs(clean_glycan, return_list = FALSE)
   expect_equal(igraph::V(clean_graph)$sub, c("", ""))
-  expect_equal(igraph::V(clean_graph)$mono, c("Glc", "Gal"))  # Monos should be unchanged
+  expect_equal(igraph::V(clean_graph)$mono, c("Gal", "Glc"))  # Monos should be unchanged
 })
 
 test_that("remove_substituents input validation", {

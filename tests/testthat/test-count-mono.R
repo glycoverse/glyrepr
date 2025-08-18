@@ -18,11 +18,11 @@ create_test_glycan_graph <- function(mono_names, linkages = NULL, anomer = "?1")
     }
   }
   
+  igraph::V(graph)$name <- as.character(1:igraph::vcount(graph))
   igraph::V(graph)$mono <- mono_names
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- linkages
   graph$anomer <- anomer
-  graph$alditol <- FALSE
   graph
 }
 

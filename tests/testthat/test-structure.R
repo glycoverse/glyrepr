@@ -2,6 +2,7 @@
 
 good_glycan_graph <- function() {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  igraph::V(graph)$name <- as.character(1:igraph::vcount(graph))
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- c("", "", "")
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
@@ -73,6 +74,7 @@ test_that("ensure_name_vertex_attr preserves existing names", {
 
 test_that("glycan structure class", {
   graph <- igraph::make_tree(3, children = 2, mode = "out")
+  igraph::V(graph)$name <- as.character(1:igraph::vcount(graph))
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "GlcNAc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-3")
@@ -364,6 +366,7 @@ create_simple_glycan_graph <- function(mono_names, linkages, anomer = "?1") {
     graph <- igraph::make_graph(edges = edges, directed = TRUE)
   }
   
+  igraph::V(graph)$name <- as.character(1:igraph::vcount(graph))
   igraph::V(graph)$mono <- mono_names
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- linkages

@@ -100,7 +100,8 @@ glycan_structure <- function(...) {
   unique_iupacs <- iupacs[unique_indices]
   names(unique_graphs) <- unique_iupacs
   
-  new_glycan_structure(iupacs, mono_types, unique_graphs)
+  res <- new_glycan_structure(iupacs, mono_types, unique_graphs)
+  reorder_graphs(res)
 }
 
 # Helper function to validate a single glycan structure
