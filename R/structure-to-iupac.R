@@ -68,28 +68,26 @@ structure_to_iupac <- function(glycan) {
 
 # Internal function to convert a single igraph to IUPAC
 .structure_to_iupac_single <- function(glycan) {
-  # Find root (node with in-degree 0)
   root <- which(igraph::degree(glycan, mode = "in") == 0)
-  if (length(root) != 1) {
-    cli::cli_abort("Glycan structure must have exactly one root node.")
-  }
-  
-  # Calculate depth for each node
   depths <- calculate_depths(glycan, root)
-  
-  # Generate sequence starting from root
-  seq_result <- seq_glycan(glycan, root, depths)
-  
-  # Add root anomer at the end
+
+  # Step 1: Generate pseudo-IUPAC sequence starting from root
+  # `pseudo_seq` is a string like "V1E1[V2E2]V3E3".
+  # V1, V2, V3 are the vertex indices, E1, E2, E3 are the edge indices.
+  pseudo_seq <- seq_glycan(glycan, root, depths)
+
+  # Step 2: Replace vertex and edge indices with actual monosaccharides and linkages
+  real_seq <- replace_mono_and_link(pseudo_seq, glycan)
+
   anomer <- glycan$anomer
-  paste0(seq_result, "(", anomer, "-")
+  paste0(real_seq, "(", anomer, "-")
 }
 
 #' Parse linkage string into comparable components
-#' 
+#'
 #' @param linkage Character string in format "xy-z" (e.g., "b1-4", "a2-3")
 #' @return Named list with x, y, z components and their numeric ranks
-#' @keywords internal
+#' @noRd
 parse_linkage <- function(linkage) {
   # Parse linkage format: xy-z where x is a/b/?, y is digit/?, z is digit/?
   pattern <- "^([ab\\?])(\\d|\\?)[-](\\d|\\?)$"
@@ -118,7 +116,7 @@ parse_linkage <- function(linkage) {
 #' 
 #' @param linkage1,linkage2 Character strings representing linkages
 #' @return Integer: -1 if linkage1 < linkage2, 0 if equal, 1 if linkage1 > linkage2
-#' @keywords internal
+#' @noRd
 compare_linkages <- function(linkage1, linkage2) {
   p1 <- parse_linkage(linkage1)
   p2 <- parse_linkage(linkage2)
@@ -142,7 +140,7 @@ compare_linkages <- function(linkage1, linkage2) {
 #' @param glycan An igraph object representing a glycan structure
 #' @param root Root vertex
 #' @return Named vector of depths for each node
-#' @keywords internal
+#' @noRd
 calculate_depths <- function(glycan, root) {
   all_vertices <- igraph::V(glycan)
   depths <- rep(NA_real_, length(all_vertices))
@@ -186,36 +184,28 @@ calculate_depths <- function(glycan, root) {
   depths
 }
 
-#' Generate glycan sequence recursively
-#' 
+#' Generate glycan sequence recursively using pseudo-IUPAC format
+#'
 #' @param glycan An igraph object representing a glycan structure
 #' @param node Current node
 #' @param depths Vector of depths for all nodes
-#' @return Character string representing the sequence
-#' @keywords internal
+#' @return Character string representing the pseudo-IUPAC sequence
+#' @noRd
 seq_glycan <- function(glycan, node, depths) {
   children <- igraph::neighbors(glycan, node, mode = "out")
   
   # Base case: leaf node
   if (length(children) == 0) {
-    mono <- igraph::vertex_attr(glycan, "mono", node)
-    sub <- igraph::vertex_attr(glycan, "sub", node)
-    # Combine monosaccharide with substituent if present
-    if (sub == "") {
-      return(mono)
-    } else {
-      # Remove commas to get IUPAC format
-      iupac_sub <- stringr::str_remove_all(sub, ",")
-      return(paste0(mono, iupac_sub))
-    }
+    # Return vertex index with V prefix
+    return(paste0("V", as.character(node)))
   }
-  
+
   # Find backbone child (deepest, break ties by linkage)
   child_names <- as.character(children)
   child_depths <- depths[child_names]
   max_depth <- max(child_depths)
   backbone_candidates <- children[child_depths == max_depth]
-  
+
   # Choose backbone child by linkage if multiple candidates
   if (length(backbone_candidates) > 1) {
     candidate_linkages <- character(length(backbone_candidates))
@@ -223,24 +213,23 @@ seq_glycan <- function(glycan, node, depths) {
       edge_id <- igraph::get_edge_ids(glycan, vp = c(as.character(node), as.character(backbone_candidates[i])))
       candidate_linkages[i] <- igraph::edge_attr(glycan, "linkage", edge_id)
     }
-    
+
     # Sort by linkage (ascending order) - smaller linkage wins
     linkage_order <- order(candidate_linkages, decreasing = FALSE)
     backbone_child <- backbone_candidates[linkage_order[1]]
   } else {
     backbone_child <- backbone_candidates[1]
   }
-  
+
   # Other children are branches
   branch_children <- children[!children %in% backbone_child]
-  
+
   # Generate backbone sequence
   backbone_seq <- seq_glycan(glycan, backbone_child, depths)
-  
-  # Get backbone linkage
+
+  # Get backbone edge index
   backbone_edge_id <- igraph::get_edge_ids(glycan, vp = c(as.character(node), as.character(backbone_child)))
-  backbone_linkage <- igraph::edge_attr(glycan, "linkage", backbone_edge_id)
-  
+
   # Generate branch sequences
   branch_parts <- character()
   if (length(branch_children) > 0) {
@@ -250,38 +239,72 @@ seq_glycan <- function(glycan, node, depths) {
       edge_id <- igraph::get_edge_ids(glycan, vp = c(as.character(node), as.character(branch_children[i])))
       branch_linkages[i] <- igraph::edge_attr(glycan, "linkage", edge_id)
     }
-    
+
     branch_order <- order(branch_linkages, decreasing = FALSE)
     branch_children <- branch_children[branch_order]
-    
+
     for (i in seq_along(branch_children)) {
       branch_child <- branch_children[i]
       edge_id <- igraph::get_edge_ids(glycan, vp = c(as.character(node), as.character(branch_child)))
-      branch_linkage <- igraph::edge_attr(glycan, "linkage", edge_id)
-      
-      # Generate branch sequence
+
+      # Generate branch sequence with edge index
       branch_seq <- seq_glycan(glycan, branch_child, depths)
-      branch_parts[i] <- paste0("[", branch_seq, "(", branch_linkage, ")]")
+      branch_parts[i] <- paste0("[", branch_seq, "E", edge_id, "]")
     }
   }
-  
-  # Get current node's monosaccharide and substituent
-  current_mono <- igraph::vertex_attr(glycan, "mono", node)
-  current_sub <- igraph::vertex_attr(glycan, "sub", node)
-  
-  # Combine monosaccharide with substituent if present
-  # Convert comma-separated internal format to directly concatenated IUPAC format
-  # e.g., "3Me,6S" becomes "3Me6S"
-  current_mono_with_sub <- if (current_sub == "") {
-    current_mono
-  } else {
-    # Remove commas to get IUPAC format
-    iupac_sub <- stringr::str_remove_all(current_sub, ",")
-    paste0(current_mono, iupac_sub)
-  }
-  
-  # Combine: backbone + (backbone_linkage) + branches + current_mono_with_sub
+
+  # Combine: backbone + E<edge_index> + branches + V<node_index>
   branches_str <- paste0(branch_parts, collapse = "")
-  paste0(backbone_seq, "(", backbone_linkage, ")", branches_str, current_mono_with_sub)
+  paste0(backbone_seq, "E", backbone_edge_id, branches_str, "V", as.character(node))
 }
 
+#' Replace vertex and edge indices with actual monosaccharides and linkages
+#'
+#' @param pseudo_seq Character string containing pseudo-IUPAC sequence with V and E prefixes
+#' @param glycan An igraph object representing a glycan structure
+#' @return Character string with V<index> replaced by monosaccharides and E<index> replaced by linkages
+#' @noRd
+replace_mono_and_link <- function(pseudo_seq, glycan) {
+  # Replace vertex indices (V<index>) with monosaccharides and substituents
+  vertex_pattern <- "V(\\d+)"
+  vertex_matches <- stringr::str_match_all(pseudo_seq, vertex_pattern)[[1]]
+
+  if (nrow(vertex_matches) > 0) {
+    for (i in seq_len(nrow(vertex_matches))) {
+      vertex_index <- as.numeric(vertex_matches[i, 2])
+      mono <- igraph::vertex_attr(glycan, "mono", vertex_index)
+      sub <- igraph::vertex_attr(glycan, "sub", vertex_index)
+
+      # Combine monosaccharide with substituent if present
+      mono_with_sub <- if (sub == "") {
+        mono
+      } else {
+        # Remove commas to get IUPAC format
+        iupac_sub <- stringr::str_remove_all(sub, ",")
+        paste0(mono, iupac_sub)
+      }
+
+      # Replace V<index> with actual monosaccharide
+      pseudo_seq <- stringr::str_replace(
+        pseudo_seq, paste0("V", vertex_index), mono_with_sub
+      )
+    }
+  }
+
+  # Replace edge indices (E<index>) with linkages
+  edge_pattern <- "E(\\d+)"
+  edge_matches <- stringr::str_match_all(pseudo_seq, edge_pattern)[[1]]
+
+  if (nrow(edge_matches) > 0) {
+    for (i in seq_len(nrow(edge_matches))) {
+      edge_index <- as.numeric(edge_matches[i, 2])
+      linkage <- igraph::edge_attr(glycan, "linkage", edge_index)
+      # Replace E<index> with actual linkage wrapped in parentheses
+      pseudo_seq <- stringr::str_replace(
+        pseudo_seq, paste0("E", edge_index), paste0("(", linkage, ")")
+      )
+    }
+  }
+
+  pseudo_seq
+}
