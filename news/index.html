@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,8 @@
 <ul><li>The <code>i</code> parameter is removed, as indexed can be done manually on the input <code>glyrepr_structure</code> vector of on the returned list easily.</li>
 <li>Add a <code>return_list</code> parameter to control the return type. This parameter makes this function “type-stable”.</li>
 </ul></li>
+<li>
+<code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> and <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> now reorder the underlying graphs to be in line with the IUPAC-style sequence. For example, the vertex order of “Gal(b1-3)[GlcNAc(b1-6)]GalNAc(b1-” is always 1. Gal, 2. GlcNAc, 3. GalNAc, and edges b1-3, b1-6, no matter what the original graphs are. Users can assign the indices of vertices and edges easily by printing the structure to console. This update makes <code>glymotif::match_motif()</code> more meaningful.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>

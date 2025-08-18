@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -283,7 +283,7 @@ like <code>purrr</code>!</p>
 <span><span class="va">degree_sequences</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>  <span class="co"># Show first 3</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; 1 2 3 4 5 </span></span>
-<span><span class="co">#&gt; 1 2 3 1 1 </span></span>
+<span><span class="co">#&gt; 1 1 3 2 1 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
 <span><span class="co">#&gt; 1 2 </span></span>
@@ -291,7 +291,7 @@ like <code>purrr</code>!</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
 <span><span class="co">#&gt; 1 2 3 </span></span>
-<span><span class="co">#&gt; 2 1 1</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 1 2</span></span></code></pre></div>
 <p><strong>Check if any structure has isolated vertices:</strong></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/smap_predicates.html">ssome</a></span><span class="op">(</span><span class="va">large_struc</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/degree.html" class="external-link">degree</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
@@ -350,14 +350,14 @@ deduplication:</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"smap_int (optimized)"</span><span class="op">)</span></span>
 <span><span class="va">vertex_counts_optimized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smap.html">smap_int</a></span><span class="op">(</span><span class="va">huge_struc</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; smap_int (optimized): 0.002 sec elapsed</span></span>
+<span><span class="co">#&gt; smap_int (optimized): 0.001 sec elapsed</span></span>
 <span></span>
 <span><span class="co"># Naive approach: extract all graphs and process each one</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Naive approach (all graphs)"</span><span class="op">)</span></span>
 <span><span class="va">all_graphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">huge_struc</span><span class="op">)</span>  <span class="co"># Extracts all 25,000 graphs</span></span>
 <span><span class="va">vertex_counts_naive</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">all_graphs</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Naive approach (all graphs): 0.224 sec elapsed</span></span>
+<span><span class="co">#&gt; Naive approach (all graphs): 0.249 sec elapsed</span></span>
 <span></span>
 <span><span class="co"># Verify results are equivalent (though data types may differ)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">vertex_counts_optimized</span>, <span class="va">vertex_counts_naive</span><span class="op">)</span></span>
@@ -511,7 +511,7 @@ analysis tools. Go forth and analyze! 🌟</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] tictoc_1.2.1       lobstr_1.1.2       glyrepr_0.6.1.9000</span></span>
+<span><span class="co">#&gt; [1] tictoc_1.2.1       lobstr_1.1.2       glyrepr_0.6.1.9001</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] jsonlite_2.0.0    dplyr_1.1.4       compiler_4.5.1    tidyselect_1.2.1 </span></span>

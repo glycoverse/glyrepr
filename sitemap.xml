@@ -19,9 +19,7 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/available_monosaccharides.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/available_substituents.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/reference/calculate_depths.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/colorize_iupac_string.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/reference/compare_linkages.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/convert_to_generic.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/count_mono.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/dot-extract_base_mono.html</loc></url>
@@ -40,12 +38,10 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/is_known_monosaccharide.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/n_glycan_core.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/normalize_substituents.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/reference/parse_linkage.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/possible_linkages.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/remove_linkages.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/remove_substituents.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/replace_monos_with_colored.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/reference/seq_glycan.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/simap.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/smap.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/smap2.html</loc></url>
