@@ -45,7 +45,7 @@
 <code>convert_mono_type()</code> is now replaced by <code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code>. <code>convert_mono_type()</code> was created when three monosaccharide types existed: “concrete”, “generic”, and “simple”. When “simple” was removed, the old <code>convert_mono_type()</code> seems redundant, as the only valid conversion is from “concrete” to “generic” now. Therefore, we remove this function now and add a more straightforward <code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code>.</li>
 <li>
 <code><a href="../reference/get_structure_graphs.html">get_structure_graphs()</a></code> is redesigned.
-<ul><li>The <code>i</code> parameter is removed, as indexed can be done manually on the input <code>glyrepr_structure</code> vector of on the returned list easily.</li>
+<ul><li>The <code>i</code> parameter is removed, as indexing can be done manually on the input <code>glyrepr_structure</code> vector or on the returned list easily.</li>
 <li>Add a <code>return_list</code> parameter to control the return type. This parameter makes this function “type-stable”.</li>
 </ul></li>
 <li>
