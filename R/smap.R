@@ -211,6 +211,35 @@ NULL
   unname(unique_converted[idx])
 }
 
+# Helper function to generate a hash-based key for complex objects
+# Used for deduplication when dealing with nested lists and other complex structures
+.generate_object_hash <- function(obj) {
+  serialized_data <- serialize(obj, connection = NULL)
+  hash_input <- sum(as.integer(serialized_data))
+  hex_hash <- as.hexmode(hash_input)
+  format(hex_hash, width = 8)
+}
+
+# Helper function to extract values from tibble list-columns
+# Tibble stores single-element lists as list(data) in list-columns, requiring unwrapping
+.extract_from_list_column <- function(value) {
+  if (is.list(value) && length(value) == 1) {
+    value[[1]]  # Extract from list-column wrapper
+  } else {
+    value       # Use as-is for non-list or multi-element cases
+  }
+}
+
+# Helper function to generate deduplication keys for arbitrary values
+# Handles both simple values (convert to character) and complex objects (hash-based keys)
+.generate_value_key <- function(value, prefix = "list_") {
+  if (is.list(value)) {
+    paste0(prefix, .generate_object_hash(value))
+  } else {
+    as.character(value)
+  }
+}
+
 #' @rdname smap
 #' @export
 smap <- function(.x, .f, ..., .parallel = FALSE) {
@@ -549,19 +578,7 @@ smap2 <- function(.x, .y, .f, ..., .parallel = FALSE) {
   # 2. Create hash-based keys for complex list objects to enable proper deduplication
   
   # Generate keys for y values to enable proper deduplication
-  y_val_keys <- purrr::map_chr(.y, function(y_element) {
-    if (is.list(y_element)) {
-      # For list objects, create a hash-based key since they can't be converted to strings directly
-      serialized_data <- serialize(y_element, connection = NULL)
-      hash_input <- sum(as.integer(serialized_data))
-      hex_hash <- as.hexmode(hash_input)
-      formatted_hash <- format(hex_hash, width = 8)
-      paste0("list_", formatted_hash)
-    } else {
-      # For simple objects, convert directly to character
-      as.character(y_element)
-    }
-  })
+  y_val_keys <- purrr::map_chr(.y, .generate_value_key)
   
   # Use tibble to create combinations without unwanted list expansion
   combinations_df <- tibble::tibble(
@@ -579,13 +596,7 @@ smap2 <- function(.x, .y, .f, ..., .parallel = FALSE) {
     # BUG FIX: Proper extraction from tibble list-columns
     # When tibble stores list objects in a list-column, accessing row$y_val returns
     # a length-1 list containing the actual data, rather than the data itself.
-    # We need to unwrap this extra layer for single-element lists while preserving
-    # the original structure for other cases.
-    y_val <- if (is.list(row$y_val) && length(row$y_val) == 1) {
-      row$y_val[[1]]  # Extract the actual data from the list-column wrapper
-    } else {
-      row$y_val       # Use as-is for non-list or multi-element cases
-    }
+    y_val <- .extract_from_list_column(row$y_val)
     
     .f(structures[[row$code]], y_val, ...)
   }, use_parallel = .parallel)
@@ -648,19 +659,25 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
   structures <- attr(.x, "structures")
   
   # Create unique combinations data frame for proper handling
-  combinations_df <- data.frame(
+  # BUG FIX: Use tibble to prevent unwanted expansion of nested lists (same fix as smap2)
+  y_val_keys <- purrr::map_chr(.y, .generate_value_key)
+  
+  combinations_df <- tibble::tibble(
     code = codes,
     y_val = .y,
-    stringsAsFactors = FALSE
+    combo_key = paste0(codes, "|||", y_val_keys)
   )
-  combinations_df$combo_key <- paste0(combinations_df$code, "|||", combinations_df$y_val)
   
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
   # Apply function only to unique combinations
   new_structures <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
     row <- unique_combinations_df[i, ]
-    result <- .f(structures[[row$code]], row$y_val, ...)
+    
+    # BUG FIX: Proper extraction from tibble list-columns (same as smap2)
+    y_val <- .extract_from_list_column(row$y_val)
+    
+    result <- .f(structures[[row$code]], y_val, ...)
     if (!inherits(result, "igraph")) {
       cli::cli_abort("Function `.f` must return an igraph object when using `smap2_structure()`.")
     }
@@ -741,6 +758,11 @@ NULL
 #' @rdname spmap
 #' @export
 spmap <- function(.l, .f, ..., .parallel = FALSE) {
+  # FUNCTION-LEVEL BUG FIX DOCUMENTATION:
+  # This function had a similar bug to smap2 where data.frame() would unwrap
+  # nested list arguments, causing incorrect row expansion. Fixed by using tibble
+  # and proper hash-based key generation for complex objects.
+  
   # Check if it's actually a plain list, not a vctrs object that looks like a list
   if (!inherits(.l, "list") || inherits(.l, "vctrs_vctr") || length(.l) == 0) {
     cli::cli_abort("Input `.l` must be a non-empty list.")
@@ -766,18 +788,24 @@ spmap <- function(.l, .f, ..., .parallel = FALSE) {
   structures <- attr(.l[[1]], "structures")
   
   # Create unique combinations data frame for proper handling
-  combinations_df <- data.frame(
-    code = codes,
-    stringsAsFactors = FALSE
+  # BUG FIX: Use tibble to prevent unwanted expansion of nested lists
+  combinations_df <- tibble::tibble(
+    code = codes
   )
   
-  # Add other arguments as columns
+  # Add other arguments as columns - using tibble prevents list expansion
   for (i in seq_along(.l)[-1]) {
     combinations_df[[paste0("arg", i)]] <- .l[[i]]
   }
   
-  # Create combination key
-  combinations_df$combo_key <- do.call(paste, c(combinations_df[setdiff(names(combinations_df), "combo_key")], sep = "|||"))
+  # Create combination key with proper handling of complex objects
+  key_components <- list(codes)
+  for (i in seq_along(.l)[-1]) {
+    arg_values <- .l[[i]]
+    key_component <- purrr::map_chr(arg_values, .generate_value_key)
+    key_components <- append(key_components, list(key_component))
+  }
+  combinations_df$combo_key <- do.call(paste, c(key_components, sep = "|||"))
   
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
@@ -788,7 +816,9 @@ spmap <- function(.l, .f, ..., .parallel = FALSE) {
     args <- list(structures[[row$code]])
     if (length(.l) > 1) {
       for (j in 2:length(.l)) {
-        args[[j]] <- row[[paste0("arg", j)]]
+        # BUG FIX: Proper extraction from tibble list-columns
+        col_val <- row[[paste0("arg", j)]]
+        args[[j]] <- .extract_from_list_column(col_val)
       }
     }
     do.call(.f, c(args, list(...)))
@@ -833,6 +863,10 @@ spmap_chr <- function(.l, .f, ..., .parallel = FALSE) {
 #' @rdname spmap
 #' @export
 spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
+  # FUNCTION-LEVEL BUG FIX DOCUMENTATION:
+  # This function had the same nested list expansion bug as spmap and smap2.
+  # Fixed by using tibble and proper list-column handling.
+  
   if (!is.list(.l) || length(.l) == 0) {
     cli::cli_abort("Input `.l` must be a non-empty list.")
   }
@@ -857,18 +891,24 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
   structures <- attr(.l[[1]], "structures")
   
   # Create unique combinations data frame for proper handling
-  combinations_df <- data.frame(
-    code = codes,
-    stringsAsFactors = FALSE
+  # BUG FIX: Use tibble to prevent unwanted expansion of nested lists
+  combinations_df <- tibble::tibble(
+    code = codes
   )
   
-  # Add other arguments as columns
+  # Add other arguments as columns - using tibble prevents list expansion
   for (i in seq_along(.l)[-1]) {
     combinations_df[[paste0("arg", i)]] <- .l[[i]]
   }
   
-  # Create combination key
-  combinations_df$combo_key <- do.call(paste, c(combinations_df[setdiff(names(combinations_df), "combo_key")], sep = "|||"))
+  # Create combination key with proper handling of complex objects
+  key_components <- list(codes)
+  for (i in seq_along(.l)[-1]) {
+    arg_values <- .l[[i]]
+    key_component <- purrr::map_chr(arg_values, .generate_value_key)
+    key_components <- append(key_components, list(key_component))
+  }
+  combinations_df$combo_key <- do.call(paste, c(key_components, sep = "|||"))
   
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
@@ -879,7 +919,9 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
     args <- list(structures[[row$code]])
     if (length(.l) > 1) {
       for (j in 2:length(.l)) {
-        args[[j]] <- row[[paste0("arg", j)]]
+        # BUG FIX: Proper extraction from tibble list-columns
+        col_val <- row[[paste0("arg", j)]]
+        args[[j]] <- .extract_from_list_column(col_val)
       }
     }
     result <- do.call(.f, c(args, list(...)))
