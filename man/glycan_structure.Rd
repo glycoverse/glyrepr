@@ -10,66 +10,141 @@ glycan_structure(...)
 is_glycan_structure(x)
 }
 \arguments{
-\item{...}{igraph graph objects to be converted to glycan structures, or existing glycan structure vectors.}
+\item{...}{igraph graph objects to be converted to glycan structures, or existing
+glycan structure vectors. Supports mixed input of multiple objects.}
 
 \item{x}{An object to check or convert.}
 }
 \value{
-A glycan structure vector object.
+A \code{glyrepr_structure} class glycan structure vector object.
 }
 \description{
-A vector of glycan structures with efficient storage using hash-based deduplication.
+\code{glycan_structure()} creates an efficient glycan structure vector for storing and
+processing glycan molecular structures. The function employs hash-based deduplication
+mechanisms, making it suitable for glycoproteomics, glycomics analysis, and glycan
+structure comparison studies.
 }
-\details{
-The underlying implementation uses hash values of IUPAC codes of the glycan structures.
-This prevents redundant storage and computation, which is very useful for glycan structures.
+\section{Core Features}{
+\itemize{
+\item \strong{Efficient Storage}: Uses hash values of IUPAC codes for deduplication,
+avoiding redundant storage of identical glycan structures
+\item \strong{Graph Model Representation}: Each glycan structure is represented as a directed
+graph where nodes are monosaccharides and edges are glycosidic linkages
+\item \strong{Vectorized Operations}: Supports R's vectorized operations for batch
+processing of glycan data
+\item \strong{Type Safety}: Built on the vctrs package, providing type-safe operations
+}
+}
 
-Each glycan structure is a directed graph modeling of a glycan structure,
-where nodes are monosaccharides and edges are linkages.
-}
-\section{S3 Classes}{
-A glycan structure vector is a vctrs record with additional S3 class \code{glyrepr_structure}.
-Therefore, \code{sloop::s3_class()} of a glycan structure vector is
+\section{Data Structure Overview}{
+A glycan structure vector is a vctrs record with an additional S3 class
+\code{glyrepr_structure}. Therefore, \code{sloop::s3_class()} returns the class hierarchy
 \code{c("glyrepr_structure", "vctrs_rcrd")}.
 
-Constraints for individual structures:
+Each glycan structure must satisfy the following constraints:
+\subsection{Graph Structure Requirements}{
 \itemize{
-\item The graph must be directed and an outward tree (reducing end as root).
-\item The graph must have a graph attribute \code{anomer}, in the form of "a1".
-Unknown parts can be "?", e.g. "?1", "a?", "??".
-\item The graph must have a vertex attribute \code{mono} for monosaccharide names.
-\item The graph must have a vertex attribute \code{sub} for substituents.
-\item The graph must have an edge attribute \code{linkage} for linkages.
-\item Monosaccharide name must be known, either generic (Hex, HexNAc, etc.)
-or concrete (Glc, Gal, etc.), but not a mixture of both.
-NA is not allowed.
-\item Substituent must be valid. For single substituents, use the form "xY",
-where x is position and Y is substituent name, e.g. "2Ac", "3S", etc.
-For multiple substituents, separate them with commas and order by position,
-e.g. "3Me,4Ac", "2S,6P", etc. Empty string "" means no substituents.
-\item Linkages must be valid, in the form of "a/bX-Y", where X and Y are integers,
-e.g. "b1-4", "a2-3", etc.
-Any position can be unknown ("?") or partially unknown (e.g. "3/6").
-For example, the following linkages are all valid:
-"a1-?", "b?-3", "a1-3/6", "??-3", "a1-3/6/9", "??-?".
-NA is not allowed.
+\item Must be a directed graph with an outward tree structure (reducing end as root)
+\item Must have a graph attribute \code{anomer} in the format "a1" or "b1"
+\itemize{
+\item Unknown parts can be represented with "?", e.g., "?1", "a?", "??"
+}
+}
+}
+
+\subsection{Node Attributes}{
+\itemize{
+\item \code{mono}: Monosaccharide names, must be known monosaccharide types
+\itemize{
+\item Generic names: Hex, HexNAc, dHex, NeuAc, etc.
+\item Concrete names: Glc, Gal, Man, GlcNAc, etc.
+\item Cannot mix generic and concrete names
+\item NA values are not allowed
+}
+\item \code{sub}: Substituent information
+\itemize{
+\item Single substituent format: "xY" (x = position, Y = substituent name),
+e.g., "2Ac", "3S"
+\item Multiple substituents separated by commas and ordered by position,
+e.g., "3Me,4Ac", "2S,6P"
+\item No substituents represented by empty string ""
+}
+}
+}
+
+\subsection{Edge Attributes}{
+\itemize{
+\item \code{linkage}: Glycosidic linkage information in format "a/bX-Y"
+\itemize{
+\item Standard format: e.g., "b1-4", "a2-3"
+\item Unknown positions allowed: "a1-?", "b?-3", "??-?"
+\item Partially unknown positions: "a1-3/6", "a1-3/6/9"
+\item NA values are not allowed
+}
+}
+}
+}
+
+\section{Node and Edge Order}{
+The indices of vertices and linkages in a glycan correspond directly to their
+order in the IUPAC-condensed string, which is printed when you print a
+\code{\link[=glycan_structure]{glycan_structure()}}.
+For example, for the glycan "Man(a1-3)\link{Man(a1-6)}Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-)",
+the vertices are "Man", "Man", "Man", "GlcNAc", "GlcNAc",
+and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".
+}
+
+\section{Use Cases}{
+\itemize{
+\item \strong{Glycoproteomics Analysis}: Processing glycan structure information from
+mass spectrometry data
+\item \strong{Glycomics Research}: Comparing glycan expression profiles across different
+samples or conditions
+\item \strong{Structure-Function Analysis}: Studying relationships between glycan
+structures and biological functions
+\item \strong{Database Queries}: Performing structure matching and searches in glycan
+databases
 }
 }
 
 \examples{
 library(igraph)
 
-# A simple glycan structure: GlcNAc(b1-4)GlcNAc
-graph <- make_graph(~ 1-+2)  # 1 and 2 are monosaccharides
-V(graph)$mono <- c("GlcNAc", "GlcNAc")
-V(graph)$sub <- ""
-E(graph)$linkage <- "b1-4"
-graph$anomer <- "a1"
+# Example 1: Create a simple glycan structure GlcNAc(b1-4)GlcNAc
+graph <- make_graph(~ 1-+2)  # Create graph with two monosaccharides
+V(graph)$mono <- c("GlcNAc", "GlcNAc")  # Set monosaccharide types
+V(graph)$sub <- ""  # No substituents
+E(graph)$linkage <- "b1-4"  # β1-4 glycosidic linkage
+graph$anomer <- "a1"  # α anomeric carbon
 
 # Create glycan structure vector
-glycan_structure(graph)
+simple_struct <- glycan_structure(graph)
+print(simple_struct)
+
+# Example 2: Use predefined glycan core structures
+n_core <- n_glycan_core()  # N-glycan core structure
+o_core1 <- o_glycan_core_1()  # O-glycan Core 1 structure
 
 # Create vector with multiple structures
-glycan_structure(graph, o_glycan_core_1())
+multi_struct <- glycan_structure(n_core, o_core1)
+print(multi_struct)
+
+# Example 3: Create complex structure with substituents
+complex_graph <- make_graph(~ 1-+2-+3)
+V(complex_graph)$mono <- c("GlcNAc", "Gal", "NeuAc")
+V(complex_graph)$sub <- c("", "", "")  # Add substituents as needed
+E(complex_graph)$linkage <- c("b1-4", "a2-3")
+complex_graph$anomer <- "b1"
+
+complex_struct <- glycan_structure(complex_graph)
+print(complex_struct)
+
+# Example 4: Check if object is a glycan structure
+is_glycan_structure(simple_struct)  # TRUE
+is_glycan_structure(graph)          # FALSE
+
+# Example 5: Mix different input types
+mixed_struct <- glycan_structure(graph, o_glycan_core_2(), simple_struct)
+print(mixed_struct)
 
 }
