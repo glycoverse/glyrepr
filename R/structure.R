@@ -55,7 +55,7 @@
 #' The indices of vertices and linkages in a glycan correspond directly to their
 #' order in the IUPAC-condensed string, which is printed when you print a
 #' [glyrepr::glycan_structure()].
-#' For example, for the glycan "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-)",
+#' For example, for the glycan `Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-`,
 #' the vertices are "Man", "Man", "Man", "GlcNAc", "GlcNAc",
 #' and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".
 #'
