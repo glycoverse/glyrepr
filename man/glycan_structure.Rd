@@ -131,7 +131,7 @@ print(multi_struct)
 
 # Example 3: Create complex structure with substituents
 complex_graph <- make_graph(~ 1-+2-+3)
-V(complex_graph)$mono <- c("GlcNAc", "Gal", "NeuAc")
+V(complex_graph)$mono <- c("GlcNAc", "Gal", "Neu5Ac")
 V(complex_graph)$sub <- c("", "", "")  # Add substituents as needed
 E(complex_graph)$linkage <- c("b1-4", "a2-3")
 complex_graph$anomer <- "b1"
