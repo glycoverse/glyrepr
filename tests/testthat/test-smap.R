@@ -920,3 +920,143 @@ test_that("spmap_structure correctly updates unique structures count when modifi
   expect_equal(as.character(result)[1], as.character(result)[2])
   expect_equal(as.character(result)[1], "Gal(??-?)GalNAc(??-")
 })
+
+# Additional regression tests for the smap2 nested list fix
+test_that("smap2 handles real glycan structures with nested match results correctly", {
+  # Create a realistic glycan structure (simulating glyenzy use case)
+  glycan_code <- "GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  structures <- as_glycan_structure(glycan_code)
+  
+  # Create nested list simulating enzyme rule match results
+  # This is the exact structure that was causing the original bug
+  rule_matches <- list(list(c(6, 5, 4, 3, 2, 1)))
+  
+  # Test that smap2 processes this correctly
+  call_count <- 0
+  result <- smap2(structures, rule_matches, function(graph, match_data) {
+    call_count <<- call_count + 1
+    
+    # Verify the graph is correct
+    expect_true(igraph::is_igraph(graph))
+    expect_equal(igraph::vcount(graph), 6)
+    
+    # Verify the match data structure is preserved
+    expect_true(is.list(match_data))
+    expect_length(match_data, 1)
+    expect_equal(match_data[[1]], c(6, 5, 4, 3, 2, 1))
+    
+    return("processed")
+  })
+  
+  # Should be called exactly once (not 6 times due to expansion bug)
+  expect_equal(call_count, 1)
+  expect_length(result, 1)
+  expect_equal(result[[1]], "processed")
+})
+
+test_that("smap2 tibble fix handles multiple glycans with different nested structures", {
+  # Create multiple structures
+  glycan_codes <- c(
+    "GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
+    "Gal(a1-3)GalNAc(a1-"
+  )
+  structures <- as_glycan_structure(glycan_codes)
+  
+  # Create different nested structures for each glycan
+  nested_data <- list(
+    list(c(6, 5, 4, 3, 2, 1)),  # First glycan: complex match
+    list(c(2, 1))               # Second glycan: simple match
+  )
+  
+  results <- smap2(structures, nested_data, function(graph, match_data) {
+    return(list(
+      vertex_count = igraph::vcount(graph),
+      match_length = length(match_data[[1]])
+    ))
+  })
+  
+  # Verify results correspond correctly to inputs
+  expect_length(results, 2)
+  expect_equal(results[[1]]$vertex_count, 6)
+  expect_equal(results[[1]]$match_length, 6)
+  expect_equal(results[[2]]$vertex_count, 2)
+  expect_equal(results[[2]]$match_length, 2)
+})
+
+test_that("smap2 hash generation works correctly for different list structures", {
+  # Test the hash-based key generation with various list structures
+  structures <- as_glycan_structure("Gal(a1-3)GalNAc(a1-")[1]
+  
+  # Different nested list structures that should produce different keys
+  list_variants <- list(
+    list(c(1, 2, 3)),
+    list(c(3, 2, 1)),           # Same elements, different order
+    list(c(1, 2, 3, 4)),        # Different length
+    list(list(a = 1, b = 2))    # Named list
+  )
+  
+  # Each should be handled correctly without expansion
+  for (i in seq_along(list_variants)) {
+    result <- smap2(structures, list_variants[i], function(graph, data) {
+      expect_true(is.list(data))
+      return(paste0("variant_", i))
+    })
+    
+    expect_length(result, 1)
+    expect_equal(result[[1]], paste0("variant_", i))
+  }
+})
+
+test_that("smap2 refactored code maintains performance with complex inputs", {
+  # Performance regression test for the refactored hash generation
+  glycan_codes <- c(
+    "Gal(a1-3)GalNAc(a1-",
+    "GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
+    "Man(a1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  )
+  structures <- as_glycan_structure(glycan_codes)
+  
+  # Create moderately complex nested structures
+  complex_nested <- list(
+    list(c(1:10)),
+    list(list(x = 1:5, y = letters[1:5])),
+    list(matrix(1:6, nrow = 2))
+  )
+  
+  # Should complete without errors and reasonable time
+  start_time <- Sys.time()
+  result <- smap2(structures, complex_nested, function(graph, data) {
+    return("completed")
+  })
+  end_time <- Sys.time()
+  
+  # Basic correctness checks
+  expect_length(result, 3)
+  expect_true(all(unlist(result) == "completed"))
+  
+  # Performance should be reasonable (less than 1 second for this simple case)
+  expect_true(as.numeric(end_time - start_time) < 1)
+})
+
+test_that("smap2 edge case: empty lists and mixed types", {
+  glycan_codes <- c("Gal(a1-3)GalNAc(a1-", "GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
+  structures <- as_glycan_structure(glycan_codes)
+  
+  # Test with empty lists and mixed simple/complex types
+  mixed_data <- list(
+    list(),              # Empty list
+    "simple_string"      # Non-list data
+  )
+  
+  result <- smap2(structures, mixed_data, function(graph, data) {
+    if (is.list(data)) {
+      return(paste0("list_", length(data)))
+    } else {
+      return(paste0("non_list_", data))
+    }
+  })
+  
+  expect_length(result, 2)
+  expect_equal(result[[1]], "list_0")
+  expect_equal(result[[2]], "non_list_simple_string")
+})

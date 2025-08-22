@@ -496,6 +496,28 @@ NULL
 #' @rdname smap2
 #' @export
 smap2 <- function(.x, .y, .f, ..., .parallel = FALSE) {
+  # FUNCTION-LEVEL BUG FIX DOCUMENTATION:
+  # 
+  # This function previously had a critical bug when handling nested list objects
+  # in the .y parameter. The issue occurred in two places:
+  # 
+  # 1. DATA FRAME EXPANSION BUG:
+  #    Using data.frame() with nested lists caused unwanted row expansion.
+  #    Example: .y = list(list(c(6,5,4,3,2,1))) would create 6 rows instead of 1,
+  #    breaking the 1:1 correspondence with glycan structures.
+  # 
+  # 2. LIST-COLUMN EXTRACTION BUG:
+  #    When extracting values from tibble list-columns, an extra layer of list
+  #    wrapping was not properly handled.
+  # 
+  # SOLUTION:
+  #    - Replace data.frame() with tibble::tibble() for proper list-column support
+  #    - Implement hash-based keys for complex list objects
+  #    - Add proper unwrapping logic when extracting from list-columns
+  # 
+  # This fix ensures smap2 works correctly with nested data structures commonly
+  # used in glycan analysis workflows.
+  
   if (!is_glycan_structure(.x)) {
     cli::cli_abort("Input `.x` must be a glycan_structure vector.")
   }
@@ -515,19 +537,57 @@ smap2 <- function(.x, .y, .f, ..., .parallel = FALSE) {
   structures <- attr(.x, "structures")
   
   # Create unique combinations data frame for proper handling
-  combinations_df <- data.frame(
+  # 
+  # BUG FIX NOTES:
+  # Prior to this fix, using data.frame() with nested list objects in the y_val column
+  # caused unwanted expansion where the inner vectors would be unwrapped into separate rows.
+  # For example, if .y = list(list(c(6,5,4,3,2,1))), data.frame() would create 6 rows
+  # instead of 1, breaking the length correspondence with the glycan structures.
+  # 
+  # The fix involves two changes:
+  # 1. Use tibble::tibble() instead of data.frame() to properly handle list-columns
+  # 2. Create hash-based keys for complex list objects to enable proper deduplication
+  
+  # Generate keys for y values to enable proper deduplication
+  y_val_keys <- purrr::map_chr(.y, function(y_element) {
+    if (is.list(y_element)) {
+      # For list objects, create a hash-based key since they can't be converted to strings directly
+      serialized_data <- serialize(y_element, connection = NULL)
+      hash_input <- sum(as.integer(serialized_data))
+      hex_hash <- as.hexmode(hash_input)
+      formatted_hash <- format(hex_hash, width = 8)
+      paste0("list_", formatted_hash)
+    } else {
+      # For simple objects, convert directly to character
+      as.character(y_element)
+    }
+  })
+  
+  # Use tibble to create combinations without unwanted list expansion
+  combinations_df <- tibble::tibble(
     code = codes,
     y_val = .y,
-    stringsAsFactors = FALSE
+    combo_key = paste0(codes, "|||", y_val_keys)
   )
-  combinations_df$combo_key <- paste0(combinations_df$code, "|||", combinations_df$y_val)
   
   unique_combinations_df <- combinations_df[!duplicated(combinations_df$combo_key), ]
   
   # Apply function only to unique combinations
   unique_results <- .smap_apply(seq_len(nrow(unique_combinations_df)), function(i) {
     row <- unique_combinations_df[i, ]
-    .f(structures[[row$code]], row$y_val, ...)
+    
+    # BUG FIX: Proper extraction from tibble list-columns
+    # When tibble stores list objects in a list-column, accessing row$y_val returns
+    # a length-1 list containing the actual data, rather than the data itself.
+    # We need to unwrap this extra layer for single-element lists while preserving
+    # the original structure for other cases.
+    y_val <- if (is.list(row$y_val) && length(row$y_val) == 1) {
+      row$y_val[[1]]  # Extract the actual data from the list-column wrapper
+    } else {
+      row$y_val       # Use as-is for non-list or multi-element cases
+    }
+    
+    .f(structures[[row$code]], y_val, ...)
   }, use_parallel = .parallel)
   names(unique_results) <- unique_combinations_df$combo_key
   
