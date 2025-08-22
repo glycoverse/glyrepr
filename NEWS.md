@@ -1,3 +1,10 @@
+# glyrepr 0.7.1
+
+## Minor improvements and bug fixes
+
+* Fix the bug that `smap2()`, `spmap()`, and related functions return unexpected results when the input `y` is a list.
+* Improve the documentation of `glycan_structure()`, including the new behavior of vertex and edge order introduced in 0.7.0.
+
 # glyrepr 0.7.0
 
 ## Breaking changes
