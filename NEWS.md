@@ -1,3 +1,9 @@
+# glyrepr 0.7.2
+
+## Minor improvements and bug fixes
+
+* Fix the bug that `structure_to_iupac()` returns incorrect sequences with incorrect backbone or branch order.
+
 # glyrepr 0.7.1
 
 ## Minor improvements and bug fixes
