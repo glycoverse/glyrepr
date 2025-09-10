@@ -55,25 +55,6 @@ test_that("structure_to_iupac handles two-node structures", {
   expect_equal(result, "Glc(a1-3)Man(b1-")
 })
 
-test_that("linkage comparison works correctly", {
-  # Test different anomeric configurations: a < b < ?
-  expect_equal(compare_linkages("a1-3", "b1-3"), -1)
-  expect_equal(compare_linkages("b1-3", "?1-3"), -1)
-  expect_equal(compare_linkages("a1-3", "?1-3"), -1)
-  expect_equal(compare_linkages("a1-3", "a1-3"), 0)
-  
-  # Test different positions
-  expect_equal(compare_linkages("a1-3", "a2-3"), -1)
-  expect_equal(compare_linkages("a1-3", "a1-4"), -1)
-  expect_equal(compare_linkages("a?-3", "a1-3"), 1)  # ? > numbers
-  expect_equal(compare_linkages("a1-?", "a1-3"), 1)  # ? > numbers
-  
-  # Test complex combinations
-  expect_equal(compare_linkages("a1-3", "a1-6"), -1)
-  expect_equal(compare_linkages("a1-6", "a2-3"), -1)
-  expect_equal(compare_linkages("b2-3", "a1-6"), 1)
-})
-
 test_that("parse_linkage works correctly", {
   # Test valid linkages
   result1 <- parse_linkage("a1-3")
@@ -91,10 +72,7 @@ test_that("parse_linkage works correctly", {
   expect_equal(result2$z, "?")
   expect_equal(result2$x_rank, 3)
   expect_equal(result2$y_rank, 2)
-  expect_equal(result2$z_rank, Inf)
-  
-  # Test invalid linkage
-  expect_error(parse_linkage("invalid"), "Invalid linkage format")
+  expect_equal(result2$z_rank, 0)
 })
 
 test_that("structure_to_iupac ensures isomorphic graphs produce same sequence", {
@@ -135,10 +113,10 @@ test_that("structure_to_iupac handles complex branched structures", {
   igraph::E(graph)$linkage <- c("b1-4", "a1-3", "a1-2", "a1-6", "b1-3")
   graph$anomer <- "a1"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   # Based on actual algorithm output
-  expect_equal(result, "Gal(a1-6)[Fuc(b1-3)]GlcNAc(a1-3)[GalNAc(a1-2)]Man(b1-4)Glc(a1-")
+  expect_equal(result, "Fuc(b1-3)[Gal(a1-6)]GlcNAc(a1-3)[GalNAc(a1-2)]Man(b1-4)Glc(a1-")
 })
 
 test_that("structure_to_iupac selects correct backbone based on depth", {
@@ -175,6 +153,23 @@ test_that("structure_to_iupac selects backbone by linkage when depths are equal"
   expect_equal(result, "Gal(a1-3)[Fuc(a1-6)]Man(b1-4)Glc(b2-")
 })
 
+test_that("structure_to_iupac selects backbone by linkage when depths are equal with ?", {
+  # Create structure where depths are equal but linkages differ
+  # Glc -> Man ├─ Gal (linkage a1-?)
+  #            └─ Fuc (linkage a1-6)
+  # Both have same depth, but a1-3 < a1-6, so Gal should be backbone
+  graph <- igraph::make_graph(~ 1-+2, 2-+3, 2-+4)
+  igraph::V(graph)$mono <- c("Glc", "Man", "Gal", "Fuc")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- c("b1-4", "a1-?", "a1-6")
+  graph$anomer <- "b2"
+  glycan <- glycan_structure(graph)
+  
+  result <- structure_to_iupac(glycan)
+  # Gal should be backbone (a1-?), Fuc should be branch (a1-6)
+  expect_equal(result, "Gal(a1-?)[Fuc(a1-6)]Man(b1-4)Glc(b2-")
+})
+
 test_that("structure_to_iupac handles different anomer values", {
   # Test different anomer values
   anomers <- c("a1", "b1", "?1", "a2", "b2", "?2")
@@ -193,11 +188,12 @@ test_that("structure_to_iupac handles different anomer values", {
   }
 })
 
-test_that("structure_to_iupac handles multiple branches correctly", {
+test_that("structure_to_iupac handles multiple branches correctly 1", {
   # Create structure with 3 branches
-  # Glc -> Man ├─ Gal (a1-2)
-  #            ├─ Fuc (a1-3) <- should be backbone (smallest)
-  #            └─ Hex (a1-6)
+  # Glc -> Man 
+  #         ├─ Gal (a1-2) <- should be backbone (smallest)
+  #         ├─ Fuc (a1-3) <- should be the first branch
+  #         └─ Hex (a1-6) <- should be the second branch
   graph <- igraph::make_graph(~ 1-+2, 2-+3, 2-+4, 2-+5)
   igraph::V(graph)$mono <- c("Glc", "Man", "Gal", "Fuc", "GalNAc")
   igraph::V(graph)$sub <- ""
@@ -209,6 +205,15 @@ test_that("structure_to_iupac handles multiple branches correctly", {
   # Gal should be backbone (a1-2 is smallest), Fuc and GalNAc should be branches
   # Branches should be ordered: a1-3 < a1-6
   expect_equal(result, "Gal(a1-2)[Fuc(a1-3)][GalNAc(a1-6)]Man(b1-4)Glc(a1-")
+})
+
+test_that("structure_to_iupac handles multiple branches correctly 1", {
+  s1 <- "GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-2)Man(a1-6)][GlcNAc(b1-4)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  s2 <- "GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  glycan1 <- as_glycan_structure(s1)
+  glycan2 <- as_glycan_structure(s2)
+  expect_equal(structure_to_iupac(glycan1), s2)
+  expect_equal(structure_to_iupac(glycan2), s2)
 })
 
 test_that("structure_to_iupac produces correct sequence for examples in documentation", {

@@ -90,49 +90,33 @@ structure_to_iupac <- function(glycan) {
 #' @noRd
 parse_linkage <- function(linkage) {
   # Parse linkage format: xy-z where x is a/b/?, y is digit/?, z is digit/?
-  pattern <- "^([ab\\?])(\\d|\\?)[-](\\d|\\?)$"
-  match <- stringr::str_match(linkage, pattern)
-  
-  if (is.na(match[1])) {
-    cli::cli_abort(glue::glue("Invalid linkage format: {linkage}"))
-  }
-  
-  x <- match[2]  # anomeric configuration
-  y <- match[3]  # first position  
-  z <- match[4]  # second position
-  
+
+  x <- stringr::str_sub(linkage, 1, 1)  # anomeric configuration
+  link_part <- stringr::str_sub(linkage, 2, -1)  # first position  
+  y <- stringr::str_split_i(link_part, "-", 1)  # first position  
+  z <- stringr::str_split_i(link_part, "-", 2)  # second position
+
   # Convert to numeric ranks for comparison
   # For x: ? > b > a, so assign ? = 3, b = 2, a = 1
   x_rank <- switch(x, "a" = 1, "b" = 2, "?" = 3)
-  
+
   # For y and z: ? is greater than any number
-  y_rank <- if (y == "?") Inf else as.numeric(y)
-  z_rank <- if (z == "?") Inf else as.numeric(z)
-  
+  y_rank <- if (y == "?" || stringr::str_detect(y, "/")) 0 else as.numeric(y)
+  z_rank <- if (z == "?" || stringr::str_detect(z, "/")) 0 else as.numeric(z)
+
   list(x = x, y = y, z = z, x_rank = x_rank, y_rank = y_rank, z_rank = z_rank)
 }
 
-#' Compare two linkages
-#' 
-#' @param linkage1,linkage2 Character strings representing linkages
-#' @return Integer: -1 if linkage1 < linkage2, 0 if equal, 1 if linkage1 > linkage2
+#' Order linkages
+#'
+#' @param linkages A character vector of linkages.
+#' @param decreasing Logical. If TRUE, the linkages are ordered in decreasing order.
+#' @return A character vector of ordered linkages.
 #' @noRd
-compare_linkages <- function(linkage1, linkage2) {
-  p1 <- parse_linkage(linkage1)
-  p2 <- parse_linkage(linkage2)
-  
-  # Compare x_rank first
-  if (p1$x_rank != p2$x_rank) {
-    return(sign(p1$x_rank - p2$x_rank))
-  }
-  
-  # Then y_rank
-  if (p1$y_rank != p2$y_rank) {
-    return(sign(p1$y_rank - p2$y_rank))
-  }
-  
-  # Finally z_rank
-  sign(p1$z_rank - p2$z_rank)
+order_linkages <- function(linkages, decreasing = FALSE) {
+  parsed <- purrr::map(linkages, parse_linkage)
+  rank <- purrr::map_dbl(parsed, ~ .x$z_rank)
+  order(rank, decreasing = decreasing)
 }
 
 #' Calculate depth (longest path to leaf) for each node
@@ -145,42 +129,42 @@ calculate_depths <- function(glycan, root) {
   all_vertices <- igraph::V(glycan)
   depths <- rep(NA_real_, length(all_vertices))
   names(depths) <- names(all_vertices)
-  
+
   # Use a local function to calculate depths with memoization
   calculate_single_depth <- function(node) {
     node_name <- as.character(node)
-    
+
     if (!is.na(depths[node_name])) {
       return(depths[node_name])
     }
-    
+
     # Get child nodes
     children <- igraph::neighbors(glycan, node, mode = "out")
-    
+
     if (length(children) == 0) {
       # Leaf node
       depths[node_name] <<- 0
     } else {
       # Calculate depth for all children first
       child_depths <- sapply(children, calculate_single_depth)
-      
+
       # This node's depth is 1 + max child depth
       depths[node_name] <<- 1 + max(child_depths)
     }
-    
+
     depths[node_name]
   }
-  
+
   # Calculate depths for all nodes starting from root
   calculate_single_depth(root)
-  
+
   # Fill in any remaining nodes (shouldn't be needed for connected graph)
   for (v in all_vertices) {
     if (is.na(depths[as.character(v)])) {
       calculate_single_depth(v)
     }
   }
-  
+
   depths
 }
 
@@ -193,7 +177,7 @@ calculate_depths <- function(glycan, root) {
 #' @noRd
 seq_glycan <- function(glycan, node, depths) {
   children <- igraph::neighbors(glycan, node, mode = "out")
-  
+
   # Base case: leaf node
   if (length(children) == 0) {
     # Return vertex index with V prefix
@@ -215,7 +199,7 @@ seq_glycan <- function(glycan, node, depths) {
     }
 
     # Sort by linkage (ascending order) - smaller linkage wins
-    linkage_order <- order(candidate_linkages, decreasing = FALSE)
+    linkage_order <- order_linkages(candidate_linkages, decreasing = FALSE)
     backbone_child <- backbone_candidates[linkage_order[1]]
   } else {
     backbone_child <- backbone_candidates[1]
@@ -240,7 +224,7 @@ seq_glycan <- function(glycan, node, depths) {
       branch_linkages[i] <- igraph::edge_attr(glycan, "linkage", edge_id)
     }
 
-    branch_order <- order(branch_linkages, decreasing = FALSE)
+    branch_order <- order_linkages(branch_linkages, decreasing = FALSE)
     branch_children <- branch_children[branch_order]
 
     for (i in seq_along(branch_children)) {
