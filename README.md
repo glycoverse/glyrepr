@@ -31,14 +31,14 @@ You can install the latest release of glyrepr from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("glycoverse/glyrepr@*release")
+# install.packages("remotes")
+remotes::install_github("glycoverse/glyrepr@*release")
 ```
 
 Or install the development version:
 
 ``` r
-devtools::install_github("glycoverse/glyrepr")
+remotes::install_github("glycoverse/glyrepr")
 ```
 
 ## Documentation
