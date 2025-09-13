@@ -1,3 +1,11 @@
+# glyrepr 0.7.3
+
+## Minor improvements and bug fixes
+
+* Fix some typos in the documentation.
+* Add examples to some functions.
+* Prepare for release on CRAN.
+
 # glyrepr 0.7.2
 
 ## Minor improvements and bug fixes
