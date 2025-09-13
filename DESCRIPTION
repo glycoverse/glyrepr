@@ -2,11 +2,10 @@ Package: glyrepr
 Title: Representation for Glycan Structures in R
 Version: 0.7.2
 Authors@R: 
-    person("Bin", "Fu", , "23110220018@m.fudan.edu.cn", role = c("aut", "cre"),
+    person("Bin", "Fu", , "23110220018@m.fudan.edu.cn", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-8567-2997"))
-Description: This package is a wrapper of 'igraph' for representing glycan structures in R. 
-    It provides a set of functions to create and manipulate glycan structures, 
-    and to visualize them in a graph format.
+Description: This package provides two important representations of glycans:
+    glycan compositions and glycan structures.
 License: MIT + file LICENSE
 Suggests: 
     testthat (>= 3.0.0),
