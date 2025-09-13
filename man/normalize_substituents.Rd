@@ -20,4 +20,5 @@ returns a normalized string with substituents sorted by position.
 normalize_substituents("4Ac,3Me")  # Returns "3Me,4Ac"
 normalize_substituents("6S")       # Returns "6S"
 normalize_substituents("")         # Returns ""
+
 }

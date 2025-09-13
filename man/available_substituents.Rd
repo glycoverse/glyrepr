@@ -12,3 +12,7 @@ A character vector.
 \description{
 Get the available substituents for monosaccharides.
 }
+\examples{
+available_substituents()
+
+}

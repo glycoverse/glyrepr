@@ -99,7 +99,11 @@ monosaccharides <- tibble::tribble(
 #' @param mono_type A character string specifying the type of monosaccharides.
 #'  Can be "all", "generic", or "concrete". Default is "all".
 #'
-#' @return A character vector of monosaccharide names.
+#' @returns A character vector of monosaccharide names.
+#'
+#' @examples
+#' available_monosaccharides()
+#' 
 #' @export
 available_monosaccharides <- function(mono_type = "all") {
   checkmate::assert_choice(mono_type, c("all", "generic", "concrete"))
@@ -117,7 +121,12 @@ available_monosaccharides <- function(mono_type = "all") {
 #'
 #' @param mono A character vector of monosaccharide names.
 #'
-#' @return A logical vector.
+#' @returns A logical vector.
+#'
+#' @examples
+#' is_known_monosaccharide(c("Gal", "Hex"))
+#' is_known_monosaccharide(c("X", "Hx", "Nac"))
+#'
 #' @export
 is_known_monosaccharide <- function(mono) {
   checkmate::assert_character(mono)

@@ -8,7 +8,7 @@
 #'
 #' @param glycan A glyrepr_structure vector.
 #'
-#' @return A logical vector indicating if each glycan structure has linkages.
+#' @returns A logical vector indicating if each glycan structure has linkages.
 #'
 #' @examples
 #' glycan <- o_glycan_core_1(linkage = TRUE)
@@ -29,7 +29,7 @@ has_linkages <- function(glycan) {
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
   }
-  
+
   smap_lgl(glycan, .has_linkages_single)
 }
 
@@ -126,7 +126,7 @@ possible_linkages <- function(
 #'
 #' @param glycan A glyrepr_structure vector.
 #'
-#' @return A glyrepr_structure vector with all linkages removed.
+#' @returns A glyrepr_structure vector with all linkages removed.
 #'
 #' @examples
 #' glycan <- o_glycan_core_1(linkage = TRUE)

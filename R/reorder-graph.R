@@ -5,7 +5,7 @@
 #' to be in line with the IUPAC-style sequence.
 #'
 #' @param x A [glycan_structure()] object.
-#' @return A [glycan_structure()] object with the underlying graphs reordered.
+#' @returns A [glycan_structure()] object with the underlying graphs reordered.
 #' @noRd
 reorder_graphs <- function(x) {
   checkmate::assert_class(x, "glyrepr_structure")

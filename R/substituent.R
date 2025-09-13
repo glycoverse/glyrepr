@@ -2,7 +2,11 @@
 #'
 #' Get the available substituents for monosaccharides.
 #'
-#' @return A character vector.
+#' @returns A character vector.
+#'
+#' @examples
+#' available_substituents()
+#'
 #' @export
 available_substituents <- function() {
   c("Me", "Ac", "NAc", "P", "S", "Pyr", "PC", "PPEtn", "PEtn", "N")
@@ -14,12 +18,14 @@ available_substituents <- function() {
 #' returns a normalized string with substituents sorted by position.
 #'
 #' @param sub A character string representing substituents, e.g., "4Ac,3Me" or "6S"
-#' @return A character string with substituents sorted by position, e.g., "3Me,4Ac"
-#' @export
+#' @returns A character string with substituents sorted by position, e.g., "3Me,4Ac"
+#'
 #' @examples
 #' normalize_substituents("4Ac,3Me")  # Returns "3Me,4Ac"
 #' normalize_substituents("6S")       # Returns "6S"
 #' normalize_substituents("")         # Returns ""
+#'
+#' @export
 normalize_substituents <- function(sub) {
   checkmate::assert_character(sub, len = 1)
   
@@ -58,7 +64,12 @@ normalize_substituents <- function(sub) {
 #'
 #' @param glycan A glyrepr_structure vector.
 #'
-#' @return A glyrepr_structure vector with all substituents removed.
+#' @returns A glyrepr_structure vector with all substituents removed.
+#'
+#' @examples
+#' (glycan <- glycan_structure(o_glycan_core_1()))
+#' remove_substituents(glycan)
+#'
 #' @export
 remove_substituents <- function(glycan) {
   if (!is_glycan_structure(glycan)) {
@@ -67,7 +78,7 @@ remove_substituents <- function(glycan) {
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
   }
-  
+
   smap_structure(glycan, .remove_substituents_single)
 }
 
@@ -75,5 +86,3 @@ remove_substituents <- function(glycan) {
 .remove_substituents_single <- function(glycan) {
   igraph::set_vertex_attr(glycan, "sub", value = "")
 }
-
-

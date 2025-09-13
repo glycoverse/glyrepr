@@ -8,7 +8,7 @@
 #'   Monosaccharides and substituents can be mixed in the same composition.
 #' @param x A list of named integer vectors.
 #'
-#' @return A glyrepr_composition object.
+#' @returns A glyrepr_composition object.
 #'
 #' @details
 #' Compositions can contain:
@@ -141,7 +141,7 @@ valid_glycan_composition <- function(x) {
 #'   a glycan structure vector,
 #'   or an existing glyrepr_composition object.
 #'
-#' @return A glyrepr_composition object.
+#' @returns A glyrepr_composition object.
 #'
 #' @details
 #' When converting from glycan structures, both monosaccharides and substituents 
@@ -175,6 +175,7 @@ as_glycan_composition <- function(x) {
   UseMethod("as_glycan_composition")
 }
 
+#' @rdname as_glycan_composition
 #' @export
 as_glycan_composition.glyrepr_composition <- function(x) {
   x
@@ -202,6 +203,7 @@ extract_substituent_types <- function(sub_strings) {
   all_subs
 }
 
+#' @rdname as_glycan_composition
 #' @export
 as_glycan_composition.glyrepr_structure <- function(x) {
   # Get mono_types directly from the structure data
@@ -287,6 +289,7 @@ parse_single_composition <- function(char) {
   })
 }
 
+#' @rdname as_glycan_composition
 #' @export
 as_glycan_composition.character <- function(x) {
   # Handle empty character vector
@@ -324,6 +327,7 @@ as_glycan_composition.character <- function(x) {
   do.call(glycan_composition, compositions)
 }
 
+#' @rdname as_glycan_composition
 #' @export
 as_glycan_composition.default <- function(x) {
   if (is.null(names(x)) && is.list(x)) {

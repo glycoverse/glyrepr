@@ -114,7 +114,7 @@ valid_anomer <- function(anomer) {
 #'
 #' @param linkages A character vector of linkages.
 #'
-#' @return A logical vector.
+#' @returns A logical vector.
 #'
 #' @examples
 #' # Valid linkages

@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package is a wrapper of 'igraph' for representing glycan structures in R. It provides a set of functions to create and manipulate glycan structures, and to visualize them in a graph format.
+This package provides two important representations of glycans: glycan compositions and glycan structures.
 }
 \seealso{
 Useful links:
@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Bin Fu \email{23110220018@m.fudan.edu.cn} (\href{https://orcid.org/0000-0001-8567-2997}{ORCID})
+\strong{Maintainer}: Bin Fu \email{23110220018@m.fudan.edu.cn} (\href{https://orcid.org/0000-0001-8567-2997}{ORCID}) [copyright holder]
 
 }
 \keyword{internal}

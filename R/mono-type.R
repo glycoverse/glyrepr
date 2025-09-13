@@ -178,7 +178,7 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #'   - A glycan composition vector ("glyrepr_composition" object);
 #'   - A glycan structure vector ("glyrepr_structure" object).
 #'
-#' @return A character vector specifying the monosaccharide type(s).
+#' @returns A character vector specifying the monosaccharide type(s).
 #'   For structures and compositions, returns the type for each element.
 #'
 #' @examples

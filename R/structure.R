@@ -74,7 +74,7 @@
 #'   glycan structure vectors. Supports mixed input of multiple objects.
 #' @param x An object to check or convert.
 #'
-#' @return A `glyrepr_structure` class glycan structure vector object.
+#' @returns A `glyrepr_structure` class glycan structure vector object.
 #'
 #' @examples
 #' library(igraph)
@@ -304,7 +304,7 @@ is_glycan_structure <- function(x) {
 #'   a character vector of IUPAC-condensed strings,
 #'   or an existing glyrepr_structure object.
 #'
-#' @return A glyrepr_structure object.
+#' @returns A glyrepr_structure object.
 #'
 #' @examples
 #' library(igraph)
@@ -390,7 +390,7 @@ format.glyrepr_structure <- function(x, ...) {
 #' @param x A glyrepr_structure object
 #' @param indices Indices of structures to format
 #' @param colored A logical value indicating whether to add colors
-#' @return A character vector of formatted structures for the specified indices
+#' @returns A character vector of formatted structures for the specified indices
 #' @keywords internal
 format_glycan_structure_subset <- function(x, indices, colored = TRUE) {
   if (!colored) {
@@ -536,7 +536,7 @@ as.character.glyrepr_structure <- function(x, ...) {
 #'   If `FALSE` and `x` has a length of 1, return the igraph object directly.
 #'   If not provided (default), `FALSE` when `x` has a length of 1 and `TRUE` otherwise.
 #'
-#' @return A list of igraph objects or an igraph object directly (see `return_list` parameter).
+#' @returns A list of igraph objects or an igraph object directly (see `return_list` parameter).
 #'
 #' @examples
 #' structures <- glycan_structure(o_glycan_core_1(), n_glycan_core())

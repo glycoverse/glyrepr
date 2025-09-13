@@ -15,3 +15,8 @@ A logical vector.
 \description{
 This function checks if a vector of monosaccharide names are known.
 }
+\examples{
+is_known_monosaccharide(c("Gal", "Hex"))
+is_known_monosaccharide(c("X", "Hx", "Nac"))
+
+}

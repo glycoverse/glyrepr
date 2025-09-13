@@ -28,7 +28,7 @@
 #' - `smap_chr()`: Returns a character vector
 #' - `smap_structure()`: Returns a new glycan structure vector (`.f` must return igraph objects)
 #'
-#' @return 
+#' @returns
 #' - `smap()`: A list
 #' - `smap_vec()`: An atomic vector of type specified by `.ptype`
 #' - `smap_lgl/int/dbl/chr()`: Atomic vectors of the corresponding type

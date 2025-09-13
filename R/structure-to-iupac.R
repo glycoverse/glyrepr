@@ -31,7 +31,7 @@
 #'
 #' @param glycan A glyrepr_structure vector.
 #'
-#' @return A character vector representing the IUPAC sequences.
+#' @returns A character vector representing the IUPAC sequences.
 #'
 #' @examples
 #' # Simple linear structure
@@ -86,7 +86,7 @@ structure_to_iupac <- function(glycan) {
 #' Parse linkage string into comparable components
 #'
 #' @param linkage Character string in format "xy-z" (e.g., "b1-4", "a2-3")
-#' @return Named list with x, y, z components and their numeric ranks
+#' @returns Named list with x, y, z components and their numeric ranks
 #' @noRd
 parse_linkage <- function(linkage) {
   # Parse linkage format: xy-z where x is a/b/?, y is digit/?, z is digit/?
@@ -111,7 +111,7 @@ parse_linkage <- function(linkage) {
 #'
 #' @param linkages A character vector of linkages.
 #' @param decreasing Logical. If TRUE, the linkages are ordered in decreasing order.
-#' @return A character vector of ordered linkages.
+#' @returns A character vector of ordered linkages.
 #' @noRd
 order_linkages <- function(linkages, decreasing = FALSE) {
   parsed <- purrr::map(linkages, parse_linkage)
@@ -123,7 +123,7 @@ order_linkages <- function(linkages, decreasing = FALSE) {
 #' 
 #' @param glycan An igraph object representing a glycan structure
 #' @param root Root vertex
-#' @return Named vector of depths for each node
+#' @returns Named vector of depths for each node
 #' @noRd
 calculate_depths <- function(glycan, root) {
   all_vertices <- igraph::V(glycan)
@@ -173,7 +173,7 @@ calculate_depths <- function(glycan, root) {
 #' @param glycan An igraph object representing a glycan structure
 #' @param node Current node
 #' @param depths Vector of depths for all nodes
-#' @return Character string representing the pseudo-IUPAC sequence
+#' @returns Character string representing the pseudo-IUPAC sequence
 #' @noRd
 seq_glycan <- function(glycan, node, depths) {
   children <- igraph::neighbors(glycan, node, mode = "out")
@@ -246,7 +246,7 @@ seq_glycan <- function(glycan, node, depths) {
 #'
 #' @param pseudo_seq Character string containing pseudo-IUPAC sequence with V and E prefixes
 #' @param glycan An igraph object representing a glycan structure
-#' @return Character string with V<index> replaced by monosaccharides and E<index> replaced by linkages
+#' @returns Character string with V<index> replaced by monosaccharides and E<index> replaced by linkages
 #' @noRd
 replace_mono_and_link <- function(pseudo_seq, glycan) {
   # Replace vertex indices (V<index>) with monosaccharides and substituents

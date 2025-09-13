@@ -2,9 +2,21 @@
 % Please edit documentation in R/composition.R
 \name{as_glycan_composition}
 \alias{as_glycan_composition}
+\alias{as_glycan_composition.glyrepr_composition}
+\alias{as_glycan_composition.glyrepr_structure}
+\alias{as_glycan_composition.character}
+\alias{as_glycan_composition.default}
 \title{Convert to Glycan Composition}
 \usage{
 as_glycan_composition(x)
+
+\method{as_glycan_composition}{glyrepr_composition}(x)
+
+\method{as_glycan_composition}{glyrepr_structure}(x)
+
+\method{as_glycan_composition}{character}(x)
+
+\method{as_glycan_composition}{default}(x)
 }
 \arguments{
 \item{x}{An object to convert to a glycan composition.
