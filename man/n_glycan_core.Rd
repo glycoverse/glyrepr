@@ -33,7 +33,7 @@ via GlcNAc to an Asn residue of the protein backbone.
 A common motif of all N-glycans is the \strong{chitobiose core},
 composed of three mannose and two GlcNAc moieties,
 which is commonly attached to the protein backbone via GlcNAc.
-The mannose residue is branched and connected via α1,3- and α1,6-glycosidic
+The mannose residue is branched and connected via a1,3- and a1,6-glycosidic
 linkages to the two other mannose building blocks.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{    Man

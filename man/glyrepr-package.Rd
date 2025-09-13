@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package provides two important representations of glycans: glycan compositions and glycan structures.
+Provide two important representations of glycans: glycan compositions and glycan structures.
 }
 \seealso{
 Useful links:

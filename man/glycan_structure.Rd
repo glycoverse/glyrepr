@@ -114,8 +114,8 @@ library(igraph)
 graph <- make_graph(~ 1-+2)  # Create graph with two monosaccharides
 V(graph)$mono <- c("GlcNAc", "GlcNAc")  # Set monosaccharide types
 V(graph)$sub <- ""  # No substituents
-E(graph)$linkage <- "b1-4"  # β1-4 glycosidic linkage
-graph$anomer <- "a1"  # α anomeric carbon
+E(graph)$linkage <- "b1-4"  # b1-4 glycosidic linkage
+graph$anomer <- "a1"  # a anomeric carbon
 
 # Create glycan structure vector
 simple_struct <- glycan_structure(graph)
