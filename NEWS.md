@@ -1,3 +1,10 @@
+# glyrepr 0.7.4
+
+## Minor improvements and bug fixes
+
+* Update package title and description.
+* Remove parallel examples in `smap()`.
+
 # glyrepr 0.7.3
 
 ## Minor improvements and bug fixes
