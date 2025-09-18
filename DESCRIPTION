@@ -1,5 +1,5 @@
 Package: glyrepr
-Title: Representation for Glycan Structures in R
+Title: Representation for Glycan Compositions and Structures
 Version: 0.7.3
 Authors@R: 
     person("Bin", "Fu", , "23110220018@m.fudan.edu.cn", role = c("aut", "cre", "cph"),

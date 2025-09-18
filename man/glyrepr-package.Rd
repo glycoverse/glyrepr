@@ -4,7 +4,7 @@
 \name{glyrepr-package}
 \alias{glyrepr}
 \alias{glyrepr-package}
-\title{glyrepr: Representation for Glycan Structures in R}
+\title{glyrepr: Representation for Glycan Compositions and Structures}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
