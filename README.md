@@ -27,15 +27,13 @@ probably already using or will use.
 
 ## Installation
 
-You can install the latest release of glyrepr from
-[GitHub](https://github.com/) with:
+You can install the latest release of glyrepr from CRAN with:
 
 ``` r
-# install.packages("remotes")
-remotes::install_github("glycoverse/glyrepr@*release")
+install.packages("glyrepr")
 ```
 
-Or install the development version:
+Or install the development version from GitHub:
 
 ``` r
 remotes::install_github("glycoverse/glyrepr")
