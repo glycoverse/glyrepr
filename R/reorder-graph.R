@@ -18,7 +18,8 @@ reorder_graphs <- function(x) {
 .reorder_one_graph <- function(graph) {
   root <- which(igraph::degree(graph, mode = "in") == 0)
   depths <- calculate_depths(graph, root)
-  pseudo_seq <- seq_glycan(graph, root, depths)
+  seq_cache <- build_seq_cache(graph)
+  pseudo_seq <- seq_glycan(root, depths, seq_cache)
   .reorder_by_pseudo_seq(graph, pseudo_seq)
 }
 
