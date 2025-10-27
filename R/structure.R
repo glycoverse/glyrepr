@@ -466,7 +466,7 @@ pillar_shaft.glyrepr_structure <- function(x, ...) {
     colorize_iupac_string(code, mono_names)
   })
 
-  pillar::new_pillar_shaft_simple(formatted, align = "left")
+  pillar::new_pillar_shaft_simple(formatted, align = "left", min_width = 10)
 }
 
 #' @export
