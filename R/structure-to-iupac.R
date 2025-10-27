@@ -69,13 +69,12 @@ structure_to_iupac <- function(glycan) {
 # Internal function to convert a single igraph to IUPAC
 .structure_to_iupac_single <- function(glycan) {
   root <- which(igraph::degree(glycan, mode = "in") == 0)
-  depths <- calculate_depths(glycan, root)
-  seq_cache <- build_seq_cache(glycan)
+  seq_cache <- build_seq_cache(glycan, root)
 
   # Step 1: Generate pseudo-IUPAC sequence starting from root
   # `pseudo_seq` is a string like "V1E1[V2E2]V3E3".
   # V1, V2, V3 are the vertex indices, E1, E2, E3 are the edge indices.
-  pseudo_seq <- seq_glycan(root, depths, seq_cache)
+  pseudo_seq <- seq_glycan(root, seq_cache)
 
   # Step 2: Replace vertex and edge indices with actual monosaccharides and linkages
   real_seq <- replace_mono_and_link(pseudo_seq, glycan)
@@ -124,44 +123,43 @@ order_linkages <- function(linkages, decreasing = FALSE) {
 #' 
 #' @param glycan An igraph object representing a glycan structure
 #' @param root Root vertex
-#' @returns Named vector of depths for each node
+#' @returns Numeric vector of depths for each node (indexed by vertex id)
 #' @noRd
 calculate_depths <- function(glycan, root) {
-  all_vertices <- igraph::V(glycan)
-  depths <- rep(NA_real_, length(all_vertices))
-  names(depths) <- names(all_vertices)
+  vcount <- igraph::vcount(glycan)
+  depths <- rep(NA_real_, vcount)
 
   # Use a local function to calculate depths with memoization
   calculate_single_depth <- function(node) {
-    node_name <- as.character(node)
+    node_index <- as.integer(node)
 
-    if (!is.na(depths[node_name])) {
-      return(depths[node_name])
+    if (!is.na(depths[node_index])) {
+      return(depths[node_index])
     }
 
     # Get child nodes
-    children <- igraph::neighbors(glycan, node, mode = "out")
+    children <- as.integer(igraph::neighbors(glycan, node_index, mode = "out"))
 
     if (length(children) == 0) {
       # Leaf node
-      depths[node_name] <<- 0
+      depths[node_index] <<- 0
     } else {
       # Calculate depth for all children first
-      child_depths <- sapply(children, calculate_single_depth)
+      child_depths <- vapply(children, calculate_single_depth, numeric(1))
 
       # This node's depth is 1 + max child depth
-      depths[node_name] <<- 1 + max(child_depths)
+      depths[node_index] <<- 1 + max(child_depths)
     }
 
-    depths[node_name]
+    depths[node_index]
   }
 
   # Calculate depths for all nodes starting from root
   calculate_single_depth(root)
 
   # Fill in any remaining nodes (shouldn't be needed for connected graph)
-  for (v in all_vertices) {
-    if (is.na(depths[as.character(v)])) {
+  for (v in seq_len(vcount)) {
+    if (is.na(depths[v])) {
       calculate_single_depth(v)
     }
   }
@@ -172,9 +170,10 @@ calculate_depths <- function(glycan, root) {
 #' Build adjacency cache for sequence generation
 #'
 #' @param glycan An igraph object representing a glycan structure
-#' @returns List containing child vertices, edge ids, and linkages per parent
+#' @param root Root vertex index used for depth calculation
+#' @returns List containing child vertices, edge ids, linkages per parent, and node depths
 #' @noRd
-build_seq_cache <- function(glycan) {
+build_seq_cache <- function(glycan, root) {
   vcount <- igraph::vcount(glycan)
   edge_ids <- seq_len(igraph::ecount(glycan))
   edge_vertices <- igraph::ends(glycan, igraph::E(glycan), names = FALSE)
@@ -196,18 +195,18 @@ build_seq_cache <- function(glycan) {
   list(
     children = children,
     edge_ids = parent_edge_ids,
-    linkages = parent_linkages
+    linkages = parent_linkages,
+    depths = calculate_depths(glycan, root)
   )
 }
 
 #' Generate glycan sequence recursively using pseudo-IUPAC format
 #'
 #' @param node Current node
-#' @param depths Vector of depths for all nodes
 #' @param cache Precomputed adjacency and edge metadata
 #' @returns Character string representing the pseudo-IUPAC sequence
 #' @noRd
-seq_glycan <- function(node, depths, cache) {
+seq_glycan <- function(node, cache) {
   children <- cache$children[[node]]
 
   # Base case: leaf node
@@ -217,8 +216,7 @@ seq_glycan <- function(node, depths, cache) {
   }
 
   # Find backbone child (deepest, break ties by linkage)
-  child_names <- as.character(children)
-  child_depths <- depths[child_names]
+  child_depths <- cache$depths[children]
   max_depth <- max(child_depths)
   backbone_candidate_idx <- which(child_depths == max_depth)
   child_linkages <- cache$linkages[[node]]
@@ -239,7 +237,7 @@ seq_glycan <- function(node, depths, cache) {
   branch_idx <- setdiff(seq_along(children), backbone_idx)
 
   # Generate backbone sequence
-  backbone_seq <- seq_glycan(backbone_child, depths, cache)
+  backbone_seq <- seq_glycan(backbone_child, cache)
 
   # Get backbone edge index
   backbone_edge_id <- child_edge_ids[backbone_idx]
@@ -258,7 +256,7 @@ seq_glycan <- function(node, depths, cache) {
       edge_id <- child_edge_ids[idx]
 
       # Generate branch sequence with edge index
-      branch_seq <- seq_glycan(branch_child, depths, cache)
+      branch_seq <- seq_glycan(branch_child, cache)
       branch_parts[i] <- paste0("[", branch_seq, "E", edge_id, "]")
     }
   }
