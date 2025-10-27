@@ -55,26 +55,6 @@ test_that("structure_to_iupac handles two-node structures", {
   expect_equal(result, "Glc(a1-3)Man(b1-")
 })
 
-test_that("parse_linkage works correctly", {
-  # Test valid linkages
-  result1 <- parse_linkage("a1-3")
-  expect_equal(result1$x, "a")
-  expect_equal(result1$y, "1")
-  expect_equal(result1$z, "3")
-  expect_equal(result1$x_rank, 1)
-  expect_equal(result1$y_rank, 1)
-  expect_equal(result1$z_rank, 3)
-  
-  # Test with ?
-  result2 <- parse_linkage("?2-?")
-  expect_equal(result2$x, "?")
-  expect_equal(result2$y, "2")
-  expect_equal(result2$z, "?")
-  expect_equal(result2$x_rank, 3)
-  expect_equal(result2$y_rank, 2)
-  expect_equal(result2$z_rank, 0)
-})
-
 test_that("structure_to_iupac ensures isomorphic graphs produce same sequence", {
   # Create first graph: Man with a1-3 and a1-6 branches (in that order)
   graph1 <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)

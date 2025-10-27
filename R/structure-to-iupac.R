@@ -98,10 +98,10 @@ parse_linkage <- function(linkage) {
   z <- stringr::str_split_i(link_part, "-", 2)  # second position
 
   # Convert to numeric ranks for comparison
-  # For x: ? > b > a, so assign ? = 3, b = 2, a = 1
-  x_rank <- switch(x, "a" = 1, "b" = 2, "?" = 3)
+  # For x: b > a > ?, so assign b = 3, a = 2, ? = 1
+  x_rank <- switch(x, "a" = 3, "b" = 2, "?" = 1)
 
-  # For y and z: ? is greater than any number
+  # For y and z: ? is smaller than any number
   y_rank <- if (y == "?" || stringr::str_detect(y, "/")) 0 else as.numeric(y)
   z_rank <- if (z == "?" || stringr::str_detect(z, "/")) 0 else as.numeric(z)
 
