@@ -222,18 +222,19 @@ seq_glycan <- function(node, cache) {
     return(paste0("V", as.character(node)))
   }
 
-  children_order <- order_branches(node, cache)
-
-  backbone_child <- children[[children_order[[1]]]]
-  backbone_edge_id <- edge_ids[[children_order[[1]]]]
-  backbone_seq <- seq_glycan(backbone_child, cache)
-
   if (length(children) > 1) {
-    branch_children <- children[children_order[-1]]
-    branch_edge_ids <- edge_ids[children_order[-1]]
+    children_order <- order_branches(node, cache)
+    backbone_child <- children[[children_order$backbone]]
+    backbone_edge_id <- edge_ids[[children_order$backbone]]
+    backbone_seq <- seq_glycan(backbone_child, cache)
+    branch_children <- children[children_order$branches]
+    branch_edge_ids <- edge_ids[children_order$branches]
     branch_seqs <- purrr::map_chr(branch_children, ~ seq_glycan(.x, cache))
     branch_seqs <- paste0("[", branch_seqs, "E", branch_edge_ids, "]")
   } else {
+    backbone_child <- children[[1]]
+    backbone_edge_id <- edge_ids[[1]]
+    backbone_seq <- seq_glycan(backbone_child, cache)
     branch_seqs <- ""
   }
 
@@ -248,8 +249,9 @@ seq_glycan <- function(node, cache) {
 #'
 #' @param node A node index.
 #' @param cache Precomputed adjacency and edge metadata
-#' @returns An integer vector of children order. `children[order]` is the ordered children.
-#'   The first element is the backbone child, and the rest are branches in order.
+#' @returns A list of two elements:
+#'   - "backbone": the index of the backbone child.
+#'   - "branches": the indices of the branches in order.
 #' @noRd
 order_branches <- function(node, cache) {
   # Find the backbone child
@@ -261,9 +263,9 @@ order_branches <- function(node, cache) {
 
   # Order the rest of the children
   if (length(children) > 1) {
-    c(backbone_child_index, rev(linkage_order[linkage_order != backbone_child_index]))
+    list(backbone = backbone_child_index, branches = rev(linkage_order[linkage_order != backbone_child_index]))
   } else {
-    backbone_child_index
+    list(backbone = backbone_child_index, branches = integer(0))
   }
 }
 
