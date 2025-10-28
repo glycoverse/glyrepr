@@ -525,5 +525,12 @@ obj_print_data.glyrepr_composition <- function(x, ..., max_n = 10, colored = TRU
 #' @importFrom pillar pillar_shaft
 #' @export
 pillar_shaft.glyrepr_composition <- function(x, ...) {
-  pillar::pillar_shaft(format(x))
+  if (length(x) == 0) {
+    return(pillar::pillar_shaft(character()))
+  }
+
+  indices <- seq_len(length(x))
+  formatted <- format_glycan_composition_subset(x, indices, colored = TRUE)
+
+  pillar::new_pillar_shaft_simple(formatted, align = "left", min_width = 10)
 }
