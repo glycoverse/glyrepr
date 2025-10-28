@@ -1,5 +1,11 @@
 # glyrepr (development version)
 
+## Minor improvements and bug fixes
+
+* IUPAC sequence generation is deterministic now for tie branches.
+* Glycan structures are now truncated when printed to console as a column in a tibble.
+* Glycan compositions are now colored when printed to console as a column in a tibble.
+
 # glyrepr 0.7.4
 
 ## Minor improvements and bug fixes
