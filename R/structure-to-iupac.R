@@ -169,6 +169,12 @@ calculate_depths <- function(glycan, root) {
 
 #' Build adjacency cache for sequence generation
 #'
+#' It caches the following information:
+#' - children: children[[i]] is all the children ids of vertex i.
+#' - edge_ids: edge_ids[[i]] is all the edge ids directed from vertex i.
+#' - linkages: linkages[[i]] is all the linkage attributes (e.g. "b1-4") of the edges directed from vertex i.
+#' - depths: depths[i] is the maximum depth of the subtree rooted at vertex i.
+#'
 #' @param glycan An igraph object representing a glycan structure
 #' @param root Root vertex index used for depth calculation
 #' @returns List containing child vertices, edge ids, linkages per parent, and node depths
@@ -208,6 +214,7 @@ build_seq_cache <- function(glycan, root) {
 #' @noRd
 seq_glycan <- function(node, cache) {
   children <- cache$children[[node]]
+  edge_ids <- cache$edge_ids[[node]]
 
   # Base case: leaf node
   if (is.null(children) || length(children) == 0) {
@@ -215,55 +222,49 @@ seq_glycan <- function(node, cache) {
     return(paste0("V", as.character(node)))
   }
 
-  # Find backbone child (deepest, break ties by linkage)
-  child_depths <- cache$depths[children]
-  max_depth <- max(child_depths)
-  backbone_candidate_idx <- which(child_depths == max_depth)
-  child_linkages <- cache$linkages[[node]]
-  child_edge_ids <- cache$edge_ids[[node]]
+  children_order <- order_branches(node, cache)
 
-  # Choose backbone child by linkage if multiple candidates
-  if (length(backbone_candidate_idx) > 1) {
-    candidate_linkages <- child_linkages[backbone_candidate_idx]
-    # Sort by linkage (ascending order) - smaller linkage wins
-    linkage_order <- order_linkages(candidate_linkages, decreasing = FALSE)
-    backbone_idx <- backbone_candidate_idx[linkage_order[1]]
-  } else {
-    backbone_idx <- backbone_candidate_idx[1]
-  }
-
-  backbone_child <- children[backbone_idx]
-  # Other children are branches
-  branch_idx <- setdiff(seq_along(children), backbone_idx)
-
-  # Generate backbone sequence
+  backbone_child <- children[[children_order[[1]]]]
+  backbone_edge_id <- edge_ids[[children_order[[1]]]]
   backbone_seq <- seq_glycan(backbone_child, cache)
 
-  # Get backbone edge index
-  backbone_edge_id <- child_edge_ids[backbone_idx]
-
-  # Generate branch sequences
-  branch_parts <- character()
-  if (length(branch_idx) > 0) {
-    # Sort branches by linkage
-    branch_linkages <- child_linkages[branch_idx]
-    branch_order <- order_linkages(branch_linkages, decreasing = FALSE)
-    branch_idx <- branch_idx[branch_order]
-
-    for (i in seq_along(branch_idx)) {
-      idx <- branch_idx[i]
-      branch_child <- children[idx]
-      edge_id <- child_edge_ids[idx]
-
-      # Generate branch sequence with edge index
-      branch_seq <- seq_glycan(branch_child, cache)
-      branch_parts[i] <- paste0("[", branch_seq, "E", edge_id, "]")
-    }
+  if (length(children) > 1) {
+    branch_children <- children[children_order[-1]]
+    branch_edge_ids <- edge_ids[children_order[-1]]
+    branch_seqs <- purrr::map_chr(branch_children, ~ seq_glycan(.x, cache))
+    branch_seqs <- paste0("[", branch_seqs, "E", branch_edge_ids, "]")
+  } else {
+    branch_seqs <- ""
   }
 
   # Combine: backbone + E<edge_index> + branches + V<node_index>
-  branches_str <- paste0(branch_parts, collapse = "")
+  branches_str <- paste0(branch_seqs, collapse = "")
   paste0(backbone_seq, "E", backbone_edge_id, branches_str, "V", as.character(node))
+}
+
+#' Order branches
+#'
+#' This function orders all branches of a node by depth, then by linkages.
+#'
+#' @param node A node index.
+#' @param cache Precomputed adjacency and edge metadata
+#' @returns An integer vector of children order. `children[order]` is the ordered children.
+#'   The first element is the backbone child, and the rest are branches in order.
+#' @noRd
+order_branches <- function(node, cache) {
+  # Find the backbone child
+  children <- cache$children[[node]]
+  child_depths <- cache$depths[children]
+  child_linkages <- cache$linkages[[node]]
+  linkage_order <- order_linkages(child_linkages, decreasing = TRUE)
+  backbone_child_index <- order(child_depths, linkage_order, decreasing = TRUE)[[1]]
+
+  # Order the rest of the children
+  if (length(children) > 1) {
+    c(backbone_child_index, rev(linkage_order[linkage_order != backbone_child_index]))
+  } else {
+    backbone_child_index
+  }
 }
 
 #' Replace vertex and edge indices with actual monosaccharides and linkages
