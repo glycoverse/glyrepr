@@ -203,13 +203,6 @@ The root monosaccharide (rightmost) doesn't connect to anything further,
 so its anomeric carbon is "free." 
 The format `(xy-` tells us about its anomeric state without a target.
 
-**Simplification shortcut**: 
-For common monosaccharides, 
-you can often omit the anomeric info entirely:
-```
-Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc
-```
-
 ## Put Your Skills to the Test! 🧪
 
 Ready to become an IUPAC-condensed master? 
