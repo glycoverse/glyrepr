@@ -154,11 +154,11 @@ calculate_depths <- function(glycan, root) {
 #' Build adjacency cache for sequence generation
 #'
 #' It caches the following information:
-#' - children: children[[i]] is all the children ids of vertex i.
-#' - edge_ids: edge_ids[[i]] is all the edge ids directed from vertex i.
-#' - linkages: linkages[[i]] is all the linkage attributes (e.g. "b1-4") of the edges directed from vertex i.
-#' - depths: depths[i] is the maximum depth of the subtree rooted at vertex i.
-#' - signatures: signatures[i] is the signature of the subtree rooted at vertex i.
+#' - children: `children[[i]]` is all the children ids of vertex i.
+#' - edge_ids: `edge_ids[[i]]` is all the edge ids directed from vertex i.
+#' - linkages: `linkages[[i]]` is all the linkage attributes (e.g. "b1-4") of the edges directed from vertex i.
+#' - depths: `depths[i]` is the maximum depth of the subtree rooted at vertex i.
+#' - signatures: `signatures[i]` is the signature of the subtree rooted at vertex i.
 #'   The signature of a node is a string used for branch ordering in ties breaking.
 #'
 #' @param glycan An igraph object representing a glycan structure
