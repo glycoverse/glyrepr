@@ -83,44 +83,28 @@ structure_to_iupac <- function(glycan) {
   paste0(real_seq, "(", anomer, "-")
 }
 
-#' Parse linkage string into comparable components
+#' Calculate linkage rank used for ordering linkages
 #'
-#' @param linkage Character string in format "xy-z" (e.g., "b1-4", "a2-3")
-#' @returns Named list with x, y, z components and their numeric ranks
-#' @noRd
-parse_linkage <- function(linkage) {
-  # Parse linkage format: xy-z where x is a/b/?, y is digit/?, z is digit/?
-
-  x <- stringr::str_sub(linkage, 1, 1)  # anomeric configuration
-  link_part <- stringr::str_sub(linkage, 2, -1)  # first position  
-  y <- stringr::str_split_i(link_part, "-", 1)  # first position  
-  z <- stringr::str_split_i(link_part, "-", 2)  # second position
-
-  # Convert to numeric ranks for comparison
-  # For x: b > a > ?, so assign b = 3, a = 2, ? = 1
-  x_rank <- switch(x, "a" = 3, "b" = 2, "?" = 1)
-
-  # For y and z: ? is smaller than any number
-  y_rank <- if (y == "?" || stringr::str_detect(y, "/")) 0 else as.numeric(y)
-  z_rank <- if (z == "?" || stringr::str_detect(z, "/")) 0 else as.numeric(z)
-
-  list(x = x, y = y, z = z, x_rank = x_rank, y_rank = y_rank, z_rank = z_rank)
-}
-
-#' Order linkages
+#' This is the reciprocal of the second position of the linkage.
+#' "?" always rank the highest, so assigned 1.
+#' For example, "b1-4" has rank 1/4, "a2-3" has rank 1/3, "a?-?" has rank 1.
 #'
-#' @param linkages A character vector of linkages.
-#' @param decreasing Logical. If TRUE, the linkages are ordered in decreasing order.
-#' @returns A character vector of ordered linkages.
+#' @param linkages Character vector in format "xy-z" (e.g., "b1-4", "a2-3")
+#' @returns Numeric rank of the linkage.
 #' @noRd
-order_linkages <- function(linkages, decreasing = FALSE) {
-  parsed <- purrr::map(linkages, parse_linkage)
-  rank <- purrr::map_dbl(parsed, ~ .x$z_rank)
-  order(rank, decreasing = decreasing)
+calculate_linkage_rank <- function(linkages) {
+  pos2 <- stringr::str_split_i(linkages, "-", 2)  # second position
+  suppressWarnings(
+    dplyr::if_else(
+      pos2 == "?" | stringr::str_detect(pos2, "/"),
+      1,
+      1 / as.numeric(pos2)
+    )
+  )
 }
 
 #' Calculate depth (longest path to leaf) for each node
-#' 
+#'
 #' @param glycan An igraph object representing a glycan structure
 #' @param root Root vertex
 #' @returns Numeric vector of depths for each node (indexed by vertex id)
@@ -252,18 +236,22 @@ seq_glycan <- function(node, cache) {
 #' @returns A list of two elements:
 #'   - "backbone": the index of the backbone child.
 #'   - "branches": the indices of the branches in order.
+#'   All indices can only be used on `cache$children[[node]]`.
+#'   For example, when `backbone` is 2, it means `cache$children[[node]][[2]]` is the backbone child.
 #' @noRd
 order_branches <- function(node, cache) {
   # Find the backbone child
   children <- cache$children[[node]]
   child_depths <- cache$depths[children]
   child_linkages <- cache$linkages[[node]]
-  linkage_order <- order_linkages(child_linkages, decreasing = TRUE)
-  backbone_child_index <- order(child_depths, linkage_order, decreasing = TRUE)[[1]]
+  linkage_ranks <- calculate_linkage_rank(child_linkages)
+  backbone_child_index <- order(child_depths, linkage_ranks, decreasing = TRUE)[[1]]
 
   # Order the rest of the children
   if (length(children) > 1) {
-    list(backbone = backbone_child_index, branches = rev(linkage_order[linkage_order != backbone_child_index]))
+    branch_order <- order(linkage_ranks, decreasing = TRUE)
+    branch_order <- branch_order[branch_order != backbone_child_index]
+    list(backbone = backbone_child_index, branches = branch_order)
   } else {
     list(backbone = backbone_child_index, branches = integer(0))
   }
