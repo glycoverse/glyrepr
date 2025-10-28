@@ -158,6 +158,8 @@ calculate_depths <- function(glycan, root) {
 #' - edge_ids: edge_ids[[i]] is all the edge ids directed from vertex i.
 #' - linkages: linkages[[i]] is all the linkage attributes (e.g. "b1-4") of the edges directed from vertex i.
 #' - depths: depths[i] is the maximum depth of the subtree rooted at vertex i.
+#' - signatures: signatures[i] is the signature of the subtree rooted at vertex i.
+#'   The signature of a node is a string used for branch ordering in ties breaking.
 #'
 #' @param glycan An igraph object representing a glycan structure
 #' @param root Root vertex index used for depth calculation
@@ -182,11 +184,59 @@ build_seq_cache <- function(glycan, root) {
     parent_linkages[[parent]] <- c(parent_linkages[[parent]], edge_linkages[edge_id])
   }
 
+  # ===== Calculate node signatures =====
+  mono_vec <- igraph::vertex_attr(glycan, "mono")
+  sub_vec  <- igraph::vertex_attr(glycan, "sub")
+  mono_sub <- ifelse(
+    is.na(sub_vec) | sub_vec == "",
+    mono_vec,
+    paste0(mono_vec, stringr::str_remove_all(sub_vec, ","))
+  )
+
+  signature <- rep(NA_character_, vcount)
+
+  compute_sig <- function(node) {
+    if (!is.na(signature[node])) {
+      return(signature[node])
+    }
+
+    kids <- children[[node]]
+
+    if (is.null(kids) || length(kids) == 0) {
+      signature[node] <<- mono_sub[node]
+    } else {
+      toks <- character(length(kids))
+      for (i in seq_along(kids)) {
+        kid <- kids[i]
+        link_i <- parent_linkages[[node]][i]
+        toks[i] <- paste0(link_i, "->", compute_sig(kid))
+      }
+
+      toks <- sort(toks)
+
+      signature[node] <<- paste0(
+        mono_sub[node],
+        "{",
+        paste0(toks, collapse = ","),
+        "}"
+      )
+    }
+
+    signature[node]
+  }
+
+  # trigger calculation of all node signatures
+  for (n in seq_len(vcount)) {
+    compute_sig(n)
+  }
+  # ===== End of calculating node signatures =====
+
   list(
     children = children,
     edge_ids = parent_edge_ids,
     linkages = parent_linkages,
-    depths = calculate_depths(glycan, root)
+    depths = calculate_depths(glycan, root),
+    signatures = signature
   )
 }
 
@@ -245,11 +295,12 @@ order_branches <- function(node, cache) {
   child_depths <- cache$depths[children]
   child_linkages <- cache$linkages[[node]]
   linkage_ranks <- calculate_linkage_rank(child_linkages)
-  backbone_child_index <- order(child_depths, linkage_ranks, decreasing = TRUE)[[1]]
+  child_sigs <- cache$signatures[children]
+  backbone_child_index <- order(child_depths, linkage_ranks, child_sigs, decreasing = TRUE)[[1]]
 
   # Order the rest of the children
   if (length(children) > 1) {
-    branch_order <- order(linkage_ranks, decreasing = TRUE)
+    branch_order <- order(linkage_ranks, child_sigs, decreasing = TRUE)
     branch_order <- branch_order[branch_order != backbone_child_index]
     list(backbone = backbone_child_index, branches = branch_order)
   } else {
