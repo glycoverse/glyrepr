@@ -1,5 +1,7 @@
 # glyrepr (development version)
 
+# glyrepr 0.7.5
+
 ## Minor improvements and bug fixes
 
 * IUPAC sequence generation is deterministic now for tie branches.
