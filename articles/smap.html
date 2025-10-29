@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.5.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -168,7 +168,7 @@ structures, you’ll hit a wall:</p>
 <span>  error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"💥 Error:"</span>, <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/cnd_message.html" class="external-link">cnd_message</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; 💥 Error: <span style="color: #00BBBB;">ℹ</span> In index: 1.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Caused by error in `ensure_igraph()`:</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Caused by error in `ensure_igraph()` at igraph/R/aaa-auto.R:52:3:</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Must provide a graph object (provided wrong object type).</span></span></code></pre></div>
 <p><strong>Why does this fail?</strong> Because <code>purrr</code>
 functions don’t understand the internal structure optimization of
@@ -357,7 +357,7 @@ deduplication:</p>
 <span><span class="va">all_graphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">huge_struc</span><span class="op">)</span>  <span class="co"># Extracts all 25,000 graphs</span></span>
 <span><span class="va">vertex_counts_naive</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">all_graphs</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Naive approach (all graphs): 0.237 sec elapsed</span></span>
+<span><span class="co">#&gt; Naive approach (all graphs): 0.224 sec elapsed</span></span>
 <span></span>
 <span><span class="co"># Verify results are equivalent (though data types may differ)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">vertex_counts_optimized</span>, <span class="va">vertex_counts_naive</span><span class="op">)</span></span>
@@ -511,7 +511,7 @@ analysis tools. Go forth and analyze! 🌟</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] tictoc_1.2.1       lobstr_1.1.2       glyrepr_0.7.4.9000</span></span>
+<span><span class="co">#&gt; [1] tictoc_1.2.1       lobstr_1.1.2       glyrepr_0.7.5.9000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] jsonlite_2.0.0    dplyr_1.1.4       compiler_4.5.1    tidyselect_1.2.1 </span></span>
