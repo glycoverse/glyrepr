@@ -2,3 +2,42 @@ url: https://glycoverse.github.io/glyrepr/
 template:
   bootstrap: 5
 
+reference:
+- title: "Glycan Composition and Structure Creation"
+  contents:
+  - glycan_composition
+  - as_glycan_composition
+  - is_glycan_composition
+  - glycan_structure
+  - as_glycan_structure
+  - is_glycan_structure
+- title: "Glycan Composition and Structure Inspection"
+  contents:
+  - count_mono
+  - get_anomer
+  - get_mono_type
+  - get_structure_graphs
+  - has_linkages
+  - structure_to_iupac
+- title: "Glycan Composition and Structure Manipulation"
+  contents:
+  - convert_to_generic
+  - remove_linkages
+  - remove_substituents
+  - matches("^s.*map.*$")
+  - ssome
+  - severy
+  - snone
+- title: "Example Glycan Structures"
+  contents:
+  - n_glycan_core
+  - o_glycan_core_1
+  - o_glycan_core_2
+- title: "Helper Functions"
+  contents:
+  - available_monosaccharides
+  - available_substituents
+  - is_known_monosaccharide
+  - normalize_substituents
+  - possible_linkages
+  - valid_linkages
