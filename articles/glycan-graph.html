@@ -121,9 +121,9 @@ Instead, let’s extract the underlying graph using
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span>
 <span><span class="va">graph</span></span>
-<span><span class="co">#&gt; IGRAPH 5fff81e DN-- 5 4 -- </span></span>
+<span><span class="co">#&gt; IGRAPH 1dc14b7 DN-- 5 4 -- </span></span>
 <span><span class="co">#&gt; + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span></span>
-<span><span class="co">#&gt; + edges from 5fff81e (vertex names):</span></span>
+<span><span class="co">#&gt; + edges from 1dc14b7 (vertex names):</span></span>
 <span><span class="co">#&gt; [1] 3-&gt;1 3-&gt;2 4-&gt;3 5-&gt;4</span></span></code></pre></div>
 <p>Let’s decode what we’re seeing here 🕵️:</p>
 <p><strong>First line:</strong> Directed Named (“DN”) graph with 5
@@ -250,7 +250,7 @@ search:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bfs_result</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/bfs.html" class="external-link">bfs</a></span><span class="op">(</span><span class="va">graph</span>, root <span class="op">=</span> <span class="fl">1</span>, mode <span class="op">=</span> <span class="st">"out"</span><span class="op">)</span></span>
 <span><span class="va">bfs_result</span><span class="op">$</span><span class="va">order</span></span>
-<span><span class="co">#&gt; + 5/5 vertices, named, from 5fff81e:</span></span>
+<span><span class="co">#&gt; + 5/5 vertices, named, from 1dc14b7:</span></span>
 <span><span class="co">#&gt; [1] 1 2 3 4 5</span></span></code></pre></div>
 </div>
 <div class="section level3">
