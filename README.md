@@ -9,11 +9,11 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/glyrepr)](https://CRAN.R-project.org/package=glyrepr)
+[![R-universe
+version](https://glycoverse.r-universe.dev/glyrepr/badges/version)](https://glycoverse.r-universe.dev/glyrepr)
 [![R-CMD-check](https://github.com/glycoverse/glyrepr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/glycoverse/glyrepr/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/glycoverse/glyrepr/graph/badge.svg)](https://app.codecov.io/gh/glycoverse/glyrepr)
-[![R-universe
-version](https://glycoverse.r-universe.dev/glyrepr/badges/version)](https://glycoverse.r-universe.dev/glyrepr)
 <!-- badges: end -->
 
 `glyrepr` provides two important representations of glycans: glycan
