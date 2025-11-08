@@ -72,7 +72,7 @@ as_glycan_composition(comp_list)
 **Method 3: The Parser**
 ```{r}
 # Copy-paste from your mass spec software? No problem!
-as_glycan_composition(c("Hex(5)HexNAc(2)", "Gal(1)GalNAc(1)"))
+as_glycan_composition(c("Hex(5)HexNAc(2)", "H1N1"))
 ```
 
 ### The Magic of Colors 🌈
@@ -169,6 +169,46 @@ toc()
 **Mind = blown!** 🤯 
 The performance is nearly identical because `glyrepr` only processes each unique structure once, 
 then cleverly expands the results.
+
+### Understanding Structure Resolution Levels 🔬
+
+Not all glycan structures are created equal — 
+they come in different levels of detail, 
+like zoom levels on a map. 
+`glyrepr` recognizes four resolution levels:
+
+- **"intact"**: The full picture — 
+  all monosaccharides are concrete (e.g., "Man", "GlcNAc"), 
+  and all linkages are fully determined (e.g., "a2-3", "b1-4").
+- **"partial"**: Almost there — 
+  all monosaccharides are concrete (e.g., "Man", "GlcNAc"), 
+  but some linkage information is missing (e.g., "a2-?").
+- **"topological"**: We know what's there, but not how they connect — 
+  all monosaccharides are concrete (e.g., "Man", "GlcNAc"), 
+  but the linkage information is completely unknown ("??-?").
+- **"basic"**: The minimalist view — 
+  all monosaccharides are generic (e.g., "Hex", "HexNAc"), 
+  and the linkage information is completely unknown ("??-?").
+
+💡 **Fun fact**: 
+In theory, you could have a glycan with generic monosaccharides but fully determined linkages 
+(e.g., "Hex(b1-3)HexNAc(a1-")). 
+But in practice, this is almost unheard of — 
+linkage information is much harder to obtain than monosaccharide information. 
+That's why `glyrepr` assigns these structures to the "basic" level too.
+
+You can get the structure level for a glycan structure vector with `get_structure_level()`:
+
+```{r}
+glycans <- as_glycan_structure(c(
+  "Gal(b1-3)GalNAc(a1-",
+  "Gal(b1-?)GalNAc(a1-",
+  "Gal(??-?)GalNAc(??-",
+  "Hex(??-?)HexNAc(??-",
+  "Hex(b1-3)HexNAc(a1-"
+))
+get_structure_level(glycans)
+```
 
 ### Structure Manipulation Tools
 
