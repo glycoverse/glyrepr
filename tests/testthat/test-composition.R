@@ -41,6 +41,10 @@ test_that("unknown monosaccharides throw error", {
   expect_error(glycan_composition(c(Glc = 1, unknown = 1)), "must have only known monosaccharides")
 })
 
+test_that("glycan_composition rejects wrong types", {
+  expect_error(glycan_composition(list(c(Hex = 1, Glc = 1))), "Must be one or more named integer vectors")
+})
+
 test_that("as_glycan_composition works with named vectors", {
   # Test generic composition
   vec <- c(Hex = 2, HexNAc = 1)

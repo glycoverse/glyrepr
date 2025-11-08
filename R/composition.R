@@ -44,6 +44,12 @@
 #' @export
 glycan_composition <- function(...) {
   args <- rlang::list2(...)
+  if (!purrr::every(args, checkmate::test_integerish)) {
+    cli::cli_abort(c(
+      "Must be one or more named integer vectors.",
+      "i" = "You might want to use {.fn as_glycan_composition} for more flexible input."
+    ))
+  }
   x <- purrr::map(args, ~ {
     result <- as.integer(.x)
     names(result) <- names(.x)
