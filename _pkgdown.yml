@@ -19,6 +19,7 @@ reference:
   - get_structure_graphs
   - has_linkages
   - structure_to_iupac
+  - get_structure_level
 - title: "Glycan Composition and Structure Manipulation"
   contents:
   - convert_to_generic
