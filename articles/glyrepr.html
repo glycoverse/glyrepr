@@ -161,10 +161,10 @@ superpower:</p>
 <p><strong>Method 3: The Parser</strong></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Copy-paste from your mass spec software? No problem!</span></span>
-<span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hex(5)HexNAc(2)"</span>, <span class="st">"Gal(1)GalNAc(1)"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hex(5)HexNAc(2)"</span>, <span class="st">"H1N1"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
 <span><span class="co">#&gt; [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span></span>
-<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span></span></code></pre></div>
+<span><span class="co">#&gt; [2] <span style="color: #000000;">Hex</span>(1)<span style="color: #000000;">HexNAc</span>(1)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-magic-of-colors">The Magic of Colors 🌈<a class="anchor" aria-label="anchor" href="#the-magic-of-colors"></a>
@@ -269,15 +269,58 @@ copy of each book, no matter how many people want to read it.</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5 structures: 0.025 sec elapsed</span></span>
+<span><span class="co">#&gt; Converting 5 structures: 0.023 sec elapsed</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5,000 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">large_struc</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5,000 structures: 0.024 sec elapsed</span></span></code></pre></div>
+<span><span class="co">#&gt; Converting 5,000 structures: 0.023 sec elapsed</span></span></code></pre></div>
 <p><strong>Mind = blown!</strong> 🤯 The performance is nearly identical
 because <code>glyrepr</code> only processes each unique structure once,
 then cleverly expands the results.</p>
+</div>
+<div class="section level3">
+<h3 id="understanding-structure-resolution-levels">Understanding Structure Resolution Levels 🔬<a class="anchor" aria-label="anchor" href="#understanding-structure-resolution-levels"></a>
+</h3>
+<p>Not all glycan structures are created equal — they come in different
+levels of detail, like zoom levels on a map. <code>glyrepr</code>
+recognizes four resolution levels:</p>
+<ul>
+<li>
+<strong>“intact”</strong>: The full picture — all monosaccharides
+are concrete (e.g., “Man”, “GlcNAc”), and all linkages are fully
+determined (e.g., “a2-3”, “b1-4”).</li>
+<li>
+<strong>“partial”</strong>: Almost there — all monosaccharides are
+concrete (e.g., “Man”, “GlcNAc”), but some linkage information is
+missing (e.g., “a2-?”).</li>
+<li>
+<strong>“topological”</strong>: We know what’s there, but not how
+they connect — all monosaccharides are concrete (e.g., “Man”, “GlcNAc”),
+but the linkage information is completely unknown (“??-?”).</li>
+<li>
+<strong>“basic”</strong>: The minimalist view — all monosaccharides
+are generic (e.g., “Hex”, “HexNAc”), and the linkage information is
+completely unknown (“??-?”).</li>
+</ul>
+<p>💡 <strong>Fun fact</strong>: In theory, you could have a glycan with
+generic monosaccharides but fully determined linkages (e.g.,
+“Hex(b1-3)HexNAc(a1-”)). But in practice, this is almost unheard of —
+linkage information is much harder to obtain than monosaccharide
+information. That’s why <code>glyrepr</code> assigns these structures to
+the “basic” level too.</p>
+<p>You can get the structure level for a glycan structure vector with
+<code><a href="../reference/get_structure_level.html">get_structure_level()</a></code>:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">glycans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Gal(b1-3)GalNAc(a1-"</span>,</span>
+<span>  <span class="st">"Gal(b1-?)GalNAc(a1-"</span>,</span>
+<span>  <span class="st">"Gal(??-?)GalNAc(??-"</span>,</span>
+<span>  <span class="st">"Hex(??-?)HexNAc(??-"</span>,</span>
+<span>  <span class="st">"Hex(b1-3)HexNAc(a1-"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="va">glycans</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "intact"      "partial"     "topological" "basic"       "basic"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="structure-manipulation-tools">Structure Manipulation Tools<a class="anchor" aria-label="anchor" href="#structure-manipulation-tools"></a>
@@ -285,7 +328,7 @@ then cleverly expands the results.</p>
 <p><code>glyrepr</code> comes with several handy tools for structure
 manipulation:</p>
 <p><strong>Strip away the connections:</strong></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_linkages.html">remove_linkages</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;glycan_structure[5]&gt;</span></span>
 <span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(??-?)[<span style="color: #00AF5F;">Man</span>(??-?)]<span style="color: #00AF5F;">Man</span>(??-?)<span style="color: #0087D7;">GlcNAc</span>(??-?)<span style="color: #0087D7;">GlcNAc</span>(??-</span></span>
@@ -295,7 +338,7 @@ manipulation:</p>
 <span><span class="co">#&gt; [5] <span style="color: #0087D7;">GlcNAc</span>6Ac(??-?)<span style="color: #0087D7;">Glc</span>3Me(??-</span></span>
 <span><span class="co">#&gt; # Unique structures: 5</span></span></code></pre></div>
 <p><strong>Remove the decorations:</strong></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Let's look at our decorated structure first</span></span>
 <span><span class="va">struc</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span></span>
 <span><span class="co">#&gt; &lt;glycan_structure[1]&gt;</span></span>
@@ -316,7 +359,7 @@ manipulation:</p>
 <h3 id="from-structure-to-composition">From Structure to Composition<a class="anchor" aria-label="anchor" href="#from-structure-to-composition"></a>
 </h3>
 <p>Ever wondered what’s actually in those complex structures? Easy:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
 <span><span class="va">comp</span></span>
 <span><span class="co">#&gt; &lt;glycan_composition[5]&gt;</span></span>
@@ -330,7 +373,7 @@ manipulation:</p>
 <h3 id="back-to-strings">Back to Strings<a class="anchor" aria-label="anchor" href="#back-to-strings"></a>
 </h3>
 <p>Need to export your data or use it elsewhere?</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get the original string representations</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span></span>
@@ -348,7 +391,7 @@ manipulation:</p>
 </h3>
 <p><code>glyrepr</code> objects are first-class citizens in the
 tidyverse:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -388,7 +431,7 @@ packages in the glycoverse</li>
 <div class="section level2">
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -414,16 +457,16 @@ packages in the glycoverse</li>
 <span><span class="co">#&gt; [1] dplyr_1.1.4        tibble_3.3.0       tictoc_1.2.1       glyrepr_0.7.5.9000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] jsonlite_2.0.0    compiler_4.5.2    tidyselect_1.2.1  stringr_1.5.2    </span></span>
+<span><span class="co">#&gt;  [1] jsonlite_2.0.0    compiler_4.5.2    tidyselect_1.2.1  stringr_1.6.0    </span></span>
 <span><span class="co">#&gt;  [5] jquerylib_0.1.4   systemfonts_1.3.1 textshaping_1.0.4 yaml_2.3.10      </span></span>
 <span><span class="co">#&gt;  [9] fastmap_1.2.0     R6_2.6.1          generics_0.1.4    igraph_2.2.1     </span></span>
 <span><span class="co">#&gt; [13] knitr_1.50        backports_1.5.0   checkmate_2.3.3   rstackdeque_1.1.1</span></span>
 <span><span class="co">#&gt; [17] desc_1.4.3        bslib_0.9.0       pillar_1.11.1     rlang_1.1.6      </span></span>
 <span><span class="co">#&gt; [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.54        </span></span>
-<span><span class="co">#&gt; [25] fs_1.6.6          sass_0.4.10       cli_3.6.5         pkgdown_2.1.3    </span></span>
+<span><span class="co">#&gt; [25] fs_1.6.6          sass_0.4.10       cli_3.6.5         pkgdown_2.2.0    </span></span>
 <span><span class="co">#&gt; [29] magrittr_2.0.4    digest_0.6.37     lifecycle_1.0.4   vctrs_0.6.5      </span></span>
 <span><span class="co">#&gt; [33] evaluate_1.0.5    glue_1.8.0        ragg_1.5.0        rmarkdown_2.30   </span></span>
-<span><span class="co">#&gt; [37] purrr_1.1.0       tools_4.5.2       pkgconfig_2.0.3   htmltools_0.5.8.1</span></span></code></pre></div>
+<span><span class="co">#&gt; [37] purrr_1.2.0       tools_4.5.2       pkgconfig_2.0.3   htmltools_0.5.8.1</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -436,7 +479,7 @@ packages in the glycoverse</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

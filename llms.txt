@@ -1,0 +1,196 @@
+# glyrepr
+
+`glyrepr` provides two important representations of glycans: glycan
+compositions and glycan structures. This package is the core of
+`glycoverse` ecosystem, as it provides the basic data structures and
+functions for representing and manipulating glycans.
+
+In fact, the functions in this packages are heavily used by other
+`glycoverse` packages such as
+[glyparse](https://github.com/glycoverse/glyparse) and
+[glymotif](https://github.com/glycoverse/glymotif), which you are
+probably already using or will use.
+
+## Installation
+
+You can install the latest release of glyrepr from CRAN with:
+
+``` r
+install.packages("glyrepr")
+```
+
+Or install the development version from GitHub:
+
+``` r
+remotes::install_github("glycoverse/glyrepr")
+```
+
+## Documentation
+
+- 🚀 Get started:
+  [Here](https://glycoverse.github.io/glyrepr/articles/glyrepr.html)
+- 🔍 Underlying graph representation:
+  [Here](https://glycoverse.github.io/glyrepr/articles/glycan-graph.html)
+- 🔧 Faster structure operations:
+  [Here](https://glycoverse.github.io/glyrepr/articles/smap.html)
+- ✏️ IUPAC-condensed glycan text representation:
+  [Here](https://glycoverse.github.io/glyrepr/articles/iupac.html)
+- 📚 Reference:
+  [Here](https://glycoverse.github.io/glyrepr/reference/index.html)
+
+## Role in `glycoverse`
+
+As the cornerstone of the `glycoverse` ecosystem, this package provides
+two fundamental data structures for representing glycans:
+[`glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/glycan_composition.md)
+and
+[`glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.md).
+These specialized data types are what distinguish `glycoverse` from
+other omics analysis frameworks, serving as the foundation for
+higher-level packages like `glymotif`, which build upon them to perform
+advanced glycan analysis.
+
+## Example
+
+``` r
+library(glyrepr)
+
+# Create glycan compositions
+glycan_composition(
+  c(Man = 5, GlcNAc = 2),
+  c(Man = 3, Gal = 2, GlcNAc = 4, Fuc = 1, Neu5Ac = 2)
+)
+#> <glycan_composition[2]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(2)
+
+# Parse IUPAC-condensed glycan text representation
+# `glyrepr` supports IUPAC-condensed glycan text representation natively.
+# For other formats like WURCS or glycoCT, use the `glyparse` package.
+# For example, the following two glycan structures are equivalent:
+structures <- as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(?1-", "Man(a1-2)GlcNAc(?1-"))
+
+# Get the composition of a glycan structure
+as_glycan_composition(structures)
+#> <glycan_composition[2]>
+#> [1] GlcNAc(2)
+#> [2] Man(1)GlcNAc(1)
+
+# Count the number of given residues
+count_mono(structures, "Hex")
+#> [1] 0 1
+count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
+#> [1] 5
+```
+
+# Package index
+
+## Glycan Composition and Structure Creation
+
+- [`glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/glycan_composition.md)
+  [`is_glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/glycan_composition.md)
+  : Create a Glycan Composition
+- [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_composition.md)
+  : Convert to Glycan Composition
+- [`glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.md)
+  [`is_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.md)
+  : Create a Glycan Structure Vector
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md)
+  : Convert to Glycan Structure Vector
+
+## Glycan Composition and Structure Inspection
+
+- [`count_mono()`](https://glycoverse.github.io/glyrepr/reference/count_mono.md)
+  : Get the Number of Monosaccharides
+- [`get_anomer()`](https://glycoverse.github.io/glyrepr/reference/get_anomer.md)
+  : Get the Anomeric information
+- [`get_mono_type()`](https://glycoverse.github.io/glyrepr/reference/get_mono_type.md)
+  : Get Monosaccharide Types
+- [`get_structure_graphs()`](https://glycoverse.github.io/glyrepr/reference/get_structure_graphs.md)
+  : Access Individual Glycan Structures
+- [`has_linkages()`](https://glycoverse.github.io/glyrepr/reference/has_linkages.md)
+  : Determine if a Glycan Structure has Linkages
+- [`structure_to_iupac()`](https://glycoverse.github.io/glyrepr/reference/structure_to_iupac.md)
+  : Convert Glycan Structure to IUPAC-like Sequence
+- [`get_structure_level()`](https://glycoverse.github.io/glyrepr/reference/get_structure_level.md)
+  : Get the Structure Resolution Levels
+
+## Glycan Composition and Structure Manipulation
+
+- [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/reference/convert_to_generic.md)
+  : Convert Monosaccharides to Generic Type
+- [`remove_linkages()`](https://glycoverse.github.io/glyrepr/reference/remove_linkages.md)
+  : Remove All Linkages from a Glycan
+- [`remove_substituents()`](https://glycoverse.github.io/glyrepr/reference/remove_substituents.md)
+  : Remove All Substituents from a Glycan
+- [`simap()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  [`simap_vec()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  [`simap_lgl()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  [`simap_int()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  [`simap_dbl()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  [`simap_chr()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  [`simap_structure()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  : Map Functions Over Glycan Structure Vectors with Indices
+- [`smap()`](https://glycoverse.github.io/glyrepr/reference/smap.md)
+  [`smap_vec()`](https://glycoverse.github.io/glyrepr/reference/smap.md)
+  [`smap_lgl()`](https://glycoverse.github.io/glyrepr/reference/smap.md)
+  [`smap_int()`](https://glycoverse.github.io/glyrepr/reference/smap.md)
+  [`smap_dbl()`](https://glycoverse.github.io/glyrepr/reference/smap.md)
+  [`smap_chr()`](https://glycoverse.github.io/glyrepr/reference/smap.md)
+  [`smap_structure()`](https://glycoverse.github.io/glyrepr/reference/smap.md)
+  : Map Functions Over Glycan Structure Vectors
+- [`smap2()`](https://glycoverse.github.io/glyrepr/reference/smap2.md)
+  [`smap2_vec()`](https://glycoverse.github.io/glyrepr/reference/smap2.md)
+  [`smap2_lgl()`](https://glycoverse.github.io/glyrepr/reference/smap2.md)
+  [`smap2_int()`](https://glycoverse.github.io/glyrepr/reference/smap2.md)
+  [`smap2_dbl()`](https://glycoverse.github.io/glyrepr/reference/smap2.md)
+  [`smap2_chr()`](https://glycoverse.github.io/glyrepr/reference/smap2.md)
+  [`smap2_structure()`](https://glycoverse.github.io/glyrepr/reference/smap2.md)
+  : Map Functions Over Two Glycan Structure Vectors
+- [`ssome()`](https://glycoverse.github.io/glyrepr/reference/smap_predicates.md)
+  [`severy()`](https://glycoverse.github.io/glyrepr/reference/smap_predicates.md)
+  [`snone()`](https://glycoverse.github.io/glyrepr/reference/smap_predicates.md)
+  : Test Predicates on Glycan Structure Vectors
+- [`smap_unique()`](https://glycoverse.github.io/glyrepr/reference/smap_unique.md)
+  : Apply Function to Unique Structures Only
+- [`spmap()`](https://glycoverse.github.io/glyrepr/reference/spmap.md)
+  [`spmap_vec()`](https://glycoverse.github.io/glyrepr/reference/spmap.md)
+  [`spmap_lgl()`](https://glycoverse.github.io/glyrepr/reference/spmap.md)
+  [`spmap_int()`](https://glycoverse.github.io/glyrepr/reference/spmap.md)
+  [`spmap_dbl()`](https://glycoverse.github.io/glyrepr/reference/spmap.md)
+  [`spmap_chr()`](https://glycoverse.github.io/glyrepr/reference/spmap.md)
+  [`spmap_structure()`](https://glycoverse.github.io/glyrepr/reference/spmap.md)
+  : Map Functions Over Glycan Structure Vectors and Multiple Arguments
+
+## Example Glycan Structures
+
+- [`n_glycan_core()`](https://glycoverse.github.io/glyrepr/reference/n_glycan_core.md)
+  [`o_glycan_core_1()`](https://glycoverse.github.io/glyrepr/reference/n_glycan_core.md)
+  [`o_glycan_core_2()`](https://glycoverse.github.io/glyrepr/reference/n_glycan_core.md)
+  : Example Glycan Structures
+
+## Helper Functions
+
+- [`available_monosaccharides()`](https://glycoverse.github.io/glyrepr/reference/available_monosaccharides.md)
+  : Get Available Monosaacharides
+- [`available_substituents()`](https://glycoverse.github.io/glyrepr/reference/available_substituents.md)
+  : Available Substituents
+- [`is_known_monosaccharide()`](https://glycoverse.github.io/glyrepr/reference/is_known_monosaccharide.md)
+  : Check if a Monosaccharide is Known
+- [`possible_linkages()`](https://glycoverse.github.io/glyrepr/reference/possible_linkages.md)
+  : Generate Possible Linkages
+- [`valid_linkages()`](https://glycoverse.github.io/glyrepr/reference/valid_linkages.md)
+  : Check if Linkages are Valid
+
+# Articles
+
+### All vignettes
+
+- [Glycan Graphs: The Network Behind Your Sugar Structures
+  🕸️](https://glycoverse.github.io/glyrepr/articles/glycan-graph.md):
+- [Getting Started with
+  glyrepr](https://glycoverse.github.io/glyrepr/articles/glyrepr.md):
+- [Decoding Glycans: Your Guide to IUPAC-Condensed
+  Format](https://glycoverse.github.io/glyrepr/articles/iupac.md):
+- [Power User Guide: Efficient Glycan
+  Manipulation](https://glycoverse.github.io/glyrepr/articles/smap.md):

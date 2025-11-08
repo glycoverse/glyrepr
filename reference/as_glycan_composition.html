@@ -87,36 +87,49 @@ contributes one "Me" substituent to the composition.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Convert a named vector</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># From a named vector</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Hex <span class="op">=</span> <span class="fl">5</span>, HexNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[1]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Convert a named vector with substituents</span></span></span>
+<span class="r-in"><span><span class="co"># From a named vector with substituents</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Glc <span class="op">=</span> <span class="fl">2</span>, Gal <span class="op">=</span> <span class="fl">1</span>, Me <span class="op">=</span> <span class="fl">1</span>, S <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[1]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #0087D7;">Glc</span>(2)<span style="color: #FFD700;">Gal</span>(1)<span style="color: #000000;">Me</span>(1)<span style="color: #000000;">S</span>(1)</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Convert a list of named vectors</span></span></span>
+<span class="r-in"><span><span class="co"># From a list of named vectors</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Hex <span class="op">=</span> <span class="fl">5</span>, HexNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Hex <span class="op">=</span> <span class="fl">3</span>, HexNAc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[2]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #000000;">Hex</span>(3)<span style="color: #000000;">HexNAc</span>(1)</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Convert an existing composition (returns as-is)</span></span></span>
+<span class="r-in"><span><span class="co"># From a character vector of Byonic composition strings</span></span></span>
+<span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hex(5)HexNAc(2)"</span>, <span class="st">"Hex(3)HexNAc(1)"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[2]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #000000;">Hex</span>(3)<span style="color: #000000;">HexNAc</span>(1)</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># From a character vector of simple composition strings</span></span></span>
+<span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H5N2"</span>, <span class="st">"H5N4S1F1"</span>, <span class="st">"H5N4A1G1"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[3]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(4)<span style="color: #000000;">dHex</span>(1)<span style="color: #000000;">NeuAc</span>(1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(4)<span style="color: #000000;">NeuAc</span>(1)<span style="color: #000000;">NeuGc</span>(1)</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># From an existing composition (returns as-is)</span></span></span>
 <span class="r-in"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Hex <span class="op">=</span> <span class="fl">5</span>, HexNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="va">comp</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[1]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Convert a glycan structure vector</span></span></span>
+<span class="r-in"><span><span class="co"># From a glycan structure vector</span></span></span>
 <span class="r-in"><span><span class="va">strucs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="n_glycan_core.html">o_glycan_core_1</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[2]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #0087D7;">GlcNAc</span>(2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Convert structures with substituents</span></span></span>
+<span class="r-in"><span><span class="co"># From structures with substituents</span></span></span>
 <span class="r-in"><span><span class="co"># (This will count both monosaccharides and any substituents present)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -130,7 +143,7 @@ contributes one "Me" substituent to the composition.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
