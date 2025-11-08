@@ -296,11 +296,12 @@ test_that("as_glycan_composition rejects NA", {
 })
 
 test_that("as_glycan_composition works for empty characters", {
-  char1 <- c("")
-  char2 <- character()
-  expected <- glycan_composition()
-  expect_equal(as_glycan_composition(char1), expected)
-  expect_equal(as_glycan_composition(char2), expected)
+  expect_equal(as_glycan_composition(character()), glycan_composition())
+})
+
+test_that("as_glycan_composition rejects empty strings", {
+  chars <- c("", "Hex(5)HexNAc(2)")
+  expect_error(as_glycan_composition(chars))
 })
 
 test_that("as_glycan_composition raises error for illegal characters", {

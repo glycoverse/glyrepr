@@ -250,9 +250,9 @@ as_glycan_composition.glyrepr_structure <- function(x) {
 
 # Helper function to parse a single composition string
 parse_single_composition <- function(char) {
-  # Handle empty string - treat as empty composition
-  if (char == "" || is.na(char)) {
-    return(list(composition = NULL, valid = TRUE))
+  # Reject empty strings
+  if (char == "") {
+    return(list(composition = NULL, valid = FALSE))
   }
   
   # Try to parse the character string
