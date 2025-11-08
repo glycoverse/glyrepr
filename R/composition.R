@@ -261,18 +261,23 @@ parse_single_composition <- function(char) {
     return(list(composition = NULL, valid = FALSE))
   }
 
-  # Try to parse the character string
-  tryCatch({
-    comp <- .parse_byonic_comp(char)
-    list(composition = comp, valid = TRUE)
-  }, error = function(e) {
-    tryCatch({
-      comp <- .parse_simple_comp(char)
-      list(composition = comp, valid = TRUE)
-    }, error = function(e) {
-      list(composition = NULL, valid = FALSE)
-    })
-  })
+  # Try each parser in sequence until one succeeds
+  parsers <- list(.parse_byonic_comp, .parse_simple_comp)
+  for (parser in parsers) {
+    result <- tryCatch(
+      {
+        composition <- parser(char)
+        list(composition = composition, valid = TRUE)
+      },
+      error = function(e) NULL
+    )
+    if (!is.null(result)) {
+      return(result)
+    }
+  }
+
+  # All parsers failed
+  list(composition = NULL, valid = FALSE)
 }
 
 .parse_byonic_comp <- function(x) {
