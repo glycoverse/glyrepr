@@ -385,10 +385,7 @@ as_glycan_composition.character <- function(x) {
       "i" = "Expected format: 'Hex(5)HexNAc(2)' with monosaccharide names followed by counts in parentheses."
     ))
   }
-  
-  # Filter out NULL entries (from empty strings)
-  compositions <- compositions[!purrr::map_lgl(compositions, is.null)]
-  
+
   # Handle case where all strings were empty
   if (length(compositions) == 0) {
     return(glycan_composition())
