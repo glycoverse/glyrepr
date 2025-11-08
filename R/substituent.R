@@ -24,8 +24,7 @@ available_substituents <- function() {
 #' normalize_substituents("4Ac,3Me")  # Returns "3Me,4Ac"
 #' normalize_substituents("6S")       # Returns "6S"
 #' normalize_substituents("")         # Returns ""
-#'
-#' @export
+#' @noRd
 normalize_substituents <- function(sub) {
   checkmate::assert_character(sub, len = 1)
   
