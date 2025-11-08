@@ -1,12 +1,16 @@
 #' Determine if a Glycan Structure has Linkages
 #'
-#' @description
 #' Unknown linkages in a glycan structure are represented by "??-?".
-#' This function checks if all linkages in a glycan structure are unknown.
-#' Note that even only one linkage is partial known (e.g. "a?-?"),
-#' this function will return `TRUE`.
+#' Also, a linkage can be partially known (e.g. "a?-?").
+#' This function checks if a glycan structure has linkages,
+#' in a strict or lenient way.
 #'
-#' @param glycan A glyrepr_structure vector.
+#' @param glycan A [glycan_structure()] vector.
+#' @param strict A logical value.
+#'   * If `FALSE` (default), a glycan is considered to have linkages if any
+#'     linkage is partially known (not "??-?").
+#'   * If `TRUE`, a glycan is considered to have linkages only if all linkages
+#'     are fully determined (no "?" in the linkage).
 #'
 #' @returns A logical vector indicating if each glycan structure has linkages.
 #'
@@ -19,23 +23,27 @@
 #' has_linkages(glycan)
 #' print(glycan)
 #'
+#' glycan <- as_glycan_structure("Gal(b1-?)GalNAc(a1-")
+#' has_linkages(glycan)
+#' has_linkages(glycan, strict = TRUE)
+#'
 #' @seealso [remove_linkages()], [possible_linkages()]
 #'
 #' @export
-has_linkages <- function(glycan) {
-  if (!is_glycan_structure(glycan)) {
-    cli::cli_abort(c(
-      "Input must be a glyrepr_structure vector.",
-      "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
-    ))
-  }
+has_linkages <- function(glycan, strict = FALSE) {
+  checkmate::assert_class(glycan, "glyrepr_structure")
+  checkmate::assert_flag(strict)
 
-  smap_lgl(glycan, .has_linkages_single)
+  smap_lgl(glycan, .has_linkages_single, strict = strict)
 }
 
 # Internal function to check linkages in a single igraph
-.has_linkages_single <- function(glycan) {
-  any(igraph::E(glycan)$linkage != "??-?")
+.has_linkages_single <- function(glycan, strict) {
+  if (strict) {
+    all(!stringr::str_detect(igraph::E(glycan)$linkage, stringr::fixed("?")))
+  } else {
+    any(igraph::E(glycan)$linkage != "??-?")
+  }
 }
 
 #' Generate Possible Linkages

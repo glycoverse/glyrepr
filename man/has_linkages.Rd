@@ -4,19 +4,27 @@
 \alias{has_linkages}
 \title{Determine if a Glycan Structure has Linkages}
 \usage{
-has_linkages(glycan)
+has_linkages(glycan, strict = FALSE)
 }
 \arguments{
-\item{glycan}{A glyrepr_structure vector.}
+\item{glycan}{A \code{\link[=glycan_structure]{glycan_structure()}} vector.}
+
+\item{strict}{A logical value.
+\itemize{
+\item If \code{FALSE} (default), a glycan is considered to have linkages if any
+linkage is partially known (not "??-?").
+\item If \code{TRUE}, a glycan is considered to have linkages only if all linkages
+are fully determined (no "?" in the linkage).
+}}
 }
 \value{
 A logical vector indicating if each glycan structure has linkages.
 }
 \description{
 Unknown linkages in a glycan structure are represented by "??-?".
-This function checks if all linkages in a glycan structure are unknown.
-Note that even only one linkage is partial known (e.g. "a?-?"),
-this function will return \code{TRUE}.
+Also, a linkage can be partially known (e.g. "a?-?").
+This function checks if a glycan structure has linkages,
+in a strict or lenient way.
 }
 \examples{
 glycan <- o_glycan_core_1(linkage = TRUE)
@@ -26,6 +34,10 @@ print(glycan)
 glycan <- remove_linkages(glycan)
 has_linkages(glycan)
 print(glycan)
+
+glycan <- as_glycan_structure("Gal(b1-?)GalNAc(a1-")
+has_linkages(glycan)
+has_linkages(glycan, strict = TRUE)
 
 }
 \seealso{

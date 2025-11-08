@@ -21,6 +21,13 @@ test_that("`has_linkages()` works for glycans without linkages", {
   expect_false(has_linkages(glycan))
 })
 
+test_that("has_linkages works in strict mode", {
+  glycan <- as_glycan_structure("Gal(b1-?)GalNAc(a1-")
+  expect_false(has_linkages(glycan, strict = TRUE))
+  glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
+  expect_true(has_linkages(glycan, strict = TRUE))
+})
+
 
 # Tests for possible_linkages() function
 test_that("a?-2", {
