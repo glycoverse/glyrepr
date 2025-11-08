@@ -43,7 +43,7 @@
 #' @seealso `available_monosaccharides()`, `available_substituents()`
 #' @export
 glycan_composition <- function(...) {
-  args <- list(...)
+  args <- rlang::list2(...)
   x <- purrr::map(args, ~ {
     result <- as.integer(.x)
     names(result) <- names(.x)
