@@ -302,6 +302,11 @@ as_glycan_composition.character <- function(x) {
   if (length(x) == 0) {
     return(glycan_composition())
   }
+
+  # Handling NA
+  if (any(is.na(x))) {
+    cli::cli_abort("Cannot parse NA as glycan composition.")
+  }
   
   # Parse each character string using the helper function
   parse_result <- purrr::map(x, parse_single_composition)

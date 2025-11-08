@@ -290,6 +290,11 @@ test_that("as_glycan_composition works for compositions", {
   expect_equal(as_glycan_composition(chars), expected)
 })
 
+test_that("as_glycan_composition rejects NA", {
+  chars <- c("Hex(5)HexNAc(2)", NA)
+  expect_error(as_glycan_composition(chars), "Cannot parse NA as glycan composition.")
+})
+
 test_that("as_glycan_composition works for empty characters", {
   char1 <- c("")
   char2 <- character()
