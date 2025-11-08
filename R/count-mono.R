@@ -10,23 +10,30 @@
 #' @param x A glycan composition (`glyrepr_composition`) or
 #'   a glycan structure (`glyrepr_structure`) vector
 #' @param mono The monosaccharide to count. A character scalar.
+#'   If `NULL` (default), return the total number of monosaccharides.
 #'
 #' @returns A numeric vector of the same length as `x`.
 #'
 #' @examples
-#' comp <- glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, Man = 1,GalNAc = 1))
+#' comp <- glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, Man = 1, GalNAc = 1))
 #' count_mono(comp, "Hex")
 #' count_mono(comp, "Gal")
 #'
 #' struct <- as_glycan_structure("Gal(b1-3)GlcNAc(b1-4)Glc(a1-")
 #' count_mono(struct, "Gal")
 #'
+#' # Total number of monosaccharides
+#' count_mono(comp)
+#'
 #' @export
-count_mono <- function(x, mono) {
+count_mono <- function(x, mono = NULL) {
   UseMethod("count_mono")
 }
 
 .check_mono_arg <- function(mono) {
+  if (is.null(mono)) {
+    return()
+  }
   checkmate::assert_string(mono)
   if (!is_known_mono(mono)) {
     cli::cli_abort("{.arg mono} must be a known monosaccharide.")
@@ -35,13 +42,20 @@ count_mono <- function(x, mono) {
 
 #' @rdname count_mono
 #' @export
-count_mono.glyrepr_composition <- function(x, mono) {
+count_mono.glyrepr_composition <- function(x, mono = NULL) {
   .check_mono_arg(mono)
+
+  if (is.null(mono)) {
+    data <- vctrs::field(vctrs::vec_data(x), "data")
+    return(purrr::map_int(data, sum))
+  }
+
   mono_type <- get_mono_type(mono)
   if (mono_type == "generic") {
     x <- convert_to_generic(x)
   }
   data <- vctrs::field(vctrs::vec_data(x), "data")
+
   count_one <- function(one_mono, mono) {
     if (mono %in% names(one_mono)) {
       n <- one_mono[[mono]]
@@ -63,7 +77,7 @@ count_mono.glyrepr_composition <- function(x, mono) {
 
 #' @rdname count_mono
 #' @export
-count_mono.glyrepr_structure <- function(x, mono) {
+count_mono.glyrepr_structure <- function(x, mono = NULL) {
   .check_mono_arg(mono)
   comps <- as_glycan_composition(x)
   count_mono(comps, mono)
