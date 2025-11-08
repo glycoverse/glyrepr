@@ -254,45 +254,48 @@ parse_single_composition <- function(char) {
   if (char == "") {
     return(list(composition = NULL, valid = FALSE))
   }
-  
+
   # Try to parse the character string
   tryCatch({
-    # Use regex to find all patterns like "MonoName(number)"
-    pattern <- "([A-Za-z0-9]+)\\((\\d+)\\)"
-    matches <- stringr::str_extract_all(char, pattern, simplify = FALSE)[[1]]
-
-    if (length(matches) == 0) {
-      return(list(composition = NULL, valid = FALSE))
-    }
-
-    # Check if the entire string was matched (no remaining characters)
-    total_matched_length <- sum(stringr::str_length(matches))
-    if (total_matched_length != stringr::str_length(char)) {
-      return(list(composition = NULL, valid = FALSE))
-    }
-
-    # Parse each match using stringr::str_match
-    parsed_matches <- purrr::map(matches, function(match) {
-      match_result <- stringr::str_match(match, pattern)
-      list(
-        name = match_result[1, 2],  # First capture group
-        count = as.integer(match_result[1, 3])  # Second capture group
-      )
-    })
-
-    # Extract names and counts
-    mono_names <- purrr::map_chr(parsed_matches, "name")
-    mono_counts <- purrr::map_int(parsed_matches, "count")
-
-    # Create named vector
-    comp <- mono_counts
-    names(comp) <- mono_names
-
-    return(list(composition = comp, valid = TRUE))
-
+    comp <- .parse_byonic_comp(char)
+    list(composition = comp, valid = TRUE)
   }, error = function(e) {
-    return(list(composition = NULL, valid = FALSE))
+    list(composition = NULL, valid = FALSE)
   })
+}
+
+.parse_byonic_comp <- function(x) {
+  # Use regex to find all patterns like "MonoName(number)"
+  pattern <- "([A-Za-z0-9]+)\\((\\d+)\\)"
+  matches <- stringr::str_extract_all(x, pattern, simplify = FALSE)[[1]]
+
+  if (length(matches) == 0) {
+    stop()
+  }
+
+  # Check if the entire string was matched (no remaining characters)
+  total_matched_length <- sum(stringr::str_length(matches))
+  if (total_matched_length != stringr::str_length(x)) {
+    stop()
+  }
+
+  # Parse each match using stringr::str_match
+  parsed_matches <- purrr::map(matches, function(match) {
+    match_result <- stringr::str_match(match, pattern)
+    list(
+      name = match_result[1, 2],  # First capture group
+      count = as.integer(match_result[1, 3])  # Second capture group
+    )
+  })
+
+  # Extract names and counts
+  mono_names <- purrr::map_chr(parsed_matches, "name")
+  mono_counts <- purrr::map_int(parsed_matches, "count")
+
+  # Create named vector
+  comp <- mono_counts
+  names(comp) <- mono_names
+  comp
 }
 
 #' @rdname as_glycan_composition
