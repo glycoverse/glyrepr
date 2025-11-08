@@ -93,9 +93,9 @@ is_known_composition_component <- function(names) {
 
 valid_glycan_composition <- function(x) {
   valid_one <- function(x) {
-    # Allow empty compositions (for conversion results)
+    # Reject empty compositions
     if (length(x) == 0) {
-      return(TRUE)
+      cli::cli_abort("Each composition in {.arg ...} must have at least one residue.")
     }
     
     # Check if the composition is named

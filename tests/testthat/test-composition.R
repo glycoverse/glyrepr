@@ -45,6 +45,10 @@ test_that("glycan_composition rejects wrong types", {
   expect_error(glycan_composition(list(c(Hex = 1, Glc = 1))), "Must be one or more named integer vectors")
 })
 
+test_that("glycan_composition rejects empty compositions", {
+  expect_error(glycan_composition(integer(0)), "at least one residue")
+})
+
 test_that("as_glycan_composition works with named vectors", {
   # Test generic composition
   vec <- c(Hex = 2, HexNAc = 1)
@@ -72,15 +76,7 @@ test_that("as_glycan_composition returns existing composition unchanged", {
   expect_identical(result, original)
 })
 
-test_that("as_glycan_composition handles edge cases", {
-  # Empty composition
-  vec <- integer(0)
-  names(vec) <- character(0)
-  comp <- as_glycan_composition(vec)
-  expected <- glycan_composition(vec)
-  expect_equal(comp, expected)
-
-  # Single residue
+test_that("as_glycan_composition handles compositions with one residue", {
   vec <- c(Hex = 1)
   comp <- as_glycan_composition(vec)
   expected <- glycan_composition(c(Hex = 1))
