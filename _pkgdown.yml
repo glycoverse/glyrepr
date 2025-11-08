@@ -38,6 +38,5 @@ reference:
   - available_monosaccharides
   - available_substituents
   - is_known_monosaccharide
-  - normalize_substituents
   - possible_linkages
   - valid_linkages
