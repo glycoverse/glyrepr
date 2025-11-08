@@ -290,6 +290,16 @@ test_that("as_glycan_composition works for compositions", {
   expect_equal(as_glycan_composition(chars), expected)
 })
 
+test_that("as_glycan_composition works for simple compositions", {
+  chars <- c("H5N2", "H5N4S1F1", "H5N4A1G1")
+  expected <- glycan_composition(
+    c(Hex = 5, HexNAc = 2),
+    c(Hex = 5, HexNAc = 4, NeuAc = 1, dHex = 1),
+    c(Hex = 5, HexNAc = 4, NeuAc = 1, NeuGc = 1)
+  )
+  expect_equal(as_glycan_composition(chars), expected)
+})
+
 test_that("as_glycan_composition rejects NA", {
   chars <- c("Hex(5)HexNAc(2)", NA)
   expect_error(as_glycan_composition(chars), "Cannot parse NA as glycan composition.")
@@ -305,8 +315,8 @@ test_that("as_glycan_composition rejects empty strings", {
 })
 
 test_that("as_glycan_composition raises error for illegal characters", {
-  chars <- c("H5N2", "invalid", "Hex(5)HexNAc(2)")  # we do not support "H5N2" format yet
-  err_msg <- "Characters cannot be parsed as glycan compositions at index 1 and 2"
+  chars <- c("invalid", "Hex(5)HexNAc(2)")
+  err_msg <- "Characters cannot be parsed as glycan compositions at index 1"
   expect_error(as_glycan_composition(chars), err_msg)
 })
 

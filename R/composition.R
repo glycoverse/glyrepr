@@ -260,7 +260,12 @@ parse_single_composition <- function(char) {
     comp <- .parse_byonic_comp(char)
     list(composition = comp, valid = TRUE)
   }, error = function(e) {
-    list(composition = NULL, valid = FALSE)
+    tryCatch({
+      comp <- .parse_simple_comp(char)
+      list(composition = comp, valid = TRUE)
+    }, error = function(e) {
+      list(composition = NULL, valid = FALSE)
+    })
   })
 }
 
@@ -290,6 +295,47 @@ parse_single_composition <- function(char) {
 
   # Extract names and counts
   mono_names <- purrr::map_chr(parsed_matches, "name")
+  mono_counts <- purrr::map_int(parsed_matches, "count")
+
+  # Create named vector
+  comp <- mono_counts
+  names(comp) <- mono_names
+  comp
+}
+
+.parse_simple_comp <- function(x) {
+  # "S" and "A" are both NeuAc, "G" is NeuGc
+  mono_pattern <- "([HNFSAG])(\\d+)"
+  matches <- stringr::str_extract_all(x, mono_pattern, simplify = FALSE)[[1]]
+
+  # Check if no monos were matched
+  if (length(matches) == 0) {
+    stop()
+  }
+
+  # Check if the entire string was matched (no remaining characters)
+  total_matched_length <- sum(stringr::str_length(matches))
+  if (total_matched_length != stringr::str_length(x)) {
+    stop()
+  }
+
+  parsed_matches <- purrr::map(matches, function(match) {
+    match_result <- stringr::str_match(match, mono_pattern)
+    list(
+      name = match_result[1, 2],  # First capture group
+      count = as.integer(match_result[1, 3])  # Second capture group
+    )
+  })
+
+  mono_names <- purrr::map_chr(parsed_matches, "name")
+  mono_names <- dplyr::case_match(mono_names,
+    "H" ~ "Hex",
+    "N" ~ "HexNAc",
+    "F" ~ "dHex",
+    "S" ~ "NeuAc",
+    "A" ~ "NeuAc",
+    "G" ~ "NeuGc"
+  )
   mono_counts <- purrr::map_int(parsed_matches, "count")
 
   # Create named vector
