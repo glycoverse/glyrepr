@@ -38,24 +38,30 @@ vertex in the structure. For example, a vertex with \code{sub = "3Me"}
 contributes one "Me" substituent to the composition.
 }
 \examples{
-# Convert a named vector
+# From a named vector
 as_glycan_composition(c(Hex = 5, HexNAc = 2))
 
-# Convert a named vector with substituents
+# From a named vector with substituents
 as_glycan_composition(c(Glc = 2, Gal = 1, Me = 1, S = 1))
 
-# Convert a list of named vectors
+# From a list of named vectors
 as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
 
-# Convert an existing composition (returns as-is)
+# From a character vector of Byonic composition strings
+as_glycan_composition(c("Hex(5)HexNAc(2)", "Hex(3)HexNAc(1)"))
+
+# From a character vector of simple composition strings
+as_glycan_composition(c("H5N2", "H5N4S1F1", "H5N4A1G1"))
+
+# From an existing composition (returns as-is)
 comp <- glycan_composition(c(Hex = 5, HexNAc = 2))
 as_glycan_composition(comp)
 
-# Convert a glycan structure vector
+# From a glycan structure vector
 strucs <- c(n_glycan_core(), o_glycan_core_1())
 as_glycan_composition(strucs)
 
-# Convert structures with substituents
+# From structures with substituents
 # (This will count both monosaccharides and any substituents present)
 
 }
