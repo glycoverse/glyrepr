@@ -26,6 +26,7 @@
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/glycoverse/glyrepr/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -34,11 +35,38 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-
+      <small>Source: <a href="https://github.com/glycoverse/glyrepr/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>Remove <code>normalize_substituents()</code>. This function does not help outside of <code>glyrepr</code> so we make it an internal function.</li>
+<li>
+<code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> cannot accept empty integer vectors now. Therefore, <code>glycan_composition(integer(0))</code> is not valid anymore.</li>
+<li>
+<code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> now checks input types more strictly.</li>
+<li>
+<code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> handles NA values and empty strings (““) more strictly. Now an error will be raised if NA values or empty strings are passed instead of dropping them silently. This update makes <code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> size-stable and consistent with <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>Add <code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> to get the structure resolution levels of a glycan structure vector.</li>
+<li>
+<code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> now supports simple composition strings like “H5N2”, “H5N4F1S2”, “H5N4A1G1”, etc.</li>
+<li>
+<code><a href="../reference/count_mono.html">count_mono()</a></code> now returns total number of monosaccharides when <code>mono</code> is <code>NULL</code>.</li>
+<li>
+<code><a href="../reference/has_linkages.html">has_linkages()</a></code> now has a <code>strict</code> parameter to control the strictness of the check.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> now supports <code>!!!</code>.</li>
+<li>Add more examples about character strings in the documentation of <code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code>.</li>
+<li>Add a section about structure resolution levels in the getting started vignette.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.5" id="glyrepr-075">glyrepr 0.7.5<a class="anchor" aria-label="anchor" href="#glyrepr-075"></a></h2><p class="text-muted">CRAN release: 2025-10-29</p>

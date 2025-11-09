@@ -16,6 +16,10 @@ Useful links:
 
 - <https://glycoverse.github.io/glyrepr/>
 
+- <https://github.com/glycoverse/glyrepr>
+
+- Report bugs at <https://github.com/glycoverse/glyrepr/issues>
+
 ## Author
 
 **Maintainer**: Bin Fu <23110220018@m.fudan.edu.cn>

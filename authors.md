@@ -7,6 +7,9 @@
 
 ## Citation
 
+Source:
+[`DESCRIPTION`](https://github.com/glycoverse/glyrepr/blob/main/DESCRIPTION)
+
 Fu B (2025). *glyrepr: Representation for Glycan Compositions and
 Structures*. R package version 0.7.5.9000,
 <https://glycoverse.github.io/glyrepr/>.

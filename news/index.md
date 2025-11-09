@@ -2,6 +2,45 @@
 
 ## glyrepr (development version)
 
+### Breaking changes
+
+- Remove `normalize_substituents()`. This function does not help outside
+  of `glyrepr` so we make it an internal function.
+- [`glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/glycan_composition.md)
+  cannot accept empty integer vectors now. Therefore,
+  `glycan_composition(integer(0))` is not valid anymore.
+- [`glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/glycan_composition.md)
+  now checks input types more strictly.
+- [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_composition.md)
+  handles NA values and empty strings (““) more strictly. Now an error
+  will be raised if NA values or empty strings are passed instead of
+  dropping them silently. This update makes
+  [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_composition.md)
+  size-stable and consistent with
+  [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md).
+
+### New features
+
+- Add
+  [`get_structure_level()`](https://glycoverse.github.io/glyrepr/reference/get_structure_level.md)
+  to get the structure resolution levels of a glycan structure vector.
+- [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_composition.md)
+  now supports simple composition strings like “H5N2”, “H5N4F1S2”,
+  “H5N4A1G1”, etc.
+- [`count_mono()`](https://glycoverse.github.io/glyrepr/reference/count_mono.md)
+  now returns total number of monosaccharides when `mono` is `NULL`.
+- [`has_linkages()`](https://glycoverse.github.io/glyrepr/reference/has_linkages.md)
+  now has a `strict` parameter to control the strictness of the check.
+
+### Minor improvements and bug fixes
+
+- [`glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/glycan_composition.md)
+  now supports `!!!`.
+- Add more examples about character strings in the documentation of
+  [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_composition.md).
+- Add a section about structure resolution levels in the getting started
+  vignette.
+
 ## glyrepr 0.7.5
 
 CRAN release: 2025-10-29

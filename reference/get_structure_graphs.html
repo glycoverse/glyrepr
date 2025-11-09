@@ -26,6 +26,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/glycoverse/glyrepr/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -34,7 +35,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Access Individual Glycan Structures</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/glycoverse/glyrepr/blob/main/R/structure.R" class="external-link"><code>R/structure.R</code></a></small>
       <div class="d-none name"><code>get_structure_graphs.Rd</code></div>
     </div>
 
@@ -71,28 +72,28 @@ If not provided (default), <code>FALSE</code> when <code>x</code> has a length o
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">structures</span> <span class="op">&lt;-</span> <span class="fu"><a href="glycan_structure.html">glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="n_glycan_core.html">o_glycan_core_1</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">get_structure_graphs</span><span class="op">(</span><span class="va">structures</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH c906cc9 DN-- 2 1 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH c929f44 DN-- 2 1 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edge from c906cc9 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edge from c929f44 (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2-&gt;1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 4e1e626 DN-- 5 4 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 858587d DN-- 5 4 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 4e1e626 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 858587d (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3-&gt;1 3-&gt;2 4-&gt;3 5-&gt;4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">get_structure_graphs</span><span class="op">(</span><span class="va">structures</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH c906cc9 DN-- 2 1 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH c929f44 DN-- 2 1 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edge from c906cc9 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edge from c929f44 (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2-&gt;1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 4e1e626 DN-- 5 4 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 858587d DN-- 5 4 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 4e1e626 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 858587d (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3-&gt;1 3-&gt;2 4-&gt;3 5-&gt;4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
