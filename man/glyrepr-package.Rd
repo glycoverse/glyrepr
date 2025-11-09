@@ -14,6 +14,8 @@ Computational representations of glycan compositions and structures, including d
 Useful links:
 \itemize{
   \item \url{https://glycoverse.github.io/glyrepr/}
+  \item \url{https://github.com/glycoverse/glyrepr}
+  \item Report bugs at \url{https://github.com/glycoverse/glyrepr/issues}
 }
 
 }
