@@ -1,6 +1,6 @@
 # Changelog
 
-## glyrepr (development version)
+## glyrepr 0.8.0
 
 ### Breaking changes
 
