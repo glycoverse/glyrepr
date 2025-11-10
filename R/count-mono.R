@@ -51,7 +51,10 @@ count_mono.glyrepr_composition <- function(x, mono = NULL) {
   }
 
   mono_type <- get_mono_type(mono)
-  mono_type[is.na(mono_type)] <- "concrete"
+  # special monosaccharides are those having the same name for both generic and concrete types
+  if (is.na(mono_type)) {
+    mono_type <- "special"  # the value is not used anywhere, just for readability
+  }
   if (mono_type == "generic") {
     x <- convert_to_generic(x)
   }
