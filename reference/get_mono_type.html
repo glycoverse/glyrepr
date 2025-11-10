@@ -86,6 +86,15 @@ For structures and compositions, returns the type for each element.</p>
 </ul><p>For the full list of monosaccharides, use <code><a href="available_monosaccharides.html">available_monosaccharides()</a></code>.</p>
     </div>
     <div class="section level2">
+    <h2 id="special-monosaccharides">Special monosaccharides<a class="anchor" aria-label="anchor" href="#special-monosaccharides"></a></h2>
+    <p>Some monosaccharides have the same name for both generic and concrete types.
+For example, "Mur" is both a generic and concrete monosaccharide.
+<code>get_mono_type()</code> will return NA for these monosaccharides.</p>
+<p>If a <code><a href="glycan_composition.html">glycan_composition()</a></code> or <code><a href="glycan_structure.html">glycan_structure()</a></code> contains these special monosaccharides,
+the logic will be as follows:</p><ul><li><p>If at least one residue is not a special monosaccharide, the type will be determined as the type of the residues.</p></li>
+<li><p>If all residues are special monosaccharides, the type will be determined as "concrete".</p></li>
+</ul></div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="convert_to_generic.html">convert_to_generic()</a></code></p></div>
     </div>
@@ -106,6 +115,15 @@ For structures and compositions, returns the type for each element.</p>
 <span class="r-in"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Glc <span class="op">=</span> <span class="fl">2</span>, GalNAc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">get_mono_type</span><span class="op">(</span><span class="va">comp</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "concrete"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Special cases</span></span></span>
+<span class="r-in"><span><span class="va">comps</span> <span class="op">&lt;-</span> <span class="fu"><a href="glycan_composition.html">glycan_composition</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Neu <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Neu <span class="op">=</span> <span class="fl">1</span>, Glc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Mur <span class="op">=</span> <span class="fl">1</span>, Hex <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">get_mono_type</span><span class="op">(</span><span class="va">comps</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "concrete" "concrete" "generic" </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

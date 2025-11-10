@@ -40,9 +40,22 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>Update the monosaccharides table:
+<ul><li>Add generic monosaccharides to Ara, Lyx, Xyl, Rib, Api, Neu, Kdn, Pse, Leg, Aci, 4eLeg, Bac, LDmanHep, DDmanHep, Kdo, Dha, MurNAc, MurNGc, Mur, Fru, Tag, Sor, Psi.</li>
+<li>Rename “Pent” to “Pen”.</li>
+<li>Delete “Sia” from the table.</li>
+</ul></li>
+<li>Update the logic of monosaccharide type determination for glycan compositions and glycan structures, considering some special monosaccharides have the same name for both generic and concrete types (e.g. “Neu”, “Mur”). The new rules:
+<ul><li>Mixed monosaccharides are still not allowed.</li>
+<li>If all residues besides the special monosaccharides are of the same type, it will be determined as the glycan monosaccharide type.</li>
+<li>If all residues are special monosaccharides, it will be determined as “concrete”.</li>
+</ul></li>
+</ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.8.0" id="glyrepr-080">glyrepr 0.8.0<a class="anchor" aria-label="anchor" href="#glyrepr-080"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.8.0" id="glyrepr-080">glyrepr 0.8.0<a class="anchor" aria-label="anchor" href="#glyrepr-080"></a></h2><p class="text-muted">CRAN release: 2025-11-09</p>
 <div class="section level3">
 <h3 id="breaking-changes-0-8-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-8-0"></a></h3>
 <ul><li>Remove <code>normalize_substituents()</code>. This function does not help outside of <code>glyrepr</code> so we make it an internal function.</li>
