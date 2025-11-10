@@ -20,6 +20,12 @@
   - If all residues are special monosaccharides, it will be determined
     as “concrete”.
 
+### Minor improvements and bug fixes
+
+- Fix the bug that
+  [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/reference/convert_to_generic.md)
+  fails with glycan compositions containing substituents.
+
 ## glyrepr 0.8.0
 
 CRAN release: 2025-11-09
