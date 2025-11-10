@@ -1,5 +1,16 @@
 # glyrepr (development version)
 
+## New features
+
+* Update the monosaccharides table:
+  * Add generic monosaccharides to Ara, Lyx, Xyl, Rib, Api, Neu, Kdn, Pse, Leg, Aci, 4eLeg, Bac, LDmanHep, DDmanHep, Kdo, Dha, MurNAc, MurNGc, Mur, Fru, Tag, Sor, Psi.
+  * Rename "Pent" to "Pen".
+  * Delete "Sia" from the table.
+* Update the logic of monosaccharide type determination for glycan compositions and glycan structures, considering some special monosaccharides have the same name for both generic and concrete types (e.g. "Neu", "Mur"). The new rules:
+  * Mixed monosaccharides are still not allowed.
+  * If all residues besides the special monosaccharides are of the same type, it will be determined as the glycan monosaccharide type.
+  * If all residues are special monosaccharides, it will be determined as "concrete".
+
 # glyrepr 0.8.0
 
 ## Breaking changes
