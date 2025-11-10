@@ -11,6 +11,10 @@
   * If all residues besides the special monosaccharides are of the same type, it will be determined as the glycan monosaccharide type.
   * If all residues are special monosaccharides, it will be determined as "concrete".
 
+## Minor improvements and bug fixes
+
+* Fix the bug that `convert_to_generic()` fails with glycan compositions containing substituents.
+
 # glyrepr 0.8.0
 
 ## Breaking changes
