@@ -76,6 +76,13 @@ test_that("convert_to_generic works with glycan compositions", {
   expect_equal(comp_data, c(Hex = 2, HexNAc = 1))
 })
 
+test_that("convert_to_generic works with glycan compositions with substituents", {
+  comp <- glycan_composition(c(Gal = 2, GlcNAc = 1, Me = 1))
+  result <- convert_to_generic(comp)
+  expected <- glycan_composition(c(Hex = 2, HexNAc = 1, Me = 1))
+  expect_equal(result, expected)
+})
+
 test_that("convert_to_generic with already generic composition returns same", {
   comp_generic <- glycan_composition(c(Hex = 2, HexNAc = 1))
   result <- convert_to_generic(comp_generic)

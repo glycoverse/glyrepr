@@ -301,6 +301,9 @@ convert_mono_type_ <- function(mono, from, to) {
 }
 
 convert_one_mono_type <- function(mono, from, to) {
+  if (mono %in% available_substituents()) {
+    return(mono)
+  }
   from_ <- monosaccharides[[from]]
   to_ <- monosaccharides[[to]]
   to_[match(mono, from_)]  # it might be NA
