@@ -58,36 +58,35 @@ monosaccharides <- tibble::tribble(
   "ddHex", "Dig",
   "ddHex", "Col",
   # Pentose
-  "Pent", "Ara",
-  "Pent", "Lyx",
-  "Pent", "Xyl",
-  "Pent", "Rib",
+  "Pen", "Ara",
+  "Pen", "Lyx",
+  "Pen", "Xyl",
+  "Pen", "Rib",
   # 3-deoxy-nonulosonic acids
   "NeuAc", "Neu5Ac",
   "NeuGc", "Neu5Gc",
-  NA, "Sia",
-  NA, "Neu",
-  NA, "Kdn",
+  "Neu", "Neu",
+  "Kdn", "Kdn",
   # 3,9-dideoxy-nonulosonic acids
-  NA, "Pse",
-  NA, "Leg",
-  NA, "Aci",
-  NA, "4eLeg",
+  "Pse", "Pse",
+  "Leg", "Leg",
+  "Aci", "Aci",
+  "4eLeg", "4eLeg",
   # Unknown
-  NA, "Bac",
-  NA, "LDmanHep",
-  NA, "Kdo",
-  NA, "Dha",
-  NA, "DDmanHep",
-  NA, "MurNAc",
-  NA, "MurNGc",
-  NA, "Mur",
+  "Bac", "Bac",
+  "Hep", "LDmanHep",
+  "Kdo", "Kdo",
+  "HepA", "Dha",
+  "Hep", "DDmanHep",
+  "MurAc", "MurNAc",
+  "MurGc", "MurNGc",
+  "Mur", "Mur",
   # Assigned
-  NA, "Api",
-  NA, "Fru",
-  NA, "Tag",
-  NA, "Sor",
-  NA, "Psi"
+  "Pen", "Api",
+  "Hex", "Fru",
+  "Hex", "Tag",
+  "Hex", "Sor",
+  "Hex", "Psi"
 )
 
 
@@ -103,7 +102,7 @@ monosaccharides <- tibble::tribble(
 #'
 #' @examples
 #' available_monosaccharides()
-#' 
+#'
 #' @export
 available_monosaccharides <- function(mono_type = "all") {
   checkmate::assert_choice(mono_type, c("all", "generic", "concrete"))
