@@ -171,6 +171,17 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #'
 #' For the full list of monosaccharides, use [available_monosaccharides()].
 #'
+#' # Special monosaccharides
+#'
+#' Some monosaccharides have the same name for both generic and concrete types.
+#' For example, "Mur" is both a generic and concrete monosaccharide.
+#' `get_mono_type()` will return NA for these monosaccharides.
+#'
+#' If a [glycan_composition()] or [glycan_structure()] contains these special monosaccharides,
+#' the logic will be as follows:
+#' - If at least one residue is not a special monosaccharide, the type will be determined as the type of the residues.
+#' - If all residues are special monosaccharides, the type will be determined as "concrete".
+#'
 #' @param x Either of these objects:
 #'   - A character vector of monosaccharide names;
 #'   - A glycan composition vector ("glyrepr_composition" object);
@@ -182,14 +193,22 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #' @examples
 #' # Character vector
 #' get_mono_type(c("Gal", "Hex"))
-#' 
+#'
 #' # Glycan structures
 #' get_mono_type(n_glycan_core(mono_type = "concrete"))
 #' get_mono_type(n_glycan_core(mono_type = "generic"))
-#' 
+#'
 #' # Glycan compositions
 #' comp <- glycan_composition(c(Glc = 2, GalNAc = 1))
 #' get_mono_type(comp)
+#'
+#' # Special cases
+#' comps <- glycan_composition(
+#'   c(Neu = 1),
+#'   c(Neu = 1, Glc = 1),
+#'   c(Mur = 1, Hex = 1),
+#' )
+#' get_mono_type(comps)
 #'
 #' @seealso [convert_to_generic()]
 #'
