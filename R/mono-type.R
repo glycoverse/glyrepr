@@ -145,9 +145,7 @@ convert_to_generic.glyrepr_composition <- function(x) {
       result <- as.integer(result)
       names(result) <- result_names  # Restore names
 
-      # Sort by monosaccharide order
-      mono_order <- get_monosaccharide_order(names(result))
-      result <- result[order(mono_order)]
+      result <- .reorder_composition_components(result, "generic")
     }
 
     result
@@ -227,7 +225,7 @@ get_mono_type.glyrepr_structure <- function(x) {
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
   }
-  
+
   data <- vctrs::vec_data(x)
   vctrs::field(data, "mono_type")
 }
@@ -241,15 +239,42 @@ get_mono_type.glyrepr_composition <- function(x) {
       "i" = "Use `glycan_composition()` to create a glyrepr_composition from named vectors."
     ))
   }
-  
+
   data <- vctrs::vec_data(x)
   vctrs::field(data, "mono_type")
 }
 
+#' Decide mono type from a vector of monosaccharide names
+#'
+#' This function handles the special cases where some monosaccharides
+#' have the same name for both generic and concrete types.
+#' For example, "Mur" is both a generic and concrete monosaccharide.
+#'
+#' This function is used internally when creating [glycan_composition()] and [glycan_structure()].
+#'
+#' @param x A character vector of monosaccharide names.
+#' @returns A character scalar of monosaccharide type. Can be "concrete", "generic", "mixed", or "unknown".
+#' @noRd
+get_mono_type_impl <- function(x) {
+  types <- tryCatch(
+    get_mono_type.character(x),
+    error = function(e) "unknown"
+  )
+  if (all(is.na(types))) {
+    return("concrete")
+  }
+  unique_types <- unique(types[!is.na(types)])
+  if (length(unique_types) > 1) {
+    "mixed"
+  } else {
+    unique_types[[1]]
+  }
+}
+
 get_graph_mono_type <- function(graph) {
   # This function is the implementation of get_mono_type for a single glycan graph.
-  first_mono <- igraph::vertex_attr(graph, "mono")[[1]]
-  get_mono_type(first_mono)
+  monos <- igraph::vertex_attr(graph, "mono")
+  get_mono_type_impl(monos)
 }
 
 convert_mono_type_ <- function(mono, from, to) {
