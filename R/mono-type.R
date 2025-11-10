@@ -205,12 +205,16 @@ get_mono_type <- function(x) {
 get_mono_type.character <- function(x) {
   checkmate::assert_character(x)
   result <- vector("character", length = length(x))
-  result[x %in% monosaccharides$concrete] <- "concrete"
-  result[x %in% monosaccharides$generic] <- "generic"
-  unknown <- x[result == ""]
-  if (length(unknown) > 0) {
-    cli::cli_abort("Unknown monosaccharide: {.val {unknown}}.")
+  is_concrete <- x %in% monosaccharides$concrete
+  is_generic <- x %in% monosaccharides$generic
+  is_unknown <- !(is_concrete | is_generic)
+  if (any(is_unknown)) {
+    cli::cli_abort("Unknown monosaccharide: {.val {x[is_unknown]}}.")
   }
+  is_special <- is_concrete & is_generic  # same name for both generic and concrete
+  result[is_concrete] <- "concrete"
+  result[is_generic] <- "generic"
+  result[is_special] <- NA_character_
   result
 }
 

@@ -41,6 +41,12 @@ test_that("count_mono works with compositions", {
   expect_equal(count_mono(comp2, "Man"), 0)  # Not present
 })
 
+test_that("count_mono works for compositions unable to be converted to generic", {
+  comp <- glycan_composition(c(GlcNAc = 2, Kdn = 1))
+  expect_equal(count_mono(comp, "HexNAc"), 2)
+  expect_equal(count_mono(comp, "Kdn"), 1)
+})
+
 test_that("count_mono works when counting generic in concrete compositions", {
   # When mono is generic, it should count all matching concrete monos
   comp <- glycan_composition(c(Glc = 2, Gal = 1, Man = 1, GlcNAc = 2, GalNAc = 1))
