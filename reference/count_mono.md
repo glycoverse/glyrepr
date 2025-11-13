@@ -1,21 +1,23 @@
 # Get the Number of Monosaccharides
 
-Get the number of monosaccharides in a glycan composition or glycan
-structure. When `mono` is "generic" (e.g. "Hex", "HexNAc"), it counts
-all "concrete" monosaccharides that match. For example, "Hex" will count
-all Glc, Man, Gal, etc. When `mono` is "concrete" (e.g. "Gal",
-"GalNAc"), NA is returned when the composition is "generic".
+When `mono` is:
+
+- `NULL` (default), returns the total number of monosaccharides and
+  substituents.
+
+- A string, returns the number of the specified monosaccharide or
+  substituent.
 
 ## Usage
 
 ``` r
-count_mono(x, mono = NULL)
+count_mono(x, mono = NULL, include_subs = FALSE)
 
 # S3 method for class 'glyrepr_composition'
-count_mono(x, mono = NULL)
+count_mono(x, mono = NULL, include_subs = FALSE)
 
 # S3 method for class 'glyrepr_structure'
-count_mono(x, mono = NULL)
+count_mono(x, mono = NULL, include_subs = FALSE)
 ```
 
 ## Arguments
@@ -23,16 +25,28 @@ count_mono(x, mono = NULL)
 - x:
 
   A glycan composition (`glyrepr_composition`) or a glycan structure
-  (`glyrepr_structure`) vector
+  (`glyrepr_structure`) vector.
 
 - mono:
 
-  The monosaccharide to count. A character scalar. If `NULL` (default),
-  return the total number of monosaccharides.
+  The monosaccharide or substituent to count. A character scalar. If
+  `NULL` (default), return the total number of monosaccharides.
+
+- include_subs:
+
+  Whether to include substituents when `mono` is `NULL`. Default is
+  `FALSE`.
 
 ## Value
 
 A numeric vector of the same length as `x`.
+
+## Details
+
+When `mono` is "generic" (e.g. "Hex", "HexNAc"), it counts all
+"concrete" monosaccharides that match. For example, "Hex" will count all
+Glc, Man, Gal, etc. When `mono` is "concrete" (e.g. "Gal", "GalNAc"), NA
+is returned when the composition is "generic".
 
 ## Examples
 
