@@ -88,6 +88,17 @@ test_that("count_mono works with `mono` as NULL", {
   expect_equal(count_mono(comp), c(7L, 3L))
 })
 
+test_that("`include_subs` works when `mono` is NULL", {
+  comp <- glycan_composition(c(Glc = 1, S = 1))
+  expect_equal(count_mono(comp), 1L)
+  expect_equal(count_mono(comp, include_subs = TRUE), 2L)
+})
+
+test_that("count_mono works for substituents", {
+  comp <- glycan_composition(c(Glc = 1, S = 1), c(Glc = 1))
+  expect_equal(count_mono(comp, "S"), c(1L, 0L))
+})
+
 # Tests for count_mono with glycan structures ----------------------------
 
 test_that("count_mono works with glycan structures", {

@@ -6,24 +6,33 @@
 \alias{count_mono.glyrepr_structure}
 \title{Get the Number of Monosaccharides}
 \usage{
-count_mono(x, mono = NULL)
+count_mono(x, mono = NULL, include_subs = FALSE)
 
-\method{count_mono}{glyrepr_composition}(x, mono = NULL)
+\method{count_mono}{glyrepr_composition}(x, mono = NULL, include_subs = FALSE)
 
-\method{count_mono}{glyrepr_structure}(x, mono = NULL)
+\method{count_mono}{glyrepr_structure}(x, mono = NULL, include_subs = FALSE)
 }
 \arguments{
 \item{x}{A glycan composition (\code{glyrepr_composition}) or
-a glycan structure (\code{glyrepr_structure}) vector}
+a glycan structure (\code{glyrepr_structure}) vector.}
 
-\item{mono}{The monosaccharide to count. A character scalar.
+\item{mono}{The monosaccharide or substituent to count. A character scalar.
 If \code{NULL} (default), return the total number of monosaccharides.}
+
+\item{include_subs}{Whether to include substituents when \code{mono} is \code{NULL}.
+Default is \code{FALSE}.}
 }
 \value{
 A numeric vector of the same length as \code{x}.
 }
 \description{
-Get the number of monosaccharides in a glycan composition or glycan structure.
+When \code{mono} is:
+\itemize{
+\item \code{NULL} (default), returns the total number of monosaccharides and substituents.
+\item A string, returns the number of the specified monosaccharide or substituent.
+}
+}
+\details{
 When \code{mono} is "generic" (e.g. "Hex", "HexNAc"),
 it counts all "concrete" monosaccharides that match.
 For example, "Hex" will count all Glc, Man, Gal, etc.
