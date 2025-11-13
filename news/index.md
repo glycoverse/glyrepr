@@ -19,6 +19,9 @@
     type, it will be determined as the glycan monosaccharide type.
   - If all residues are special monosaccharides, it will be determined
     as “concrete”.
+- [`count_mono()`](https://glycoverse.github.io/glyrepr/reference/count_mono.md)
+  now supports counting substituents, with a new argument
+  `include_subs`.
 
 ### Minor improvements and bug fixes
 
