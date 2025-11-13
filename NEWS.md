@@ -10,6 +10,7 @@
   * Mixed monosaccharides are still not allowed.
   * If all residues besides the special monosaccharides are of the same type, it will be determined as the glycan monosaccharide type.
   * If all residues are special monosaccharides, it will be determined as "concrete".
+* `count_mono()` now supports counting substituents, with a new argument `include_subs`.
 
 ## Minor improvements and bug fixes
 
