@@ -25,6 +25,7 @@ reference:
   - convert_to_generic
   - remove_linkages
   - remove_substituents
+  - reduce_structure_level
   - matches("^s.*map.*$")
   - ssome
   - severy
