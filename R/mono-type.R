@@ -173,14 +173,12 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #'
 #' # Special monosaccharides
 #'
-#' Some monosaccharides have the same name for both generic and concrete types.
-#' For example, "Mur" is both a generic and concrete monosaccharide.
-#' `get_mono_type()` will return NA for these monosaccharides.
-#'
-#' If a [glycan_composition()] or [glycan_structure()] contains these special monosaccharides,
-#' the logic will be as follows:
-#' - If at least one residue is not a special monosaccharide, the type will be determined as the type of the residues.
-#' - If all residues are special monosaccharides, the type will be determined as "concrete".
+#' Some monosaccharides are special in that they have no generic names in database or literature.
+#' For example, "Mur" is a rare monosaccharide that has no popular generic name.
+#' In `glyrepr`, we assign a "g" prefix to these monosaccharides as their generic names.
+#' This includes "gNeu", "gKdn", "gPse", "gLeg", "gAci", "g4eLeg", "gBac", "gKdo", "gMur".
+#' These names might only be meaningful inside `glycoverse`.
+#' Take care when you export results from `glycoverse` functions to other analysis tools.
 #'
 #' @param x Either of these objects:
 #'   - A character vector of monosaccharide names;
@@ -206,7 +204,7 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #' comps <- glycan_composition(
 #'   c(Neu = 1),
 #'   c(Neu = 1, Glc = 1),
-#'   c(Mur = 1, Hex = 1),
+#'   c(gMur = 1, Hex = 1),
 #' )
 #' get_mono_type(comps)
 #'
@@ -228,10 +226,8 @@ get_mono_type.character <- function(x) {
   if (any(is_unknown)) {
     cli::cli_abort("Unknown monosaccharide: {.val {x[is_unknown]}}.")
   }
-  is_special <- is_concrete & is_generic  # same name for both generic and concrete
   result[is_concrete] <- "concrete"
   result[is_generic] <- "generic"
-  result[is_special] <- NA_character_
   result
 }
 
@@ -279,10 +275,8 @@ get_mono_type_impl <- function(x) {
     get_mono_type.character(x),
     error = function(e) "unknown"
   )
-  if (all(is.na(types))) {
-    return("concrete")
-  }
-  unique_types <- unique(types[!is.na(types)])
+
+  unique_types <- unique(types)
   if (length(unique_types) > 1) {
     "mixed"
   } else {
