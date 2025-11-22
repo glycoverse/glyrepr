@@ -21,8 +21,8 @@ test_that("get mono type of character vector", {
 
 test_that("get_mono_type of special monosaccharides", {
   # Some monosaccharides have the same name for both generic and concrete types.
-  # These monosaccharides should return NA.
-  expect_equal(get_mono_type(c("Mur", "Neu", "Kdn")), rep(NA_character_, 3))
+  expect_equal(get_mono_type(c("Mur", "Neu", "Kdn")), rep("concrete", 3))
+  expect_equal(get_mono_type(c("gMur", "gNeu", "gKdn")), rep("generic", 3))
 })
 
 test_that("get_mono_type of unknown monosaccharides", {

@@ -37,11 +37,10 @@ test_that("mono types are decided correctly for compositions", {
   comps <- glycan_composition(
     c(Hex = 1, HexNAc = 1),  # generic
     c(Glc = 1, Gal = 1),  # concrete
-    c(Mur = 1, Glc = 1),  # concrete
-    c(Mur = 1, Hex = 1),  # generic
-    c(Mur = 1)  # concrete
+    c(Hex = 1, gMur = 1),  # generic
+    c(Glc = 1, Mur = 1)  # concrete
   )
-  expect_equal(get_mono_type(comps), c("generic", "concrete", "concrete", "generic", "concrete"))
+  expect_equal(get_mono_type(comps), c("generic", "concrete", "generic", "concrete"))
 })
 
 test_that("mixed types throw error", {

@@ -48,8 +48,8 @@ test_that("count_mono works for compositions unable to be converted to generic",
 })
 
 test_that("count_mono works for compositions with special monosaccharides", {
-  comp <- glycan_composition(c(Neu = 1, Hex = 1))
-  expect_equal(count_mono(comp, "Neu"), 1)
+  comp <- glycan_composition(c(gNeu = 1, Hex = 1))
+  expect_equal(count_mono(comp, "gNeu"), 1)
   expect_equal(count_mono(comp, "Hex"), 1)
   expect_equal(count_mono(comp, "Glc"), NA_integer_)
 })
