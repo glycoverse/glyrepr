@@ -40,9 +40,11 @@ has_linkages <- function(glycan, strict = FALSE) {
 # Internal function to check linkages in a single igraph
 .has_linkages_single <- function(glycan, strict) {
   if (strict) {
-    all(!stringr::str_detect(igraph::E(glycan)$linkage, stringr::fixed("?")))
+    linkages <- igraph::E(glycan)$linkage
+    anomer <- glycan$anomer
+    all(!stringr::str_detect(c(linkages, anomer), stringr::fixed("?")))
   } else {
-    any(igraph::E(glycan)$linkage != "??-?")
+    any(igraph::E(glycan)$linkage != "??-?") | glycan$anomer != "??"
   }
 }
 
