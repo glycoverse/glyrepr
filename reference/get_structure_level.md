@@ -40,6 +40,11 @@ get_structure_level(x)
 A character vector of the same length as `x`, containing the structure
 level for each element.
 
+## See also
+
+[`has_linkages()`](https://glycoverse.github.io/glyrepr/reference/has_linkages.md),
+[`get_mono_type()`](https://glycoverse.github.io/glyrepr/reference/get_mono_type.md)
+
 ## Examples
 
 ``` r

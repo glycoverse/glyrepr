@@ -38,6 +38,8 @@
   : Remove All Linkages from a Glycan
 - [`remove_substituents()`](https://glycoverse.github.io/glyrepr/reference/remove_substituents.md)
   : Remove All Substituents from a Glycan
+- [`reduce_structure_level()`](https://glycoverse.github.io/glyrepr/reference/reduce_structure_level.md)
+  : Reduce a Glycan Structure to a Lower Resolution Level
 - [`simap()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
   [`simap_vec()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
   [`simap_lgl()`](https://glycoverse.github.io/glyrepr/reference/simap.md)

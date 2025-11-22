@@ -182,12 +182,12 @@ library(tictoc)
 tic("Converting 5 structures")
 result_small <- convert_to_generic(struc)
 toc()
-#> Converting 5 structures: 0.022 sec elapsed
+#> Converting 5 structures: 0.031 sec elapsed
 
 tic("Converting 5,000 structures")
 result_large <- convert_to_generic(large_struc)
 toc()
-#> Converting 5,000 structures: 0.027 sec elapsed
+#> Converting 5,000 structures: 0.068 sec elapsed
 ```
 
 **Mind = blown!** 🤯 The performance is nearly identical because
@@ -376,7 +376,7 @@ sessionInfo()
 #> [17] desc_1.4.3        bslib_0.9.0       pillar_1.11.1     rlang_1.1.6      
 #> [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.54        
 #> [25] fs_1.6.6          sass_0.4.10       cli_3.6.5         pkgdown_2.2.0    
-#> [29] magrittr_2.0.4    digest_0.6.38     lifecycle_1.0.4   vctrs_0.6.5      
+#> [29] magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.4   vctrs_0.6.5      
 #> [33] evaluate_1.0.5    glue_1.8.0        ragg_1.5.0        rmarkdown_2.30   
 #> [37] purrr_1.2.0       tools_4.5.2       pkgconfig_2.0.3   htmltools_0.5.8.1
 ```

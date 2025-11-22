@@ -4,30 +4,29 @@
 
 ### New features
 
-- Update the monosaccharides table:
+- Update the monosaccharides table, ensuring all monosaccharides having
+  generic names:
   - Add generic monosaccharides to Ara, Lyx, Xyl, Rib, Api, Neu, Kdn,
     Pse, Leg, Aci, 4eLeg, Bac, LDmanHep, DDmanHep, Kdo, Dha, MurNAc,
     MurNGc, Mur, Fru, Tag, Sor, Psi.
   - Rename “Pent” to “Pen”.
   - Delete “Sia” from the table.
-- Update the logic of monosaccharide type determination for glycan
-  compositions and glycan structures, considering some special
-  monosaccharides have the same name for both generic and concrete types
-  (e.g. “Neu”, “Mur”). The new rules:
-  - Mixed monosaccharides are still not allowed.
-  - If all residues besides the special monosaccharides are of the same
-    type, it will be determined as the glycan monosaccharide type.
-  - If all residues are special monosaccharides, it will be determined
-    as “concrete”.
 - [`count_mono()`](https://glycoverse.github.io/glyrepr/reference/count_mono.md)
   now supports counting substituents, with a new argument
   `include_subs`.
+- Add
+  [`reduce_structure_level()`](https://glycoverse.github.io/glyrepr/reference/reduce_structure_level.md)
+  to reduce a glycan structure to a lower resolution level.
 
 ### Minor improvements and bug fixes
 
 - Fix the bug that
   [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/reference/convert_to_generic.md)
   fails with glycan compositions containing substituents.
+- Fix the bug that
+  [`has_linkages()`](https://glycoverse.github.io/glyrepr/reference/has_linkages.md)
+  didn’t consider reducing end anomers, which influenced the results of
+  [`get_structure_level()`](https://glycoverse.github.io/glyrepr/reference/get_structure_level.md).
 
 ## glyrepr 0.8.0
 

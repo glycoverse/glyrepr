@@ -27,9 +27,9 @@ A character vector of monosaccharide names.
 ``` r
 available_monosaccharides()
 #>  [1] "Hex"      "HexNAc"   "HexN"     "HexA"     "dHex"     "dHexNAc" 
-#>  [7] "ddHex"    "Pen"      "NeuAc"    "NeuGc"    "Neu"      "Kdn"     
-#> [13] "Pse"      "Leg"      "Aci"      "4eLeg"    "Bac"      "Hep"     
-#> [19] "Kdo"      "HepA"     "MurAc"    "MurGc"    "Mur"      "Glc"     
+#>  [7] "ddHex"    "Pen"      "NeuAc"    "NeuGc"    "gNeu"     "gKdn"    
+#> [13] "gPse"     "gLeg"     "gAci"     "g4eLeg"   "gBac"     "Hep"     
+#> [19] "gKdo"     "HepA"     "MurAc"    "MurGc"    "gMur"     "Glc"     
 #> [25] "Man"      "Gal"      "Gul"      "Alt"      "All"      "Tal"     
 #> [31] "Ido"      "GlcNAc"   "GalNAc"   "ManNAc"   "GulNAc"   "AltNAc"  
 #> [37] "AllNAc"   "TalNAc"   "IdoNAc"   "GlcN"     "ManN"     "GalN"    
@@ -39,6 +39,8 @@ available_monosaccharides()
 #> [61] "6dTal"    "QuiNAc"   "RhaNAc"   "6dAltNAc" "6dTalNAc" "FucNAc"  
 #> [67] "Oli"      "Tyv"      "Abe"      "Par"      "Dig"      "Col"     
 #> [73] "Ara"      "Lyx"      "Xyl"      "Rib"      "Neu5Ac"   "Neu5Gc"  
-#> [79] "LDmanHep" "Dha"      "DDmanHep" "MurNAc"   "MurNGc"   "Api"     
-#> [85] "Fru"      "Tag"      "Sor"      "Psi"     
+#> [79] "Neu"      "Kdn"      "Pse"      "Leg"      "Aci"      "4eLeg"   
+#> [85] "Bac"      "LDmanHep" "Kdo"      "Dha"      "DDmanHep" "MurNAc"  
+#> [91] "MurNGc"   "Mur"      "Api"      "Fru"      "Tag"      "Sor"     
+#> [97] "Psi"     
 ```
