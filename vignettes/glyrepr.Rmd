@@ -228,6 +228,17 @@ struc[5]
 remove_substituents(struc[5])
 ```
 
+**Convert monosaccharides to generic:**
+```{r}
+convert_to_generic(struc)
+```
+
+**Reduce structure resolution level:**
+```{r}
+reduce_structure_level(struc, to_level = "basic")
+# Same as remove_linkages() then convert_to_generic()
+```
+
 ## Part 3: Conversions and Integrations
 
 ### From Structure to Composition
