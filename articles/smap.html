@@ -358,7 +358,7 @@ deduplication:</p>
 <span><span class="va">all_graphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">huge_struc</span><span class="op">)</span>  <span class="co"># Extracts all 25,000 graphs</span></span>
 <span><span class="va">vertex_counts_naive</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">all_graphs</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Naive approach (all graphs): 0.22 sec elapsed</span></span>
+<span><span class="co">#&gt; Naive approach (all graphs): 0.218 sec elapsed</span></span>
 <span></span>
 <span><span class="co"># Verify results are equivalent (though data types may differ)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">vertex_counts_optimized</span>, <span class="va">vertex_counts_naive</span><span class="op">)</span></span>

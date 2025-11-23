@@ -137,6 +137,7 @@ string! It’s like giving directions to a complex building.
 2.  **Everything else is a branch** (like rooms off the hallway)
 3.  **Branches go in square brackets `[]`**
 4.  **Write branches just before the monosaccharide they connect to**
+5.  **Perform 1-4 for each branch**
 
 #### Example 1: A Simple O-Glycan 🌿
 
@@ -148,6 +149,7 @@ string! It’s like giving directions to a complex building.
 2.  **Add linkage info**: `Gal(b1-4)GlcNAc(b1-6)GalNAc(a1-`
 3.  **Spot the branch**: The bottom `Gal` connects to `GalNAc`
 4.  **Insert the branch**: `Gal(b1-4)GlcNAc(b1-6)[Gal(b1-3)]GalNAc(a1-`
+5.  The branch is a single “Gal(b1-3)” unit, no need for step 5.
 
 **Final result**:
 
@@ -171,6 +173,34 @@ creates branches with **lower position numbers**.
 **Final result**:
 
     Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
+
+#### Example 3:
+
+![](resources/H9N2.png)
+
+Let’s look at one more example to solidify our understanding. This
+example is a bit more complex, as it has three branches with the same
+length, branching on different residues. In this case, we look for the
+first breaking point from right to left: the b4 Man. Two mannoses are
+connected to the Man, one with a1-3 linkage and the other with a1-6
+linkage. According to the tie breaking law, we choose the bottom one
+(a1-3) as the main chain. Let’s write out the main chain first.
+
+    Man(a1-2)Man(a1-2)Man(a1-3)[BRANCH]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
+
+Now let’s look at the branch, which itself has branches too (highlighed
+part).
+
+![](resources/H9N2_highlighted.png)
+
+The IUPAC-condensed string of the branch goes (using the tie breaking
+law again):
+
+    BRANCH = Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)
+
+Let’s combine them together:
+
+    Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
 
 ### Step 5: The Root Mystery — Anomeric Information
 

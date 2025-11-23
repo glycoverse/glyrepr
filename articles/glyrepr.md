@@ -187,7 +187,7 @@ toc()
 tic("Converting 5,000 structures")
 result_large <- convert_to_generic(large_struc)
 toc()
-#> Converting 5,000 structures: 0.068 sec elapsed
+#> Converting 5,000 structures: 0.067 sec elapsed
 ```
 
 **Mind = blown!** 🤯 The performance is nearly identical because
@@ -266,6 +266,33 @@ remove_substituents(struc[5])
 #> <glycan_structure[1]>
 #> [1] GlcNAc(b1-4)Glc(a1-
 #> # Unique structures: 1
+```
+
+**Convert monosaccharides to generic:**
+
+``` r
+convert_to_generic(struc)
+#> <glycan_structure[5]>
+#> [1] Hex(a1-3)[Hex(a1-6)]Hex(b1-4)HexNAc(b1-4)HexNAc(b1-
+#> [2] Hex(b1-3)HexNAc(a1-
+#> [3] Hex(b1-3)[HexNAc(b1-6)]HexNAc(a1-
+#> [4] Hex(a1-3)[Hex(a1-6)]Hex(a1-3)[Hex(a1-6)]Hex(a1-
+#> [5] HexNAc6Ac(b1-4)Hex3Me(a1-
+#> # Unique structures: 5
+```
+
+**Reduce structure resolution level:**
+
+``` r
+reduce_structure_level(struc, to_level = "basic")
+#> <glycan_structure[5]>
+#> [1] Hex(??-?)[Hex(??-?)]Hex(??-?)HexNAc(??-?)HexNAc(??-
+#> [2] Hex(??-?)HexNAc(??-
+#> [3] HexNAc(??-?)[Hex(??-?)]HexNAc(??-
+#> [4] Hex(??-?)[Hex(??-?)]Hex(??-?)[Hex(??-?)]Hex(??-
+#> [5] HexNAc6Ac(??-?)Hex3Me(??-
+#> # Unique structures: 5
+# Same as remove_linkages() then convert_to_generic()
 ```
 
 ## Part 3: Conversions and Integrations
