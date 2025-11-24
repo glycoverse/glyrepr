@@ -1,6 +1,6 @@
 Package: glyrepr
 Title: Representation for Glycan Compositions and Structures
-Version: 0.9.0
+Version: 0.9.0.9000
 Authors@R: 
     person("Bin", "Fu", , "23110220018@m.fudan.edu.cn", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-8567-2997"))
