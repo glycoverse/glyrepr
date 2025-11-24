@@ -182,12 +182,12 @@ library(tictoc)
 tic("Converting 5 structures")
 result_small <- convert_to_generic(struc)
 toc()
-#> Converting 5 structures: 0.03 sec elapsed
+#> Converting 5 structures: 0.031 sec elapsed
 
 tic("Converting 5,000 structures")
 result_large <- convert_to_generic(large_struc)
 toc()
-#> Converting 5,000 structures: 0.063 sec elapsed
+#> Converting 5,000 structures: 0.064 sec elapsed
 ```
 
 **Mind = blown!** 🤯 The performance is nearly identical because
@@ -393,7 +393,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] dplyr_1.1.4   tibble_3.3.0  tictoc_1.2.1  glyrepr_0.9.0
+#> [1] dplyr_1.1.4        tibble_3.3.0       tictoc_1.2.1       glyrepr_0.9.0.9000
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] jsonlite_2.0.0    compiler_4.5.2    tidyselect_1.2.1  stringr_1.6.0    
