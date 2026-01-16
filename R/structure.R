@@ -509,7 +509,11 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
   
   # Only keep structures that are actually used
   if (length(available_structures) > 0) {
-    retrenched_structures <- available_structures[needed_codes[needed_codes %in% names(available_structures)]]
+    if (length(needed_codes) == 0) {
+      retrenched_structures <- available_structures[0]
+    } else {
+      retrenched_structures <- available_structures[needed_codes[needed_codes %in% names(available_structures)]]
+    }
   } else {
     retrenched_structures <- available_structures
   }
