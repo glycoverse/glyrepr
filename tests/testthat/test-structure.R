@@ -753,6 +753,12 @@ test_that("glycan_structure vectors can be subset with necessary structure prese
   expect_length(attr(subset3, "structures"), 2)  # Subset preserves 2 unique
 })
 
+test_that("subsetting with zero length indices or NULL removes all structures", {
+  sv <- glycan_structure(o_glycan_core_1())
+  expect_length(attr(sv[integer(0)], "structures"), 0)
+  expect_length(attr(sv[NULL], "structures"), 0)
+})
+
 test_that("glycan_structure vectors can be repeated", {
   sv <- glycan_structure(o_glycan_core_1())
   
