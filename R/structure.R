@@ -469,20 +469,67 @@ pillar_shaft.glyrepr_structure <- function(x, ...) {
   pillar::new_pillar_shaft_simple(formatted, align = "left", min_width = 10)
 }
 
+# ==============================================================================
+# VCTRS SUBSETTING AND COMBINING FOR GLYCAN STRUCTURE VECTORS
+# ==============================================================================
+#
+# The glycan_structure vector uses vctrs for vector operations. This requires
+# careful handling of the `structures` attribute during subsetting and combining.
+#
+# THE PROBLEM:
+# When subsetting with empty indices (e.g., sv[integer(0)] or sv[NULL]), vctrs
+# calls vec_restore() to reconstruct the vector. The original implementation
+# preserved structures even for empty results, which was incorrect.
+#
+# THE CHALLENGE:
+# During combining operations (c(sv1, sv2)), vctrs calls vec_restore() multiple
+# times BEFORE vec_ptype2() is called to create the prototype. This means the
+# structures from each input vector must be preserved across these calls so
+# vec_ptype2() can access them for proper deduplication.
+#
+# THE SOLUTION:
+# We use a shared environment (.glycan_structure_env) to temporarily store
+# original structures during the combining process. vec_restore() stores the
+# structures from each input, and vec_ptype2() retrieves them to create the
+# combined prototype. After vec_ptype2() completes, stored structures are cleared.
+#
+# For subsetting with empty indices, vec_restore() correctly returns empty
+# structures since needed_codes is empty.
+#
+# ==============================================================================
+
+# Environment to store original structures during vec_restore for vec_ptype2 to use
+# This is needed because vctrs calls vec_restore() multiple times BEFORE vec_ptype2()
+# during combining operations (c()). We need to preserve structures from each input
+# vector so vec_ptype2() can access them for proper deduplication.
+.glycan_structure_env <- new.env(parent = emptyenv())
+
 #' @export
 vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
-  x_structures <- attr(x, "structures")
-  y_structures <- attr(y, "structures")
-  
+  on.exit({
+    # Ensure cleanup happens even if there's an error
+    assign(".x_structures", NULL, envir = .glycan_structure_env)
+    assign(".y_structures", NULL, envir = .glycan_structure_env)
+  }, add = TRUE)
+
+  # Retrieve original structures that were stored by vec_restore() during combining
+  # If not found in the environment, fall back to structures in x/y (for non-combining cases)
+  x_structures <- get0(".x_structures", envir = .glycan_structure_env, ifnotfound = attr(x, "structures"))
+  y_structures <- get0(".y_structures", envir = .glycan_structure_env, ifnotfound = attr(y, "structures"))
+
+  # Clear stored structures after retrieval
+  assign(".x_structures", NULL, envir = .glycan_structure_env)
+  assign(".y_structures", NULL, envir = .glycan_structure_env)
+
   # Combine all structures from both x and y
   all_structures <- c(x_structures, y_structures)
-  
-  # Remove duplicates (keep first occurrence)
+
+  # Remove duplicates while keeping the first occurrence (handles identical structures)
   unique_names <- unique(names(all_structures))
   combined_structures <- all_structures[unique_names]
   names(combined_structures) <- unique_names
-  
-  # Create prototype with all structures
+
+  # Create prototype with all unique structures (empty data, only structures attribute)
   new_glycan_structure(character(), character(), structures = combined_structures)
 }
 
@@ -491,32 +538,86 @@ vec_cast.glyrepr_structure.glyrepr_structure <- function(x, to, ...) {
   x
 }
 
+# vec_restore is called by vctrs to reconstruct a vector after subsetting or
+# combining operations. It must return a glycan_structure vector with the
+# correct `structures` attribute.
+#
+# Key behaviors:
+# 1. During subsetting with empty indices: returns empty structures (length 0)
+# 2. During combining (c()): stores structures for vec_ptype2 to retrieve later
+# 3. During subsetting with non-empty indices: filters to only used structures
 #' @export
 vec_restore.glyrepr_structure <- function(x, to, ...) {
   # x is the proxy data (data.frame) after vctrs operations
   # to is the original glyrepr_structure object for reference
 
-  # Extract data from the proxy
+  # Extract data from the proxy (data.frame format used by vctrs internally)
   data <- vctrs::vec_data(x)
   iupacs <- vctrs::field(data, "iupac")
   mono_types <- vctrs::field(data, "mono_type")
 
-  # Get available structures
+  # Get structures from the reference object
   available_structures <- attr(to, "structures")
 
-  # Find which unique structures are still needed
+  # Find which unique structures are still needed (based on iupac codes in result)
   needed_codes <- unique(iupacs)
 
-  # For slicing operations, optimize by removing unused structures
-  # For combination operations, we typically get all the needed structures already
-  if (length(needed_codes) > 0 && length(available_structures) > 0) {
-    # Only keep structures that are actually used
-    retrenched_structures <- available_structures[needed_codes[needed_codes %in% names(available_structures)]]
-  } else {
-    retrenched_structures <- available_structures
+  # -----------------------------------------------------------------------------
+  # Store structures for vec_ptype2 during combining operations
+  # -----------------------------------------------------------------------------
+  # During c(sv1, sv2), vctrs calls vec_restore() multiple times BEFORE vec_ptype2()
+  # is called. We need to preserve the original structures from each input vector
+  # so vec_ptype2() can access them for proper deduplication.
+  #
+  # The storage strategy:
+  # - First vector's structures go to .x_structures
+  # - Second vector's structures go to .y_structures
+  # - If more structures are found later, combine into .x_structures
+  # -----------------------------------------------------------------------------
+
+  # Check what structures are already stored
+  x_stored <- get0(".x_structures", envir = .glycan_structure_env, ifnotfound = NULL)
+  y_stored <- get0(".y_structures", envir = .glycan_structure_env, ifnotfound = NULL)
+
+  # Get names of already stored structures to avoid duplicates
+  stored_names <- c(names(x_stored), names(y_stored))
+
+  # Store new structures that aren't already saved
+  if (length(available_structures) > 0) {
+    new_names <- setdiff(names(available_structures), stored_names)
+    if (length(new_names) > 0) {
+      if (is.null(x_stored)) {
+        # First slot empty: store in .x_structures
+        assign(".x_structures", available_structures[new_names], envir = .glycan_structure_env)
+      } else if (is.null(y_stored)) {
+        # Second slot empty: store in .y_structures
+        assign(".y_structures", available_structures[new_names], envir = .glycan_structure_env)
+      } else {
+        # Both slots full: combine into .x_structures (removing duplicates)
+        combined <- c(x_stored, y_stored, available_structures[new_names])
+        assign(".x_structures", combined[!duplicated(names(combined))], envir = .glycan_structure_env)
+      }
+    }
   }
 
-  # Create new vector with structures
+  # -----------------------------------------------------------------------------
+  # Filter structures for the result vector
+  # -----------------------------------------------------------------------------
+  # - If result has data (non-empty needed_codes): filter to only used structures
+  # - If result is empty (empty needed_codes): return empty structures
+  #   This handles subsetting with empty indices like sv[integer(0)] or sv[NULL]
+  # -----------------------------------------------------------------------------
+
+  if (length(needed_codes) > 0 && length(available_structures) > 0) {
+    # Subsetting with non-empty indices: keep only structures that are used
+    retrenched_structures <- available_structures[needed_codes[needed_codes %in% names(available_structures)]]
+  } else {
+    # Subsetting with empty indices: return empty structures
+    # (This is the key fix for issue #5)
+    retrenched_structures <- list()
+  }
+
+  # Create new vector with filtered structures
   new_glycan_structure(iupacs, mono_types, structures = retrenched_structures)
 }
 
