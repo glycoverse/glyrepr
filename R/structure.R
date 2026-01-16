@@ -506,11 +506,9 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 
   # Find which unique structures are still needed
   needed_codes <- unique(iupacs)
-
-  # For slicing operations, optimize by removing unused structures
-  # For combination operations, we typically get all the needed structures already
-  if (length(needed_codes) > 0 && length(available_structures) > 0) {
-    # Only keep structures that are actually used
+  
+  # Only keep structures that are actually used
+  if (length(available_structures) > 0) {
     retrenched_structures <- available_structures[needed_codes[needed_codes %in% names(available_structures)]]
   } else {
     retrenched_structures <- available_structures

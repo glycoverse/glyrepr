@@ -737,6 +737,8 @@ test_that("glycan_structure vectors can be subset with necessary structure prese
   subset1 <- sv[1]
   subset2 <- sv[c(1, 3)]
   subset3 <- sv[2:3]
+  empty_subset1 <- sv[c()]
+  empty_subset2 <- sv[integer(0)]
   
   expect_s3_class(subset1, "glyrepr_structure")
   expect_s3_class(subset2, "glyrepr_structure")
@@ -745,12 +747,16 @@ test_that("glycan_structure vectors can be subset with necessary structure prese
   expect_equal(length(subset1), 1)
   expect_equal(length(subset2), 2)
   expect_equal(length(subset3), 2)
+  expect_equal(length(empty_subset1), 0)
+  expect_equal(length(empty_subset2), 0)
   
   # Check that unique structure tracking is maintained
   expect_length(attr(sv, "structures"), 2)  # Original has 2 unique
   expect_length(attr(subset1, "structures"), 1)  # Subset preserves 1 unique
   expect_length(attr(subset2, "structures"), 1)  # Subset preserves 1 unique
   expect_length(attr(subset3, "structures"), 2)  # Subset preserves 2 unique
+  expect_length(attr(empty_subset1, "structures"), 0)  # Empty subset preserves 0 unique
+  expect_length(attr(empty_subset2, "structures"), 0)  # Empty subset preserves 0 unique
 })
 
 test_that("glycan_structure vectors can be repeated", {
