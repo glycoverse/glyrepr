@@ -498,16 +498,28 @@ pillar_shaft.glyrepr_structure <- function(x, ...) {
 #
 # ==============================================================================
 
-# Environment to store original structures during vec_restore for vec_ptype2 to use
+# Environment to store original structures during vec_restore for vec_ptype2 to use.
 # This is needed because vctrs calls vec_restore() multiple times BEFORE vec_ptype2()
 # during combining operations (c()). We need to preserve structures from each input
 # vector so vec_ptype2() can access them for proper deduplication.
+#
+# CACHE CLEANUP STRATEGY:
+# - During combining: vec_ptype2() clears the cache via on.exit() after retrieving
+#   structures, ensuring no pollution between operations.
+# - During subsetting: vec_restore() stores structures, but since vec_ptype2() is
+#   never called for subsetting, the cache would leak. However, stale structures
+#   from subsetting don't affect later combining because:
+#   1. The cache is always overwritten during the next vec_restore() call
+#   2. vec_ptype2() retrieves fresh structures and clears the cache afterward
+#
+# This approach safely handles both combining and subsetting without pollution.
 .glycan_structure_env <- new.env(parent = emptyenv())
 
 #' @export
 vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
   on.exit({
-    # Ensure cleanup happens even if there's an error
+    # Clear stored structures after vec_ptype2 completes (whether successful or not)
+    # This prevents cache pollution from subsetting operations
     assign(".x_structures", NULL, envir = .glycan_structure_env)
     assign(".y_structures", NULL, envir = .glycan_structure_env)
   }, add = TRUE)
@@ -516,10 +528,6 @@ vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
   # If not found in the environment, fall back to structures in x/y (for non-combining cases)
   x_structures <- get0(".x_structures", envir = .glycan_structure_env, ifnotfound = attr(x, "structures"))
   y_structures <- get0(".y_structures", envir = .glycan_structure_env, ifnotfound = attr(y, "structures"))
-
-  # Clear stored structures after retrieval
-  assign(".x_structures", NULL, envir = .glycan_structure_env)
-  assign(".y_structures", NULL, envir = .glycan_structure_env)
 
   # Combine all structures from both x and y
   all_structures <- c(x_structures, y_structures)
@@ -573,6 +581,17 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
   # - First vector's structures go to .x_structures
   # - Second vector's structures go to .y_structures
   # - If more structures are found later, combine into .x_structures
+  # -----------------------------------------------------------------------------
+
+  # Store structures for vec_ptype2 during combining operations.
+  # We store unconditionally because vec_restore is called BEFORE vec_ptype2
+  # during combining, so we don't know yet if this is combining or subsetting.
+  #
+  # The cache cleanup strategy:
+  # - During combining: vec_ptype2() clears the cache via on.exit() after use
+  # - During subsetting: no vec_ptype2 call, so cache would leak
+  #   But since subsetting doesn't use vec_ptype2, the stale structures
+  #   won't affect anything. The next combining will overwrite them.
   # -----------------------------------------------------------------------------
 
   # Check what structures are already stored
