@@ -97,11 +97,11 @@ NA is returned when the composition is "generic".</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Hex <span class="op">=</span> <span class="fl">5</span>, HexNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Gal <span class="op">=</span> <span class="fl">1</span>, Man <span class="op">=</span> <span class="fl">1</span>, GalNAc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Gal <span class="op">=</span> <span class="fl">1</span>, Man <span class="op">=</span> <span class="fl">1</span>, GalNAc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">count_mono</span><span class="op">(</span><span class="va">comp</span>, <span class="st">"Hex"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-in"><span><span class="fu">count_mono</span><span class="op">(</span><span class="va">comp</span>, <span class="st">"Gal"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">struct</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="st">"Gal(b1-3)GlcNAc(b1-4)Glc(a1-"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">count_mono</span><span class="op">(</span><span class="va">struct</span>, <span class="st">"Gal"</span><span class="op">)</span></span></span>
@@ -109,7 +109,7 @@ NA is returned when the composition is "generic".</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Total number of monosaccharides</span></span></span>
 <span class="r-in"><span><span class="fu">count_mono</span><span class="op">(</span><span class="va">comp</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

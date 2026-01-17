@@ -51,11 +51,11 @@ is returned when the composition is "generic".
 ## Examples
 
 ``` r
-comp <- glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, Man = 1, GalNAc = 1))
+comp <- glycan_composition(c(Gal = 1, Man = 1, GalNAc = 1))
 count_mono(comp, "Hex")
-#> [1] 5 2
+#> [1] 2
 count_mono(comp, "Gal")
-#> [1] NA  1
+#> [1] 1
 
 struct <- as_glycan_structure("Gal(b1-3)GlcNAc(b1-4)Glc(a1-")
 count_mono(struct, "Gal")
@@ -63,5 +63,5 @@ count_mono(struct, "Gal")
 
 # Total number of monosaccharides
 count_mono(comp)
-#> [1] 7 3
+#> [1] 3
 ```

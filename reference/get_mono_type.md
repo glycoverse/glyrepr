@@ -78,13 +78,4 @@ get_mono_type(n_glycan_core(mono_type = "generic"))
 comp <- glycan_composition(c(Glc = 2, GalNAc = 1))
 get_mono_type(comp)
 #> [1] "concrete"
-
-# Special cases
-comps <- glycan_composition(
-  c(Neu = 1),
-  c(Neu = 1, Glc = 1),
-  c(gMur = 1, Hex = 1),
-)
-get_mono_type(comps)
-#> [1] "concrete" "concrete" "generic" 
 ```

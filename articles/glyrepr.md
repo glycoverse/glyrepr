@@ -46,9 +46,9 @@ superpower:
 
 ``` r
 # Just tell R what you have
-glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, GalNAc = 1))
+glycan_composition(c(Man = 5, GlcNAc = 2), c(Gal = 1, GalNAc = 1))
 #> <glycan_composition[2]>
-#> [1] Hex(5)HexNAc(2)
+#> [1] Man(5)GlcNAc(2)
 #> [2] Gal(1)GalNAc(1)
 ```
 
@@ -56,10 +56,10 @@ glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, GalNAc = 1))
 
 ``` r
 # Perfect when you're processing data from files or databases
-comp_list <- list(c(Hex = 5, HexNAc = 2), c(Gal = 1, GalNAc = 1))
+comp_list <- list(c(Man = 5, GlcNAc = 2), c(Gal = 1, GalNAc = 1))
 as_glycan_composition(comp_list)
 #> <glycan_composition[2]>
-#> [1] Hex(5)HexNAc(2)
+#> [1] Man(5)GlcNAc(2)
 #> [2] Gal(1)GalNAc(1)
 ```
 
@@ -87,18 +87,15 @@ universal “color code” for glycans. Think of it as the glycan rainbow
 Now here’s where `glyrepr` shows its intelligence:
 
 ``` r
-comp <- glycan_composition(
-  c(Hex = 5, HexNAc = 2),          # generic sugars
-  c(Gal = 1, Man = 1, GalNAc = 1)  # concrete sugars
-)
+comp <- glycan_composition(c(Gal = 1, Man = 1, GalNAc = 1))
 
 # How many galactose residues?
 count_mono(comp, "Gal")
-#> [1] NA  1
+#> [1] 1
 
 # How many hexose residues? (This includes Gal and Man!)
 count_mono(comp, "Hex")
-#> [1] 5 2
+#> [1] 2
 ```
 
 Notice how
@@ -182,12 +179,12 @@ library(tictoc)
 tic("Converting 5 structures")
 result_small <- convert_to_generic(struc)
 toc()
-#> Converting 5 structures: 0.031 sec elapsed
+#> Converting 5 structures: 0.022 sec elapsed
 
 tic("Converting 5,000 structures")
 result_large <- convert_to_generic(large_struc)
 toc()
-#> Converting 5,000 structures: 0.064 sec elapsed
+#> Converting 5,000 structures: 0.027 sec elapsed
 ```
 
 **Mind = blown!** 🤯 The performance is nearly identical because
@@ -393,17 +390,17 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] dplyr_1.1.4        tibble_3.3.0       tictoc_1.2.1       glyrepr_0.9.0.9000
+#> [1] dplyr_1.1.4        tibble_3.3.1       tictoc_1.2.1       glyrepr_0.9.0.9000
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] jsonlite_2.0.0    compiler_4.5.2    tidyselect_1.2.1  stringr_1.6.0    
-#>  [5] jquerylib_0.1.4   systemfonts_1.3.1 textshaping_1.0.4 yaml_2.3.10      
+#>  [5] jquerylib_0.1.4   systemfonts_1.3.1 textshaping_1.0.4 yaml_2.3.12      
 #>  [9] fastmap_1.2.0     R6_2.6.1          generics_0.1.4    igraph_2.2.1     
-#> [13] knitr_1.50        backports_1.5.0   checkmate_2.3.3   rstackdeque_1.1.1
-#> [17] desc_1.4.3        bslib_0.9.0       pillar_1.11.1     rlang_1.1.6      
-#> [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.54        
+#> [13] knitr_1.51        backports_1.5.0   checkmate_2.3.3   rstackdeque_1.1.1
+#> [17] desc_1.4.3        bslib_0.9.0       pillar_1.11.1     rlang_1.1.7      
+#> [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.55        
 #> [25] fs_1.6.6          sass_0.4.10       cli_3.6.5         pkgdown_2.2.0    
-#> [29] magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.4   vctrs_0.6.5      
+#> [29] magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.0      
 #> [33] evaluate_1.0.5    glue_1.8.0        ragg_1.5.0        rmarkdown_2.30   
-#> [37] purrr_1.2.0       tools_4.5.2       pkgconfig_2.0.3   htmltools_0.5.8.1
+#> [37] purrr_1.2.1       tools_4.5.2       pkgconfig_2.0.3   htmltools_0.5.9
 ```

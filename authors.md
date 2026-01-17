@@ -10,14 +10,14 @@
 Source:
 [`DESCRIPTION`](https://github.com/glycoverse/glyrepr/blob/main/DESCRIPTION)
 
-Fu B (2025). *glyrepr: Representation for Glycan Compositions and
+Fu B (2026). *glyrepr: Representation for Glycan Compositions and
 Structures*. R package version 0.9.0.9000,
 <https://glycoverse.github.io/glyrepr/>.
 
     @Manual{,
       title = {glyrepr: Representation for Glycan Compositions and Structures},
       author = {Bin Fu},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.9.0.9000},
       url = {https://glycoverse.github.io/glyrepr/},
     }
