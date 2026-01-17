@@ -643,18 +643,19 @@ test_that("c() combines glycan_structure vectors correctly", {
   # This was previously failing due to ifelse() with igraph objects
   sv1 <- n_glycan_core()
   sv2 <- o_glycan_core_1()
-  
+
   # This should not error (previously caused rep.igraph error)
   combined <- c(sv1, sv2)
-  
+
   expect_s3_class(combined, "glyrepr_structure")
   expect_equal(length(combined), 2)
   expect_length(attr(combined, "graphs"), 2)  # Two unique structures
-  
+
   # Check that both structures are preserved
-  formatted <- format(combined)
-  expect_true("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-" %in% formatted)
-  expect_true("Gal(b1-3)GalNAc(a1-" %in% formatted)
+  expect_equal(structure_to_iupac(combined), c(
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
+    "Gal(b1-3)GalNAc(a1-"
+  ))
 })
 
 test_that("c() handles duplicate structures across vectors", {
@@ -688,33 +689,36 @@ test_that("c() combines multiple structure vectors efficiently", {
   sv1 <- o_glycan_core_1()
   sv2 <- n_glycan_core()
   sv3 <- c(o_glycan_core_1(), n_glycan_core())  # Contains both
-  
+
   combined <- c(sv1, sv2, sv3)
-  
+
   expect_s3_class(combined, "glyrepr_structure")
   expect_equal(length(combined), 4)  # 1 + 1 + 2 = 4 total elements
   expect_length(attr(combined, "graphs"), 2)  # Only 2 unique structures
-  
+
   # Check all elements are present
-  formatted <- format(combined)
-  expect_equal(sum(formatted == "Gal(b1-3)GalNAc(a1-"), 2)  # o_glycan_core_1 appears twice
-  expect_equal(sum(formatted == "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"), 2)  # n_glycan_core appears twice
+  expect_equal(structure_to_iupac(combined), c(
+    "Gal(b1-3)GalNAc(a1-",
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
+    "Gal(b1-3)GalNAc(a1-",
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  ))
 })
 
 test_that("c() preserves structure integrity across combinations", {
   # Use existing example structures
   sv1 <- o_glycan_core_1()
   sv2 <- n_glycan_core()
-  
+
   combined <- c(sv1, sv2)
-  
+
   # Check that we can retrieve the original structures correctly
   extracted_graphs <- get_structure_graphs(combined)
-  
+
   expect_length(extracted_graphs, 2)
   expect_s3_class(extracted_graphs[[1]], "igraph")
   expect_s3_class(extracted_graphs[[2]], "igraph")
-  
+
   # Verify structure properties are preserved using known structures
   # o_glycan_core_1 has GalNAc and Gal
   # n_glycan_core has Man and GlcNAc
