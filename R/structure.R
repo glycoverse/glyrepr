@@ -403,6 +403,11 @@ vec_cast.glyrepr_structure.character <- function(x, to, ...) {
 }
 
 #' @export
+vec_cast.character.glyrepr_structure <- function(x, to, ...) {
+  vctrs::vec_data(x)
+}
+
+#' @export
 vec_proxy.glyrepr_structure <- function(x, ...) {
   iupacs <- vctrs::vec_data(x)
   graphs <- attr(x, "graphs")
