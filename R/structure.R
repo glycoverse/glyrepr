@@ -361,25 +361,16 @@ pillar_shaft.glyrepr_structure <- function(x, ...) {
 
 #' @export
 vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
-  # Handle empty cases - one of them becomes the prototype
-  if (length(x) == 0) {
-    return(y)
-  }
-  if (length(y) == 0) {
-    return(x)
-  }
-
-  # Both non-empty: combine graphs from both vectors
+  # Get graphs from both vectors (works for both empty prototypes and full vectors)
   graphs_x <- attr(x, "graphs")
   graphs_y <- attr(y, "graphs")
 
-  # Union of graphs (by IUPAC name as key)
+  # Combine graphs from both vectors (union by IUPAC name as key)
   combined_graphs <- c(graphs_x, graphs_y)
   # Remove duplicates, keeping first occurrence (from x)
   unique_graphs <- combined_graphs[!duplicated(names(combined_graphs))]
 
   # Create prototype with combined graphs
-  # The actual IUPAC values don't matter for prototype, but we need valid structure
   out <- new_glycan_structure()
   attr(out, "graphs") <- unique_graphs
   out
@@ -425,7 +416,11 @@ vec_cast.character.glyrepr_structure <- function(x, to, ...) {
 
 #' @export
 vec_restore.glyrepr_structure <- function(x, to, ...) {
-  NextMethod()
+  # Get the graphs attribute from the prototype
+  graphs <- attr(to, "graphs")
+  # Create the restored object with combined data and prototype's graphs
+  out <- vctrs::new_vctr(x, graphs = graphs, class = class(to))
+  out
 }
 
 #' Convert to Glycan Structure Vector
