@@ -26,9 +26,8 @@ Compositions can contain both monosaccharides and substituents.
 \details{
 Compositions can contain:
 \itemize{
-\item Monosaccharides: either generic (e.g., "Hex", "HexNAc") or concrete
-(e.g., "Glc", "Gal"). All monosaccharides in a composition must be
-of the same type.
+\item Monosaccharides: either generic (e.g., "Hex", "HexNAc") or concrete (e.g., "Glc", "Gal").
+All monosaccharides in a composition vector must be of the same type.
 \item Substituents: e.g., "Me", "Ac", "S". These can be mixed with either
 generic or concrete monosaccharides.
 }

@@ -13,14 +13,13 @@
 #' @details
 #' Compositions can contain:
 #'
-#' - Monosaccharides: either generic (e.g., "Hex", "HexNAc") or concrete 
-#'   (e.g., "Glc", "Gal"). All monosaccharides in a composition must be 
-#'   of the same type.
-#' - Substituents: e.g., "Me", "Ac", "S". These can be mixed with either 
+#' - Monosaccharides: either generic (e.g., "Hex", "HexNAc") or concrete (e.g., "Glc", "Gal").
+#'   All monosaccharides in a composition vector must be of the same type.
+#' - Substituents: e.g., "Me", "Ac", "S". These can be mixed with either
 #'   generic or concrete monosaccharides.
 #'
 #' Components are automatically sorted with monosaccharides first (according to 
-#' their order in the monosaccharides table), followed by substituents (according 
+#' their order in the monosaccharides table), followed by substituents (according
 #' to their order in `available_substituents()`).
 #'
 #' @examples
