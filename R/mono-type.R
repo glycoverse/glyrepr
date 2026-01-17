@@ -222,7 +222,10 @@ get_mono_type.glyrepr_composition <- function(x) {
 
   # All compositions in a composition vector must be of the same type.
   # Therefore, we just need to check the first composition.
-  get_mono_type_impl(names(vctrs::field(x, "data")[[1]]))
+  # Filter out substituents before determining monosaccharide type.
+  comp_names <- names(vctrs::field(x, "data")[[1]])
+  mono_names <- comp_names[!comp_names %in% available_substituents()]
+  get_mono_type_impl(mono_names)
 }
 
 #' Decide mono type from a vector of monosaccharide names

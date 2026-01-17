@@ -37,6 +37,20 @@ test_that("get mono type of composition", {
   expect_equal(get_mono_type(comp_concrete), "concrete")
 })
 
+test_that("get_mono_type of composition with substituents", {
+  # Concrete composition with sulfate substituent
+  comp_sulfate <- glycan_composition(c(Gal = 2, GlcNAc = 1, S = 1))
+  expect_equal(get_mono_type(comp_sulfate), "concrete")
+
+  # Generic composition with methyl substituent
+  comp_methyl <- glycan_composition(c(Hex = 2, HexNAc = 1, Me = 1))
+  expect_equal(get_mono_type(comp_methyl), "generic")
+
+  # Composition with multiple different substituents
+  comp_multi_sub <- glycan_composition(c(Gal = 3, GlcNAc = 2, S = 1, Ac = 1))
+  expect_equal(get_mono_type(comp_multi_sub), "concrete")
+})
+
 test_that("get mono type of empty composition", {
   comp_empty <- glycan_composition()
   expect_equal(get_mono_type(comp_empty), character())
