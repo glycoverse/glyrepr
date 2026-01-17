@@ -790,28 +790,27 @@ test_that("smap handles additional arguments correctly with parallel parameter",
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
   structures <- c(core1, core2)
-  
+
   # Function that takes additional arguments
   func_with_args <- function(g, multiplier = 1, offset = 0) {
     igraph::vcount(g) * multiplier + offset
   }
-  
+
   # Test with additional arguments and parallel parameter
   result1 <- smap_int(structures, func_with_args, multiplier = 2, offset = 1, .parallel = FALSE)
   result2 <- smap_int(structures, func_with_args, multiplier = 2, offset = 1, .parallel = NULL)
-  
+
   expect_equal(length(result1), 2)
   expect_equal(result1, result2)
   expect_type(result1, "integer")
-  
+
   # Verify the calculation is correct by computing expected values
   # Get the actual structures from the glycan_structure object
-  structures_list <- attr(structures, "structures")
-  data <- vctrs::vec_data(structures)
-  codes <- vctrs::field(data, "iupac")
-  
-  expected1 <- igraph::vcount(structures_list[[codes[1]]]) * 2 + 1
-  expected2 <- igraph::vcount(structures_list[[codes[2]]]) * 2 + 1
+  graphs <- attr(structures, "graphs")
+  codes <- vctrs::vec_data(structures)
+
+  expected1 <- igraph::vcount(graphs[[codes[1]]]) * 2 + 1
+  expected2 <- igraph::vcount(graphs[[codes[2]]]) * 2 + 1
   expect_equal(result1[1], expected1)
   expect_equal(result1[2], expected2)
 })
@@ -820,14 +819,14 @@ test_that("smap auto-parallel threshold behavior", {
   # Create a small dataset (should not trigger auto-parallel)
   core1 <- o_glycan_core_1()
   small_structures <- c(core1, core1, core1)  # 3 total, 1 unique
-  
+
   # Simple function
   simple_func <- function(g) igraph::vcount(g)
-  
+
   # With small dataset, auto-parallel should behave like sequential
   result_auto <- smap_int(small_structures, simple_func, .parallel = NULL)
   result_seq <- smap_int(small_structures, simple_func, .parallel = FALSE)
-  
+
   expect_equal(result_auto, result_seq)
   expect_equal(length(result_auto), 3)
   expect_type(result_auto, "integer")
@@ -837,12 +836,12 @@ test_that("smap parallel parameter validation", {
   # Create test structures
   core1 <- o_glycan_core_1()
   structures <- core1
-  
+
   # Test that .parallel accepts valid values
   expect_no_error(smap_int(structures, igraph::vcount, .parallel = TRUE))
   expect_no_error(smap_int(structures, igraph::vcount, .parallel = FALSE))
   expect_no_error(smap_int(structures, igraph::vcount, .parallel = NULL))
-  
+
   # Test that invalid .parallel values are handled gracefully
   # The function should either work or give a meaningful error, not crash
   expect_error(
