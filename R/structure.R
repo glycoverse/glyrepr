@@ -275,7 +275,7 @@ vec_ptype_abbr.glyrepr_structure <- function(x, ...) "struct"
 
 #' @export
 format.glyrepr_structure <- function(x, ...) {
-  vctrs::vec_data(x)
+  format(vctrs::vec_data(x), ...)
 }
 
 #' Format a Subset of Glycan Structures with Optional Colors
