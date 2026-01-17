@@ -290,14 +290,13 @@ format_glycan_structure_subset <- function(x, indices, colored = TRUE) {
     return(format(x)[indices])
   }
 
-  data <- vctrs::vec_data(x)
-  codes <- vctrs::field(data, "iupac")[indices]
-  mono_types <- vctrs::field(data, "mono_type")[indices]
-  structures <- attr(x, "structures")
+  codes <- vctrs::vec_data(x)[indices]
+  mono_type <- get_mono_type.glyrepr_structure(x)
+  graphs <- attr(x, "graphs")
 
   # For each structure, add colors if concrete type
-  purrr::map2_chr(codes, mono_types, function(code, mono_type) {
-    structure <- structures[[code]]
+  purrr::map_chr(codes, function(code) {
+    structure <- graphs[[code]]
     mono_names <- igraph::V(structure)$mono
 
     # Add colors to monosaccharides and gray linkages
@@ -312,7 +311,7 @@ format_glycan_structure_subset <- function(x, indices, colored = TRUE) {
 
 #' @export
 obj_print_footer.glyrepr_structure <- function(x, ...) {
-  cat("# Unique structures: ", format(length(attr(x, "structures"))), "\n", sep = "")
+  cat("# Unique structures: ", format(length(attr(x, "graphs"))), "\n", sep = "")
 }
 
 #' @export
@@ -364,7 +363,28 @@ pillar_shaft.glyrepr_structure <- function(x, ...) {
 
 #' @export
 vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
-  new_glycan_structure()
+  # Handle empty cases - one of them becomes the prototype
+  if (length(x) == 0) {
+    return(y)
+  }
+  if (length(y) == 0) {
+    return(x)
+  }
+
+  # Both non-empty: combine graphs from both vectors
+  graphs_x <- attr(x, "graphs")
+  graphs_y <- attr(y, "graphs")
+
+  # Union of graphs (by IUPAC name as key)
+  combined_graphs <- c(graphs_x, graphs_y)
+  # Remove duplicates, keeping first occurrence (from x)
+  unique_graphs <- combined_graphs[!duplicated(names(combined_graphs))]
+
+  # Create prototype with combined graphs
+  # The actual IUPAC values don't matter for prototype, but we need valid structure
+  out <- new_glycan_structure()
+  attr(out, "graphs") <- unique_graphs
+  out
 }
 
 #' @export
@@ -406,23 +426,8 @@ vec_cast.character.glyrepr_structure <- function(x, to, ...) {
 }
 
 #' @export
-vec_proxy.glyrepr_structure <- function(x, ...) {
-  iupacs <- vctrs::vec_data(x)
-  graphs <- attr(x, "graphs")
-  data.frame(iupac = iupacs, graph = unname(graphs[iupacs]))
-}
-
-#' @export
 vec_restore.glyrepr_structure <- function(x, to, ...) {
-  unique_df <- dplyr::distinct(x, .data$iupac, .keep_all = TRUE)
-  unique_graphs <- rlang::set_names(unique_df$graph, unique_df$iupac)
-  new_glycan_structure(x$iupac, unique_graphs)
-}
-
-#' @export
-as.character.glyrepr_structure <- function(x, ...) {
-  data <- vctrs::vec_data(x)
-  vctrs::field(data, "iupac")
+  NextMethod()
 }
 
 #' Convert to Glycan Structure Vector

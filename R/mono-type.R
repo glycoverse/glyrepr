@@ -202,8 +202,13 @@ get_mono_type.glyrepr_structure <- function(x) {
     ))
   }
 
-  data <- vctrs::vec_data(x)
-  vctrs::field(data, "mono_type")
+  if (length(x) == 0) {
+    return(character())
+  }
+
+  graphs1 <- attr(x, "graphs")[[1]]
+  monos1 <- igraph::V(graphs1)$mono
+  get_mono_type_impl(monos1)
 }
 
 #' @export
