@@ -45,13 +45,22 @@
 glycan_composition <- function(...) {
   args <- rlang::list2(...)
   .valid_glycan_composition_input(args)
-  mono_types <- .get_comp_mono_types(args)
-  x <- purrr::map2(args, mono_types, ~ {
+  x <- purrr::map(args, ~ {
     result <- as.integer(.x)
     names(result) <- names(.x)
-    .reorder_composition_components(result, .y)
+    .reorder_composition_components(result)
   })
-  new_glycan_composition(x, mono_types)
+  new_glycan_composition(x)
+}
+
+#' Create a glycan composition object
+#' @param x A list of named integer vectors.
+#' @returns A glyrepr_composition object.
+#' @noRd
+new_glycan_composition <- function(x) {
+  # Use vctrs::list_of instead of new_list_of
+  x <- vctrs::new_list_of(x, .ptype = integer(), class = "glyrepr_composition_list")
+  vctrs::new_rcrd(list(data = x), class = "glyrepr_composition")
 }
 
 #' Validate glycan composition input
@@ -96,6 +105,10 @@ glycan_composition <- function(...) {
   }
 }
 
+#' Get monosaccharide types from a list of named integer vectors (composition components)
+#' @param x A list of named integer vectors.
+#' @returns A character vector of monosaccharide types.
+#' @noRd
 .get_comp_mono_types <- function(x) {
   # remove all substituents
   x <- purrr::map(x, ~ .x[!names(.x) %in% available_substituents()])
@@ -104,12 +117,6 @@ glycan_composition <- function(...) {
     cli::cli_abort("Must have only one type of monosaccharide")
   }
   mono_types
-}
-
-new_glycan_composition <- function(x) {
-  # Use vctrs::list_of instead of new_list_of
-  x <- vctrs::new_list_of(x, .ptype = integer(), class = "glyrepr_composition_list")
-  vctrs::new_rcrd(list(data = x), class = "glyrepr_composition")
 }
 
 # Helper function to check if a name is a known composition component (monosaccharide or substituent)
@@ -413,11 +420,10 @@ as.character.glyrepr_composition <- function(x, ...) {
 #' Monosaccharides are placed before substituents.
 #
 #' @param components A named integer vector of composition components.
-#' @param mono_type The monosaccharide type.
 #' @returns A named integer vector of reordered composition components.
 #' @noRd
-.reorder_composition_components <- function(components, mono_type) {
-  mono_orders <- available_monosaccharides(mono_type)
+.reorder_composition_components <- function(components) {
+  mono_orders <- available_monosaccharides()
   sub_orders <- available_substituents()
   orders <- c(mono_orders, sub_orders)
   components[order(match(names(components), orders))]
