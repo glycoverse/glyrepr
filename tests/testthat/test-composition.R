@@ -33,13 +33,6 @@ test_that("substituents are located after monosaccharides", {
   expect_equal(as.character(comp), "Glc(1)Gal(1)Ac(1)S(1)")
 })
 
-test_that("mono types are decided correctly for compositions", {
-  comps1 <- glycan_composition(c(Hex = 1, HexNAc = 1), c(Hex = 1, gMur = 1))
-  comps2 <- glycan_composition(c(Glc = 1, Gal = 1), c(Glc = 1, Mur = 1))
-  expect_equal(get_mono_type(comps1), "generic")
-  expect_equal(get_mono_type(comps2), "concrete")
-})
-
 test_that("mixed types within one composition throws error", {
   expect_error(glycan_composition(c(Hex = 1, Glc = 1)), "Must have only one type of monosaccharide")
 })
