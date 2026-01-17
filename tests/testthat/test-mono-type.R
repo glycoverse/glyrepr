@@ -30,11 +30,16 @@ test_that("get_mono_type of unknown monosaccharides", {
 })
 
 test_that("get mono type of composition", {
-  comp_generic <- glycan_composition(c(Hex = 4, HexNAc = 1))
+  comp_generic <- glycan_composition(c(Hex = 4, HexNAc = 1), c(Hex = 1, HexNAc = 1))
   comp_concrete <- glycan_composition(c(Gal = 4, GlcNAc = 1))
 
   expect_equal(get_mono_type(comp_generic), "generic")
   expect_equal(get_mono_type(comp_concrete), "concrete")
+})
+
+test_that("get mono type of empty composition", {
+  comp_empty <- glycan_composition()
+  expect_equal(get_mono_type(comp_empty), character())
 })
 
 # Tests for convert_to_generic function
@@ -87,4 +92,10 @@ test_that("convert_to_generic with already generic composition returns same", {
   comp_generic <- glycan_composition(c(Hex = 2, HexNAc = 1))
   result <- convert_to_generic(comp_generic)
   expect_identical(result, comp_generic)
+})
+
+test_that("convert_to_generic with empty composition returns empty composition", {
+  comp_empty <- glycan_composition()
+  result <- convert_to_generic(comp_empty)
+  expect_equal(result, comp_empty)
 })
