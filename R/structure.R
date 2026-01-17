@@ -261,87 +261,10 @@ ensure_name_vertex_attr <- function(glycan) {
   glycan
 }
 
-#' @export 
+#' @export
 #' @rdname glycan_structure
 is_glycan_structure <- function(x) {
   inherits(x, "glyrepr_structure")
-}
-
-#' Convert to Glycan Structure Vector
-#'
-#' Convert an object to a glycan structure vector.
-#'
-#' @param x An object to convert to a glycan structure vector.
-#'   Can be an igraph object, a list of igraph objects,
-#'   a character vector of IUPAC-condensed strings,
-#'   or an existing glyrepr_structure object.
-#'
-#' @returns A glyrepr_structure object.
-#'
-#' @examples
-#' library(igraph)
-#'
-#' # Convert a single igraph
-#' graph <- make_graph(~ 1-+2)
-#' V(graph)$mono <- c("GlcNAc", "GlcNAc")
-#' V(graph)$sub <- ""
-#' E(graph)$linkage <- "b1-4"
-#' graph$anomer <- "a1"
-#' as_glycan_structure(graph)
-#'
-#' # Convert a list of igraphs
-#' o_glycan_vec <- o_glycan_core_1()
-#' o_glycan_graph <- get_structure_graphs(o_glycan_vec)
-#' as_glycan_structure(list(graph, o_glycan_graph))
-#'
-#' # Convert a character vector of IUPAC-condensed strings
-#' as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
-#'
-#' @export
-as_glycan_structure <- function(x) {
-  UseMethod("as_glycan_structure")
-}
-
-#' @export
-as_glycan_structure.glyrepr_structure <- function(x) {
-  x
-}
-
-#' @export
-as_glycan_structure.igraph <- function(x) {
-  glycan_structure(x)
-}
-
-#' @export
-as_glycan_structure.list <- function(x) {
-  # Validate that all elements are igraph objects
-  if (!all(purrr::map_lgl(x, ~ inherits(.x, "igraph")))) {
-    cli::cli_abort(c(
-      "All elements in the list must be igraph objects.",
-      "i" = "Each graph in the list should be a valid glycan structure."
-    ))
-  }
-  do.call(glycan_structure, x)
-}
-
-#' @export
-as_glycan_structure.character <- function(x) {
-  if (length(x) == 1) {
-    graph <- .parse_iupac_condensed_single(x)
-    return(glycan_structure(graph))
-  } else {
-    # Multiple characters - return list of structures
-    graphs <- purrr::map(x, .parse_iupac_condensed_single)
-    return(do.call(glycan_structure, graphs))
-  }
-}
-
-#' @export
-as_glycan_structure.default <- function(x) {
-  cli::cli_abort(c(
-    "Cannot convert object of class {.cls {class(x)}} to glyrepr_structure.",
-    "i" = "Supported types: igraph object, list of igraph objects, character vector (IUPAC-condensed), or existing glyrepr_structure."
-  ))
 }
 
 #' @export
@@ -443,24 +366,40 @@ pillar_shaft.glyrepr_structure <- function(x, ...) {
 
 #' @export
 vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
-  x_structures <- attr(x, "structures")
-  y_structures <- attr(y, "structures")
-
-  # Combine all structures from both x and y
-  all_structures <- c(x_structures, y_structures)
-
-  # Remove duplicates (keep first occurrence)
-  unique_names <- unique(names(all_structures))
-  combined_structures <- all_structures[unique_names]
-  names(combined_structures) <- unique_names
-
-  # Create prototype with all structures
-  new_glycan_structure(character(), combined_structures)
+  new_glycan_structure()
 }
 
 #' @export
 vec_cast.glyrepr_structure.glyrepr_structure <- function(x, to, ...) {
   x
+}
+
+#' @export
+vec_cast.glyrepr_structure.igraph <- function(x, to, ...) {
+  glycan_structure(x)
+}
+
+#' @export
+vec_cast.glyrepr_structure.list <- function(x, to, ...) {
+  if (!all(purrr::map_lgl(x, ~ inherits(.x, "igraph")))) {
+    cli::cli_abort(c(
+      "All elements in the list must be igraph objects.",
+      "i" = "Each graph in the list should be a valid glycan structure."
+    ))
+  }
+  do.call(glycan_structure, x)
+}
+
+#' @export
+vec_cast.glyrepr_structure.character <- function(x, to, ...) {
+  if (length(x) == 1) {
+    graph <- .parse_iupac_condensed_single(x)
+    return(glycan_structure(graph))
+  } else {
+    # Multiple characters - return list of structures
+    graphs <- purrr::map(x, .parse_iupac_condensed_single)
+    return(do.call(glycan_structure, graphs))
+  }
 }
 
 #' @export
@@ -497,6 +436,41 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 as.character.glyrepr_structure <- function(x, ...) {
   data <- vctrs::vec_data(x)
   vctrs::field(data, "iupac")
+}
+
+#' Convert to Glycan Structure Vector
+#'
+#' Convert an object to a glycan structure vector.
+#'
+#' @param x An object to convert to a glycan structure vector.
+#'   Can be an igraph object, a list of igraph objects,
+#'   a character vector of IUPAC-condensed strings,
+#'   or an existing glyrepr_structure object.
+#'
+#' @returns A glyrepr_structure object.
+#'
+#' @examples
+#' library(igraph)
+#'
+#' # Convert a single igraph
+#' graph <- make_graph(~ 1-+2)
+#' V(graph)$mono <- c("GlcNAc", "GlcNAc")
+#' V(graph)$sub <- ""
+#' E(graph)$linkage <- "b1-4"
+#' graph$anomer <- "a1"
+#' as_glycan_structure(graph)
+#'
+#' # Convert a list of igraphs
+#' o_glycan_vec <- o_glycan_core_1()
+#' o_glycan_graph <- get_structure_graphs(o_glycan_vec)
+#' as_glycan_structure(list(graph, o_glycan_graph))
+#'
+#' # Convert a character vector of IUPAC-condensed strings
+#' as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
+#'
+#' @export
+as_glycan_structure <- function(x) {
+  vctrs::vec_cast(x, glycan_structure())
 }
 
 #' Access Individual Glycan Structures
