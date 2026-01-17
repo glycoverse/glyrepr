@@ -1,7 +1,7 @@
 # reduce_structure_level rejects higher level
 
     Code
-      reduce_structure_level(glycans, to_level = "topological")
+      reduce_structure_level(glycan, to_level = "topological")
     Condition
       Error in `reduce_structure_level()`:
       ! Cannot reduce a structure to a higher resolution level.
