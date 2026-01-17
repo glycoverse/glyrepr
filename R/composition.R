@@ -56,7 +56,7 @@ glycan_composition <- function(...) {
 #' @param x A list of named integer vectors.
 #' @returns A glyrepr_composition object.
 #' @noRd
-new_glycan_composition <- function(x) {
+new_glycan_composition <- function(x = list()) {
   # Use vctrs::list_of instead of new_list_of
   x <- vctrs::new_list_of(x, .ptype = integer(), class = "glyrepr_composition_list")
   vctrs::new_rcrd(list(data = x), class = "glyrepr_composition")
@@ -138,62 +138,6 @@ is_known_composition_component <- function(names) {
   is_known_monosaccharide(names) | names %in% available_substituents()
 }
 
-#' Convert to Glycan Composition
-#'
-#' Convert an object to a glycan composition. The resulting composition can 
-#' contain both monosaccharides and substituents.
-#'
-#' @param x An object to convert to a glycan composition.
-#'   Can be a named integer vector, a list of named integer vectors,
-#'   a glycan structure vector,
-#'   or an existing glyrepr_composition object.
-#'
-#' @returns A glyrepr_composition object.
-#'
-#' @details
-#' When converting from glycan structures, both monosaccharides and substituents 
-#' are counted. Substituents are extracted from the `sub` attribute of each 
-#' vertex in the structure. For example, a vertex with `sub = "3Me"` 
-#' contributes one "Me" substituent to the composition.
-#'
-#' @examples
-#' # From a named vector
-#' as_glycan_composition(c(Hex = 5, HexNAc = 2))
-#'
-#' # From a named vector with substituents
-#' as_glycan_composition(c(Glc = 2, Gal = 1, Me = 1, S = 1))
-#'
-#' # From a list of named vectors
-#' as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
-#'
-#' # From a character vector of Byonic composition strings
-#' as_glycan_composition(c("Hex(5)HexNAc(2)", "Hex(3)HexNAc(1)"))
-#'
-#' # From a character vector of simple composition strings
-#' as_glycan_composition(c("H5N2", "H5N4S1F1", "H5N4A1G1"))
-#'
-#' # From an existing composition (returns as-is)
-#' comp <- glycan_composition(c(Hex = 5, HexNAc = 2))
-#' as_glycan_composition(comp)
-#'
-#' # From a glycan structure vector
-#' strucs <- c(n_glycan_core(), o_glycan_core_1())
-#' as_glycan_composition(strucs)
-#'
-#' # From structures with substituents
-#' # (This will count both monosaccharides and any substituents present)
-#'
-#' @export
-as_glycan_composition <- function(x) {
-  UseMethod("as_glycan_composition")
-}
-
-#' @rdname as_glycan_composition
-#' @export
-as_glycan_composition.glyrepr_composition <- function(x) {
-  x
-}
-
 # Helper function to extract substituent types from substituent strings
 extract_substituent_types <- function(sub_strings) {
   # Extract substituent types from strings like "3Me", "6S", "4Ac,3Me"
@@ -214,43 +158,6 @@ extract_substituent_types <- function(sub_strings) {
   }
 
   all_subs
-}
-
-#' @rdname as_glycan_composition
-#' @export
-as_glycan_composition.glyrepr_structure <- function(x) {
-  # Get mono_types directly from the structure data
-  data <- vctrs::vec_data(x)
-
-  # Use smap to convert each structure to composition
-  compositions <- smap(x, function(graph) {
-    # Count monosaccharides
-    monos <- igraph::V(graph)$mono
-    mono_tb <- table(monos)
-    mono_result <- as.integer(mono_tb)
-    names(mono_result) <- names(mono_tb)
-
-    # Count substituents
-    subs <- igraph::V(graph)$sub
-    sub_types <- extract_substituent_types(subs)
-    if (length(sub_types) > 0) {
-      sub_tb <- table(sub_types)
-      sub_result <- as.integer(sub_tb)
-      names(sub_result) <- names(sub_tb)
-    } else {
-      sub_result <- integer(0)
-    }
-
-    # Combine monosaccharides and substituents
-    result <- c(mono_result, sub_result)
-
-    # Sort by composition component order (monosaccharides first, then substituents)
-    result <- .reorder_composition_components(result)
-    result
-  })
-
-  # Create composition object
-  new_glycan_composition(compositions)
 }
 
 # Helper function to parse a single composition string
@@ -354,9 +261,64 @@ parse_single_composition <- function(char) {
   comp
 }
 
-#' @rdname as_glycan_composition
+#' Reorder composition components
+#'
+#' Composition components include monosaccharides and substituents.
+#' This function reorders the components based on the names.
+#' It assumes that all components are valid.
+#'
+#' The order is determined by the order of the names in [available_monosaccharides()]
+#' and [available_substituents()].
+#' Monosaccharides are placed before substituents.
+#
+#' @param components A named integer vector of composition components.
+#' @returns A named integer vector of reordered composition components.
+#' @noRd
+.reorder_composition_components <- function(components) {
+  mono_orders <- available_monosaccharides()
+  sub_orders <- available_substituents()
+  orders <- c(mono_orders, sub_orders)
+  components[order(match(names(components), orders))]
+}
+
 #' @export
-as_glycan_composition.character <- function(x) {
+vec_ptype_full.glyrepr_composition <- function(x, ...) "glycan_composition"
+
+#' @export
+vec_ptype_abbr.glyrepr_composition <- function(x, ...) "comp"
+
+#' @export
+format.glyrepr_composition <- function(x, ...) {
+  vec_cast(x, character())
+}
+
+#' @export
+#' @rdname glycan_composition
+is_glycan_composition <- function(x) {
+  inherits(x, "glyrepr_composition")
+}
+
+#' @export
+vec_ptype2.glyrepr_composition.glyrepr_composition <- function(x, y, ...) {
+  new_glycan_composition(list())
+}
+
+#' @export
+vec_cast.glyrepr_composition.glyrepr_composition <- function(x, to, ...) {
+  x
+}
+
+#' @export
+vec_cast.character.glyrepr_composition <- function(x, to, ...) {
+  convert_one <- function(comp) {
+    paste0(names(comp), "(", comp, ")", collapse = "")
+  }
+  data <- vctrs::vec_data(x)
+  purrr::map_chr(vctrs::field(data, "data"), convert_one)
+}
+
+#' @export
+vec_cast.glyrepr_composition.character <- function(x, to, ...) {
   # Handle empty character vector
   if (length(x) == 0) {
     return(glycan_composition())
@@ -394,105 +356,52 @@ as_glycan_composition.character <- function(x) {
   do.call(glycan_composition, compositions)
 }
 
-#' @rdname as_glycan_composition
 #' @export
-as_glycan_composition.default <- function(x) {
-  if (is.null(names(x)) && is.list(x)) {
-    # Handle list of named vectors - validate that all elements are named
-    if (!all(purrr::map_lgl(x, ~ !is.null(names(.x))))) {
-      cli::cli_abort(c(
-        "All elements in the list must be named vectors.",
-        "i" = "Each vector in the list should have names indicating monosaccharides."
-      ))
-    }
-    do.call(glycan_composition, x)
-  } else if (!is.null(names(x)) && is.numeric(x)) {
-    # Handle single named vector
-    glycan_composition(x)
-  } else {
-    cli::cli_abort(c(
-      "Cannot convert object of class {.cls {class(x)}} to glyrepr_composition.",
-      "i" = "Supported types: named integer vector, list of named integer vectors, or existing glyrepr_composition."
-    ))
-  }
-}
-
-#' @export
-as.character.glyrepr_composition <- function(x, ...) {
-  format(x)
-}
-
-#' Reorder composition components
-#'
-#' Composition components include monosaccharides and substituents.
-#' This function reorders the components based on the names.
-#' It assumes that all components are valid.
-#'
-#' The order is determined by the order of the names in [available_monosaccharides()]
-#' and [available_substituents()].
-#' Monosaccharides are placed before substituents.
-#
-#' @param components A named integer vector of composition components.
-#' @returns A named integer vector of reordered composition components.
-#' @noRd
-.reorder_composition_components <- function(components) {
-  mono_orders <- available_monosaccharides()
-  sub_orders <- available_substituents()
-  orders <- c(mono_orders, sub_orders)
-  components[order(match(names(components), orders))]
-}
-
-#' @export
-vec_ptype_full.glyrepr_composition <- function(x, ...) "glycan_composition"
-
-#' @export
-vec_ptype_abbr.glyrepr_composition <- function(x, ...) "comp"
-
-#' @export
-format.glyrepr_composition <- function(x, ...) {
-  format_one <- function(comp) {
-    paste0(names(comp), "(", comp, ")", collapse = "")
-  }
+vec_cast.glyrepr_composition.glyrepr_structure <- function(x, to, ...) {
   data <- vctrs::vec_data(x)
-  purrr::map_chr(vctrs::field(data, "data"), format_one)
-}
 
-#' @export
-#' @rdname glycan_composition
-is_glycan_composition <- function(x) {
-  inherits(x, "glyrepr_composition")
-}
+  # Use smap to convert each structure to composition
+  compositions <- smap(x, function(graph) {
+    # Count monosaccharides
+    monos <- igraph::V(graph)$mono
+    mono_tb <- table(monos)
+    mono_result <- as.integer(mono_tb)
+    names(mono_result) <- names(mono_tb)
 
-#' @export
-vec_ptype2.glyrepr_composition.glyrepr_composition <- function(x, y, ...) {
-  new_glycan_composition(list())
-}
-
-#' @export
-vec_cast.glyrepr_composition.glyrepr_composition <- function(x, to, ...) {
-  x
-}
-
-# Helper function to format a subset of compositions
-format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
-  if (!colored) {
-    return(format(x)[indices])
-  }
-
-  # Format with colors if concrete type
-  format_one_colored <- function(comp) {
-    mono_names <- names(comp)
-    # Add colors to monosaccharides (generic monos automatically get black color)
-    if (colored) {
-      mono_names <- add_colors(mono_names, colored = TRUE)
+    # Count substituents
+    subs <- igraph::V(graph)$sub
+    sub_types <- extract_substituent_types(subs)
+    if (length(sub_types) > 0) {
+      sub_tb <- table(sub_types)
+      sub_result <- as.integer(sub_tb)
+      names(sub_result) <- names(sub_tb)
+    } else {
+      sub_result <- integer(0)
     }
-    paste0(mono_names, "(", comp, ")", collapse = "")
+
+    # Combine monosaccharides and substituents
+    result <- c(mono_result, sub_result)
+
+    # Sort by composition component order (monosaccharides first, then substituents)
+    result <- .reorder_composition_components(result)
+    result
+  })
+
+  # Create composition object
+  new_glycan_composition(compositions)
+}
+
+#' @export
+vec_cast.glyrepr_composition.list <- function(x, to, ...) {
+  if (length(x) == 0) {
+    return(glycan_composition())
   }
+  do.call(glycan_composition, x)
+}
 
-  data <- vctrs::vec_data(x)
-  comp_data <- vctrs::field(data, "data")[indices]
-
-  purrr::map_chr(comp_data, format_one_colored)
+#' @export
+as_glycan_composition <- function(x) {
+  vec_cast(x, new_glycan_composition())
 }
 
 #' @export
@@ -528,4 +437,26 @@ pillar_shaft.glyrepr_composition <- function(x, ...) {
   formatted <- format_glycan_composition_subset(x, indices, colored = TRUE)
 
   pillar::new_pillar_shaft_simple(formatted, align = "left", min_width = 10)
+}
+
+# Helper function to format a subset of compositions
+format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
+  if (!colored) {
+    return(format(x)[indices])
+  }
+
+  # Format with colors if concrete type
+  format_one_colored <- function(comp) {
+    mono_names <- names(comp)
+    # Add colors to monosaccharides (generic monos automatically get black color)
+    if (colored) {
+      mono_names <- add_colors(mono_names, colored = TRUE)
+    }
+    paste0(mono_names, "(", comp, ")", collapse = "")
+  }
+
+  data <- vctrs::vec_data(x)
+  comp_data <- vctrs::field(data, "data")[indices]
+
+  purrr::map_chr(comp_data, format_one_colored)
 }

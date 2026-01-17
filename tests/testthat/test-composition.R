@@ -53,20 +53,6 @@ test_that("glycan_composition rejects empty compositions", {
   expect_error(glycan_composition(integer(0)), "at least one residue")
 })
 
-test_that("as_glycan_composition works with named vectors", {
-  # Test generic composition
-  vec <- c(Hex = 2, HexNAc = 1)
-  comp <- as_glycan_composition(vec)
-  expected <- glycan_composition(c(Hex = 2, HexNAc = 1))
-  expect_equal(comp, expected)
-
-  # Test concrete composition
-  vec <- c(Glc = 2, Gal = 1)
-  comp <- as_glycan_composition(vec)
-  expected <- glycan_composition(c(Glc = 2, Gal = 1))
-  expect_equal(comp, expected)
-})
-
 test_that("as_glycan_composition works with list of named vectors", {
   vec_list <- list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1))
   comp <- as_glycan_composition(vec_list)
@@ -80,14 +66,7 @@ test_that("as_glycan_composition returns existing composition unchanged", {
   expect_identical(result, original)
 })
 
-test_that("as_glycan_composition handles compositions with one residue", {
-  vec <- c(Hex = 1)
-  comp <- as_glycan_composition(vec)
-  expected <- glycan_composition(c(Hex = 1))
-  expect_equal(comp, expected)
-})
-
-test_that("as_composition works for a glycan structure", {
+test_that("as_glycan_composition works for a glycan structure", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- ""
@@ -102,7 +81,7 @@ test_that("as_composition works for a glycan structure", {
   expect_equal(comp, expected_comp)
 })
 
-test_that("as_composition works for a glycan structure with substituents", {
+test_that("as_glycan_composition works for a glycan structure with substituents", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- c("", "", "3Me")
@@ -117,7 +96,7 @@ test_that("as_composition works for a glycan structure with substituents", {
   expect_equal(comp, expected_comp)
 })
 
-test_that("as_composition works for a glycan structure with multiple substituents", {
+test_that("as_glycan_composition works for a glycan structure with multiple substituents", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- c("", "", "3Me,6S")
