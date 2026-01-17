@@ -125,7 +125,7 @@ glycan_structure <- function(...) {
 
   if (length(graphs) == 0) {
     # Return empty vector
-    return(new_glycan_structure(character(), character()))
+    return(new_glycan_structure())
   }
 
   # Validate and process each graph
@@ -139,16 +139,13 @@ glycan_structure <- function(...) {
   # Use IUPAC codes directly as data for the rcrd structure
   iupacs <- purrr::map_chr(processed_graphs, .structure_to_iupac_single)
 
-  # Get mono types for each structure
-  mono_types <- purrr::map_chr(processed_graphs, get_graph_mono_type)
-
   # Create a unique list based on uniqueness of IUPAC codes for structures storage
   unique_indices <- which(!duplicated(iupacs))
   unique_graphs <- processed_graphs[unique_indices]
   unique_iupacs <- iupacs[unique_indices]
   names(unique_graphs) <- unique_iupacs
 
-  res <- new_glycan_structure(iupacs, mono_types, unique_graphs)
+  res <- new_glycan_structure(iupacs, unique_graphs)
   reorder_graphs(res)
 }
 
@@ -470,7 +467,7 @@ vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
   names(combined_structures) <- unique_names
 
   # Create prototype with all structures
-  new_glycan_structure(character(), character(), structures = combined_structures)
+  new_glycan_structure(character(), combined_structures)
 }
 
 #' @export
@@ -504,7 +501,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
   }
 
   # Create new vector with structures
-  new_glycan_structure(iupacs, mono_types, structures = retrenched_structures)
+  new_glycan_structure(iupacs, retrenched_structures)
 }
 
 
