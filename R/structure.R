@@ -409,7 +409,7 @@ vec_cast.character.glyrepr_structure <- function(x, to, ...) {
 vec_proxy.glyrepr_structure <- function(x, ...) {
   iupacs <- vctrs::vec_data(x)
   graphs <- attr(x, "graphs")
-  data.frame(iupac = iupacs, graph = graphs[iupacs])
+  data.frame(iupac = iupacs, graph = unname(graphs[iupacs]))
 }
 
 #' @export
