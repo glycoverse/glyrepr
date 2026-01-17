@@ -344,14 +344,12 @@ pillar_shaft.glyrepr_structure <- function(x, ...) {
   }
 
   # Get formatted strings with colors
-  data <- vctrs::vec_data(x)
-  codes <- vctrs::field(data, "iupac")
-  mono_types <- vctrs::field(data, "mono_type")
-  structures <- attr(x, "structures")
+  codes <- vctrs::vec_data(x)
+  graphs <- attr(x, "graphs")
 
   # For each structure, add colors if concrete type
-  formatted <- purrr::map2_chr(codes, mono_types, function(code, mono_type) {
-    structure <- structures[[code]]
+  formatted <- purrr::map_chr(codes, function(code) {
+    structure <- graphs[[code]]
     mono_names <- igraph::V(structure)$mono
 
     # Add colors to monosaccharides and gray linkages
