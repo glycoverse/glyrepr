@@ -350,6 +350,12 @@ new_glycan_composition <- function(x = list()) {
 #' @noRd
 .get_comp_mono_types <- function(x) {
   x <- purrr::map(x, ~ .x[!names(.x) %in% available_substituents()])  # remove all substituents
+
+  # After removing substituents, each composition must contain at least one monosaccharide.
+  # Otherwise, get_mono_type_impl() would be called with an empty vector and fail.
+  if (!purrr::every(x, ~ length(.x) > 0)) {
+    cli::cli_abort("Each composition must contain at least one monosaccharide (non-substituent residue).")
+  }
   purrr::map_chr(x, ~ get_mono_type_impl(names(.x)))
 }
 
