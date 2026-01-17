@@ -245,13 +245,13 @@ validate_single_glycan_structure <- function(glycan) {
   glycan
 }
 
-# Helper function to create a new glycan structure vector
-new_glycan_structure <- function(iupac = character(), mono_type = character(), structures = list()) {
-  vctrs::new_rcrd(
-    list(iupac = iupac, mono_type = mono_type),
-    structures = structures,
-    class = "glyrepr_structure"
-  )
+#' Helper function to create a new glycan structure vector
+#' @param iupac A character vector of IUPAC-condensed strings.
+#' @param graphs A list of igraph objects.
+#' @returns A glyrepr_structure object (a vctr object)
+#' @noRd
+new_glycan_structure <- function(iupac = character(), graphs = list()) {
+  vctrs::new_vctr(iupac, graphs = graphs, class = "glyrepr_structure")
 }
 
 # Helper function to extract structures from existing vector
