@@ -504,25 +504,24 @@ test_that("spmap_structure works with regular functions", {
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
   structures <- c(core1, core2)
-  
+
   # Function that adds graph attribute based on multiple arguments
   add_attributes <- function(g, label, value) {
     g <- igraph::set_graph_attr(g, "custom_label", label)
     g <- igraph::set_graph_attr(g, "custom_value", value)
     g
   }
-  
+
   labels <- c("label1", "label2")
   values <- c(10, 20)
   result <- spmap_structure(list(structures, labels, values), add_attributes)
-  
+
   expect_s3_class(result, "glyrepr_structure")
   expect_equal(length(result), 2)
-  
+
   # Check that attributes were added
-  structures_list <- attr(result, "structures")
-  data <- vctrs::vec_data(result)
-  first_structure <- structures_list[[vctrs::field(data, "iupac")[1]]]
+  graphs <- attr(result, "graphs")
+  first_structure <- graphs[[vctrs::vec_data(result)[1]]]
   expect_equal(igraph::graph_attr(first_structure, "custom_label"), "label1")
   expect_equal(igraph::graph_attr(first_structure, "custom_value"), 10)
 })
@@ -664,9 +663,8 @@ test_that("simap_structure works with regular functions", {
   expect_equal(length(result), 2)
   
   # Check that attributes were added
-  structures_list <- attr(result, "structures")
-  data <- vctrs::vec_data(result)
-  first_structure <- structures_list[[vctrs::field(data, "iupac")[1]]]
+  graphs <- attr(result, "graphs")
+  first_structure <- graphs[[vctrs::vec_data(result)[1]]]
   expect_equal(igraph::graph_attr(first_structure, "position"), 1)
 })
 
@@ -856,13 +854,13 @@ test_that("smap_structure correctly updates unique structures count when modific
   structures <- as_glycan_structure(glycans)
 
   # Before modification: should have 2 unique structures
-  expect_equal(length(attr(structures, "structures")), 2)
+  expect_equal(length(attr(structures, "graphs")), 2)
 
   # Remove linkages - both structures should become identical
   result <- remove_linkages(structures)
 
   # After modification: should have only 1 unique structure
-  expect_equal(length(attr(result, "structures")), 1)
+  expect_equal(length(attr(result, "graphs")), 1)
 
   # Both elements should have the same IUPAC code
   expect_equal(as.character(result)[1], as.character(result)[2])
@@ -876,7 +874,7 @@ test_that("smap2_structure correctly updates unique structures count when modifi
   values <- c("test1", "test2")
 
   # Before modification: should have 2 unique structures
-  expect_equal(length(attr(structures, "structures")), 2)
+  expect_equal(length(attr(structures, "graphs")), 2)
 
   # Function that removes linkages regardless of second argument
   remove_linkages_func <- function(g, val) {
@@ -887,7 +885,7 @@ test_that("smap2_structure correctly updates unique structures count when modifi
   result <- smap2_structure(structures, values, remove_linkages_func)
 
   # After modification: should have only 1 unique structure
-  expect_equal(length(attr(result, "structures")), 1)
+  expect_equal(length(attr(result, "graphs")), 1)
 
   # Both elements should have the same IUPAC code
   expect_equal(as.character(result)[1], as.character(result)[2])
@@ -902,7 +900,7 @@ test_that("spmap_structure correctly updates unique structures count when modifi
   values2 <- c(1, 2)
 
   # Before modification: should have 2 unique structures
-  expect_equal(length(attr(structures, "structures")), 2)
+  expect_equal(length(attr(structures, "graphs")), 2)
 
   # Function that removes linkages regardless of other arguments
   remove_linkages_func <- function(g, val1, val2) {
@@ -913,7 +911,7 @@ test_that("spmap_structure correctly updates unique structures count when modifi
   result <- spmap_structure(list(structures, values1, values2), remove_linkages_func)
 
   # After modification: should have only 1 unique structure
-  expect_equal(length(attr(result, "structures")), 1)
+  expect_equal(length(attr(result, "graphs")), 1)
 
   # Both elements should have the same IUPAC code
   expect_equal(as.character(result)[1], as.character(result)[2])
