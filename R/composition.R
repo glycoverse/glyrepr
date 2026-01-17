@@ -98,7 +98,22 @@ new_glycan_composition <- function(x) {
     ))
   }
 
-  # 5. Positive number check
+  # 5. Mono type check
+  mono_types <- .get_comp_mono_types(x)
+  if (any(mono_types == "mixed")) {
+    cli::cli_abort(c(
+      "Must have only one type of monosaccharide.",
+      "x" = "Some compositions have mixed monosaccharide types (both generic and concrete)."
+    ))
+  }
+  if (!all(mono_types == mono_types[[1]])) {
+    cli::cli_abort(c(
+      "Must have only one type of monosaccharide.",
+      "x" = "Both generic and concrete compositions exist."
+    ))
+  }
+
+  # 6. Positive number check
   if (!purrr::every(x, ~ all(.x > 0))) {
     cli::cli_abort("Must have only positive numbers of residues.")
   }
@@ -109,13 +124,8 @@ new_glycan_composition <- function(x) {
 #' @returns A character vector of monosaccharide types.
 #' @noRd
 .get_comp_mono_types <- function(x) {
-  # remove all substituents
-  x <- purrr::map(x, ~ .x[!names(.x) %in% available_substituents()])
-  mono_types <- purrr::map_chr(x, ~ get_mono_type_impl(names(.x)))
-  if (any(mono_types == "mixed")) {
-    cli::cli_abort("Must have only one type of monosaccharide")
-  }
-  mono_types
+  x <- purrr::map(x, ~ .x[!names(.x) %in% available_substituents()])  # remove all substituents
+  purrr::map_chr(x, ~ get_mono_type_impl(names(.x)))
 }
 
 # Helper function to check if a name is a known composition component (monosaccharide or substituent)
