@@ -12,13 +12,13 @@
 #'
 #' @details
 #' Compositions can contain:
-#' 
+#'
 #' - Monosaccharides: either generic (e.g., "Hex", "HexNAc") or concrete 
 #'   (e.g., "Glc", "Gal"). All monosaccharides in a composition must be 
 #'   of the same type.
 #' - Substituents: e.g., "Me", "Ac", "S". These can be mixed with either 
 #'   generic or concrete monosaccharides.
-#' 
+#'
 #' Components are automatically sorted with monosaccharides first (according to 
 #' their order in the monosaccharides table), followed by substituents (according 
 #' to their order in `available_substituents()`).
@@ -177,21 +177,21 @@ as_glycan_composition.glyrepr_composition <- function(x) {
 extract_substituent_types <- function(sub_strings) {
   # Extract substituent types from strings like "3Me", "6S", "4Ac,3Me"
   all_subs <- character(0)
-  
+
   for (sub_str in sub_strings) {
     if (sub_str == "" || is.na(sub_str)) {
       next
     }
-    
+
     # Split by commas for multiple substituents
     individual_subs <- stringr::str_split(sub_str, ",")[[1]]
     individual_subs <- individual_subs[individual_subs != ""]
-    
+
     # Extract substituent names (remove position numbers)
     sub_names <- stringr::str_extract(individual_subs, "[A-Za-z]+$")
     all_subs <- c(all_subs, sub_names)
   }
-  
+
   all_subs
 }
 
@@ -201,7 +201,7 @@ as_glycan_composition.glyrepr_structure <- function(x) {
   # Get mono_types directly from the structure data
   data <- vctrs::vec_data(x)
   structure_mono_types <- vctrs::field(data, "mono_type")
-  
+
   # Use smap2 to convert each structure to composition with known mono_type
   compositions <- smap2(x, structure_mono_types, function(graph, mono_type) {
     # Count monosaccharides
@@ -209,7 +209,7 @@ as_glycan_composition.glyrepr_structure <- function(x) {
     mono_tb <- table(monos)
     mono_result <- as.integer(mono_tb)
     names(mono_result) <- names(mono_tb)
-    
+
     # Count substituents
     subs <- igraph::V(graph)$sub
     sub_types <- extract_substituent_types(subs)
@@ -220,15 +220,15 @@ as_glycan_composition.glyrepr_structure <- function(x) {
     } else {
       sub_result <- integer(0)
     }
-    
+
     # Combine monosaccharides and substituents
     result <- c(mono_result, sub_result)
-    
+
     # Sort by composition component order (monosaccharides first, then substituents)
     result <- .reorder_composition_components(result, mono_type)
     result
   })
-  
+
   # Create composition vector
   do.call(glycan_composition, compositions)
 }
@@ -346,17 +346,17 @@ as_glycan_composition.character <- function(x) {
   if (any(is.na(x))) {
     cli::cli_abort("Cannot parse NA as glycan composition.")
   }
-  
+
   # Parse each character string using the helper function
   parse_result <- purrr::map(x, parse_single_composition)
-  
+
   # Extract validity and compositions
   valid_flags <- purrr::map_lgl(parse_result, "valid")
   compositions <- purrr::map(parse_result, "composition")
-  
+
   # Find invalid indices
   invalid_indices <- which(!valid_flags)
-  
+
   # Check for invalid characters
   if (length(invalid_indices) > 0) {
     cli::cli_abort(c(
@@ -369,7 +369,7 @@ as_glycan_composition.character <- function(x) {
   if (length(compositions) == 0) {
     return(glycan_composition())
   }
-  
+
   # Create composition vector
   do.call(glycan_composition, compositions)
 }
@@ -459,7 +459,7 @@ format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
   if (!colored) {
     return(format(x)[indices])
   }
-  
+
   # Format with colors if concrete type
   format_one_colored <- function(comp, mono_type) {
     mono_names <- names(comp)
@@ -469,11 +469,11 @@ format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
     }
     paste0(mono_names, "(", comp, ")", collapse = "")
   }
-  
+
   data <- vctrs::vec_data(x)
   comp_data <- vctrs::field(data, "data")[indices]
   mono_types <- vctrs::field(data, "mono_type")[indices]
-  
+
   purrr::map2_chr(comp_data, mono_types, format_one_colored)
 }
 
@@ -485,11 +485,11 @@ obj_print_data.glyrepr_composition <- function(x, ..., max_n = 10, colored = TRU
 
   n <- length(x)
   n_show <- min(n, max_n)
-  
+
   # Only format the compositions that need to be shown to improve performance
   indices_to_show <- seq_len(n_show)
   formatted <- format_glycan_composition_subset(x, indices_to_show, colored = colored)
-  
+
   # Print each composition on its own line with indexing, up to max_n
   for (i in seq_len(n_show)) {
     cat("[", i, "] ", formatted[i], "\n", sep = "")
