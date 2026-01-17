@@ -106,10 +106,10 @@ glycan_composition <- function(...) {
   mono_types
 }
 
-new_glycan_composition <- function(x, mono_types) {
+new_glycan_composition <- function(x) {
   # Use vctrs::list_of instead of new_list_of
-  x <- vctrs::list_of(!!!x, .ptype = integer())
-  vctrs::new_rcrd(list(data = x, mono_type = mono_types), class = "glyrepr_composition")
+  x <- vctrs::new_list_of(x, .ptype = integer(), class = "glyrepr_composition_list")
+  vctrs::new_rcrd(list(data = x), class = "glyrepr_composition")
 }
 
 # Helper function to check if a name is a known composition component (monosaccharide or substituent)
