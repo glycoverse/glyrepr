@@ -18,7 +18,7 @@
 #' - Substituents: e.g., "Me", "Ac", "S". These can be mixed with either
 #'   generic or concrete monosaccharides.
 #'
-#' Components are automatically sorted with monosaccharides first (according to 
+#' Components are automatically sorted with monosaccharides first (according to
 #' their order in the monosaccharides table), followed by substituents (according
 #' to their order in `available_substituents()`).
 #'
@@ -51,6 +51,166 @@ glycan_composition <- function(...) {
   })
   new_glycan_composition(x)
 }
+
+#' @export
+#' @rdname glycan_composition
+is_glycan_composition <- function(x) {
+  inherits(x, "glyrepr_composition")
+}
+
+#' @export
+as_glycan_composition <- function(x) {
+  vec_cast(x, new_glycan_composition())
+}
+
+#' @export
+vec_ptype_full.glyrepr_composition <- function(x, ...) "glycan_composition"
+
+#' @export
+vec_ptype_abbr.glyrepr_composition <- function(x, ...) "comp"
+
+#' @export
+format.glyrepr_composition <- function(x, ...) {
+  vec_cast(x, character())
+}
+
+#' @export
+vec_ptype2.glyrepr_composition.glyrepr_composition <- function(x, y, ...) {
+  new_glycan_composition(list())
+}
+
+#' @export
+vec_cast.glyrepr_composition.glyrepr_composition <- function(x, to, ...) {
+  x
+}
+
+#' @export
+vec_cast.character.glyrepr_composition <- function(x, to, ...) {
+  convert_one <- function(comp) {
+    paste0(names(comp), "(", comp, ")", collapse = "")
+  }
+  data <- vctrs::vec_data(x)
+  purrr::map_chr(vctrs::field(data, "data"), convert_one)
+}
+
+#' @export
+vec_cast.glyrepr_composition.character <- function(x, to, ...) {
+  # Handle empty character vector
+  if (length(x) == 0) {
+    return(glycan_composition())
+  }
+
+  # Handling NA
+  if (any(is.na(x))) {
+    cli::cli_abort("Cannot parse NA as glycan composition.")
+  }
+
+  # Parse each character string using the helper function
+  parse_result <- purrr::map(x, parse_single_composition)
+
+  # Extract validity and compositions
+  valid_flags <- purrr::map_lgl(parse_result, "valid")
+  compositions <- purrr::map(parse_result, "composition")
+
+  # Find invalid indices
+  invalid_indices <- which(!valid_flags)
+
+  # Check for invalid characters
+  if (length(invalid_indices) > 0) {
+    cli::cli_abort(c(
+      "Characters cannot be parsed as glycan compositions at index {invalid_indices}",
+      "i" = "Expected format: 'Hex(5)HexNAc(2)' with monosaccharide names followed by counts in parentheses."
+    ))
+  }
+
+  # Handle case where all strings were empty
+  if (length(compositions) == 0) {
+    return(glycan_composition())
+  }
+
+  # Create composition vector
+  do.call(glycan_composition, compositions)
+}
+
+#' @export
+vec_cast.glyrepr_composition.glyrepr_structure <- function(x, to, ...) {
+  data <- vctrs::vec_data(x)
+
+  # Use smap to convert each structure to composition
+  compositions <- smap(x, function(graph) {
+    # Count monosaccharides
+    monos <- igraph::V(graph)$mono
+    mono_tb <- table(monos)
+    mono_result <- as.integer(mono_tb)
+    names(mono_result) <- names(mono_tb)
+
+    # Count substituents
+    subs <- igraph::V(graph)$sub
+    sub_types <- extract_substituent_types(subs)
+    if (length(sub_types) > 0) {
+      sub_tb <- table(sub_types)
+      sub_result <- as.integer(sub_tb)
+      names(sub_result) <- names(sub_tb)
+    } else {
+      sub_result <- integer(0)
+    }
+
+    # Combine monosaccharides and substituents
+    result <- c(mono_result, sub_result)
+
+    # Sort by composition component order (monosaccharides first, then substituents)
+    result <- .reorder_composition_components(result)
+    result
+  })
+
+  # Create composition object
+  new_glycan_composition(compositions)
+}
+
+#' @export
+vec_cast.glyrepr_composition.list <- function(x, to, ...) {
+  if (length(x) == 0) {
+    return(glycan_composition())
+  }
+  do.call(glycan_composition, x)
+}
+
+#' @export
+obj_print_data.glyrepr_composition <- function(x, ..., max_n = 10, colored = TRUE) {
+  if (length(x) == 0) {
+    return()
+  }
+
+  n <- length(x)
+  n_show <- min(n, max_n)
+
+  # Only format the compositions that need to be shown to improve performance
+  indices_to_show <- seq_len(n_show)
+  formatted <- format_glycan_composition_subset(x, indices_to_show, colored = colored)
+
+  # Print each composition on its own line with indexing, up to max_n
+  for (i in seq_len(n_show)) {
+    cat("[", i, "] ", formatted[i], "\n", sep = "")
+  }
+  if (n > max_n) {
+    cat("... (", n - max_n, " more not shown)\n", sep = "")
+  }
+}
+
+#' @importFrom pillar pillar_shaft
+#' @export
+pillar_shaft.glyrepr_composition <- function(x, ...) {
+  if (length(x) == 0) {
+    return(pillar::pillar_shaft(character()))
+  }
+
+  indices <- seq_len(length(x))
+  formatted <- format_glycan_composition_subset(x, indices, colored = TRUE)
+
+  pillar::new_pillar_shaft_simple(formatted, align = "left", min_width = 10)
+}
+
+# --- Internal functions -------------------------------------------------------
 
 #' Create a glycan composition object
 #' @param x A list of named integer vectors.
@@ -270,7 +430,7 @@ parse_single_composition <- function(char) {
 #' The order is determined by the order of the names in [available_monosaccharides()]
 #' and [available_substituents()].
 #' Monosaccharides are placed before substituents.
-#
+#'
 #' @param components A named integer vector of composition components.
 #' @returns A named integer vector of reordered composition components.
 #' @noRd
@@ -279,164 +439,6 @@ parse_single_composition <- function(char) {
   sub_orders <- available_substituents()
   orders <- c(mono_orders, sub_orders)
   components[order(match(names(components), orders))]
-}
-
-#' @export
-vec_ptype_full.glyrepr_composition <- function(x, ...) "glycan_composition"
-
-#' @export
-vec_ptype_abbr.glyrepr_composition <- function(x, ...) "comp"
-
-#' @export
-format.glyrepr_composition <- function(x, ...) {
-  vec_cast(x, character())
-}
-
-#' @export
-#' @rdname glycan_composition
-is_glycan_composition <- function(x) {
-  inherits(x, "glyrepr_composition")
-}
-
-#' @export
-vec_ptype2.glyrepr_composition.glyrepr_composition <- function(x, y, ...) {
-  new_glycan_composition(list())
-}
-
-#' @export
-vec_cast.glyrepr_composition.glyrepr_composition <- function(x, to, ...) {
-  x
-}
-
-#' @export
-vec_cast.character.glyrepr_composition <- function(x, to, ...) {
-  convert_one <- function(comp) {
-    paste0(names(comp), "(", comp, ")", collapse = "")
-  }
-  data <- vctrs::vec_data(x)
-  purrr::map_chr(vctrs::field(data, "data"), convert_one)
-}
-
-#' @export
-vec_cast.glyrepr_composition.character <- function(x, to, ...) {
-  # Handle empty character vector
-  if (length(x) == 0) {
-    return(glycan_composition())
-  }
-
-  # Handling NA
-  if (any(is.na(x))) {
-    cli::cli_abort("Cannot parse NA as glycan composition.")
-  }
-
-  # Parse each character string using the helper function
-  parse_result <- purrr::map(x, parse_single_composition)
-
-  # Extract validity and compositions
-  valid_flags <- purrr::map_lgl(parse_result, "valid")
-  compositions <- purrr::map(parse_result, "composition")
-
-  # Find invalid indices
-  invalid_indices <- which(!valid_flags)
-
-  # Check for invalid characters
-  if (length(invalid_indices) > 0) {
-    cli::cli_abort(c(
-      "Characters cannot be parsed as glycan compositions at index {invalid_indices}",
-      "i" = "Expected format: 'Hex(5)HexNAc(2)' with monosaccharide names followed by counts in parentheses."
-    ))
-  }
-
-  # Handle case where all strings were empty
-  if (length(compositions) == 0) {
-    return(glycan_composition())
-  }
-
-  # Create composition vector
-  do.call(glycan_composition, compositions)
-}
-
-#' @export
-vec_cast.glyrepr_composition.glyrepr_structure <- function(x, to, ...) {
-  data <- vctrs::vec_data(x)
-
-  # Use smap to convert each structure to composition
-  compositions <- smap(x, function(graph) {
-    # Count monosaccharides
-    monos <- igraph::V(graph)$mono
-    mono_tb <- table(monos)
-    mono_result <- as.integer(mono_tb)
-    names(mono_result) <- names(mono_tb)
-
-    # Count substituents
-    subs <- igraph::V(graph)$sub
-    sub_types <- extract_substituent_types(subs)
-    if (length(sub_types) > 0) {
-      sub_tb <- table(sub_types)
-      sub_result <- as.integer(sub_tb)
-      names(sub_result) <- names(sub_tb)
-    } else {
-      sub_result <- integer(0)
-    }
-
-    # Combine monosaccharides and substituents
-    result <- c(mono_result, sub_result)
-
-    # Sort by composition component order (monosaccharides first, then substituents)
-    result <- .reorder_composition_components(result)
-    result
-  })
-
-  # Create composition object
-  new_glycan_composition(compositions)
-}
-
-#' @export
-vec_cast.glyrepr_composition.list <- function(x, to, ...) {
-  if (length(x) == 0) {
-    return(glycan_composition())
-  }
-  do.call(glycan_composition, x)
-}
-
-#' @export
-as_glycan_composition <- function(x) {
-  vec_cast(x, new_glycan_composition())
-}
-
-#' @export
-obj_print_data.glyrepr_composition <- function(x, ..., max_n = 10, colored = TRUE) {
-  if (length(x) == 0) {
-    return()
-  }
-
-  n <- length(x)
-  n_show <- min(n, max_n)
-
-  # Only format the compositions that need to be shown to improve performance
-  indices_to_show <- seq_len(n_show)
-  formatted <- format_glycan_composition_subset(x, indices_to_show, colored = colored)
-
-  # Print each composition on its own line with indexing, up to max_n
-  for (i in seq_len(n_show)) {
-    cat("[", i, "] ", formatted[i], "\n", sep = "")
-  }
-  if (n > max_n) {
-    cat("... (", n - max_n, " more not shown)\n", sep = "")
-  }
-}
-
-#' @importFrom pillar pillar_shaft
-#' @export
-pillar_shaft.glyrepr_composition <- function(x, ...) {
-  if (length(x) == 0) {
-    return(pillar::pillar_shaft(character()))
-  }
-
-  indices <- seq_len(length(x))
-  formatted <- format_glycan_composition_subset(x, indices, colored = TRUE)
-
-  pillar::new_pillar_shaft_simple(formatted, align = "left", min_width = 10)
 }
 
 # Helper function to format a subset of compositions
