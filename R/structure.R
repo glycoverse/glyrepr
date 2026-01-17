@@ -253,20 +253,6 @@ new_glycan_structure <- function(iupac = character(), graphs = list()) {
   vctrs::new_vctr(iupac, graphs = graphs, class = "glyrepr_structure")
 }
 
-# Helper function to extract structures from existing vector
-get_structures_from_vector <- function(x) {
-  if (!is_glycan_structure(x)) {
-    cli::cli_abort("Input must be a glycan_structure vector.")
-  }
-
-  data <- vctrs::vec_data(x)
-  codes <- vctrs::field(data, "iupac")
-  structures <- attr(x, "structures")
-
-  # Return list of individual structures corresponding to each element
-  purrr::map(codes, ~ structures[[.x]])
-}
-
 ensure_name_vertex_attr <- function(glycan) {
   if (!("name" %in% igraph::vertex_attr_names(glycan))) {
     names <- as.character(seq_len(igraph::vcount(glycan)))
