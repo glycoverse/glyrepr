@@ -117,10 +117,10 @@ test_that("as_glycan_structure.character round-trip consistency", {
     o_glycan_core_1(),
     n_glycan_core()
   )
-  
+
   for (i in seq_along(original_structures)) {
     # Convert to IUPAC
-    iupac <- structure_to_iupac(glycan_structure(original_structures[[i]]))
+    iupac <- structure_to_iupac(original_structures[[i]])
     
     # Parse back
     parsed <- as_glycan_structure(iupac)

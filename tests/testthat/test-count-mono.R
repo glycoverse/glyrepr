@@ -120,7 +120,7 @@ test_that("count_mono works with multiple structures", {
   # Test with N-glycan and O-glycan cores
   n_glycan <- n_glycan_core()
   o_glycan <- o_glycan_core_1()
-  struct_vec <- glycan_structure(n_glycan, o_glycan)
+  struct_vec <- c(n_glycan, o_glycan)
   
   # N-glycan core has: 2 GlcNAc, 3 Man; O-glycan core has: 1 GalNAc, 1 Gal
   expect_equal(count_mono(struct_vec, "GlcNAc"), c(2, 0))

@@ -2,7 +2,7 @@ test_that("smap functions work with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test smap_int with regular function
   result <- smap_int(structures, igraph::vcount)
@@ -24,7 +24,7 @@ test_that("smap functions work with purrr-style lambda functions", {
   # Create test structures
   core1 <- o_glycan_core_1() 
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test smap_int with purrr lambda
   result_lambda <- smap_int(structures, ~ igraph::vcount(.x))
@@ -45,7 +45,7 @@ test_that("smap functions work with purrr-style lambda functions", {
 test_that("smap_unique works with purrr-style lambda functions", {
   # Create test structures with duplicates
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1, core1, core1)
+  structures <- c(core1, core1, core1)
   
   # Test with regular function
   result_regular <- smap_unique(structures, igraph::vcount)
@@ -59,7 +59,7 @@ test_that("smap_unique works with purrr-style lambda functions", {
 test_that("smap_structure works with purrr-style lambda functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1, core1)
+  structures <- c(core1, core1)
   
   # Function that adds vertex names if not present
   add_names_regular <- function(g) {
@@ -104,7 +104,7 @@ test_that("ssome works with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()  # smaller structure
   core2 <- n_glycan_core()    # larger structure
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test if some structures have more than 5 vertices
   result <- ssome(structures, function(g) igraph::vcount(g) > 5)
@@ -125,7 +125,7 @@ test_that("ssome works with purrr-style lambda functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test with purrr lambda
   result_lambda <- ssome(structures, ~ igraph::vcount(.x) > 5)
@@ -141,7 +141,7 @@ test_that("severy works with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test if all structures have at least 1 vertex (should be TRUE)
   result_true <- severy(structures, function(g) igraph::vcount(g) >= 1)
@@ -161,7 +161,7 @@ test_that("severy works with purrr-style lambda functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test with purrr lambda
   result_lambda <- severy(structures, ~ igraph::vcount(.x) >= 1)
@@ -177,7 +177,7 @@ test_that("snone works with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test if no structures have more than 50 vertices (should be TRUE)
   result_true <- snone(structures, function(g) igraph::vcount(g) > 50)
@@ -197,7 +197,7 @@ test_that("snone works with purrr-style lambda functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test with purrr lambda
   result_lambda <- snone(structures, ~ igraph::vcount(.x) > 50)
@@ -212,7 +212,7 @@ test_that("snone works with purrr-style lambda functions", {
 test_that("structure predicate functions work with duplicate structures efficiently", {
   # Create structures with many duplicates to test efficiency
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1, core1, core1, core1, core1)  # same structure 5 times
+  structures <- c(core1, core1, core1, core1, core1)  # same structure 5 times
   
   # These should only evaluate the predicate once for the unique structure
   result_some <- ssome(structures, function(g) igraph::vcount(g) > 3)
@@ -230,7 +230,7 @@ test_that("structure predicate functions work with duplicate structures efficien
 
 test_that("structure predicate functions handle edge cases", {
   # Test with single structure
-  single <- glycan_structure(o_glycan_core_1())
+  single <- o_glycan_core_1()
   expect_type(ssome(single, ~ igraph::vcount(.x) > 0), "logical")
   expect_type(severy(single, ~ igraph::vcount(.x) > 0), "logical")
   expect_type(snone(single, ~ igraph::vcount(.x) > 50), "logical")
@@ -242,7 +242,7 @@ test_that("smap2 functions work with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   weights <- c(1.0, 2.0, 1.5)
   
   # Test smap2_dbl with regular function
@@ -267,7 +267,7 @@ test_that("smap2 functions work with purrr-style lambda functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   weights <- c(1.0, 2.0, 1.5)
   
   # Test smap2_dbl with purrr lambda
@@ -286,7 +286,7 @@ test_that("smap2 functions work with recycling", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test with single weight (should be recycled)
   single_weight <- 2.5
@@ -303,7 +303,7 @@ test_that("smap2_structure works with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2)  # different structures
+  structures <- c(core1, core2)  # different structures
   
   # Function that adds a graph attribute (doesn't change structure topology)
   add_attribute <- function(g, attr_val) {
@@ -326,7 +326,7 @@ test_that("smap2_structure works with purrr-style lambda functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2)  # different structures
+  structures <- c(core1, core2)  # different structures
   
   # Test with purrr lambda that adds vertex attribute based on second argument
   labels <- c("label1", "label2")
@@ -346,7 +346,7 @@ test_that("smap2_structure works with purrr-style lambda functions", {
 test_that("smap2 functions handle duplicate structures efficiently", {
   # Create structures with duplicates to test efficiency
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1, core1, core1)  # same structure 3 times
+  structures <- c(core1, core1, core1)  # same structure 3 times
   weights <- c(1.0, 2.0, 1.0)  # first and third are same
   
   # This should only compute twice: once for (core1, 1.0) and once for (core1, 2.0)
@@ -363,7 +363,7 @@ test_that("smap2 functions handle duplicate structures efficiently", {
 
 test_that("smap2 functions validate inputs", {
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1)
+  structures <- core1
   
   # Test that first argument must be glycan_structure
   expect_error(smap2_dbl(c(1, 2, 3), c(1, 2, 3), ~ .x * .y), "glycan_structure")
@@ -378,7 +378,7 @@ test_that("smap2 functions validate inputs", {
 
 test_that("smap2 functions handle edge cases", {
   # Test with single structure
-  single <- glycan_structure(o_glycan_core_1())
+  single <- o_glycan_core_1()
   result <- smap2_dbl(single, 3.0, ~ igraph::vcount(.x) * .y)
   expect_equal(length(result), 1)
   expect_type(result, "double")
@@ -394,7 +394,7 @@ test_that("smap2 basic functionality works", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   values <- c("a", "b", "c")
   
   # Test smap2 (returns list)
@@ -413,7 +413,7 @@ test_that("smap2_chr works correctly", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   prefixes <- c("prefix1_", "prefix2_", "prefix3_")
   
   # Test smap2_chr
@@ -432,7 +432,7 @@ test_that("spmap functions work with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2)
+  structures <- c(core1, core2)
   weights <- c(1.0, 2.0)
   factors <- c(2, 3)
   
@@ -461,7 +461,7 @@ test_that("spmap functions work with purrr-style lambda functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2)
+  structures <- c(core1, core2)
   weights <- c(1.0, 2.0)
   factors <- c(2, 3)
   
@@ -484,7 +484,7 @@ test_that("spmap functions work with recycling", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test with single weight (should be recycled)
   single_weight <- 2.0
@@ -503,7 +503,7 @@ test_that("spmap_structure works with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2)
+  structures <- c(core1, core2)
   
   # Function that adds graph attribute based on multiple arguments
   add_attributes <- function(g, label, value) {
@@ -530,7 +530,7 @@ test_that("spmap_structure works with regular functions", {
 test_that("spmap functions handle duplicate structures efficiently", {
   # Create structures with duplicates to test efficiency
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1, core1, core1)
+  structures <- c(core1, core1, core1)
   weights <- c(1.0, 2.0, 1.0)
   factors <- c(2, 3, 2)
   
@@ -548,7 +548,7 @@ test_that("spmap functions handle duplicate structures efficiently", {
 
 test_that("spmap functions validate inputs", {
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1)
+  structures <- core1
   
   # Test that .l must be a list
   expect_error(spmap_dbl(structures, ~ igraph::vcount(.x)), "non-empty list")
@@ -567,7 +567,7 @@ test_that("spmap functions validate inputs", {
 
 test_that("spmap functions handle edge cases", {
   # Test with single structure
-  single <- glycan_structure(o_glycan_core_1())
+  single <- o_glycan_core_1()
   result <- spmap_dbl(list(single, 3.0, 2), ~ igraph::vcount(..1) * ..2 * ..3)
   expect_equal(length(result), 1)
   expect_type(result, "double")
@@ -583,7 +583,7 @@ test_that("spmap basic functionality works", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2)
+  structures <- c(core1, core2)
   values1 <- c("a", "b")
   values2 <- c(1, 2)
   
@@ -606,7 +606,7 @@ test_that("simap functions work with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test simap_chr with regular function (using index)
   result <- simap_chr(structures, function(g, i) paste0("Structure_", i, "_vcount_", igraph::vcount(g)))
@@ -634,7 +634,7 @@ test_that("simap functions work with purrr-style lambda functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Test simap_chr with purrr lambda
   result_lambda <- simap_chr(structures, ~ paste0("Pos", .y, "_vertices", igraph::vcount(.x)))
@@ -651,7 +651,7 @@ test_that("simap_structure works with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2)
+  structures <- c(core1, core2)
   
   # Function that adds index/name as graph attribute
   add_index_attr <- function(g, idx) {
@@ -673,7 +673,7 @@ test_that("simap_structure works with regular functions", {
 test_that("simap functions handle duplicate structures efficiently", {
   # Create structures with duplicates to test efficiency
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1, core1, core1)
+  structures <- c(core1, core1, core1)
   
   # This should compute three times since indices are different: (core1, 1), (core1, 2), (core1, 3)
   result <- simap_chr(structures, function(g, i) paste0("Structure_", i, "_vcount_", igraph::vcount(g)))
@@ -694,7 +694,7 @@ test_that("simap functions handle duplicate structures efficiently", {
 
 test_that("simap functions validate inputs", {
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1)
+  structures <- core1
   
   # Test that first argument must be glycan_structure
   expect_error(simap_chr(c(1, 2, 3), ~ paste(.x, .y)), "glycan_structure")
@@ -709,7 +709,7 @@ test_that("simap functions validate inputs", {
 
 test_that("simap functions handle edge cases", {
   # Test with single structure
-  single <- glycan_structure(o_glycan_core_1())
+  single <- o_glycan_core_1()
   result <- simap_chr(single, ~ paste0("Index", .y, "_vertices", igraph::vcount(.x)))
   expect_equal(length(result), 1)
   expect_type(result, "character")
@@ -726,7 +726,7 @@ test_that("simap basic functionality works", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2)
+  structures <- c(core1, core2)
   
   # Test simap (returns list)
   result <- simap(structures, function(g, i) {
@@ -747,7 +747,7 @@ test_that("smap parallel parameter works correctly", {
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2, core1)
+  structures <- c(core1, core2, core1)
   
   # Simple test function
   test_func <- function(g) igraph::vcount(g)
@@ -769,7 +769,7 @@ test_that("smap parallel parameter works correctly", {
 test_that("smap parallel parameter is not passed to user function", {
   # Create test structures
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1, core1)
+  structures <- c(core1, core1)
   
   # Function that would fail if .parallel is passed as argument
   strict_func <- function(g) {
@@ -789,7 +789,7 @@ test_that("smap handles additional arguments correctly with parallel parameter",
   # Create test structures
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
-  structures <- glycan_structure(core1, core2)
+  structures <- c(core1, core2)
   
   # Function that takes additional arguments
   func_with_args <- function(g, multiplier = 1, offset = 0) {
@@ -819,7 +819,7 @@ test_that("smap handles additional arguments correctly with parallel parameter",
 test_that("smap auto-parallel threshold behavior", {
   # Create a small dataset (should not trigger auto-parallel)
   core1 <- o_glycan_core_1()
-  small_structures <- glycan_structure(core1, core1, core1)  # 3 total, 1 unique
+  small_structures <- c(core1, core1, core1)  # 3 total, 1 unique
   
   # Simple function
   simple_func <- function(g) igraph::vcount(g)
@@ -836,7 +836,7 @@ test_that("smap auto-parallel threshold behavior", {
 test_that("smap parallel parameter validation", {
   # Create test structures
   core1 <- o_glycan_core_1()
-  structures <- glycan_structure(core1)
+  structures <- core1
   
   # Test that .parallel accepts valid values
   expect_no_error(smap_int(structures, igraph::vcount, .parallel = TRUE))

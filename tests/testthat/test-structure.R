@@ -384,8 +384,7 @@ test_that("glycan_structure creates empty vector by default", {
 })
 
 test_that("glycan_structure works with single glycan structure", {
-  graph <- o_glycan_core_1()
-  sv <- glycan_structure(graph)
+  sv <- o_glycan_core_1()
   
   expect_s3_class(sv, "glyrepr_structure")
   expect_equal(length(sv), 1)
@@ -395,9 +394,9 @@ test_that("glycan_structure works with single glycan structure", {
 })
 
 test_that("glycan_structure works with multiple different glycan structures", {
-  graph1 <- o_glycan_core_1()
-  graph2 <- n_glycan_core()
-  sv <- glycan_structure(graph1, graph2)
+  glycan1 <- o_glycan_core_1()
+  glycan2 <- n_glycan_core()
+  sv <- c(glycan1, glycan2)
   
   expect_s3_class(sv, "glyrepr_structure")
   expect_equal(length(sv), 2)
@@ -405,9 +404,9 @@ test_that("glycan_structure works with multiple different glycan structures", {
 })
 
 test_that("glycan_structure removes duplicates based on IUPAC codes", {
-  graph1 <- o_glycan_core_1()
-  graph2 <- o_glycan_core_1()  # Same structure
-  sv <- glycan_structure(graph1, graph2)
+  glycan1 <- o_glycan_core_1()
+  glycan2 <- o_glycan_core_1()  # Same structure
+  sv <- c(glycan1, glycan2)
   
   expect_s3_class(sv, "glyrepr_structure")
   expect_equal(length(sv), 2)  # Original vector has 2 elements
@@ -466,9 +465,9 @@ test_that("is_glycan_structure correctly identifies glycan_structure objects", {
 # Tests for format method -----------------------------------------------------
 
 test_that("format.glyrepr_structure displays correct IUPAC sequences", {
-  graph1 <- o_glycan_core_1()
-  graph2 <- n_glycan_core()
-  sv <- glycan_structure(graph1, graph2)
+  glycan1 <- o_glycan_core_1()
+  glycan2 <- n_glycan_core()
+  sv <- c(glycan1, glycan2)
   
   formatted <- format(sv)
   
@@ -487,9 +486,9 @@ test_that("format.glyrepr_structure handles empty vector", {
 })
 
 test_that("format.glyrepr_structure handles duplicates correctly", {
-  graph1 <- o_glycan_core_1()
-  graph2 <- o_glycan_core_1()
-  sv <- glycan_structure(graph1, graph2)
+  glycan1 <- o_glycan_core_1()
+  glycan2 <- o_glycan_core_1()
+  sv <- c(glycan1, glycan2)
   
   formatted <- format(sv)
   
@@ -499,7 +498,7 @@ test_that("format.glyrepr_structure handles duplicates correctly", {
 })
 
 test_that("truncation works in tibble", {
-  sv <- glycan_structure(n_glycan_core(), n_glycan_core(), n_glycan_core())
+  sv <- c(n_glycan_core(), n_glycan_core(), n_glycan_core())
   tibble <- tibble::tibble(struc = sv, a = 1)
   expect_snapshot(print(tibble, width = 30))
 })
@@ -519,10 +518,10 @@ test_that("vec_ptype_full.glyrepr_structure returns correct full type", {
 # Tests for print footer ------------------------------------------------------
 
 test_that("obj_print_footer.glyrepr_structure displays unique count", {
-  graph1 <- o_glycan_core_1()
-  graph2 <- n_glycan_core()
-  graph3 <- o_glycan_core_1()  # Duplicate
-  sv <- glycan_structure(graph1, graph2, graph3)
+  glycan1 <- o_glycan_core_1()
+  glycan2 <- n_glycan_core()
+  glycan3 <- o_glycan_core_1()  # Duplicate
+  sv <- c(glycan1, glycan2, glycan3)
   
   output <- capture.output(obj_print_footer.glyrepr_structure(sv))
   
@@ -542,9 +541,9 @@ test_that("obj_print_footer.glyrepr_structure handles empty vector", {
 # Tests for get_structure_graphs ----------------------------------------------
 
 test_that("get_structure_graphs extracts individual structures correctly", {
-  graph1 <- o_glycan_core_1()
-  graph2 <- n_glycan_core()
-  sv <- glycan_structure(graph1, graph2)
+  glycan1 <- o_glycan_core_1()
+  glycan2 <- n_glycan_core()
+  sv <- c(glycan1, glycan2)
 
   # Check that we can retrieve the original structures
   extracted_all <- get_structure_graphs(sv)
@@ -558,9 +557,9 @@ test_that("get_structure_graphs extracts individual structures correctly", {
 })
 
 test_that("get_structure_graphs return_list parameter works correctly", {
-  graph1 <- o_glycan_core_1()
-  graph2 <- n_glycan_core()
-  sv <- glycan_structure(graph1, graph2)
+  glycan1 <- o_glycan_core_1()
+  glycan2 <- n_glycan_core()
+  sv <- c(glycan1, glycan2)
 
   # Test default behavior (NULL return_list)
   # For multiple structures, should return list
@@ -584,9 +583,9 @@ test_that("get_structure_graphs return_list parameter works correctly", {
 })
 
 test_that("get_structure_graphs validates return_list parameter", {
-  graph1 <- o_glycan_core_1()
-  graph2 <- n_glycan_core()
-  sv <- glycan_structure(graph1, graph2)
+  glycan1 <- o_glycan_core_1()
+  glycan2 <- n_glycan_core()
+  sv <- c(glycan1, glycan2)
 
   # Should error when return_list = FALSE but length > 1
   expect_error(
@@ -598,16 +597,16 @@ test_that("get_structure_graphs validates return_list parameter", {
 # Integration tests -----------------------------------------------------------
 
 test_that("glycan_structure preserves glycan structures correctly", {
-  graph1 <- o_glycan_core_1()
-  graph2 <- n_glycan_core()
-  sv <- glycan_structure(graph1, graph2)
+  glycan1 <- o_glycan_core_1()
+  glycan2 <- n_glycan_core()
+  sv <- c(glycan1, glycan2)
   
   # Check that we can retrieve the original structures
   structures <- attr(sv, "structures")
   expect_length(structures, 2)
   
   # Check IUPAC codes are generated correctly
-  expected_iupacs <- c(structure_to_iupac(graph1), structure_to_iupac(graph2))
+  expected_iupacs <- c(structure_to_iupac(glycan1), structure_to_iupac(glycan2))
   data <- vctrs::vec_data(sv)
   stored_codes <- vctrs::field(data, "iupac")
   expect_equal(sort(unique(stored_codes)), sort(expected_iupacs))
@@ -662,8 +661,8 @@ test_that("c() combines glycan_structure vectors correctly", {
 })
 
 test_that("c() handles duplicate structures across vectors", {
-  sv1 <- glycan_structure(o_glycan_core_1(), n_glycan_core())
-  sv2 <- glycan_structure(o_glycan_core_1())  # Duplicate of first structure in sv1
+  sv1 <- c(o_glycan_core_1(), n_glycan_core())
+  sv2 <- o_glycan_core_1()  # Duplicate of first structure in sv1
   
   combined <- c(sv1, sv2)
   
@@ -689,9 +688,9 @@ test_that("c() works with empty vectors", {
 
 test_that("c() combines multiple structure vectors efficiently", {
   # Test combining multiple vectors with various duplicates
-  sv1 <- glycan_structure(o_glycan_core_1())
-  sv2 <- glycan_structure(n_glycan_core())
-  sv3 <- glycan_structure(o_glycan_core_1(), n_glycan_core())  # Contains both
+  sv1 <- o_glycan_core_1()
+  sv2 <- n_glycan_core()
+  sv3 <- c(o_glycan_core_1(), n_glycan_core())  # Contains both
   
   combined <- c(sv1, sv2, sv3)
   
@@ -731,7 +730,7 @@ test_that("c() preserves structure integrity across combinations", {
 # Tests for vector casting and subsetting functionality -------------------------
 
 test_that("glycan_structure vectors can be subset with necessary structure preservation", {
-  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   
   # Test various subsetting operations
   subset1 <- sv[1]
@@ -754,7 +753,7 @@ test_that("glycan_structure vectors can be subset with necessary structure prese
 })
 
 test_that("glycan_structure vectors can be repeated", {
-  sv <- glycan_structure(o_glycan_core_1())
+  sv <- o_glycan_core_1()
   
   # Test rep() function which uses vctrs casting methods
   repeated <- rep(sv, 3)
@@ -769,8 +768,8 @@ test_that("glycan_structure vectors can be repeated", {
 
 test_that("complex vector operations work correctly", {
   # Test more complex vector operations
-  sv1 <- glycan_structure(o_glycan_core_1(), n_glycan_core())
-  sv2 <- glycan_structure(n_glycan_core(), o_glycan_core_1())
+  sv1 <- c(o_glycan_core_1(), n_glycan_core())
+  sv2 <- c(n_glycan_core(), o_glycan_core_1())
   
   # Combine and then subset
   combined <- c(sv1, sv2)
@@ -788,7 +787,7 @@ test_that("complex vector operations work correctly", {
 
 test_that("structure vector methods handle edge cases", {
   # Test with single element vector
-  single <- glycan_structure(o_glycan_core_1())
+  single <- o_glycan_core_1()
   
   # Test combining with itself
   doubled <- c(single, single)
@@ -812,7 +811,7 @@ test_that("tibble row subsetting optimizes structure storage", {
   skip_if_not_installed("tibble")
   
   # Create test data with duplicates
-  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv, name = c("A", "B", "C"))
   
   # Original should have 2 unique structures
@@ -843,7 +842,7 @@ test_that("dplyr filter operations optimize structure storage", {
   skip_if_not_installed("dplyr")
   
   # Create test data with duplicates
-  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv, score = c(10, 20, 30))
   
   # Filter to single row should optimize to 1 unique structure
@@ -871,7 +870,7 @@ test_that("dplyr slice operations optimize structure storage", {
   skip_if_not_installed("dplyr")
   
   # Create test data
-  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv)
   
   # slice() operations
@@ -901,7 +900,7 @@ test_that("dplyr arrange and other operations preserve structure optimization", 
   skip_if_not_installed("dplyr")
   
   # Create test data
-  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv, score = c(30, 10, 20))
   
   # arrange() should maintain all structures
@@ -933,8 +932,8 @@ test_that("complex tibble and dplyr workflows maintain optimization", {
   skip_if_not_installed("dplyr")
   
   # Create more complex test data
-  sv <- glycan_structure(
-    o_glycan_core_1(), n_glycan_core(), o_glycan_core_1(), 
+  sv <- c(
+    o_glycan_core_1(), n_glycan_core(), o_glycan_core_1(),
     n_glycan_core(), o_glycan_core_1()
   )
   df <- tibble::tibble(
@@ -978,7 +977,7 @@ test_that("tibble operations preserve structure content integrity", {
   skip_if_not_installed("dplyr")
   
   # Create test data
-  sv <- glycan_structure(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv)
   
   # Verify that optimization doesn't affect structure content
@@ -998,7 +997,7 @@ test_that("tibble operations preserve structure content integrity", {
 
 # Tests for vector conversion -------------------------
 test_that("converting to character", {
-  sv <- glycan_structure(o_glycan_core_1())
+  sv <- o_glycan_core_1()
   expect_equal(as.character(sv), "Gal(b1-3)GalNAc(a1-")
 })
 
