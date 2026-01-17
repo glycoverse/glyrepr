@@ -177,8 +177,6 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
 
 #' @export
 vec_cast.glyrepr_composition.glyrepr_structure <- function(x, to, ...) {
-  data <- vctrs::vec_data(x)
-
   # Use smap to convert each structure to composition
   compositions <- smap(x, function(graph) {
     # Count monosaccharides
