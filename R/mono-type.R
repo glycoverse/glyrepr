@@ -169,14 +169,6 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #' comp <- glycan_composition(c(Glc = 2, GalNAc = 1))
 #' get_mono_type(comp)
 #'
-#' # Special cases
-#' comps <- glycan_composition(
-#'   c(Neu = 1),
-#'   c(Neu = 1, Glc = 1),
-#'   c(gMur = 1, Hex = 1),
-#' )
-#' get_mono_type(comps)
-#'
 #' @seealso [convert_to_generic()]
 #'
 #' @export
