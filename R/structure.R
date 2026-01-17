@@ -403,34 +403,18 @@ vec_cast.glyrepr_structure.character <- function(x, to, ...) {
 }
 
 #' @export
-vec_restore.glyrepr_structure <- function(x, to, ...) {
-  # x is the proxy data (data.frame) after vctrs operations
-  # to is the original glyrepr_structure object for reference
-
-  # Extract data from the proxy
-  data <- vctrs::vec_data(x)
-  iupacs <- vctrs::field(data, "iupac")
-  mono_types <- vctrs::field(data, "mono_type")
-
-  # Get available structures
-  available_structures <- attr(to, "structures")
-
-  # Find which unique structures are still needed
-  needed_codes <- unique(iupacs)
-
-  # For slicing operations, optimize by removing unused structures
-  # For combination operations, we typically get all the needed structures already
-  if (length(needed_codes) > 0 && length(available_structures) > 0) {
-    # Only keep structures that are actually used
-    retrenched_structures <- available_structures[needed_codes[needed_codes %in% names(available_structures)]]
-  } else {
-    retrenched_structures <- available_structures
-  }
-
-  # Create new vector with structures
-  new_glycan_structure(iupacs, retrenched_structures)
+vec_proxy.glyrepr_structure <- function(x, ...) {
+  iupacs <- vctrs::vec_data(x)
+  graphs <- attr(x, "graphs")
+  data.frame(iupac = iupacs, graph = graphs)
 }
 
+#' @export
+vec_restore.glyrepr_structure <- function(x, to, ...) {
+  unique_df <- dplyr::distinct(x, .data$iupac, .keep_all = TRUE)
+  unique_graphs <- rlang::set_names(unique_df$graph, unique_df$iupac)
+  new_glycan_structure(x$iupac, unique_graphs)
+}
 
 #' @export
 as.character.glyrepr_structure <- function(x, ...) {
