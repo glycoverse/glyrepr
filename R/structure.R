@@ -85,33 +85,33 @@
 #' V(graph)$sub <- ""  # No substituents
 #' E(graph)$linkage <- "b1-4"  # b1-4 glycosidic linkage
 #' graph$anomer <- "a1"  # a anomeric carbon
-#' 
+#'
 #' # Create glycan structure vector
 #' simple_struct <- glycan_structure(graph)
 #' print(simple_struct)
-#' 
+#'
 #' # Example 2: Use predefined glycan core structures
 #' n_core <- n_glycan_core()  # N-glycan core structure
 #' o_core1 <- o_glycan_core_1()  # O-glycan Core 1 structure
-#' 
+#'
 #' # Create vector with multiple structures
 #' multi_struct <- glycan_structure(n_core, o_core1)
 #' print(multi_struct)
-#' 
+#'
 #' # Example 3: Create complex structure with substituents
 #' complex_graph <- make_graph(~ 1-+2-+3)
 #' V(complex_graph)$mono <- c("GlcNAc", "Gal", "Neu5Ac")
 #' V(complex_graph)$sub <- c("", "", "")  # Add substituents as needed
 #' E(complex_graph)$linkage <- c("b1-4", "a2-3")
 #' complex_graph$anomer <- "b1"
-#' 
+#'
 #' complex_struct <- glycan_structure(complex_graph)
 #' print(complex_struct)
-#' 
+#'
 #' # Example 4: Check if object is a glycan structure
 #' is_glycan_structure(simple_struct)  # TRUE
 #' is_glycan_structure(graph)          # FALSE
-#' 
+#'
 #' # Example 5: Mix different input types
 #' mixed_struct <- glycan_structure(graph, o_glycan_core_2(), simple_struct)
 #' print(mixed_struct)
@@ -120,7 +120,7 @@
 #' @export
 glycan_structure <- function(...) {
   args <- list(...)
-  
+
   # Handle different input types
   graphs <- list()
   for (arg in args) {
@@ -133,12 +133,12 @@ glycan_structure <- function(...) {
       cli::cli_abort("All arguments must be igraph objects or glycan_structure vectors.")
     }
   }
-  
+
   if (length(graphs) == 0) {
     # Return empty vector
     return(new_glycan_structure(character(), character()))
   }
-  
+
   # Validate and process each graph
   processed_graphs <- purrr::map(graphs, function(graph) {
     checkmate::assert_class(graph, "igraph")
@@ -146,19 +146,19 @@ glycan_structure <- function(...) {
       validate_single_glycan_structure() %>%
       ensure_name_vertex_attr()
   })
-  
+
   # Use IUPAC codes directly as data for the rcrd structure
   iupacs <- purrr::map_chr(processed_graphs, .structure_to_iupac_single)
-  
+
   # Get mono types for each structure
   mono_types <- purrr::map_chr(processed_graphs, get_graph_mono_type)
-  
+
   # Create a unique list based on uniqueness of IUPAC codes for structures storage
   unique_indices <- which(!duplicated(iupacs))
   unique_graphs <- processed_graphs[unique_indices]
   unique_iupacs <- iupacs[unique_indices]
   names(unique_graphs) <- unique_iupacs
-  
+
   res <- new_glycan_structure(iupacs, mono_types, unique_graphs)
   reorder_graphs(res)
 }
@@ -171,66 +171,66 @@ validate_single_glycan_structure <- function(glycan) {
   if (!is_directed_graph(glycan)) {
     cli::cli_abort("Glycan structure must be directed.")
   }
-  
+
   # Check if it is an out tree
   if (!is_out_tree(glycan)) {
     cli::cli_abort("Glycan structure must be an out tree.")
   }
-  
+
   # Check if graph has a vertex attribute "mono"
   # This is the monosaccharide name, e.g. "GlcNAc", "Man", etc.
   if (!has_vertex_attrs(glycan, "mono")) {
     cli::cli_abort("Glycan structure must have a vertex attribute 'mono'.")
   }
-  
+
   # Check if no NA in vertex attribute "mono"
   mono_names <- igraph::vertex_attr(glycan, "mono")
   if (any(is.na(mono_names))) {
     cli::cli_abort("Glycan structure must have no NA in vertex attribute 'mono'.")
   }
-  
+
   # Check if all monosaccharides are known
   if (!all(is_known_mono(mono_names))) {
     unknown_monos <- unique(igraph::V(glycan)$mono[!is_known_mono(igraph::V(glycan)$mono)])
     msg <- glue::glue("Unknown monosaccharide: {stringr::str_c(unknown_monos, collapse = ', ')}")
     cli::cli_abort(msg, monos = unknown_monos)
   }
-  
+
   # Check if mixed use of generic and concrete monosaccharides
   if (mix_generic_concrete(mono_names)) {
     cli::cli_abort("Monosaccharides must be either all generic or all concrete.")
   }
-  
+
   # Check if graph has a vertex attribute "sub"
   # This is the substituent name, e.g. "Ac", "S", "P", or "" (no).
   if (!has_vertex_attrs(glycan, "sub")) {
     cli::cli_abort("Glycan structure must have a vertex attribute 'sub'.")
   }
-  
+
   # Check if no NA in vertex attribute "sub"
   subs <- igraph::vertex_attr(glycan, "sub")
   if (any(is.na(subs))) {
     cli::cli_abort("Glycan structure must have no NA in vertex attribute 'sub'.")
   }
-  
+
   # Check if all substituents are valid
   if (!all(valid_substituent(subs))) {
     invalid_subs <- unique(subs[!valid_substituent(subs)])
     msg <- glue::glue("Unknown substituent: {stringr::str_c(invalid_subs, collapse = ', ')}")
     cli::cli_abort(msg, subs = invalid_subs)
   }
-  
+
   # Check if graph has an edge attribute "linkage"
   if (!has_edge_attrs(glycan, "linkage")) {
     cli::cli_abort("Glycan structure must have an edge attribute 'linkage'.")
   }
-  
+
   # Check if no NA in edge attribute "linkage"
   linkages <- igraph::edge_attr(glycan, "linkage")
   if (any(is.na(linkages))) {
     cli::cli_abort("Glycan structure must have no NA in edge attribute 'linkage'.")
   }
-  
+
   # Check if all linkages are valid
   if (!all(valid_linkages(linkages))) {
     invalid_linkages <- unique(linkages[!valid_linkages(linkages)])
@@ -242,18 +242,16 @@ validate_single_glycan_structure <- function(glycan) {
   if (any_dup_linkage_pos(glycan)) {
     cli::cli_abort("Duplicated linkage positions.")
   }
-  
+
   # Check if "anomer" attribute exists
   if (is.null(glycan$anomer)) {
     cli::cli_abort("Glycan structure must have a graph attribute 'anomer'.")
   }
-  
+
   # Check if "anomer" attribute is valid
   if (!valid_anomer(glycan$anomer)) {
     cli::cli_abort(glue::glue("Invalid anomer: {glycan$anomer}"))
   }
-  
-
 
   glycan
 }
@@ -272,11 +270,11 @@ get_structures_from_vector <- function(x) {
   if (!is_glycan_structure(x)) {
     cli::cli_abort("Input must be a glycan_structure vector.")
   }
-  
+
   data <- vctrs::vec_data(x)
   codes <- vctrs::field(data, "iupac")
   structures <- attr(x, "structures")
-  
+
   # Return list of individual structures corresponding to each element
   purrr::map(codes, ~ structures[[.x]])
 }
@@ -396,17 +394,17 @@ format_glycan_structure_subset <- function(x, indices, colored = TRUE) {
   if (!colored) {
     return(format(x)[indices])
   }
-  
+
   data <- vctrs::vec_data(x)
   codes <- vctrs::field(data, "iupac")[indices]
   mono_types <- vctrs::field(data, "mono_type")[indices]
   structures <- attr(x, "structures")
-  
+
   # For each structure, add colors if concrete type
   purrr::map2_chr(codes, mono_types, function(code, mono_type) {
     structure <- structures[[code]]
     mono_names <- igraph::V(structure)$mono
-    
+
     # Add colors to monosaccharides and gray linkages
     if (colored) {
       colorize_iupac_string(code, mono_names)
@@ -430,11 +428,11 @@ obj_print_data.glyrepr_structure <- function(x, ..., max_n = 10, colored = TRUE)
 
   n <- length(x)
   n_show <- min(n, max_n)
-  
+
   # Only format the structures that need to be shown to improve performance
   indices_to_show <- seq_len(n_show)
   formatted <- format_glycan_structure_subset(x, indices_to_show, colored = colored)
-  
+
   # Print each IUPAC structure on its own line with indexing, up to max_n
   for (i in seq_len(n_show)) {
     cat("[", i, "] ", formatted[i], "\n", sep = "")
@@ -473,15 +471,15 @@ pillar_shaft.glyrepr_structure <- function(x, ...) {
 vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
   x_structures <- attr(x, "structures")
   y_structures <- attr(y, "structures")
-  
+
   # Combine all structures from both x and y
   all_structures <- c(x_structures, y_structures)
-  
+
   # Remove duplicates (keep first occurrence)
   unique_names <- unique(names(all_structures))
   combined_structures <- all_structures[unique_names]
   names(combined_structures) <- unique_names
-  
+
   # Create prototype with all structures
   new_glycan_structure(character(), character(), structures = combined_structures)
 }
