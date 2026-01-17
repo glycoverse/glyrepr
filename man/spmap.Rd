@@ -88,7 +88,7 @@ factors <- c(2, 3, 2)  # corresponding factors
 spmap_dbl(list(structures, weights, factors), 
           function(g, w, f) igraph::vcount(g) * w * f)
 
-# Use purrr-style lambda functions  
+# Use purrr-style lambda functions
 spmap_dbl(list(structures, weights, factors), ~ igraph::vcount(..1) * ..2 * ..3)
 
 # Test with recycling

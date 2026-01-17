@@ -79,7 +79,7 @@ weights <- c(1.0, 2.0, 1.0)  # corresponding weights
 # Map a function that uses both structure and weight
 smap2_dbl(structures, weights, function(g, w) igraph::vcount(g) * w)
 
-# Use purrr-style lambda functions  
+# Use purrr-style lambda functions
 smap2_dbl(structures, weights, ~ igraph::vcount(.x) * .y)
 
 # Test with recycling (single weight for all structures)

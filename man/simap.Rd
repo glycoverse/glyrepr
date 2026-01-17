@@ -86,7 +86,7 @@ structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
 # Map a function that uses both structure and index
 simap_chr(structures, function(g, i) paste0("Structure_", i, "_vcount_", igraph::vcount(g)))
 
-# Use purrr-style lambda functions  
+# Use purrr-style lambda functions
 simap_chr(structures, ~ paste0("Pos", .y, "_vertices", igraph::vcount(.x)))
 
 }
