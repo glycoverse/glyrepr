@@ -492,10 +492,9 @@ get_structure_graphs <- function(x, return_list = NULL) {
     }
   }
 
-  data <- vctrs::vec_data(x)
-  iupacs <- vctrs::field(data, "iupac")
-  structures <- attr(x, "structures")
-  res <- purrr::map(iupacs, ~ structures[[.x]])
+  iupacs <- vctrs::vec_data(x)
+  graphs <- attr(x, "graphs")
+  res <- purrr::map(iupacs, ~ graphs[[.x]])
   if (!return_list) {
     res <- res[[1]]
   }
