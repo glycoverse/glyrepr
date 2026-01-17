@@ -136,17 +136,19 @@ glycan_structure <- function(...) {
       ensure_name_vertex_attr()
   })
 
+  # Reorder the graphs to align with IUPAC-style sequence
+  reordered_graphs <- reorder_graphs(processed_graphs)
+
   # Use IUPAC codes directly as data for the rcrd structure
-  iupacs <- purrr::map_chr(processed_graphs, .structure_to_iupac_single)
+  iupacs <- purrr::map_chr(reordered_graphs, .structure_to_iupac_single)
 
   # Create a unique list based on uniqueness of IUPAC codes for structures storage
   unique_indices <- which(!duplicated(iupacs))
-  unique_graphs <- processed_graphs[unique_indices]
+  unique_graphs <- reordered_graphs[unique_indices]
   unique_iupacs <- iupacs[unique_indices]
   names(unique_graphs) <- unique_iupacs
 
-  res <- new_glycan_structure(iupacs, unique_graphs)
-  reorder_graphs(res)
+  new_glycan_structure(unique_iupacs, unique_graphs)
 }
 
 # Helper function to validate a single glycan structure
