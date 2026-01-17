@@ -69,6 +69,11 @@ new_glycan_composition <- function(x) {
 #' @param x A list of named integer vectors.
 #' @noRd
 .valid_glycan_composition_input <- function(x) {
+  # 0. Skip if empty
+  if (length(x) == 0) {
+    return()
+  }
+
   # 1. Type check
   if (!purrr::every(x, checkmate::test_integerish)) {
     cli::cli_abort(c(
@@ -216,10 +221,9 @@ extract_substituent_types <- function(sub_strings) {
 as_glycan_composition.glyrepr_structure <- function(x) {
   # Get mono_types directly from the structure data
   data <- vctrs::vec_data(x)
-  structure_mono_types <- vctrs::field(data, "mono_type")
 
-  # Use smap2 to convert each structure to composition with known mono_type
-  compositions <- smap2(x, structure_mono_types, function(graph, mono_type) {
+  # Use smap to convert each structure to composition
+  compositions <- smap(x, function(graph) {
     # Count monosaccharides
     monos <- igraph::V(graph)$mono
     mono_tb <- table(monos)
@@ -241,12 +245,12 @@ as_glycan_composition.glyrepr_structure <- function(x) {
     result <- c(mono_result, sub_result)
 
     # Sort by composition component order (monosaccharides first, then substituents)
-    result <- .reorder_composition_components(result, mono_type)
+    result <- .reorder_composition_components(result)
     result
   })
 
-  # Create composition vector
-  do.call(glycan_composition, compositions)
+  # Create composition object
+  new_glycan_composition(compositions)
 }
 
 # Helper function to parse a single composition string
@@ -446,11 +450,11 @@ vec_ptype_abbr.glyrepr_composition <- function(x, ...) "comp"
 
 #' @export
 format.glyrepr_composition <- function(x, ...) {
-  format_one <- function(comp, mono_type) {
+  format_one <- function(comp) {
     paste0(names(comp), "(", comp, ")", collapse = "")
   }
   data <- vctrs::vec_data(x)
-  purrr::map2_chr(vctrs::field(data, "data"), vctrs::field(data, "mono_type"), format_one)
+  purrr::map_chr(vctrs::field(data, "data"), format_one)
 }
 
 #' @export
@@ -461,7 +465,7 @@ is_glycan_composition <- function(x) {
 
 #' @export
 vec_ptype2.glyrepr_composition.glyrepr_composition <- function(x, y, ...) {
-  new_glycan_composition(list(), character())
+  new_glycan_composition(list())
 }
 
 #' @export
@@ -476,7 +480,7 @@ format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
   }
 
   # Format with colors if concrete type
-  format_one_colored <- function(comp, mono_type) {
+  format_one_colored <- function(comp) {
     mono_names <- names(comp)
     # Add colors to monosaccharides (generic monos automatically get black color)
     if (colored) {
@@ -487,9 +491,8 @@ format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
 
   data <- vctrs::vec_data(x)
   comp_data <- vctrs::field(data, "data")[indices]
-  mono_types <- vctrs::field(data, "mono_type")[indices]
 
-  purrr::map2_chr(comp_data, mono_types, format_one_colored)
+  purrr::map_chr(comp_data, format_one_colored)
 }
 
 #' @export
