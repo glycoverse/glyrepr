@@ -32,6 +32,9 @@ vertex in the structure. For example, a vertex with \code{sub = "3Me"}
 contributes one "Me" substituent to the composition.
 }
 \examples{
+# From a single named vector
+as_glycan_composition(c(Hex = 5, HexNAc = 2))
+
 # From a list of named vectors
 as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
 

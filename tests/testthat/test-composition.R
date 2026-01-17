@@ -60,6 +60,13 @@ test_that("as_glycan_composition works with list of named vectors", {
   expect_equal(comp, expected)
 })
 
+test_that("as_glycan_composition works with a single named vector", {
+  comp <- as_glycan_composition(c(Hex = 5, HexNAc = 2))
+  expected <- glycan_composition(c(Hex = 5, HexNAc = 2))
+  expect_equal(comp, expected)
+  expect_equal(comp, as_glycan_composition(list(c(Hex = 5, HexNAc = 2))))
+})
+
 test_that("as_glycan_composition returns existing composition unchanged", {
   original <- glycan_composition(c(Hex = 5, HexNAc = 2))
   result <- as_glycan_composition(original)

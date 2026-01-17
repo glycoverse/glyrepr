@@ -81,6 +81,9 @@ is_glycan_composition <- function(x) {
 #' contributes one "Me" substituent to the composition.
 #'
 #' @examples
+#' # From a single named vector
+#' as_glycan_composition(c(Hex = 5, HexNAc = 2))
+#'
 #' # From a list of named vectors
 #' as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
 #'
@@ -213,6 +216,23 @@ vec_cast.glyrepr_composition.list <- function(x, to, ...) {
     return(glycan_composition())
   }
   do.call(glycan_composition, x)
+}
+
+#' @export
+vec_cast.glyrepr_composition.integer <- function(x, to, ...) {
+  .cast_named_vector(x, to, ...)
+}
+
+#' @export
+vec_cast.glyrepr_composition.double <- function(x, to, ...) {
+  .cast_named_vector(x, to, ...)
+}
+
+.cast_named_vector <- function(x, to, ...) {
+  if (length(x) == 0) {
+    return(glycan_composition())
+  }
+  glycan_composition(x)
 }
 
 #' @export
