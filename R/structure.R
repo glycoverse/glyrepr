@@ -414,12 +414,67 @@ vec_cast.character.glyrepr_structure <- function(x, to, ...) {
   vctrs::vec_data(x)
 }
 
+# ===== IMPORTANT NOTE =====
+# `vec_restore.glyrepr_structure()` and `[.glyrepr_structure()`
+# are implemented by Claude Code.
+# I do NOT fully understand the code, but it works.
+
 #' @export
 vec_restore.glyrepr_structure <- function(x, to, ...) {
   # Get the graphs attribute from the prototype
   graphs <- attr(to, "graphs")
-  # Create the restored object with combined data and prototype's graphs
-  out <- vctrs::new_vctr(x, graphs = graphs, class = class(to))
+
+  # If prototype has no graphs, return with empty graphs
+  if (length(graphs) == 0) {
+    out <- vctrs::new_vctr(x, graphs = list(), class = class(to))
+    return(out)
+  }
+
+  # Get IUPAC codes from the data being restored
+  iupacs <- vctrs::vec_data(x)
+
+  # If x is empty (e.g., during vec_ptype2), keep all graphs from prototype
+  if (length(iupacs) == 0) {
+    out <- vctrs::new_vctr(x, graphs = graphs, class = class(to))
+    return(out)
+  }
+
+  # Filter graphs to only include those used in the subset
+  # Use unique iupacs to handle duplicates correctly
+  unique_iupacs <- unique(iupacs)
+  used_graphs <- graphs[unique_iupacs]
+  # Remove any NULL elements (can happen with empty list indexing)
+  used_graphs <- used_graphs[!vapply(used_graphs, is.null, logical(1))]
+  # Ensure names are set correctly (only if used_graphs is not empty)
+  if (length(used_graphs) > 0) {
+    names(used_graphs) <- unique_iupacs
+  }
+
+  out <- vctrs::new_vctr(x, graphs = used_graphs, class = class(to))
+  out
+}
+
+#' @rawNamespace S3method("[", glyrepr_structure)
+`[.glyrepr_structure` <- function(x, i, ...) {
+  # Call the default subsetting behavior
+  out <- NextMethod("[")
+  # Filter graphs to only include those used in the subset
+  iupacs <- vctrs::vec_data(out)
+  graphs <- attr(out, "graphs")
+  # If result is empty, return with empty graphs
+  if (length(iupacs) == 0) {
+    attr(out, "graphs") <- list()
+    return(out)
+  }
+  if (length(graphs) > 0) {
+    unique_iupacs <- unique(iupacs)
+    used_graphs <- graphs[unique_iupacs]
+    used_graphs <- used_graphs[!vapply(used_graphs, is.null, logical(1))]
+    if (length(used_graphs) > 0) {
+      names(used_graphs) <- unique_iupacs
+    }
+    attr(out, "graphs") <- used_graphs
+  }
   out
 }
 

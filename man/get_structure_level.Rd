@@ -33,14 +33,8 @@ because linkage information is far more difficult to acquire than monosaccharide
 This kind of glycan structure is also assigned to "basic" level.
 }
 \examples{
-structures <- as_glycan_structure(c(
-  "Gal(b1-3)GalNAc(a1-",
-  "Gal(b1-?)GalNAc(a1-",
-  "Gal(??-?)GalNAc(??-",
-  "Hex(??-?)HexNAc(??-",
-  "Hex(b1-3)HexNAc(a1-"
-))
-get_structure_level(structures)
+glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
+get_structure_level(glycan)
 
 }
 \seealso{

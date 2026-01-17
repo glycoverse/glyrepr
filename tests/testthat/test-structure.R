@@ -732,25 +732,33 @@ test_that("c() preserves structure integrity across combinations", {
 
 test_that("glycan_structure vectors can be subset with necessary structure preservation", {
   sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
-  
+
   # Test various subsetting operations
   subset1 <- sv[1]
   subset2 <- sv[c(1, 3)]
   subset3 <- sv[2:3]
-  
+  subset4 <- sv[c()]
+  subset5 <- sv[integer(0)]
+
   expect_s3_class(subset1, "glyrepr_structure")
   expect_s3_class(subset2, "glyrepr_structure")
   expect_s3_class(subset3, "glyrepr_structure")
-  
+  expect_s3_class(subset4, "glyrepr_structure")
+  expect_s3_class(subset5, "glyrepr_structure")
+
   expect_equal(length(subset1), 1)
   expect_equal(length(subset2), 2)
   expect_equal(length(subset3), 2)
-  
+  expect_equal(length(subset4), 0)
+  expect_equal(length(subset5), 0)
+
   # Check that unique structure tracking is maintained
   expect_length(attr(sv, "graphs"), 2)  # Original has 2 unique
   expect_length(attr(subset1, "graphs"), 1)  # Subset preserves 1 unique
   expect_length(attr(subset2, "graphs"), 1)  # Subset preserves 1 unique
   expect_length(attr(subset3, "graphs"), 2)  # Subset preserves 2 unique
+  expect_length(attr(subset4, "graphs"), 0)  # Subset preserves 0 unique
+  expect_length(attr(subset5, "graphs"), 0)  # Subset preserves 0 unique
 })
 
 test_that("glycan_structure vectors can be repeated", {
