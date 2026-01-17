@@ -74,11 +74,7 @@ test_that("convert_to_generic works with glycan compositions", {
   comp_generic <- convert_to_generic(comp_concrete)
 
   expect_true(is_glycan_composition(comp_generic))
-  data <- vctrs::vec_data(comp_generic)
-  expect_equal(vctrs::field(data, "mono_type"), "generic")
-  # Check that the conversion aggregated correctly (Gal -> Hex)
-  comp_data <- vctrs::field(data, "data")[[1]]
-  expect_equal(comp_data, c(Hex = 2, HexNAc = 1))
+  expect_equal(as.character(comp_generic), "Hex(2)HexNAc(1)")
 })
 
 test_that("convert_to_generic works with glycan compositions with substituents", {
