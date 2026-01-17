@@ -58,6 +58,46 @@ is_glycan_composition <- function(x) {
   inherits(x, "glyrepr_composition")
 }
 
+#' Convert to Glycan Composition
+#'
+#' Converts an object to a glycan composition using vctrs casting framework.
+#' This function provides a convenient way to convert various input types
+#' to [glycan_composition()].
+#'
+#' @param x An object to convert to a glycan composition.
+#'   Supported inputs include:
+#'   - Named integer vectors or lists of named integer vectors
+#'   - Character vectors with composition strings (e.g., "Hex(5)HexNAc(2)")
+#'   - `glyrepr_structure` objects (counts both monosaccharides and substituents)
+#'   - Existing `glyrepr_composition` objects (returned as-is)
+#'
+#' @returns A `glyrepr_composition` object.
+#'
+#' @details
+#' This function uses the vctrs casting framework for type conversion.
+#' When converting from glycan structures, both monosaccharides and substituents
+#' are counted. Substituents are extracted from the `sub` attribute of each
+#' vertex in the structure. For example, a vertex with `sub = "3Me"`
+#' contributes one "Me" substituent to the composition.
+#'
+#' @examples
+#' # From a list of named vectors
+#' as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
+#'
+#' # From a character vector of Byonic composition strings
+#' as_glycan_composition(c("Hex(5)HexNAc(2)", "Hex(3)HexNAc(1)"))
+#'
+#' # From a character vector of simple composition strings
+#' as_glycan_composition(c("H5N2", "H5N4S1F1"))
+#'
+#' # From an existing composition (returns as-is)
+#' comp <- glycan_composition(c(Hex = 5, HexNAc = 2))
+#' as_glycan_composition(comp)
+#'
+#' # From a glycan structure vector
+#' strucs <- c(n_glycan_core(), o_glycan_core_1())
+#' as_glycan_composition(strucs)
+#'
 #' @export
 as_glycan_composition <- function(x) {
   vec_cast(x, new_glycan_composition())
