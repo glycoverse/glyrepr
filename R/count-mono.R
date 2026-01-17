@@ -21,7 +21,7 @@
 #' @returns A numeric vector of the same length as `x`.
 #'
 #' @examples
-#' comp <- glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, Man = 1, GalNAc = 1))
+#' comp <- glycan_composition(c(Gal = 1, Man = 1, GalNAc = 1))
 #' count_mono(comp, "Hex")
 #' count_mono(comp, "Gal")
 #'

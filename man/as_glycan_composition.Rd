@@ -2,47 +2,38 @@
 % Please edit documentation in R/composition.R
 \name{as_glycan_composition}
 \alias{as_glycan_composition}
-\alias{as_glycan_composition.glyrepr_composition}
-\alias{as_glycan_composition.glyrepr_structure}
-\alias{as_glycan_composition.character}
-\alias{as_glycan_composition.default}
 \title{Convert to Glycan Composition}
 \usage{
 as_glycan_composition(x)
-
-\method{as_glycan_composition}{glyrepr_composition}(x)
-
-\method{as_glycan_composition}{glyrepr_structure}(x)
-
-\method{as_glycan_composition}{character}(x)
-
-\method{as_glycan_composition}{default}(x)
 }
 \arguments{
 \item{x}{An object to convert to a glycan composition.
-Can be a named integer vector, a list of named integer vectors,
-a glycan structure vector,
-or an existing glyrepr_composition object.}
+Supported inputs include:
+\itemize{
+\item Named integer vectors or lists of named integer vectors
+\item Character vectors with composition strings (e.g., "Hex(5)HexNAc(2)")
+\item \code{glyrepr_structure} objects (counts both monosaccharides and substituents)
+\item Existing \code{glyrepr_composition} objects (returned as-is)
+}}
 }
 \value{
-A glyrepr_composition object.
+A \code{glyrepr_composition} object.
 }
 \description{
-Convert an object to a glycan composition. The resulting composition can
-contain both monosaccharides and substituents.
+Converts an object to a glycan composition using vctrs casting framework.
+This function provides a convenient way to convert various input types
+to \code{\link[=glycan_composition]{glycan_composition()}}.
 }
 \details{
+This function uses the vctrs casting framework for type conversion.
 When converting from glycan structures, both monosaccharides and substituents
 are counted. Substituents are extracted from the \code{sub} attribute of each
 vertex in the structure. For example, a vertex with \code{sub = "3Me"}
 contributes one "Me" substituent to the composition.
 }
 \examples{
-# From a named vector
+# From a single named vector
 as_glycan_composition(c(Hex = 5, HexNAc = 2))
-
-# From a named vector with substituents
-as_glycan_composition(c(Glc = 2, Gal = 1, Me = 1, S = 1))
 
 # From a list of named vectors
 as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
@@ -51,7 +42,7 @@ as_glycan_composition(list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1)))
 as_glycan_composition(c("Hex(5)HexNAc(2)", "Hex(3)HexNAc(1)"))
 
 # From a character vector of simple composition strings
-as_glycan_composition(c("H5N2", "H5N4S1F1", "H5N4A1G1"))
+as_glycan_composition(c("H5N2", "H5N4S1F1"))
 
 # From an existing composition (returns as-is)
 comp <- glycan_composition(c(Hex = 5, HexNAc = 2))
@@ -60,8 +51,5 @@ as_glycan_composition(comp)
 # From a glycan structure vector
 strucs <- c(n_glycan_core(), o_glycan_core_1())
 as_glycan_composition(strucs)
-
-# From structures with substituents
-# (This will count both monosaccharides and any substituents present)
 
 }

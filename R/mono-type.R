@@ -59,17 +59,7 @@ convert_to_generic.character <- function(x) {
     return(x)
   }
 
-  res <- convert_mono_type_(x, from, "generic")
-
-  bad_monos <- x[is.na(res)]
-  if (length(bad_monos) > 0) {
-    cli::cli_warn(
-      "Some monosaccharides cannot be converted to generic: {.val {bad_monos}}.",
-      call = rlang::expr(convert_to_generic())
-    )
-  }
-
-  res
+  convert_mono_type_impl(x)
 }
 
 #' @export
@@ -104,55 +94,34 @@ convert_to_generic.glyrepr_composition <- function(x) {
     ))
   }
 
-  # Get current mono types
-  data <- vctrs::vec_data(x)
-  current_types <- vctrs::field(data, "mono_type")
+  if (length(x) == 0) {
+    return(x)
+  }
 
-  # Check if all are already generic
-  if (all(current_types == "generic")) {
+  # Get current mono types
+  current_type <- get_mono_type.glyrepr_composition(x)
+  if (current_type == "generic") {
     return(x)
   }
 
   # Convert each composition
-  compositions <- vctrs::field(data, "data")
-  new_compositions <- purrr::map2(compositions, current_types, function(comp, from_type) {
-    # If already generic, return as-is
-    if (from_type == "generic") {
-      return(comp)
-    }
-
+  compositions <- vctrs::field(x, "data")
+  new_compositions <- purrr::map(compositions, function(comp) {
     # Convert monosaccharide names
     old_names <- names(comp)
-    new_names <- convert_mono_type_(old_names, from_type, "generic")
-
-    # Check for unconvertible monosaccharides
-    bad_names <- old_names[is.na(new_names)]
-    if (length(bad_names) > 0) {
-      cli::cli_abort(
-        "Some monosaccharides in composition cannot be converted to generic: {.val {bad_names}}.",
-        call = rlang::expr(convert_to_generic())
-      )
-    }
+    new_names <- convert_mono_type_impl(old_names)
 
     # Create new composition with converted names, aggregating counts for duplicates
-    if (length(comp) == 0) {
-      # Handle empty composition
-      result <- integer(0)
-      names(result) <- character(0)
-    } else {
-      result <- tapply(comp, new_names, sum, na.rm = TRUE)
-      result_names <- names(result)  # Save names before conversion
-      result <- as.integer(result)
-      names(result) <- result_names  # Restore names
+    result <- tapply(comp, new_names, sum, na.rm = TRUE)
+    res_names <- names(result)
+    result <- as.integer(result)
+    names(result) <- res_names
 
-      result <- .reorder_composition_components(result, "generic")
-    }
-
-    result
+    .reorder_composition_components(result)
   })
 
   # Create new composition vector
-  do.call(glycan_composition, new_compositions)
+  new_glycan_composition(new_compositions)
 }
 
 #' Get Monosaccharide Types
@@ -199,14 +168,6 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #' # Glycan compositions
 #' comp <- glycan_composition(c(Glc = 2, GalNAc = 1))
 #' get_mono_type(comp)
-#'
-#' # Special cases
-#' comps <- glycan_composition(
-#'   c(Neu = 1),
-#'   c(Neu = 1, Glc = 1),
-#'   c(gMur = 1, Hex = 1),
-#' )
-#' get_mono_type(comps)
 #'
 #' @seealso [convert_to_generic()]
 #'
@@ -255,8 +216,16 @@ get_mono_type.glyrepr_composition <- function(x) {
     ))
   }
 
-  data <- vctrs::vec_data(x)
-  vctrs::field(data, "mono_type")
+  if (length(x) == 0) {
+    return(character())
+  }
+
+  # All compositions in a composition vector must be of the same type.
+  # Therefore, we just need to check the first composition.
+  # Filter out substituents before determining monosaccharide type.
+  comp_names <- names(vctrs::field(x, "data")[[1]])
+  mono_names <- comp_names[!comp_names %in% available_substituents()]
+  get_mono_type_impl(mono_names)
 }
 
 #' Decide mono type from a vector of monosaccharide names
@@ -290,22 +259,36 @@ get_graph_mono_type <- function(graph) {
   get_mono_type_impl(monos)
 }
 
-convert_mono_type_ <- function(mono, from, to) {
-  purrr::map2_chr(mono, from, convert_one_mono_type, to = to)
-}
-
-convert_one_mono_type <- function(mono, from, to) {
-  if (mono %in% available_substituents()) {
-    return(mono)
+#' Convert monosaccharide names to generic type
+#'
+#' This function converts concrete monosaccharide names to generic type.
+#' Generic monosaccharides are returned as is.
+#' It assumes that all monosaccharides are of the same type.
+#' Substituents are not converted.
+#'
+#' @param monos A character vector of monosaccharide names.
+#' @returns A character vector of monosaccharide names in generic type.
+#' @noRd
+convert_mono_type_impl <- function(monos) {
+  mono_type <- get_mono_type_impl(monos)
+  if (mono_type == "generic") {
+    return(monos)
   }
-  from_ <- monosaccharides[[from]]
-  to_ <- monosaccharides[[to]]
-  to_[match(mono, from_)]  # it might be NA
+  if (mono_type == "mixed") {
+    cli::cli_abort("Mixed monosaccharide types are not supported.")
+  }
+  from_ <- monosaccharides[["concrete"]]
+  to_ <- monosaccharides[["generic"]]
+  dplyr::if_else(
+    monos %in% available_substituents(),
+    monos,
+    to_[match(monos, from_)]
+  )
 }
 
 convert_glycan_mono_type_impl <- function(glycan, from, to) {
   old_names <- igraph::V(glycan)$mono
-  new_names <- convert_mono_type_(old_names, from, to)
+  new_names <- convert_mono_type_impl(old_names)
   raise_error_for_na(old_names, new_names, to)
   igraph::set_vertex_attr(glycan, "mono", value = new_names)
 }

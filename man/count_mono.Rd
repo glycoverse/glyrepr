@@ -40,7 +40,7 @@ When \code{mono} is "concrete" (e.g. "Gal", "GalNAc"),
 NA is returned when the composition is "generic".
 }
 \examples{
-comp <- glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, Man = 1, GalNAc = 1))
+comp <- glycan_composition(c(Gal = 1, Man = 1, GalNAc = 1))
 count_mono(comp, "Hex")
 count_mono(comp, "Gal")
 

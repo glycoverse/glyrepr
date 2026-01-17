@@ -59,13 +59,13 @@ each with its own superpower:
 **Method 1: The Direct Approach**
 ```{r}
 # Just tell R what you have
-glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, GalNAc = 1))
+glycan_composition(c(Man = 5, GlcNAc = 2), c(Gal = 1, GalNAc = 1))
 ```
 
 **Method 2: The Programmatic Way**
 ```{r}
 # Perfect when you're processing data from files or databases
-comp_list <- list(c(Hex = 5, HexNAc = 2), c(Gal = 1, GalNAc = 1))
+comp_list <- list(c(Man = 5, GlcNAc = 2), c(Gal = 1, GalNAc = 1))
 as_glycan_composition(comp_list)
 ```
 
@@ -88,10 +88,7 @@ Think of it as the glycan rainbow 🌈.
 Now here's where `glyrepr` shows its intelligence:
 
 ```{r}
-comp <- glycan_composition(
-  c(Hex = 5, HexNAc = 2),          # generic sugars
-  c(Gal = 1, Man = 1, GalNAc = 1)  # concrete sugars
-)
+comp <- glycan_composition(c(Gal = 1, Man = 1, GalNAc = 1))
 
 # How many galactose residues?
 count_mono(comp, "Gal")

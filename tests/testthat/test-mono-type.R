@@ -30,11 +30,30 @@ test_that("get_mono_type of unknown monosaccharides", {
 })
 
 test_that("get mono type of composition", {
-  comp_generic <- glycan_composition(c(Hex = 4, HexNAc = 1))
+  comp_generic <- glycan_composition(c(Hex = 4, HexNAc = 1), c(Hex = 1, HexNAc = 1))
   comp_concrete <- glycan_composition(c(Gal = 4, GlcNAc = 1))
 
   expect_equal(get_mono_type(comp_generic), "generic")
   expect_equal(get_mono_type(comp_concrete), "concrete")
+})
+
+test_that("get_mono_type of composition with substituents", {
+  # Concrete composition with sulfate substituent
+  comp_sulfate <- glycan_composition(c(Gal = 2, GlcNAc = 1, S = 1))
+  expect_equal(get_mono_type(comp_sulfate), "concrete")
+
+  # Generic composition with methyl substituent
+  comp_methyl <- glycan_composition(c(Hex = 2, HexNAc = 1, Me = 1))
+  expect_equal(get_mono_type(comp_methyl), "generic")
+
+  # Composition with multiple different substituents
+  comp_multi_sub <- glycan_composition(c(Gal = 3, GlcNAc = 2, S = 1, Ac = 1))
+  expect_equal(get_mono_type(comp_multi_sub), "concrete")
+})
+
+test_that("get mono type of empty composition", {
+  comp_empty <- glycan_composition()
+  expect_equal(get_mono_type(comp_empty), character())
 })
 
 # Tests for convert_to_generic function
@@ -69,11 +88,7 @@ test_that("convert_to_generic works with glycan compositions", {
   comp_generic <- convert_to_generic(comp_concrete)
 
   expect_true(is_glycan_composition(comp_generic))
-  data <- vctrs::vec_data(comp_generic)
-  expect_equal(vctrs::field(data, "mono_type"), "generic")
-  # Check that the conversion aggregated correctly (Gal -> Hex)
-  comp_data <- vctrs::field(data, "data")[[1]]
-  expect_equal(comp_data, c(Hex = 2, HexNAc = 1))
+  expect_equal(as.character(comp_generic), "Hex(2)HexNAc(1)")
 })
 
 test_that("convert_to_generic works with glycan compositions with substituents", {
@@ -87,4 +102,10 @@ test_that("convert_to_generic with already generic composition returns same", {
   comp_generic <- glycan_composition(c(Hex = 2, HexNAc = 1))
   result <- convert_to_generic(comp_generic)
   expect_identical(result, comp_generic)
+})
+
+test_that("convert_to_generic with empty composition returns empty composition", {
+  comp_empty <- glycan_composition()
+  result <- convert_to_generic(comp_empty)
+  expect_equal(result, comp_empty)
 })

@@ -33,18 +33,12 @@ test_that("substituents are located after monosaccharides", {
   expect_equal(as.character(comp), "Glc(1)Gal(1)Ac(1)S(1)")
 })
 
-test_that("mono types are decided correctly for compositions", {
-  comps <- glycan_composition(
-    c(Hex = 1, HexNAc = 1),  # generic
-    c(Glc = 1, Gal = 1),  # concrete
-    c(Hex = 1, gMur = 1),  # generic
-    c(Glc = 1, Mur = 1)  # concrete
-  )
-  expect_equal(get_mono_type(comps), c("generic", "concrete", "generic", "concrete"))
+test_that("mixed types within one composition throws error", {
+  expect_error(glycan_composition(c(Hex = 1, Glc = 1)), "Must have only one type of monosaccharide")
 })
 
-test_that("mixed types throw error", {
-  expect_error(glycan_composition(c(Hex = 1, Glc = 1)), "Must have only one type of monosaccharide")
+test_that("mixed types within one composition vector throws error", {
+  expect_error(glycan_composition(c(Hex = 1, HexNAc = 1), c(Glc = 1, Gal = 1)), "Must have only one type of monosaccharide")
 })
 
 test_that("unknown monosaccharides throw error", {
@@ -52,25 +46,11 @@ test_that("unknown monosaccharides throw error", {
 })
 
 test_that("glycan_composition rejects wrong types", {
-  expect_error(glycan_composition(list(c(Hex = 1, Glc = 1))), "Must be one or more named integer vectors")
+  expect_error(glycan_composition(list(c(Hex = 1, HexNAc = 1))), "Must be one or more named integer vectors")
 })
 
 test_that("glycan_composition rejects empty compositions", {
   expect_error(glycan_composition(integer(0)), "at least one residue")
-})
-
-test_that("as_glycan_composition works with named vectors", {
-  # Test generic composition
-  vec <- c(Hex = 2, HexNAc = 1)
-  comp <- as_glycan_composition(vec)
-  expected <- glycan_composition(c(Hex = 2, HexNAc = 1))
-  expect_equal(comp, expected)
-
-  # Test concrete composition
-  vec <- c(Glc = 2, Gal = 1)
-  comp <- as_glycan_composition(vec)
-  expected <- glycan_composition(c(Glc = 2, Gal = 1))
-  expect_equal(comp, expected)
 })
 
 test_that("as_glycan_composition works with list of named vectors", {
@@ -80,20 +60,20 @@ test_that("as_glycan_composition works with list of named vectors", {
   expect_equal(comp, expected)
 })
 
+test_that("as_glycan_composition works with a single named vector", {
+  comp <- as_glycan_composition(c(Hex = 5, HexNAc = 2))
+  expected <- glycan_composition(c(Hex = 5, HexNAc = 2))
+  expect_equal(comp, expected)
+  expect_equal(comp, as_glycan_composition(list(c(Hex = 5, HexNAc = 2))))
+})
+
 test_that("as_glycan_composition returns existing composition unchanged", {
   original <- glycan_composition(c(Hex = 5, HexNAc = 2))
   result <- as_glycan_composition(original)
   expect_identical(result, original)
 })
 
-test_that("as_glycan_composition handles compositions with one residue", {
-  vec <- c(Hex = 1)
-  comp <- as_glycan_composition(vec)
-  expected <- glycan_composition(c(Hex = 1))
-  expect_equal(comp, expected)
-})
-
-test_that("as_composition works for a glycan structure", {
+test_that("as_glycan_composition works for a glycan structure", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- ""
@@ -108,7 +88,7 @@ test_that("as_composition works for a glycan structure", {
   expect_equal(comp, expected_comp)
 })
 
-test_that("as_composition works for a glycan structure with substituents", {
+test_that("as_glycan_composition works for a glycan structure with substituents", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- c("", "", "3Me")
@@ -123,7 +103,7 @@ test_that("as_composition works for a glycan structure with substituents", {
   expect_equal(comp, expected_comp)
 })
 
-test_that("as_composition works for a glycan structure with multiple substituents", {
+test_that("as_glycan_composition works for a glycan structure with multiple substituents", {
   graph <- igraph::make_graph(~ 1-+2, 2-+3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- c("", "", "3Me,6S")
@@ -285,18 +265,15 @@ test_that("large composition printing performance is acceptable", {
 })
 
 test_that("truncation works in tibble for compositions", {
-  comp <- glycan_composition(c(Hex = 2, HexNAc = 1), c(Glc = 1, Gal = 2), c(Hex = 3, dHex = 1))
+  comp <- glycan_composition(c(Hex = 1, HexNAc = 1), c(Hex = 2, HexNAc = 1), c(Hex = 3, dHex = 1))
   tibble <- tibble::tibble(comp = comp, a = 1)
   expect_snapshot(print(tibble, width = 30))
 })
 
 # Tests for character conversion ----------------------------------------------
 test_that("as_glycan_composition works for compositions", {
-  chars <- c("Hex(5)HexNAc(2)", "Gal(2)Man(3)GlcNAc(2)Fuc(1)Neu5Ac(2)")
-  expected <- glycan_composition(
-    c(Hex = 5, HexNAc = 2),
-    c(Gal = 2, Man = 3, GlcNAc = 2, Fuc = 1, Neu5Ac = 2)
-  )
+  chars <- "Hex(5)HexNAc(2)"
+  expected <- glycan_composition(c(Hex = 5, HexNAc = 2))
   expect_equal(as_glycan_composition(chars), expected)
 })
 

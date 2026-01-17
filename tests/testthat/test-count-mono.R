@@ -84,7 +84,7 @@ test_that("count_mono works with multiple compositions", {
 })
 
 test_that("count_mono works with `mono` as NULL", {
-  comp <- glycan_composition(c(Hex = 5, HexNAc = 2), c(Gal = 1, Man = 1, GalNAc = 1))
+  comp <- glycan_composition(c(Man = 5, GlcNAc = 2), c(Gal = 1, Man = 1, GalNAc = 1))
   expect_equal(count_mono(comp), c(7L, 3L))
 })
 
