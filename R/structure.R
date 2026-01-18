@@ -254,9 +254,10 @@ validate_single_glycan_structure <- function(glycan) {
 #' a single vector are not allowed.
 #'
 #' @param graphs A list of igraph graph objects representing glycan structures.
+#' @param label A label for error messages (e.g., "Vector 1").
 #' @returns Invisible NULL. Throws an error if validation fails.
 #' @noRd
-validate_glycan_structure_vector <- function(graphs) {
+validate_glycan_structure_vector <- function(graphs, label = NULL) {
   # Skip if empty or single graph
   if (length(graphs) <= 1) {
     return(invisible(NULL))
@@ -269,20 +270,28 @@ validate_glycan_structure_vector <- function(graphs) {
   if (any(mono_types == "mixed")) {
     cli::cli_abort(c(
       "All structures must have a single monosaccharide type.",
-      "x" = "Some structures have mixed generic and concrete monosaccharides."
+      "x" = "{.val {label}} contains structures with mixed generic and concrete monosaccharides."
     ))
   }
 
   # Check that all structures have the same mono_type
-  if (length(unique(mono_types)) > 1) {
+  unique_types <- unique(mono_types)
+  if (length(unique_types) > 1) {
     concrete_count <- sum(mono_types == "concrete")
     generic_count <- sum(mono_types == "generic")
 
-    cli::cli_abort(c(
-      "All structures must have the same monosaccharide type.",
-      "x" = "Found {.val {concrete_count}} concrete and {.val {generic_count}} generic structure(s) in the same vector.",
-      "i" = "Use {.fn convert_to_generic} to convert concrete structures to generic type."
-    ))
+    if (is.null(label)) {
+      cli::cli_abort(c(
+        "All structures must have the same monosaccharide type.",
+        "x" = "Found {.val {concrete_count}} concrete and {.val {generic_count}} generic structure(s) in the same vector.",
+        "i" = "Use {.fn convert_to_generic} to convert concrete structures to generic type."
+      ))
+    } else {
+      cli::cli_abort(c(
+        "All structures must have the same monosaccharide type.",
+        "x" = "{.val {label}} has mixed types: {.val {concrete_count}} concrete and {.val {generic_count}} generic structure(s)."
+      ))
+    }
   }
 
   invisible(NULL)
@@ -408,43 +417,17 @@ vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
   graphs_x <- attr(x, "graphs")
   graphs_y <- attr(y, "graphs")
 
-  # Validate mono_type compatibility if both vectors have graphs
+  # Validate each vector separately
+  validate_glycan_structure_vector(graphs_x, label = "Vector 1")
+  validate_glycan_structure_vector(graphs_y, label = "Vector 2")
+
+  # Check that both vectors have the same mono_type
   if (length(graphs_x) > 0 && length(graphs_y) > 0) {
     mono_types_x <- purrr::map_chr(graphs_x, get_graph_mono_type)
     mono_types_y <- purrr::map_chr(graphs_y, get_graph_mono_type)
-
-    # Check for mixed types within individual graphs
-    if (any(mono_types_x == "mixed") || any(mono_types_y == "mixed")) {
-      cli::cli_abort(c(
-        "All structures must have a single monosaccharide type.",
-        "x" = "Some structures have mixed generic and concrete monosaccharides."
-      ))
-    }
-
-    # Check that both vectors have the same mono_type
     unique_types_x <- unique(mono_types_x)
     unique_types_y <- unique(mono_types_y)
 
-    # Check for mixed types (more than one unique type in a single vector)
-    if (length(unique_types_x) > 1) {
-      concrete_count_x <- sum(mono_types_x == "concrete")
-      generic_count_x <- sum(mono_types_x == "generic")
-      cli::cli_abort(c(
-        "All structures must have the same monosaccharide type.",
-        "x" = "Vector 1 has mixed types: {.val {concrete_count_x}} concrete and {.val {generic_count_x}} generic structure(s)."
-      ))
-    }
-
-    if (length(unique_types_y) > 1) {
-      concrete_count_y <- sum(mono_types_y == "concrete")
-      generic_count_y <- sum(mono_types_y == "generic")
-      cli::cli_abort(c(
-        "All structures must have the same monosaccharide type.",
-        "x" = "Vector 2 has mixed types: {.val {concrete_count_y}} concrete and {.val {generic_count_y}} generic structure(s)."
-      ))
-    }
-
-    # Check that both vectors have the same mono_type
     if (length(unique_types_x) > 0 && length(unique_types_y) > 0 &&
         unique_types_x[[1]] != unique_types_y[[1]]) {
       concrete_count_x <- sum(mono_types_x == "concrete")
