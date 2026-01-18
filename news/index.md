@@ -11,6 +11,15 @@ instead of
 The direct benefit is that `glyrepr_structure` now supports custom
 names. We’re testing the naming feature now.
 
+### New features
+
+- [`smap()`](https://glycoverse.github.io/glyrepr/reference/smap.md),
+  [`smap2()`](https://glycoverse.github.io/glyrepr/reference/smap2.md),
+  [`spmap()`](https://glycoverse.github.io/glyrepr/reference/spmap.md),
+  [`simap()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  and their variants now preserve names from input `glyrepr_structure`
+  vectors in their output.
+
 ### Breaking changes
 
 - `glyrepr_composition` and `glyrepr_structure` now enforce the same
