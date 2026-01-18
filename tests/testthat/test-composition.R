@@ -196,6 +196,14 @@ test_that("c() throws error for different monosaccharide types", {
   expect_error(c(generic_comp, concrete_comp), "Can't combine")
 })
 
+test_that("c() throws error for different monosaccharide types with substituents", {
+  # Test that combining generic and concrete compositions throws an error
+  generic_comp <- glycan_composition(c(Hex = 1, HexNAc = 1, Me = 1))
+  concrete_comp <- glycan_composition(c(Glc = 1, Gal = 1, S = 1))
+
+  expect_error(c(generic_comp, concrete_comp), "Can't combine")
+})
+
 test_that("c() maintains proper ordering within compositions", {
   # Test that monosaccharide ordering is preserved during combination
   comp1 <- glycan_composition(c(GalNAc = 1, Gal = 2))  # Out of order input

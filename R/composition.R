@@ -230,6 +230,7 @@ vec_cast.glyrepr_composition.double <- function(x, to, ...) {
 vec_restore.glyrepr_composition <- function(x, to, ...) {
   data <- vctrs::field(x, "data")
   monos_list <- purrr::map(data, names)
+  monos_list <- purrr::map(monos_list, ~ .x[!.x %in% available_substituents()])
   mono_types <- purrr::map_chr(monos_list, get_mono_type_impl)
   if (length(unique(mono_types)) > 1) {
     cli::cli_abort(c(
