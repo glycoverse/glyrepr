@@ -1188,3 +1188,15 @@ test_that("simap_structure preserves names", {
   result <- simap_structure(structures, add_index_attr)
   expect_equal(names(result), c("X", "Y"))
 })
+
+test_that("smap_unique documents behavior with named input", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1, core1)
+  names(structures) <- c("A", "B", "C")  # All same structure, different names
+
+  # smap_unique operates on unique structures only
+  result <- smap_unique(structures, igraph::vcount)
+
+  # Result is named by structure hash (IUPAC), not input names
+  expect_true(is.null(names(result)) || startsWith(names(result), "Gal"))
+})
