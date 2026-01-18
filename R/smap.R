@@ -493,6 +493,8 @@ smap2 <- function(.x, .y, .f, ..., .parallel = FALSE) {
   # This fix ensures smap2 works correctly with nested data structures commonly
   # used in glycan analysis workflows.
 
+  input_names <- names(.x)
+
   if (!is_glycan_structure(.x)) {
     cli::cli_abort("Input `.x` must be a glycan_structure vector.")
   }
@@ -548,7 +550,9 @@ smap2 <- function(.x, .y, .f, ..., .parallel = FALSE) {
   names(unique_results) <- unique_combinations_df$combo_key
 
   # Map results back to original vector positions
-  purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+  result <- purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+  names(result) <- input_names
+  result
 }
 
 #' @rdname smap2
@@ -585,6 +589,8 @@ smap2_chr <- function(.x, .y, .f, ..., .parallel = FALSE) {
 #' @rdname smap2
 #' @export
 smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
+  input_names <- names(.x)
+
   if (!is_glycan_structure(.x)) {
     cli::cli_abort("Input `.x` must be a glycan_structure vector.")
   }
@@ -630,7 +636,12 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
 
   # Rebuild glycan_structure with proper deduplication
   idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
-  .rebuild_structure_with_dedup(new_graphs, idx)
+  result <- .rebuild_structure_with_dedup(new_graphs, idx)
+
+  # Restore names
+  names(result) <- input_names
+
+  result
 }
 
 #' Map Functions Over Glycan Structure Vectors and Multiple Arguments

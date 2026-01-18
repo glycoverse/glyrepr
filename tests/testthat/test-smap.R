@@ -1091,3 +1091,33 @@ test_that("smap_structure preserves names", {
   result <- smap_structure(structures, add_attr)
   expect_equal(names(result), c("X", "Y"))
 })
+
+test_that("smap2 functions preserve names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+  weights <- c(1.0, 2.0, 1.0)
+
+  # smap2_dbl should preserve names
+  result <- smap2_dbl(structures, weights, function(g, w) igraph::vcount(g) * w)
+  expect_equal(names(result), c("A", "B", "C"))
+
+  # smap2 should preserve names in list
+  result_list <- smap2(structures, weights, function(g, w) list(count = igraph::vcount(g), weight = w))
+  expect_equal(names(result_list), c("A", "B", "C"))
+})
+
+test_that("smap2_structure preserves names", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1)
+  names(structures) <- c("X", "Y")
+  values <- c(1, 2)
+
+  add_attr <- function(g, v) {
+    igraph::set_graph_attr(g, "value", v)
+  }
+
+  result <- smap2_structure(structures, values, add_attr)
+  expect_equal(names(result), c("X", "Y"))
+})
