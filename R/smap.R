@@ -732,6 +732,9 @@ spmap <- function(.l, .f, ..., .parallel = FALSE) {
     return(list())
   }
 
+  # Capture input names for preservation in output
+  input_names <- names(.l[[1]])
+
   # Recycle all vectors to match length of first vector
   target_length <- length(.l[[1]])
   .l <- purrr::map(.l, ~ vctrs::vec_recycle(.x, target_length))
@@ -780,7 +783,9 @@ spmap <- function(.l, .f, ..., .parallel = FALSE) {
   names(unique_results) <- unique_combinations_df$combo_key
 
   # Map results back to original vector positions
-  purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+  result <- purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+  names(result) <- input_names
+  result
 }
 
 #' @rdname spmap
@@ -834,6 +839,9 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
     return(glycan_structure())
   }
 
+  # Capture input names for preservation in output
+  input_names <- names(.l[[1]])
+
   # Recycle all vectors to match length of first vector
   target_length <- length(.l[[1]])
   .l <- purrr::map(.l, ~ vctrs::vec_recycle(.x, target_length))
@@ -886,7 +894,9 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
 
   # Rebuild glycan_structure with proper deduplication
   idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
-  .rebuild_structure_with_dedup(new_graphs, idx)
+  result <- .rebuild_structure_with_dedup(new_graphs, idx)
+  names(result) <- input_names
+  result
 }
 
 #' Map Functions Over Glycan Structure Vectors with Indices

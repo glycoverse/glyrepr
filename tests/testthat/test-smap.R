@@ -1121,3 +1121,40 @@ test_that("smap2_structure preserves names", {
   result <- smap2_structure(structures, values, add_attr)
   expect_equal(names(result), c("X", "Y"))
 })
+
+# Tests for spmap names preservation -----------------------------------------
+
+test_that("spmap functions preserve names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2)
+  names(structures) <- c("A", "B")
+  weights <- c(1.0, 2.0)
+  factors <- c(2, 3)
+
+  # spmap_dbl should preserve names
+  result <- spmap_dbl(list(structures, weights, factors),
+                      function(g, w, f) igraph::vcount(g) * w * f)
+  expect_equal(names(result), c("A", "B"))
+
+  # spmap should preserve names in list
+  result_list <- spmap(list(structures, weights, factors),
+                       function(g, w, f) list(count = igraph::vcount(g), weight = w))
+  expect_equal(names(result_list), c("A", "B"))
+})
+
+test_that("spmap_structure preserves names", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1)
+  names(structures) <- c("X", "Y")
+  values1 <- c("a", "b")
+  values2 <- c(1, 2)
+
+  add_attrs <- function(g, v1, v2) {
+    g <- igraph::set_graph_attr(g, "label", v1)
+    igraph::set_graph_attr(g, "num", v2)
+  }
+
+  result <- spmap_structure(list(structures, values1, values2), add_attrs)
+  expect_equal(names(result), c("X", "Y"))
+})
