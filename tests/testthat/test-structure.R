@@ -1104,3 +1104,156 @@ test_that("[[<- is forbidden with igraph value", {
     class = "rlang_error"
   )
 })
+
+# Tests for names-----
+
+test_that("directly setting names works", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+  expect_equal(names(glycans), c("A", "B"))
+})
+
+test_that("new structures have NULL names by default", {
+  glycans <- o_glycan_core_1()
+  expect_null(names(glycans))
+})
+
+test_that("new structure vectors have NULL names by default", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  expect_null(names(glycans))
+})
+
+test_that("names are preserved after subsetting with [", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  subset1 <- glycans[1]
+  expect_equal(names(subset1), "A")
+
+  subset2 <- glycans[2]
+  expect_equal(names(subset2), "B")
+
+  subset_both <- glycans[c(1, 2)]
+  expect_equal(names(subset_both), c("A", "B"))
+
+  subset_reverse <- glycans[c(2, 1)]
+  expect_equal(names(subset_reverse), c("B", "A"))
+})
+
+test_that("names are preserved after subsetting with logical index", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  names(glycans) <- c("A", "B", "C")
+
+  subset_logical <- glycans[c(TRUE, FALSE, TRUE)]
+  expect_equal(names(subset_logical), c("A", "C"))
+})
+
+test_that("names are preserved after c() combining", {
+  glycans1 <- o_glycan_core_1()
+  glycans2 <- n_glycan_core()
+  names(glycans1) <- "A"
+  names(glycans2) <- "B"
+
+  combined <- c(glycans1, glycans2)
+  expect_equal(names(combined), c("A", "B"))
+})
+
+test_that("names are preserved after rep()", {
+  glycans <- o_glycan_core_1()
+  names(glycans) <- "A"
+
+  repeated <- rep(glycans, 3)
+  expect_equal(names(repeated), c("A", "A", "A"))
+})
+
+test_that("setting names to NULL removes names", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+  expect_equal(names(glycans), c("A", "B"))
+
+  names(glycans) <- NULL
+  expect_null(names(glycans))
+})
+
+test_that("names work with empty vectors", {
+  empty <- glycan_structure()
+  expect_null(names(empty))
+})
+
+test_that("names work with single-element vectors", {
+  glycan <- o_glycan_core_1()
+  names(glycan) <- "single"
+  expect_equal(names(glycan), "single")
+})
+
+test_that("names are preserved after combining vectors with different names", {
+  glycans1 <- c(o_glycan_core_1())
+  glycans2 <- c(n_glycan_core())
+  names(glycans1) <- "A"
+  names(glycans2) <- "B"
+
+  combined <- c(glycans1, glycans2)
+  expect_equal(names(combined), c("A", "B"))
+})
+
+test_that("names work with duplicated structures", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  names(glycans) <- c("A", "B", "C")
+
+  # First and third point to the same structure but have different names
+  expect_equal(names(glycans), c("A", "B", "C"))
+
+  # Subsetting should preserve names correctly
+  subset <- glycans[c(1, 3)]
+  expect_equal(names(subset), c("A", "C"))
+})
+
+test_that("names are preserved in tibble operations", {
+  skip_if_not_installed("tibble")
+
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  df <- tibble::tibble(id = 1:2, structure = glycans)
+
+  # Subsetting tibble should preserve names
+  subset_df <- df[1, ]
+  expect_equal(names(subset_df$structure), "A")
+
+  subset_df2 <- df[2, ]
+  expect_equal(names(subset_df2$structure), "B")
+})
+
+test_that("names work correctly with dplyr operations", {
+  skip_if_not_installed("dplyr")
+
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  df <- tibble::tibble(id = 1:2, structure = glycans)
+
+  # filter should preserve names
+  filtered <- df %>% dplyr::filter(id == 1)
+  expect_equal(names(filtered$structure), "A")
+
+  # slice should preserve names
+  sliced <- df %>% dplyr::slice(2)
+  expect_equal(names(sliced$structure), "B")
+})
+
+test_that("unname removes names", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  unname_glycans <- unname(glycans)
+  expect_null(names(unname_glycans))
+})
+
+test_that("names work with character conversion", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  # Converting to character should preserve names
+  chars <- as.character(glycans)
+  expect_equal(names(chars), c("A", "B"))
+})
