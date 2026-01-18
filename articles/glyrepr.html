@@ -267,12 +267,12 @@ copy of each book, no matter how many people want to read it.</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5 structures: 0.021 sec elapsed</span></span>
+<span><span class="co">#&gt; Converting 5 structures: 0.022 sec elapsed</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5,000 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">large_struc</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5,000 structures: 0.027 sec elapsed</span></span></code></pre></div>
+<span><span class="co">#&gt; Converting 5,000 structures: 0.029 sec elapsed</span></span></code></pre></div>
 <p><strong>Mind = blown!</strong> 🤯 The performance is nearly identical
 because <code>glyrepr</code> only processes each unique structure once,
 then cleverly expands the results.</p>
