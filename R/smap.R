@@ -230,6 +230,9 @@ smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
 
   .f <- rlang::as_function(.f)
 
+  # Capture input names for preservation
+  input_names <- names(.x)
+
   iupacs <- vctrs::vec_data(.x)
   graphs <- attr(.x, "graphs")
 
@@ -248,7 +251,12 @@ smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
 
   # Rebuild glycan_structure with proper deduplication
   idx <- match(iupacs, unique_iupacs)
-  .rebuild_structure_with_dedup(new_graphs, idx)
+  result <- .rebuild_structure_with_dedup(new_graphs, idx)
+
+  # Restore names
+  names(result) <- input_names
+
+  result
 }
 
 #' Apply Function to Unique Structures Only

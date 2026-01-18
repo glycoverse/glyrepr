@@ -1057,13 +1057,13 @@ test_that("smap2 refactored code maintains performance with complex inputs", {
 test_that("smap2 edge case: empty lists and mixed types", {
   glycan_codes <- c("Gal(a1-3)GalNAc(a1-", "GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
   structures <- as_glycan_structure(glycan_codes)
-  
+
   # Test with empty lists and mixed simple/complex types
   mixed_data <- list(
     list(),              # Empty list
     "simple_string"      # Non-list data
   )
-  
+
   result <- smap2(structures, mixed_data, function(graph, data) {
     if (is.list(data)) {
       return(paste0("list_", length(data)))
@@ -1071,8 +1071,23 @@ test_that("smap2 edge case: empty lists and mixed types", {
       return(paste0("non_list_", data))
     }
   })
-  
+
   expect_length(result, 2)
   expect_equal(result[[1]], "list_0")
   expect_equal(result[[2]], "non_list_simple_string")
+})
+
+# Tests for names preservation -----------------------------------------
+
+test_that("smap_structure preserves names", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1)
+  names(structures) <- c("X", "Y")
+
+  add_attr <- function(g) {
+    igraph::set_graph_attr(g, "test", "value")
+  }
+
+  result <- smap_structure(structures, add_attr)
+  expect_equal(names(result), c("X", "Y"))
 })
