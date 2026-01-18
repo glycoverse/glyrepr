@@ -469,9 +469,6 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
     unique_iupacs <- unique(iupacs)
     used_graphs <- graphs[unique_iupacs]
     used_graphs <- used_graphs[!vapply(used_graphs, is.null, logical(1))]
-    if (length(used_graphs) > 0) {
-      names(used_graphs) <- unique_iupacs
-    }
     attr(out, "graphs") <- used_graphs
   }
   out
