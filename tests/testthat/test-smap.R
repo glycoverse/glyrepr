@@ -1158,3 +1158,33 @@ test_that("spmap_structure preserves names", {
   result <- spmap_structure(list(structures, values1, values2), add_attrs)
   expect_equal(names(result), c("X", "Y"))
 })
+
+# Tests for simap names preservation -----------------------------------------
+
+test_that("simap functions preserve names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+
+  # simap_chr should preserve names
+  result <- simap_chr(structures, function(g, i) paste0("Structure_", i))
+  expect_equal(names(result), c("A", "B", "C"))
+
+  # simap should preserve names in list
+  result_list <- simap(structures, function(g, i) list(index = i))
+  expect_equal(names(result_list), c("A", "B", "C"))
+})
+
+test_that("simap_structure preserves names", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1)
+  names(structures) <- c("X", "Y")
+
+  add_index_attr <- function(g, idx) {
+    igraph::set_graph_attr(g, "index", idx)
+  }
+
+  result <- simap_structure(structures, add_index_attr)
+  expect_equal(names(result), c("X", "Y"))
+})

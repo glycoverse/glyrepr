@@ -1003,7 +1003,9 @@ simap <- function(.x, .f, ...) {
   names(unique_results) <- unique_combinations_df$combo_key
 
   # Map results back to original vector positions
-  purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+  result <- purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+  names(result) <- names(.x)
+  result
 }
 
 #' @rdname simap
@@ -1083,5 +1085,8 @@ simap_structure <- function(.x, .f, ...) {
 
   # Rebuild glycan_structure with proper deduplication
   idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
-  .rebuild_structure_with_dedup(new_graphs, idx)
+  input_names <- names(.x)
+  result <- .rebuild_structure_with_dedup(new_graphs, idx)
+  names(result) <- input_names
+  result
 }
