@@ -1210,3 +1210,13 @@ test_that("as_glycan_composition preserves names from glyrepr_structure", {
   result <- as_glycan_composition(structures)
   expect_equal(names(result), c("A", "B", "C"))
 })
+
+test_that("get_structure_level preserves names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+
+  result <- get_structure_level(structures)
+  expect_equal(names(result), c("A", "B", "C"))
+})
