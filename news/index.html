@@ -53,6 +53,8 @@
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
 <ul><li>Subsetting <code>glyrepr_structure</code> with <code>integer(0)</code> and <code>NULL</code> correctly removes all underlying graphs.</li>
+<li>
+<code>[[&lt;-</code> is forbidden on <code>glyrepr_structure</code> vectors. Previously, the operation could be performed silently, but resulted in an invalid object.</li>
 </ul></div>
 </div>
     <div class="section level2">
