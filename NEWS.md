@@ -11,6 +11,7 @@ We have redesigned the internal implementation of `glyrepr_composition` and `gly
 ## Minor improvements and bug fixes
 
 * Subsetting `glyrepr_structure` with `integer(0)` and `NULL` correctly removes all underlying graphs.
+* `[[<-` is forbidden on `glyrepr_structure` vectors. Previously, the operation could be performed silently, but resulted in an invalid object.
 
 # glyrepr 0.9.0
 
