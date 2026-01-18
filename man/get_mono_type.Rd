@@ -24,8 +24,10 @@ get_mono_type(x)
 }}
 }
 \value{
-A character vector specifying the monosaccharide type(s).
-For structures and compositions, returns the type for each element.
+\itemize{
+\item For character input, returns a character vector of the same length as \code{x}.
+\item For \code{glyrepr_structure} and \code{glyrepr_composition} input, returns a character scalar.
+}
 }
 \description{
 This function determines the type of monosaccharides in character vectors,
