@@ -2,6 +2,11 @@
 
 We have redesigned the internal implementation of `glyrepr_composition` and `glyrepr_structure`. Importantly, `glyrepr_structure` is now built on `vctrs::new_vctr()` instead of `vctrs::new_rcrd()`. The direct benefit is that `glyrepr_structure` now supports custom names. We're testing the naming feature now.
 
+## New features
+
+* `smap()`, `smap2()`, `spmap()`, `simap()` and their variants now preserve
+  names from input `glyrepr_structure` vectors in their output.
+
 ## Breaking changes
 
 * `glyrepr_composition` and `glyrepr_structure` now enforce the same monosaccharide type ("concrete" or "generic") within a vector. Mixed types are not allowed anymore. This invariant is enforced both when creating new vectors and when combining existing vectors.
