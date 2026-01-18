@@ -139,6 +139,9 @@ glycan_structure <- function(...) {
   # Reorder the graphs to align with IUPAC-style sequence
   reordered_graphs <- reorder_graphs(processed_graphs)
 
+  # Validate that all structures have the same mono_type
+  validate_glycan_structure_vector(reordered_graphs)
+
   # Use IUPAC codes directly as data for the glycan_structure vctrs vector
   iupacs <- purrr::map_chr(reordered_graphs, .structure_to_iupac_single)
 
@@ -242,6 +245,47 @@ validate_single_glycan_structure <- function(glycan) {
   }
 
   glycan
+}
+
+#' Validate that all structures in a vector have the same monosaccharide type
+#'
+#' This function checks that all glycan structures in a vector have the same
+#' monosaccharide type (either all generic or all concrete). Mixed types within
+#' a single vector are not allowed.
+#'
+#' @param graphs A list of igraph graph objects representing glycan structures.
+#' @returns Invisible NULL. Throws an error if validation fails.
+#' @noRd
+validate_glycan_structure_vector <- function(graphs) {
+  # Skip if empty or single graph
+  if (length(graphs) <= 1) {
+    return(invisible(NULL))
+  }
+
+  # Get mono_type for each graph
+  mono_types <- purrr::map_chr(graphs, get_graph_mono_type)
+
+  # Check for mixed types within individual graphs
+  if (any(mono_types == "mixed")) {
+    cli::cli_abort(c(
+      "All structures must have a single monosaccharide type.",
+      "x" = "Some structures have mixed generic and concrete monosaccharides."
+    ))
+  }
+
+  # Check that all structures have the same mono_type
+  if (length(unique(mono_types)) > 1) {
+    concrete_count <- sum(mono_types == "concrete")
+    generic_count <- sum(mono_types == "generic")
+
+    cli::cli_abort(c(
+      "All structures must have the same monosaccharide type.",
+      "x" = "Found {.val {concrete_count}} concrete and {.val {generic_count}} generic structure(s) in the same vector.",
+      "i" = "Use {.fn convert_to_generic} to convert concrete structures to generic type."
+    ))
+  }
+
+  invisible(NULL)
 }
 
 #' Helper function to create a new glycan structure vector
@@ -363,6 +407,39 @@ vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
   # Get graphs from both vectors (works for both empty prototypes and full vectors)
   graphs_x <- attr(x, "graphs")
   graphs_y <- attr(y, "graphs")
+
+  # Validate mono_type compatibility if both vectors have graphs
+  if (length(graphs_x) > 0 && length(graphs_y) > 0) {
+    mono_types_x <- purrr::map_chr(graphs_x, get_graph_mono_type)
+    mono_types_y <- purrr::map_chr(graphs_y, get_graph_mono_type)
+
+    # Check for mixed types within individual graphs
+    if (any(mono_types_x == "mixed") || any(mono_types_y == "mixed")) {
+      cli::cli_abort(c(
+        "All structures must have a single monosaccharide type.",
+        "x" = "Some structures have mixed generic and concrete monosaccharides."
+      ))
+    }
+
+    # Check that both vectors have the same mono_type
+    unique_types_x <- unique(mono_types_x)
+    unique_types_y <- unique(mono_types_y)
+
+    if (length(unique_types_x) > 0 && length(unique_types_y) > 0 &&
+        unique_types_x[[1]] != unique_types_y[[1]]) {
+      concrete_count_x <- sum(mono_types_x == "concrete")
+      generic_count_x <- sum(mono_types_x == "generic")
+      concrete_count_y <- sum(mono_types_y == "concrete")
+      generic_count_y <- sum(mono_types_y == "generic")
+
+      cli::cli_abort(c(
+        "All structures must have the same monosaccharide type.",
+        "x" = "Vector 1 has {.val {concrete_count_x}} concrete and {.val {generic_count_x}} generic structure(s).",
+        "x" = "Vector 2 has {.val {concrete_count_y}} concrete and {.val {generic_count_y}} generic structure(s).",
+        "i" = "Use {.fn convert_to_generic} to convert concrete structures to generic type."
+      ))
+    }
+  }
 
   # Combine graphs from both vectors (union by IUPAC name as key)
   combined_graphs <- c(graphs_x, graphs_y)

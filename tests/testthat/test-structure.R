@@ -1035,3 +1035,51 @@ test_that("vertices and edges are reordered correctly", {
   expect_equal(igraph::E(graph1)$linkage, c("b1-3", "b1-6"))
   expect_equal(igraph::E(graph2)$linkage, c("b1-3", "b1-6"))
 })
+
+# Tests for mono_type validation in glycan_structure -------------------------
+
+test_that("glycan_structure accepts multiple concrete structures", {
+  graph1 <- create_simple_glycan_graph(c("Glc", "Gal"), "b1-4")
+  graph2 <- create_simple_glycan_graph(c("Man", "GlcNAc"), "b1-4")
+  sv <- glycan_structure(graph1, graph2)
+  expect_equal(length(sv), 2)
+})
+
+test_that("glycan_structure accepts multiple generic structures", {
+  graph1 <- create_simple_glycan_graph(c("Hex", "HexNAc"), "b1-4")
+  graph2 <- create_simple_glycan_graph(c("Hex", "dHex"), "b1-6")
+  sv <- glycan_structure(graph1, graph2)
+  expect_equal(length(sv), 2)
+})
+
+test_that("glycan_structure rejects mixing concrete and generic structures", {
+  graph1 <- create_simple_glycan_graph(c("Glc", "Gal"), "b1-4")  # concrete
+  graph2 <- create_simple_glycan_graph(c("Hex", "HexNAc"), "b1-4")  # generic
+  expect_error(
+    glycan_structure(graph1, graph2),
+    "All structures must have the same monosaccharide type"
+  )
+})
+
+test_that("c() rejects combining concrete and generic structure vectors", {
+  sv1 <- o_glycan_core_1()  # concrete: Gal, GalNAc
+  sv2 <- n_glycan_core(mono_type = "generic")  # generic: Hex, HexNAc
+  expect_error(
+    c(sv1, sv2),
+    "All structures must have the same monosaccharide type"
+  )
+})
+
+test_that("get_mono_type returns same type for all structures in vector", {
+  graph1 <- create_simple_glycan_graph(c("Glc", "Gal"), "b1-4")
+  graph2 <- create_simple_glycan_graph(c("Man", "GlcNAc"), "b1-4")
+  sv <- glycan_structure(graph1, graph2)
+  expect_equal(get_mono_type(sv), "concrete")
+})
+
+test_that("get_mono_type returns same type for generic structures", {
+  graph1 <- create_simple_glycan_graph(c("Hex", "HexNAc"), "b1-4")
+  graph2 <- create_simple_glycan_graph(c("Hex", "dHex"), "b1-6")
+  sv <- glycan_structure(graph1, graph2)
+  expect_equal(get_mono_type(sv), "generic")
+})
