@@ -19,6 +19,8 @@ names. We’re testing the naming feature now.
   [`simap()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
   and their variants now preserve names from input `glyrepr_structure`
   vectors in their output.
+- `glyrepr_structure` now formally supports names. All operations on a
+  named `glyrepr_structure` vectors preserve the names.
 
 ### Breaking changes
 
