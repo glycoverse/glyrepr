@@ -1,3 +1,22 @@
+test_that("smap functions preserve names in output", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+
+  # smap_int should preserve names
+  result <- smap_int(structures, igraph::vcount)
+  expect_equal(names(result), c("A", "B", "C"))
+
+  # smap_chr should preserve names
+  result_chr <- smap_chr(structures, ~ .x$anomer)
+  expect_equal(names(result_chr), c("A", "B", "C"))
+
+  # smap should preserve names in list
+  result_list <- smap(structures, ~ igraph::vcount(.x))
+  expect_equal(names(result_list), c("A", "B", "C"))
+})
+
 test_that("smap functions work with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()

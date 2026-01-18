@@ -113,6 +113,9 @@ NULL
     cli::cli_abort("Input must be a glycan_structure vector.")
   }
 
+  # Capture input names for preservation
+  input_names <- names(.x)
+
   .f <- rlang::as_function(.f)
 
   codes <- vctrs::vec_data(.x)
@@ -132,7 +135,9 @@ NULL
   if (is.null(.convert_fn)) {
     # Optimized mapping: use match() instead of individual lookups
     idx <- match(codes, unique_codes)
-    return(unname(unique_results[idx]))
+    result <- unique_results[idx]
+    names(result) <- input_names
+    return(result)
   }
 
   # Convert to target type and map back to original positions
@@ -141,7 +146,9 @@ NULL
 
   # Optimized mapping: use match() instead of individual lookups
   idx <- match(codes, unique_codes)
-  unname(unique_converted[idx])
+  result <- unique_converted[idx]
+  names(result) <- input_names
+  return(result)
 }
 
 # Helper function to generate a hash-based key for complex objects
