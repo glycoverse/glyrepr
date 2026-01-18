@@ -529,7 +529,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
   out
 }
 
-#' @rawNamespace S3method("[", glyrepr_structure)
+#' @export
 `[.glyrepr_structure` <- function(x, i, ...) {
   # Call the default subsetting behavior
   out <- NextMethod("[")
@@ -548,6 +548,15 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
     attr(out, "graphs") <- used_graphs
   }
   out
+}
+
+#' @export
+`[[<-.glyrepr_structure` <- function(x, i, value) {
+  cli::cli_abort(c(
+    "Cannot use `[[<-` on {.cls glyrepr_structure} vectors.",
+    "x" = "This operation would create an invalid object with mismatched data and graphs.",
+    "i" = "Create a new vector instead, e.g., with `c()`."
+  ))
 }
 
 #' Convert to Glycan Structure Vector

@@ -1083,3 +1083,24 @@ test_that("get_mono_type returns same type for generic structures", {
   sv <- glycan_structure(graph1, graph2)
   expect_equal(get_mono_type(sv), "generic")
 })
+
+# Tests for [[<- operation (issue #11) -----------------------------------------
+
+test_that("[[<- is forbidden on glyrepr_structure vectors", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+
+  expect_error(
+    glycans[[1]] <- n_glycan_core(),
+    class = "rlang_error"
+  )
+})
+
+test_that("[[<- is forbidden with igraph value", {
+  glycans <- o_glycan_core_1()
+  graph <- get_structure_graphs(glycans, return_list = FALSE)
+
+  expect_error(
+    glycans[[1]] <- graph,
+    class = "rlang_error"
+  )
+})
