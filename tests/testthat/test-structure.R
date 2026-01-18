@@ -489,12 +489,27 @@ test_that("format.glyrepr_structure handles duplicates correctly", {
   glycan1 <- o_glycan_core_1()
   glycan2 <- o_glycan_core_1()
   sv <- c(glycan1, glycan2)
-  
+
   formatted <- format(sv)
-  
+
   expect_length(formatted, 2)
   expect_equal(formatted[1], formatted[2])  # Both should show same IUPAC
   expect_equal(formatted[1], "Gal(b1-3)GalNAc(a1-")
+})
+
+test_that("format.glyrepr_structure includes names with tab separation", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  expect_snapshot(format(glycans))
+})
+
+test_that("format.glyrepr_structure without names works correctly", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  # Ensure no names
+  glycans <- unname(glycans)
+
+  expect_snapshot(format(glycans))
 })
 
 test_that("truncation works in tibble", {
@@ -1103,4 +1118,197 @@ test_that("[[<- is forbidden with igraph value", {
     glycans[[1]] <- graph,
     class = "rlang_error"
   )
+})
+
+# Tests for names-----
+
+test_that("directly setting names works", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+  expect_equal(names(glycans), c("A", "B"))
+})
+
+test_that("new structures have NULL names by default", {
+  glycans <- o_glycan_core_1()
+  expect_null(names(glycans))
+})
+
+test_that("new structure vectors have NULL names by default", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  expect_null(names(glycans))
+})
+
+test_that("names are preserved after subsetting with [", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  subset1 <- glycans[1]
+  expect_equal(names(subset1), "A")
+
+  subset2 <- glycans[2]
+  expect_equal(names(subset2), "B")
+
+  subset_both <- glycans[c(1, 2)]
+  expect_equal(names(subset_both), c("A", "B"))
+
+  subset_reverse <- glycans[c(2, 1)]
+  expect_equal(names(subset_reverse), c("B", "A"))
+})
+
+test_that("names are preserved after subsetting with logical index", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  names(glycans) <- c("A", "B", "C")
+
+  subset_logical <- glycans[c(TRUE, FALSE, TRUE)]
+  expect_equal(names(subset_logical), c("A", "C"))
+})
+
+test_that("names are preserved after c() combining", {
+  glycans1 <- o_glycan_core_1()
+  glycans2 <- n_glycan_core()
+  names(glycans1) <- "A"
+  names(glycans2) <- "B"
+
+  combined <- c(glycans1, glycans2)
+  expect_equal(names(combined), c("A", "B"))
+})
+
+test_that("names are preserved after rep()", {
+  glycans <- o_glycan_core_1()
+  names(glycans) <- "A"
+
+  repeated <- rep(glycans, 3)
+  expect_equal(names(repeated), c("A", "A", "A"))
+})
+
+test_that("setting names to NULL removes names", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+  expect_equal(names(glycans), c("A", "B"))
+
+  names(glycans) <- NULL
+  expect_null(names(glycans))
+})
+
+test_that("names work with empty vectors", {
+  empty <- glycan_structure()
+  expect_null(names(empty))
+})
+
+test_that("names work with single-element vectors", {
+  glycan <- o_glycan_core_1()
+  names(glycan) <- "single"
+  expect_equal(names(glycan), "single")
+})
+
+test_that("names are preserved after combining vectors with different names", {
+  glycans1 <- c(o_glycan_core_1())
+  glycans2 <- c(n_glycan_core())
+  names(glycans1) <- "A"
+  names(glycans2) <- "B"
+
+  combined <- c(glycans1, glycans2)
+  expect_equal(names(combined), c("A", "B"))
+})
+
+test_that("names work with duplicated structures", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
+  names(glycans) <- c("A", "B", "C")
+
+  # First and third point to the same structure but have different names
+  expect_equal(names(glycans), c("A", "B", "C"))
+
+  # Subsetting should preserve names correctly
+  subset <- glycans[c(1, 3)]
+  expect_equal(names(subset), c("A", "C"))
+})
+
+test_that("names are preserved in tibble operations", {
+  skip_if_not_installed("tibble")
+
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  df <- tibble::tibble(id = 1:2, structure = glycans)
+
+  # Subsetting tibble should preserve names
+  subset_df <- df[1, ]
+  expect_equal(names(subset_df$structure), "A")
+
+  subset_df2 <- df[2, ]
+  expect_equal(names(subset_df2$structure), "B")
+})
+
+test_that("names work correctly with dplyr operations", {
+  skip_if_not_installed("dplyr")
+
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  df <- tibble::tibble(id = 1:2, structure = glycans)
+
+  # filter should preserve names
+  filtered <- df %>% dplyr::filter(id == 1)
+  expect_equal(names(filtered$structure), "A")
+
+  # slice should preserve names
+  sliced <- df %>% dplyr::slice(2)
+  expect_equal(names(sliced$structure), "B")
+})
+
+test_that("unname removes names", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  unname_glycans <- unname(glycans)
+  expect_null(names(unname_glycans))
+})
+
+test_that("names work with character conversion", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  # Converting to character should preserve names
+  chars <- as.character(glycans)
+  expect_equal(names(chars), c("A", "B"))
+})
+
+# Comprehensive regression tests for names preservation in glyrepr_structure functions
+test_that("all glyrepr_structure functions preserve names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+
+  # Type conversion (glyrepr_structure -> glyrepr_structure)
+  expect_equal(names(as_glycan_structure(structures)), c("A", "B", "C"))
+
+  # Character to glyrepr_structure conversion
+  char_vec <- c(X = "Glc(a1-", Y = "Gal(a1-")
+  expect_equal(names(as_glycan_structure(char_vec)), c("X", "Y"))
+
+  # Accessor functions (return atomic vectors)
+  expect_equal(names(get_anomer(structures)), c("A", "B", "C"))
+  expect_equal(names(has_linkages(structures)), c("A", "B", "C"))
+  expect_equal(names(get_structure_level(structures)), c("A", "B", "C"))
+  expect_equal(names(count_mono(structures)), c("A", "B", "C"))
+  expect_equal(names(structure_to_iupac(structures)), c("A", "B", "C"))
+
+  # Accessor functions (return list)
+  expect_equal(names(get_structure_graphs(structures)), c("A", "B", "C"))
+
+  # Transformation functions (return glyrepr_structure)
+  expect_equal(names(remove_linkages(structures)), c("A", "B", "C"))
+  expect_equal(names(remove_substituents(structures)), c("A", "B", "C"))
+
+  # Composition conversion
+  structs_concrete <- c(o_glycan_core_1(), n_glycan_core())
+  names(structs_concrete) <- c("X", "Y")
+  expect_equal(names(convert_to_generic(structs_concrete)), c("X", "Y"))
+
+  # Level reduction
+  expect_equal(names(reduce_structure_level(structures, "topological")), c("A", "B", "C"))
+
+  # Vector combination
+  expect_equal(names(c(structures)), c("A", "B", "C"))
 })

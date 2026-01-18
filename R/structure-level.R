@@ -30,17 +30,26 @@
 #' @export
 get_structure_level <- function(x) {
   checkmate::assert_class(x, "glyrepr_structure")
-  codes <- vctrs::vec_data(x)
+
+  # Capture input names for preservation
+  input_names <- names(x)
+
   mono_type <- get_mono_type.glyrepr_structure(x)
   has_linkages_strict <- has_linkages(x, strict = TRUE)
   has_linkages_lenient <- has_linkages(x, strict = FALSE)
-  dplyr::case_when(
+
+  result <- dplyr::case_when(
     mono_type == "concrete" & has_linkages_strict ~ "intact",
     mono_type == "concrete" & (!has_linkages_strict) & has_linkages_lenient ~ "partial",
     mono_type == "concrete" & (!has_linkages_lenient) ~ "topological",
     mono_type == "generic" & (!has_linkages_strict) ~ "basic",
     .default = "basic"
   )
+
+  # Restore names
+  names(result) <- input_names
+
+  result
 }
 
 #' Reduce a Glycan Structure to a Lower Resolution Level

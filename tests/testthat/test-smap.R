@@ -1,3 +1,22 @@
+test_that("smap functions preserve names in output", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+
+  # smap_int should preserve names
+  result <- smap_int(structures, igraph::vcount)
+  expect_equal(names(result), c("A", "B", "C"))
+
+  # smap_chr should preserve names
+  result_chr <- smap_chr(structures, ~ .x$anomer)
+  expect_equal(names(result_chr), c("A", "B", "C"))
+
+  # smap should preserve names in list
+  result_list <- smap(structures, ~ igraph::vcount(.x))
+  expect_equal(names(result_list), c("A", "B", "C"))
+})
+
 test_that("smap functions work with regular functions", {
   # Create test structures
   core1 <- o_glycan_core_1()
@@ -1038,13 +1057,13 @@ test_that("smap2 refactored code maintains performance with complex inputs", {
 test_that("smap2 edge case: empty lists and mixed types", {
   glycan_codes <- c("Gal(a1-3)GalNAc(a1-", "GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
   structures <- as_glycan_structure(glycan_codes)
-  
+
   # Test with empty lists and mixed simple/complex types
   mixed_data <- list(
     list(),              # Empty list
     "simple_string"      # Non-list data
   )
-  
+
   result <- smap2(structures, mixed_data, function(graph, data) {
     if (is.list(data)) {
       return(paste0("list_", length(data)))
@@ -1052,8 +1071,142 @@ test_that("smap2 edge case: empty lists and mixed types", {
       return(paste0("non_list_", data))
     }
   })
-  
+
   expect_length(result, 2)
   expect_equal(result[[1]], "list_0")
   expect_equal(result[[2]], "non_list_simple_string")
+})
+
+# Tests for names preservation -----------------------------------------
+
+test_that("smap_structure preserves names", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1)
+  names(structures) <- c("X", "Y")
+
+  add_attr <- function(g) {
+    igraph::set_graph_attr(g, "test", "value")
+  }
+
+  result <- smap_structure(structures, add_attr)
+  expect_equal(names(result), c("X", "Y"))
+})
+
+test_that("smap2 functions preserve names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+  weights <- c(1.0, 2.0, 1.0)
+
+  # smap2_dbl should preserve names
+  result <- smap2_dbl(structures, weights, function(g, w) igraph::vcount(g) * w)
+  expect_equal(names(result), c("A", "B", "C"))
+
+  # smap2 should preserve names in list
+  result_list <- smap2(structures, weights, function(g, w) list(count = igraph::vcount(g), weight = w))
+  expect_equal(names(result_list), c("A", "B", "C"))
+})
+
+test_that("smap2_structure preserves names", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1)
+  names(structures) <- c("X", "Y")
+  values <- c(1, 2)
+
+  add_attr <- function(g, v) {
+    igraph::set_graph_attr(g, "value", v)
+  }
+
+  result <- smap2_structure(structures, values, add_attr)
+  expect_equal(names(result), c("X", "Y"))
+})
+
+# Tests for spmap names preservation -----------------------------------------
+
+test_that("spmap functions preserve names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2)
+  names(structures) <- c("A", "B")
+  weights <- c(1.0, 2.0)
+  factors <- c(2, 3)
+
+  # spmap_dbl should preserve names
+  result <- spmap_dbl(list(structures, weights, factors),
+                      function(g, w, f) igraph::vcount(g) * w * f)
+  expect_equal(names(result), c("A", "B"))
+
+  # spmap should preserve names in list
+  result_list <- spmap(list(structures, weights, factors),
+                       function(g, w, f) list(count = igraph::vcount(g), weight = w))
+  expect_equal(names(result_list), c("A", "B"))
+})
+
+test_that("spmap_structure preserves names", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1)
+  names(structures) <- c("X", "Y")
+  values1 <- c("a", "b")
+  values2 <- c(1, 2)
+
+  add_attrs <- function(g, v1, v2) {
+    g <- igraph::set_graph_attr(g, "label", v1)
+    igraph::set_graph_attr(g, "num", v2)
+  }
+
+  result <- spmap_structure(list(structures, values1, values2), add_attrs)
+  expect_equal(names(result), c("X", "Y"))
+})
+
+# Tests for simap names preservation -----------------------------------------
+
+test_that("simap functions preserve names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+
+  # simap_chr should preserve names
+  result <- simap_chr(structures, function(g, i) paste0("Structure_", i))
+  expect_equal(names(result), c("A", "B", "C"))
+
+  # simap should preserve names in list
+  result_list <- simap(structures, function(g, i) list(index = i))
+  expect_equal(names(result_list), c("A", "B", "C"))
+})
+
+test_that("simap_structure preserves names", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1)
+  names(structures) <- c("X", "Y")
+
+  add_index_attr <- function(g, idx) {
+    igraph::set_graph_attr(g, "index", idx)
+  }
+
+  result <- simap_structure(structures, add_index_attr)
+  expect_equal(names(result), c("X", "Y"))
+})
+
+test_that("smap_unique documents behavior with named input", {
+  core1 <- o_glycan_core_1()
+  structures <- c(core1, core1, core1)
+  names(structures) <- c("A", "B", "C")  # All same structure, different names
+
+  # smap_unique operates on unique structures only
+  result <- smap_unique(structures, igraph::vcount)
+
+  # Result is named by structure hash (IUPAC), not input names
+  expect_true(is.null(names(result)) || startsWith(names(result), "Gal"))
+})
+
+test_that("get_structure_level preserves names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+
+  result <- get_structure_level(structures)
+  expect_equal(names(result), c("A", "B", "C"))
 })
