@@ -1201,16 +1201,6 @@ test_that("smap_unique documents behavior with named input", {
   expect_true(is.null(names(result)) || startsWith(names(result), "Gal"))
 })
 
-test_that("as_glycan_composition preserves names from glyrepr_structure", {
-  core1 <- o_glycan_core_1()
-  core2 <- n_glycan_core()
-  structures <- c(core1, core2, core1)
-  names(structures) <- c("A", "B", "C")
-
-  result <- as_glycan_composition(structures)
-  expect_equal(names(result), c("A", "B", "C"))
-})
-
 test_that("get_structure_level preserves names", {
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
@@ -1219,4 +1209,40 @@ test_that("get_structure_level preserves names", {
 
   result <- get_structure_level(structures)
   expect_equal(names(result), c("A", "B", "C"))
+})
+
+# Comprehensive regression tests for names preservation in glyrepr_structure functions
+test_that("all glyrepr_structure functions preserve names", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+
+  # Type conversion (glyrepr_structure -> glyrepr_structure)
+  expect_equal(names(as_glycan_structure(structures)), c("A", "B", "C"))
+
+  # Accessor functions (return atomic vectors)
+  expect_equal(names(get_anomer(structures)), c("A", "B", "C"))
+  expect_equal(names(has_linkages(structures)), c("A", "B", "C"))
+  expect_equal(names(get_structure_level(structures)), c("A", "B", "C"))
+  expect_equal(names(count_mono(structures)), c("A", "B", "C"))
+  expect_equal(names(structure_to_iupac(structures)), c("A", "B", "C"))
+
+  # Accessor functions (return list)
+  expect_equal(names(get_structure_graphs(structures)), c("A", "B", "C"))
+
+  # Transformation functions (return glyrepr_structure)
+  expect_equal(names(remove_linkages(structures)), c("A", "B", "C"))
+  expect_equal(names(remove_substituents(structures)), c("A", "B", "C"))
+
+  # Composition conversion
+  structs_concrete <- c(o_glycan_core_1(), n_glycan_core())
+  names(structs_concrete) <- c("X", "Y")
+  expect_equal(names(convert_to_generic(structs_concrete)), c("X", "Y"))
+
+  # Level reduction
+  expect_equal(names(reduce_structure_level(structures, "topological")), c("A", "B", "C"))
+
+  # Vector combination
+  expect_equal(names(c(structures)), c("A", "B", "C"))
 })
