@@ -6,6 +6,8 @@ We have redesigned the internal implementation of `glyrepr_composition` and `gly
 
 * `smap()`, `smap2()`, `spmap()`, `simap()` and their variants now preserve
   names from input `glyrepr_structure` vectors in their output.
+* `glyrepr_structure` now formally supports names. All operations on a named 
+  `glyrepr_structure` vectors preserve the names.
 
 ## Breaking changes
 
