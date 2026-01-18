@@ -73,7 +73,7 @@ than applying \code{.f} to each element pair individually when there are duplica
 # Create structure vectors with duplicates
 core1 <- o_glycan_core_1()
 core2 <- n_glycan_core()
-structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+structures <- c(core1, core2, core1)  # core1 appears twice
 weights <- c(1.0, 2.0, 1.0)  # corresponding weights
 
 # Map a function that uses both structure and weight

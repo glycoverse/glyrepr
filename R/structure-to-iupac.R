@@ -48,9 +48,9 @@
 #' graph$anomer <- "a1"
 #' glycan <- glycan_structure(graph)
 #' structure_to_iupac(glycan)  # Returns "GlcNAc6Ac(b1-4)Glc3Me(a1-"
-#' 
+#'
 #' # Vectorized structures
-#' structs <- glycan_structure(o_glycan_core_1(), n_glycan_core())
+#' structs <- c(o_glycan_core_1(), n_glycan_core())
 #' structure_to_iupac(structs)
 #'
 #' @export

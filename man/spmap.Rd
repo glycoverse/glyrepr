@@ -80,7 +80,7 @@ Scaling factor shows time increase when vector size increases 20x.
 # Create structure vectors with duplicates
 core1 <- o_glycan_core_1()
 core2 <- n_glycan_core()
-structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+structures <- c(core1, core2, core1)  # core1 appears twice
 weights <- c(1.0, 2.0, 1.0)  # corresponding weights
 factors <- c(2, 3, 2)  # corresponding factors
 

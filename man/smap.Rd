@@ -70,7 +70,7 @@ than applying \code{.f} to each element individually when there are duplicate st
 # Create a structure vector with duplicates
 core1 <- o_glycan_core_1()
 core2 <- n_glycan_core()
-structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+structures <- c(core1, core2, core1)  # core1 appears twice
 
 # Map a function that counts vertices - only computed twice, not three times
 smap_int(structures, igraph::vcount)

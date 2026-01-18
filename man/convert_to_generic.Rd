@@ -55,10 +55,7 @@ comps <- glycan_composition(
 convert_to_generic(comps)
 
 # Convert glycan structures
-strucs <- glycan_structure(
-  n_glycan_core(),
-  o_glycan_core_1()
-)
+strucs <- c(n_glycan_core(), o_glycan_core_1())
 convert_to_generic(strucs)
 
 }

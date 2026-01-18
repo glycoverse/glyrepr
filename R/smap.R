@@ -38,7 +38,7 @@
 #' # Create a structure vector with duplicates
 #' core1 <- o_glycan_core_1()
 #' core2 <- n_glycan_core()
-#' structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+#' structures <- c(core1, core2, core1)  # core1 appears twice
 #' 
 #' # Map a function that counts vertices - only computed twice, not three times
 #' smap_int(structures, igraph::vcount)
@@ -266,7 +266,7 @@ smap_structure <- function(.x, .f, ..., .parallel = FALSE) {
 #' @examples
 #' # Create a structure vector with duplicates
 #' core1 <- o_glycan_core_1()
-#' structures <- glycan_structure(core1, core1, core1)  # same structure 3 times
+#' structures <- c(core1, core1, core1)  # same structure 3 times
 #'
 #' # Only compute once for the unique structure
 #' unique_results <- smap_unique(structures, igraph::vcount)
@@ -324,7 +324,7 @@ smap_unique <- function(.x, .f, ..., .parallel = FALSE) {
 #' # Create a structure vector with duplicates
 #' core1 <- o_glycan_core_1()
 #' core2 <- n_glycan_core()
-#' structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+#' structures <- c(core1, core2, core1)  # core1 appears twice
 #'
 #' # Test if some structures have more than 5 vertices
 #' ssome(structures, function(g) igraph::vcount(g) > 5)
@@ -430,7 +430,7 @@ snone <- function(.x, .p, ...) {
 #' # Create structure vectors with duplicates
 #' core1 <- o_glycan_core_1()
 #' core2 <- n_glycan_core()
-#' structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+#' structures <- c(core1, core2, core1)  # core1 appears twice
 #' weights <- c(1.0, 2.0, 1.0)  # corresponding weights
 #'
 #' # Map a function that uses both structure and weight
@@ -667,7 +667,7 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
 #' # Create structure vectors with duplicates
 #' core1 <- o_glycan_core_1()
 #' core2 <- n_glycan_core()
-#' structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+#' structures <- c(core1, core2, core1)  # core1 appears twice
 #' weights <- c(1.0, 2.0, 1.0)  # corresponding weights
 #' factors <- c(2, 3, 2)  # corresponding factors
 #'
@@ -914,7 +914,7 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
 #' # Create structure vectors with duplicates
 #' core1 <- o_glycan_core_1()
 #' core2 <- n_glycan_core()
-#' structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+#' structures <- c(core1, core2, core1)  # core1 appears twice
 #'
 #' # Map a function that uses both structure and index
 #' simap_chr(structures, function(g, i) paste0("Structure_", i, "_vcount_", igraph::vcount(g)))
