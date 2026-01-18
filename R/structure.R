@@ -139,7 +139,7 @@ glycan_structure <- function(...) {
   # Reorder the graphs to align with IUPAC-style sequence
   reordered_graphs <- reorder_graphs(processed_graphs)
 
-  # Use IUPAC codes directly as data for the rcrd structure
+  # Use IUPAC codes directly as data for the glycan_structure vctrs vector
   iupacs <- purrr::map_chr(reordered_graphs, .structure_to_iupac_single)
 
   # Create a unique list based on uniqueness of IUPAC codes for structures storage
