@@ -444,10 +444,6 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
   used_graphs <- graphs[unique_iupacs]
   # Remove any NULL elements (can happen with empty list indexing)
   used_graphs <- used_graphs[!vapply(used_graphs, is.null, logical(1))]
-  # Ensure names are set correctly (only if used_graphs is not empty)
-  if (length(used_graphs) > 0) {
-    names(used_graphs) <- unique_iupacs
-  }
 
   out <- vctrs::new_vctr(x, graphs = used_graphs, class = class(to))
   out
