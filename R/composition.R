@@ -226,6 +226,22 @@ vec_cast.glyrepr_composition.double <- function(x, to, ...) {
   .cast_named_vector(x, to, ...)
 }
 
+#' @export
+vec_restore.glyrepr_composition <- function(x, to, ...) {
+  data <- vctrs::field(x, "data")
+  monos_list <- purrr::map(data, names)
+  monos_list <- purrr::map(monos_list, ~ .x[!.x %in% available_substituents()])
+  mono_types <- purrr::map_chr(monos_list, get_mono_type_impl)
+  if (length(unique(mono_types)) > 1) {
+    cli::cli_abort(c(
+      "Can't combine `glyrepr_composition`s with different monosaccharide types.",
+      "x" = "Found compositions with types: {.val {unique(mono_types)}}.",
+      "i" = "Use {.fn convert_to_generic} to convert concrete to generic, or ensure both compositions use the same type."
+    ))
+  }
+  new_glycan_composition(data)
+}
+
 .cast_named_vector <- function(x, to, ...) {
   if (length(x) == 0) {
     return(glycan_composition())
