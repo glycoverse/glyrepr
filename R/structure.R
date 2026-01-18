@@ -425,6 +425,26 @@ vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
     unique_types_x <- unique(mono_types_x)
     unique_types_y <- unique(mono_types_y)
 
+    # Check for mixed types (more than one unique type in a single vector)
+    if (length(unique_types_x) > 1) {
+      concrete_count_x <- sum(mono_types_x == "concrete")
+      generic_count_x <- sum(mono_types_x == "generic")
+      cli::cli_abort(c(
+        "All structures must have the same monosaccharide type.",
+        "x" = "Vector 1 has mixed types: {.val {concrete_count_x}} concrete and {.val {generic_count_x}} generic structure(s)."
+      ))
+    }
+
+    if (length(unique_types_y) > 1) {
+      concrete_count_y <- sum(mono_types_y == "concrete")
+      generic_count_y <- sum(mono_types_y == "generic")
+      cli::cli_abort(c(
+        "All structures must have the same monosaccharide type.",
+        "x" = "Vector 2 has mixed types: {.val {concrete_count_y}} concrete and {.val {generic_count_y}} generic structure(s)."
+      ))
+    }
+
+    # Check that both vectors have the same mono_type
     if (length(unique_types_x) > 0 && length(unique_types_y) > 0 &&
         unique_types_x[[1]] != unique_types_y[[1]]) {
       concrete_count_x <- sum(mono_types_x == "concrete")
