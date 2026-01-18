@@ -495,14 +495,22 @@ vec_cast.glyrepr_structure.list <- function(x, to, ...) {
 
 #' @export
 vec_cast.glyrepr_structure.character <- function(x, to, ...) {
+  # Capture input names for preservation
+  input_names <- names(x)
+
   if (length(x) == 1) {
     graph <- .parse_iupac_condensed_single(x)
-    return(glycan_structure(graph))
+    result <- glycan_structure(graph)
   } else {
     # Multiple characters - return list of structures
     graphs <- purrr::map(x, .parse_iupac_condensed_single)
-    return(do.call(glycan_structure, graphs))
+    result <- do.call(glycan_structure, graphs)
   }
+
+  # Restore names
+  names(result) <- input_names
+
+  result
 }
 
 #' @export
