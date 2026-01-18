@@ -34,7 +34,6 @@ get_structure_level <- function(x) {
   # Capture input names for preservation
   input_names <- names(x)
 
-  codes <- vctrs::vec_data(x)
   mono_type <- get_mono_type.glyrepr_structure(x)
   has_linkages_strict <- has_linkages(x, strict = TRUE)
   has_linkages_lenient <- has_linkages(x, strict = FALSE)
