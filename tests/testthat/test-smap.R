@@ -1200,3 +1200,13 @@ test_that("smap_unique documents behavior with named input", {
   # Result is named by structure hash (IUPAC), not input names
   expect_true(is.null(names(result)) || startsWith(names(result), "Gal"))
 })
+
+test_that("as_glycan_composition preserves names from glyrepr_structure", {
+  core1 <- o_glycan_core_1()
+  core2 <- n_glycan_core()
+  structures <- c(core1, core2, core1)
+  names(structures) <- c("A", "B", "C")
+
+  result <- as_glycan_composition(structures)
+  expect_equal(names(result), c("A", "B", "C"))
+})
