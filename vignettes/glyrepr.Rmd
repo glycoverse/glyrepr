@@ -197,14 +197,20 @@ That's why `glyrepr` assigns these structures to the "basic" level too.
 You can get the structure level for a glycan structure vector with `get_structure_level()`:
 
 ```{r}
-glycans <- as_glycan_structure(c(
+# Concrete structures (various linkage detail levels)
+concrete_glycans <- as_glycan_structure(c(
   "Gal(b1-3)GalNAc(a1-",
   "Gal(b1-?)GalNAc(a1-",
-  "Gal(??-?)GalNAc(??-",
+  "Gal(??-?)GalNAc(??-"
+))
+get_structure_level(concrete_glycans)
+
+# Generic structures
+generic_glycans <- as_glycan_structure(c(
   "Hex(??-?)HexNAc(??-",
   "Hex(b1-3)HexNAc(a1-"
 ))
-get_structure_level(glycans)
+get_structure_level(generic_glycans)
 ```
 
 ### Structure Manipulation Tools
