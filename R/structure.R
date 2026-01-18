@@ -291,7 +291,6 @@ format_glycan_structure_subset <- function(x, indices, colored = TRUE) {
   }
 
   codes <- vctrs::vec_data(x)[indices]
-  mono_type <- get_mono_type.glyrepr_structure(x)
   graphs <- attr(x, "graphs")
 
   # For each structure, add colors if concrete type
