@@ -66,10 +66,7 @@ convert_to_generic(comps)
 #> [2] Hex(5)HexNAc(4)dHex(1)
 
 # Convert glycan structures
-strucs <- glycan_structure(
-  n_glycan_core(),
-  o_glycan_core_1()
-)
+strucs <- c(n_glycan_core(), o_glycan_core_1())
 convert_to_generic(strucs)
 #> <glycan_structure[2]>
 #> [1] Hex(a1-3)[Hex(a1-6)]Hex(b1-4)HexNAc(b1-4)HexNAc(b1-

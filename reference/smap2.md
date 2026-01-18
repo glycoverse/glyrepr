@@ -96,14 +96,14 @@ structure-value combinations.
 # Create structure vectors with duplicates
 core1 <- o_glycan_core_1()
 core2 <- n_glycan_core()
-structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+structures <- c(core1, core2, core1)  # core1 appears twice
 weights <- c(1.0, 2.0, 1.0)  # corresponding weights
 
 # Map a function that uses both structure and weight
 smap2_dbl(structures, weights, function(g, w) igraph::vcount(g) * w)
 #> [1]  2 10  2
 
-# Use purrr-style lambda functions  
+# Use purrr-style lambda functions
 smap2_dbl(structures, weights, ~ igraph::vcount(.x) * .y)
 #> [1]  2 10  2
 

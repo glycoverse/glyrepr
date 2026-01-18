@@ -74,7 +74,7 @@ structure_to_iupac(glycan)  # Returns "GlcNAc6Ac(b1-4)Glc3Me(a1-"
 #> [1] "GlcNAc6Ac(b1-4)Glc3Me(a1-"
 
 # Vectorized structures
-structs <- glycan_structure(o_glycan_core_1(), n_glycan_core())
+structs <- c(o_glycan_core_1(), n_glycan_core())
 structure_to_iupac(structs)
 #> [1] "Gal(b1-3)GalNAc(a1-"                                
 #> [2] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"

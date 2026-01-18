@@ -75,7 +75,7 @@ Let’s verify this optimization is real:
 ``` r
 # Only 5 unique graphs are stored internally
 length(attr(large_struc, "structures"))
-#> [1] 5
+#> [1] 0
 
 # But we have 5,000 total elements
 length(large_struc)
@@ -87,8 +87,8 @@ length(large_struc)
 ``` r
 library(lobstr)
 obj_sizes(struc, large_struc)
-#> * 14.33 kB
-#> * 80.72 kB
+#> * 13.78 kB
+#> * 40.69 kB
 ```
 
 **80 kB vs 15 MB?** That’s a 200x memory efficiency! But the real magic
@@ -243,9 +243,9 @@ huge_struc <- rep(struc, 5000)  # 25,000 structures, only 5 unique
 cat("Dataset size:", length(huge_struc), "structures\n")
 #> Dataset size: 25000 structures
 cat("Unique structures:", length(attr(huge_struc, "structures")), "\n")
-#> Unique structures: 5
+#> Unique structures: 0
 cat("Redundancy factor:", length(huge_struc) / length(attr(huge_struc, "structures")), "x\n")
-#> Redundancy factor: 5000 x
+#> Redundancy factor: Inf x
 
 library(tictoc)
 
@@ -260,7 +260,7 @@ tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.229 sec elapsed
+#> Naive approach (all graphs): 0.231 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)

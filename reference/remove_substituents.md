@@ -22,7 +22,7 @@ A glyrepr_structure vector with all substituents removed.
 ## Examples
 
 ``` r
-(glycan <- glycan_structure(o_glycan_core_1()))
+(glycan <- o_glycan_core_1())
 #> <glycan_structure[1]>
 #> [1] Gal(b1-3)GalNAc(a1-
 #> # Unique structures: 1

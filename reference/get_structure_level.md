@@ -48,13 +48,7 @@ level for each element.
 ## Examples
 
 ``` r
-structures <- as_glycan_structure(c(
-  "Gal(b1-3)GalNAc(a1-",
-  "Gal(b1-?)GalNAc(a1-",
-  "Gal(??-?)GalNAc(??-",
-  "Hex(??-?)HexNAc(??-",
-  "Hex(b1-3)HexNAc(a1-"
-))
-get_structure_level(structures)
-#> [1] "intact"      "partial"     "topological" "basic"       "basic"      
+glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
+get_structure_level(glycan)
+#> [1] "intact"
 ```

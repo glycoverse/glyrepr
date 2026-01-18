@@ -184,7 +184,7 @@ toc()
 tic("Converting 5,000 structures")
 result_large <- convert_to_generic(large_struc)
 toc()
-#> Converting 5,000 structures: 0.027 sec elapsed
+#> Converting 5,000 structures: 0.028 sec elapsed
 ```
 
 **Mind = blown!** 🤯 The performance is nearly identical because
@@ -229,7 +229,7 @@ glycans <- as_glycan_structure(c(
   "Hex(b1-3)HexNAc(a1-"
 ))
 get_structure_level(glycans)
-#> [1] "intact"      "partial"     "topological" "basic"       "basic"
+#> [1] "intact"      "partial"     "topological" "topological" "intact"
 ```
 
 ### Structure Manipulation Tools

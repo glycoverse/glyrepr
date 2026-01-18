@@ -272,7 +272,7 @@ copy of each book, no matter how many people want to read it.</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5,000 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">large_struc</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5,000 structures: 0.027 sec elapsed</span></span></code></pre></div>
+<span><span class="co">#&gt; Converting 5,000 structures: 0.028 sec elapsed</span></span></code></pre></div>
 <p><strong>Mind = blown!</strong> 🤯 The performance is nearly identical
 because <code>glyrepr</code> only processes each unique structure once,
 then cleverly expands the results.</p>
@@ -318,7 +318,7 @@ the “basic” level too.</p>
 <span>  <span class="st">"Hex(b1-3)HexNAc(a1-"</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="va">glycans</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "intact"      "partial"     "topological" "basic"       "basic"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "intact"      "partial"     "topological" "topological" "intact"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="structure-manipulation-tools">Structure Manipulation Tools<a class="anchor" aria-label="anchor" href="#structure-manipulation-tools"></a>
