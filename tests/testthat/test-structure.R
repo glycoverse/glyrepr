@@ -489,12 +489,27 @@ test_that("format.glyrepr_structure handles duplicates correctly", {
   glycan1 <- o_glycan_core_1()
   glycan2 <- o_glycan_core_1()
   sv <- c(glycan1, glycan2)
-  
+
   formatted <- format(sv)
-  
+
   expect_length(formatted, 2)
   expect_equal(formatted[1], formatted[2])  # Both should show same IUPAC
   expect_equal(formatted[1], "Gal(b1-3)GalNAc(a1-")
+})
+
+test_that("format.glyrepr_structure includes names with tab separation", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  names(glycans) <- c("A", "B")
+
+  expect_snapshot(format(glycans))
+})
+
+test_that("format.glyrepr_structure without names works correctly", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+  # Ensure no names
+  glycans <- unname(glycans)
+
+  expect_snapshot(format(glycans))
 })
 
 test_that("truncation works in tibble", {

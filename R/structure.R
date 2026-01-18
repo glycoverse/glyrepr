@@ -328,7 +328,16 @@ vec_ptype_abbr.glyrepr_structure <- function(x, ...) "struct"
 
 #' @export
 format.glyrepr_structure <- function(x, ...) {
-  format(vctrs::vec_data(x), ...)
+  formatted <- format(vctrs::vec_data(x), ...)
+
+  # Add names if present
+  nms <- names(x)
+  if (!is.null(nms) && length(nms) > 0) {
+    # Use tab separation between name and structure
+    formatted <- paste(nms, formatted, sep = "\t")
+  }
+
+  formatted
 }
 
 #' Format a Subset of Glycan Structures with Optional Colors
@@ -379,9 +388,17 @@ obj_print_data.glyrepr_structure <- function(x, ..., max_n = 10, colored = TRUE)
   indices_to_show <- seq_len(n_show)
   formatted <- format_glycan_structure_subset(x, indices_to_show, colored = colored)
 
+  # Check if names are present
+  nms <- names(x)
+  has_names <- !is.null(nms) && length(nms) > 0
+
   # Print each IUPAC structure on its own line with indexing, up to max_n
   for (i in seq_len(n_show)) {
-    cat("[", i, "] ", formatted[i], "\n", sep = "")
+    if (has_names) {
+      cat("[", i, "] ", nms[i], "\t", formatted[i], "\n", sep = "")
+    } else {
+      cat("[", i, "] ", formatted[i], "\n", sep = "")
+    }
   }
   if (n > max_n) {
     cat("... (", n - max_n, " more not shown)\n", sep = "")
