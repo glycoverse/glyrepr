@@ -33,8 +33,11 @@ get_mono_type(x)
 
 ## Value
 
-A character vector specifying the monosaccharide type(s). For structures
-and compositions, returns the type for each element.
+- For character input, returns a character vector of the same length as
+  `x`.
+
+- For `glyrepr_structure` and `glyrepr_composition` input, returns a
+  character scalar.
 
 ## Two types of monosaccharides
 

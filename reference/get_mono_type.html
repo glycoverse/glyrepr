@@ -76,9 +76,10 @@ Supported types: "concrete" and "generic" (see details below).</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A character vector specifying the monosaccharide type(s).
-For structures and compositions, returns the type for each element.</p>
-    </div>
+
+<ul><li><p>For character input, returns a character vector of the same length as <code>x</code>.</p></li>
+<li><p>For <code>glyrepr_structure</code> and <code>glyrepr_composition</code> input, returns a character scalar.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="two-types-of-monosaccharides">Two types of monosaccharides<a class="anchor" aria-label="anchor" href="#two-types-of-monosaccharides"></a></h2>
     <p>There are two types of monosaccharides:</p><ul><li><p>concrete: e.g. "Gal", "GlcNAc", "Glc", "Fuc", etc.</p></li>

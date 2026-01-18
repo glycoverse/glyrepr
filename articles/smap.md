@@ -260,7 +260,7 @@ tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.239 sec elapsed
+#> Naive approach (all graphs): 0.227 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -420,7 +420,7 @@ sessionInfo()
 #> [13] igraph_2.2.1      knitr_1.51        backports_1.5.0   checkmate_2.3.3  
 #> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.9.0      
 #> [21] pillar_1.11.1     rlang_1.1.7       cachem_1.1.0      stringi_1.8.7    
-#> [25] xfun_0.55         fs_1.6.6          sass_0.4.10       cli_3.6.5        
+#> [25] xfun_0.56         fs_1.6.6          sass_0.4.10       cli_3.6.5        
 #> [29] pkgdown_2.2.0     magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.5  
 #> [33] prettyunits_1.2.0 vctrs_0.7.0       evaluate_1.0.5    glue_1.8.0       
 #> [37] ragg_1.5.0        rmarkdown_2.30    purrr_1.2.1       tools_4.5.2      

@@ -40,6 +40,20 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+<p>We have redesigned the internal implementation of <code>glyrepr_composition</code> and <code>glyrepr_structure</code>. Importantly, <code>glyrepr_structure</code> is now built on <code><a href="https://vctrs.r-lib.org/reference/new_vctr.html" class="external-link">vctrs::new_vctr()</a></code> instead of <code><a href="https://vctrs.r-lib.org/reference/new_rcrd.html" class="external-link">vctrs::new_rcrd()</a></code>. The direct benefit is that <code>glyrepr_structure</code> now supports custom names. We’re testing the naming feature now.</p>
+<div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>
+<code>glyrepr_composition</code> and <code>glyrepr_structure</code> now enforce the same monosaccharide type (“concrete” or “generic”) within a vector. Mixed types are not allowed anymore. This invariant is enforced both when creating new vectors and when combining existing vectors.</li>
+<li>
+<code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> now does not support multiple <code>glyrepr_structure</code> vectors as input anymore. For example, <code>glycan_structure(o_glycan_core_1(), o_glycan_core_2())</code> is not valid anymore. Please use <code>c(o_glycan_core_1(), o_glycan_core_2())</code> instead.</li>
+<li>
+<code><a href="../reference/get_mono_type.html">get_mono_type()</a></code> now returns a character scalar instead of a character vector for <code>glyrepr_structure</code> and <code>glyrepr_composition</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<ul><li>Subsetting <code>glyrepr_structure</code> with <code>integer(0)</code> and <code>NULL</code> correctly removes all underlying graphs.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.0" id="glyrepr-090">glyrepr 0.9.0<a class="anchor" aria-label="anchor" href="#glyrepr-090"></a></h2><p class="text-muted">CRAN release: 2025-11-23</p>

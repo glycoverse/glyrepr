@@ -2,6 +2,35 @@
 
 ## glyrepr (development version)
 
+We have redesigned the internal implementation of `glyrepr_composition`
+and `glyrepr_structure`. Importantly, `glyrepr_structure` is now built
+on
+[`vctrs::new_vctr()`](https://vctrs.r-lib.org/reference/new_vctr.html)
+instead of
+[`vctrs::new_rcrd()`](https://vctrs.r-lib.org/reference/new_rcrd.html).
+The direct benefit is that `glyrepr_structure` now supports custom
+names. We’re testing the naming feature now.
+
+### Breaking changes
+
+- `glyrepr_composition` and `glyrepr_structure` now enforce the same
+  monosaccharide type (“concrete” or “generic”) within a vector. Mixed
+  types are not allowed anymore. This invariant is enforced both when
+  creating new vectors and when combining existing vectors.
+- [`glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.md)
+  now does not support multiple `glyrepr_structure` vectors as input
+  anymore. For example,
+  `glycan_structure(o_glycan_core_1(), o_glycan_core_2())` is not valid
+  anymore. Please use `c(o_glycan_core_1(), o_glycan_core_2())` instead.
+- [`get_mono_type()`](https://glycoverse.github.io/glyrepr/reference/get_mono_type.md)
+  now returns a character scalar instead of a character vector for
+  `glyrepr_structure` and `glyrepr_composition`.
+
+### Minor improvements and bug fixes
+
+- Subsetting `glyrepr_structure` with `integer(0)` and `NULL` correctly
+  removes all underlying graphs.
+
 ## glyrepr 0.9.0
 
 CRAN release: 2025-11-23

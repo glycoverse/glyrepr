@@ -294,7 +294,7 @@ sessionInfo()
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] vctrs_0.7.0       cli_3.6.5         knitr_1.51        rlang_1.1.7      
-#>  [5] xfun_0.55         stringi_1.8.7     generics_0.1.4    textshaping_1.0.4
+#>  [5] xfun_0.56         stringi_1.8.7     generics_0.1.4    textshaping_1.0.4
 #>  [9] jsonlite_2.0.0    glue_1.8.0        htmltools_0.5.9   ragg_1.5.0       
 #> [13] sass_0.4.10       rmarkdown_2.30    tibble_3.3.1      evaluate_1.0.5   
 #> [17] jquerylib_0.1.4   fastmap_1.2.0     yaml_2.3.12       lifecycle_1.0.5  

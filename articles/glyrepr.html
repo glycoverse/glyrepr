@@ -267,12 +267,12 @@ copy of each book, no matter how many people want to read it.</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5 structures: 0.022 sec elapsed</span></span>
+<span><span class="co">#&gt; Converting 5 structures: 0.02 sec elapsed</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5,000 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">large_struc</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5,000 structures: 0.029 sec elapsed</span></span></code></pre></div>
+<span><span class="co">#&gt; Converting 5,000 structures: 0.024 sec elapsed</span></span></code></pre></div>
 <p><strong>Mind = blown!</strong> 🤯 The performance is nearly identical
 because <code>glyrepr</code> only processes each unique structure once,
 then cleverly expands the results.</p>
@@ -488,7 +488,7 @@ packages in the glycoverse</li>
 <span><span class="co">#&gt;  [9] fastmap_1.2.0     R6_2.6.1          generics_0.1.4    igraph_2.2.1     </span></span>
 <span><span class="co">#&gt; [13] knitr_1.51        backports_1.5.0   checkmate_2.3.3   rstackdeque_1.1.1</span></span>
 <span><span class="co">#&gt; [17] desc_1.4.3        bslib_0.9.0       pillar_1.11.1     rlang_1.1.7      </span></span>
-<span><span class="co">#&gt; [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.55        </span></span>
+<span><span class="co">#&gt; [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.56        </span></span>
 <span><span class="co">#&gt; [25] fs_1.6.6          sass_0.4.10       cli_3.6.5         pkgdown_2.2.0    </span></span>
 <span><span class="co">#&gt; [29] magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.0      </span></span>
 <span><span class="co">#&gt; [33] evaluate_1.0.5    glue_1.8.0        ragg_1.5.0        rmarkdown_2.30   </span></span>
