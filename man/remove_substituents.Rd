@@ -16,7 +16,7 @@ A glyrepr_structure vector with all substituents removed.
 This function replaces all substituents in a glycan structure with empty strings.
 }
 \examples{
-(glycan <- glycan_structure(o_glycan_core_1()))
+(glycan <- o_glycan_core_1())
 remove_substituents(glycan)
 
 }

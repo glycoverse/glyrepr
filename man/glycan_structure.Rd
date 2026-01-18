@@ -125,10 +125,6 @@ print(simple_struct)
 n_core <- n_glycan_core()  # N-glycan core structure
 o_core1 <- o_glycan_core_1()  # O-glycan Core 1 structure
 
-# Create vector with multiple structures
-multi_struct <- glycan_structure(n_core, o_core1)
-print(multi_struct)
-
 # Example 3: Create complex structure with substituents
 complex_graph <- make_graph(~ 1-+2-+3)
 V(complex_graph)$mono <- c("GlcNAc", "Gal", "Neu5Ac")
@@ -142,9 +138,5 @@ print(complex_struct)
 # Example 4: Check if object is a glycan structure
 is_glycan_structure(simple_struct)  # TRUE
 is_glycan_structure(graph)          # FALSE
-
-# Example 5: Mix different input types
-mixed_struct <- glycan_structure(graph, o_glycan_core_2(), simple_struct)
-print(mixed_struct)
 
 }

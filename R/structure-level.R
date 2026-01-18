@@ -23,28 +23,22 @@
 #'   containing the structure level for each element.
 #'
 #' @examples
-#' structures <- as_glycan_structure(c(
-#'   "Gal(b1-3)GalNAc(a1-",
-#'   "Gal(b1-?)GalNAc(a1-",
-#'   "Gal(??-?)GalNAc(??-",
-#'   "Hex(??-?)HexNAc(??-",
-#'   "Hex(b1-3)HexNAc(a1-"
-#' ))
-#' get_structure_level(structures)
+#' glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
+#' get_structure_level(glycan)
 #'
 #' @seealso [has_linkages()], [get_mono_type()]
 #' @export
 get_structure_level <- function(x) {
   checkmate::assert_class(x, "glyrepr_structure")
-  data <- vctrs::vec_data(x)
-  mono_types <- vctrs::field(data, "mono_type")
+  codes <- vctrs::vec_data(x)
+  mono_type <- get_mono_type.glyrepr_structure(x)
   has_linkages_strict <- has_linkages(x, strict = TRUE)
   has_linkages_lenient <- has_linkages(x, strict = FALSE)
   dplyr::case_when(
-    mono_types == "concrete" & has_linkages_strict ~ "intact",
-    mono_types == "concrete" & (!has_linkages_strict) & has_linkages_lenient ~ "partial",
-    mono_types == "concrete" & (!has_linkages_lenient) ~ "topological",
-    mono_types == "generic" & (!has_linkages_strict) ~ "basic",
+    mono_type == "concrete" & has_linkages_strict ~ "intact",
+    mono_type == "concrete" & (!has_linkages_strict) & has_linkages_lenient ~ "partial",
+    mono_type == "concrete" & (!has_linkages_lenient) ~ "topological",
+    mono_type == "generic" & (!has_linkages_strict) ~ "basic",
     .default = "basic"
   )
 }

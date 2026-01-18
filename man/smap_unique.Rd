@@ -30,7 +30,7 @@ care about unique results.
 \examples{
 # Create a structure vector with duplicates
 core1 <- o_glycan_core_1()
-structures <- glycan_structure(core1, core1, core1)  # same structure 3 times
+structures <- c(core1, core1, core1)  # same structure 3 times
 
 # Only compute once for the unique structure
 unique_results <- smap_unique(structures, igraph::vcount)

@@ -81,12 +81,12 @@ If the vector has names, the names are passed instead of indices.
 # Create structure vectors with duplicates
 core1 <- o_glycan_core_1()
 core2 <- n_glycan_core()
-structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+structures <- c(core1, core2, core1)  # core1 appears twice
 
 # Map a function that uses both structure and index
 simap_chr(structures, function(g, i) paste0("Structure_", i, "_vcount_", igraph::vcount(g)))
 
-# Use purrr-style lambda functions  
+# Use purrr-style lambda functions
 simap_chr(structures, ~ paste0("Pos", .y, "_vertices", igraph::vcount(.x)))
 
 }

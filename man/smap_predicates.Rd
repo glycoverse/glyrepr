@@ -45,7 +45,7 @@ are duplicate structures.
 # Create a structure vector with duplicates
 core1 <- o_glycan_core_1()
 core2 <- n_glycan_core()
-structures <- glycan_structure(core1, core2, core1)  # core1 appears twice
+structures <- c(core1, core2, core1)  # core1 appears twice
 
 # Test if some structures have more than 5 vertices
 ssome(structures, function(g) igraph::vcount(g) > 5)

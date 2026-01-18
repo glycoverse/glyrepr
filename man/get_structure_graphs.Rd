@@ -20,7 +20,7 @@ A list of igraph objects or an igraph object directly (see \code{return_list} pa
 Extract individual glycan structure graphs from a glycan structure vector.
 }
 \examples{
-structures <- glycan_structure(o_glycan_core_1(), n_glycan_core())
+structures <- c(o_glycan_core_1(), n_glycan_core())
 get_structure_graphs(structures)
 get_structure_graphs(structures)
 

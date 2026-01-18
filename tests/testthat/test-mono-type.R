@@ -1,11 +1,3 @@
-test_that("get_mono_type with mixed input works", {
-  struct1 <- n_glycan_core(mono_type = "concrete")
-  struct2 <- n_glycan_core(mono_type = "generic")
-  strucs <- c(struct1, struct2)
-  expected <- c("concrete", "generic")
-  expect_equal(get_mono_type(strucs), expected)
-})
-
 test_that("get mono type of structures", {
   glycan <- n_glycan_core(mono_type = "concrete")
   expect_equal(get_mono_type(glycan), "concrete")

@@ -66,7 +66,7 @@ normalize_substituents <- function(sub) {
 #' @returns A glyrepr_structure vector with all substituents removed.
 #'
 #' @examples
-#' (glycan <- glycan_structure(o_glycan_core_1()))
+#' (glycan <- o_glycan_core_1())
 #' remove_substituents(glycan)
 #'
 #' @export
