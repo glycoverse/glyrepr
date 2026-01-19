@@ -434,3 +434,104 @@ test_that("tibble printing handles NA compositions", {
   output <- capture.output(print(tibble))
   expect_true(any(grepl("<NA>", output)))
 })
+
+# ===== NA Support Comprehensive Tests =====
+
+test_that("is.na returns correct logical for compositions with NA", {
+  comp <- glycan_composition(c(Hex = 5))
+  expect_equal(is.na(comp), FALSE)
+
+  comp_na <- c(glycan_composition(c(Hex = 5)), NA)
+  expect_equal(is.na(comp_na), c(FALSE, TRUE))
+
+  comp_all_na <- glycan_composition(NA_integer_, NA_integer_)
+  expect_equal(is.na(comp_all_na), c(TRUE, TRUE))
+})
+
+test_that("anyNA detects NA compositions", {
+  comp <- glycan_composition(c(Hex = 5))
+  expect_false(anyNA(comp))
+
+  comp_na <- c(glycan_composition(c(Hex = 5)), NA)
+  expect_true(anyNA(comp_na))
+})
+
+test_that("rep handles compositions with NA", {
+  comp <- c(glycan_composition(c(Hex = 5)), NA)
+  repeated <- rep(comp, 2)
+  expect_equal(length(repeated), 4)
+  expect_equal(is.na(repeated), c(FALSE, TRUE, FALSE, TRUE))
+})
+
+test_that("rep handles compositions with NA at beginning", {
+  # Note: c(NA, comp) doesn't preserve type in base R, use vctrs::vec_c for reliable behavior
+  comp <- glycan_composition(c(Hex = 5))
+  comps <- vctrs::vec_c(NA, comp)
+  repeated <- rep(comps, 2)
+  expect_equal(length(repeated), 4)
+  expect_equal(is.na(repeated), c(TRUE, FALSE, TRUE, FALSE))
+})
+
+test_that("subsetting preserves NA", {
+  comp <- c(glycan_composition(c(Hex = 5)), NA, glycan_composition(c(Hex = 3)))
+
+  expect_true(is.na(comp[2]))
+  expect_equal(is.na(comp[c(1, 3)]), c(FALSE, FALSE))
+  expect_equal(length(comp[c(1, 3)]), 2)
+})
+
+test_that("as_glycan_composition handles list with NULL", {
+  result <- as_glycan_composition(list(c(Hex = 5), NULL))
+  expect_equal(length(result), 2)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+})
+
+test_that("combining multiple compositions with NA", {
+  comp1 <- glycan_composition(c(Hex = 5, HexNAc = 2))
+  comp2 <- glycan_composition(c(Hex = 3, HexNAc = 1))
+
+  # Note: c(NA, comp) doesn't preserve type, so we use composition first
+  combined <- c(comp1, NA, comp2, NA)
+  expect_equal(length(combined), 4)
+  expect_false(is.na(combined[1]))
+  expect_true(is.na(combined[2]))
+  expect_false(is.na(combined[3]))
+  expect_true(is.na(combined[4]))
+})
+
+test_that("empty composition vector with NA works", {
+  comps <- c(NA_character_, NA)
+  result <- as_glycan_composition(comps)
+  expect_equal(length(result), 2)
+  expect_true(is.na(result[1]))
+  expect_true(is.na(result[2]))
+})
+
+test_that("format preserves order with mixed NA and valid", {
+  comp <- glycan_composition(c(Hex = 2, HexNAc = 1))
+  # Use composition first, then NA - c(NA, comp) doesn't preserve type in base R
+  comps <- c(comp, NA, glycan_composition(c(Hex = 3)), NA)
+  formatted <- format(comps)
+  # Valid elements show as composition string, NA elements show as "<NA>"
+  expect_equal(formatted[1], "Hex(2)HexNAc(1)")
+  expect_equal(formatted[2], "<NA>")
+  expect_equal(formatted[3], "Hex(3)")
+  expect_equal(formatted[4], "<NA>")
+})
+
+test_that("NA compositions are correctly restored after subsetting", {
+  comps <- c(glycan_composition(c(Hex = 5)), NA, glycan_composition(c(Hex = 3)))
+  subset <- comps[c(1, 3)]
+  expect_equal(length(subset), 2)
+  expect_false(is.na(subset[1]))
+  expect_false(is.na(subset[2]))
+})
+
+test_that("combining concrete compositions with NA preserves type", {
+  comps <- c(glycan_composition(c(Glc = 5, Gal = 2)), NA)
+  expect_s3_class(comps, "glyrepr_composition")
+  expect_false(is.na(comps[1]))
+  expect_true(is.na(comps[2]))
+  expect_equal(format(comps[1]), "Glc(5)Gal(2)")
+})

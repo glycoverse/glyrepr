@@ -281,6 +281,37 @@ vec_cast.glyrepr_composition.double <- function(x, to, ...) {
 }
 
 #' @export
+vec_ptype2.logical.glyrepr_composition <- function(x, y, ...) {
+  new_glycan_composition(list())
+}
+
+#' @export
+vec_ptype2.glyrepr_composition.logical <- function(x, y, ...) {
+  new_glycan_composition(list())
+}
+
+#' @export
+vec_cast.glyrepr_composition.logical <- function(x, to, ...) {
+  # Cast each logical element to NA composition or error
+  # TRUE and FALSE are invalid (not NA), only NA is valid
+  result <- purrr::map(x, ~ {
+    if (is.na(.x)) {
+      NULL  # NA becomes NULL (NA composition)
+    } else {
+      cli::cli_abort("Cannot cast non-NA logical value to glyrepr_composition.")
+    }
+  })
+  new_glycan_composition(result)
+}
+
+#' @export
+vec_cast.logical.glyrepr_composition <- function(x, to, ...) {
+  # Cast glyrepr_composition to logical: NA compositions become NA, valid ones become NA (since there's no logical equivalent)
+  is_na <- is.na(x)
+  as.logical(is_na)
+}
+
+#' @export
 vec_restore.glyrepr_composition <- function(x, to, ...) {
   data <- vctrs::field(x, "data")
 
