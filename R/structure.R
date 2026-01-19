@@ -536,21 +536,63 @@ vec_cast.glyrepr_structure.list <- function(x, to, ...) {
 
 #' @export
 vec_cast.glyrepr_structure.character <- function(x, to, ...) {
-  # Capture input names for preservation
-  input_names <- names(x)
-
-  if (length(x) == 1) {
-    graph <- .parse_iupac_condensed_single(x)
-    result <- glycan_structure(graph)
-  } else {
-    # Multiple characters - return list of structures
-    graphs <- purrr::map(x, .parse_iupac_condensed_single)
-    result <- do.call(glycan_structure, graphs)
+  # Handle empty character vector
+  if (length(x) == 0) {
+    return(glycan_structure())
   }
 
-  # Restore names
-  names(result) <- input_names
+  # Handle NA values
+  na_mask <- is.na(x)
 
+  if (length(x) == 1 && na_mask[1]) {
+    # Single NA should error for backward compatibility
+    cli::cli_abort("Cannot parse empty or NA IUPAC-condensed string.")
+  }
+
+  if (all(na_mask)) {
+    # All NA - return vector of NAs with empty graphs
+    return(new_glycan_structure(rep(NA_character_, length(x)), list()))
+  }
+
+  if (any(na_mask)) {
+    # Mixed NA and non-NA
+    non_na_x <- x[!na_mask]
+
+    # Parse non-NA characters
+    graphs <- purrr::map(non_na_x, .parse_iupac_condensed_single)
+
+    # Create structure for non-NA elements
+    iupacs <- purrr::map_chr(graphs, .structure_to_iupac_single)
+
+    # Create unique graphs
+    unique_indices <- which(!duplicated(iupacs))
+    unique_graphs <- graphs[unique_indices]
+    unique_iupacs <- iupacs[unique_indices]
+    names(unique_graphs) <- unique_iupacs
+
+    # Build result preserving NA positions
+    result_iupacs <- character(length(x))
+    result_iupacs[na_mask] <- NA_character_
+
+    non_na_positions <- which(!na_mask)
+    for (i in seq_along(non_na_positions)) {
+      pos <- non_na_positions[i]
+      result_iupacs[pos] <- iupacs[i]
+    }
+
+    result <- new_glycan_structure(result_iupacs, unique_graphs)
+
+    # Restore names
+    names(result) <- names(x)
+
+    return(result)
+  }
+
+  # Original logic for non-NA case
+  input_names <- names(x)
+  graphs <- purrr::map(x, .parse_iupac_condensed_single)
+  result <- do.call(glycan_structure, graphs)
+  names(result) <- input_names
   result
 }
 

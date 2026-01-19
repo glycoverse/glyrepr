@@ -1348,3 +1348,29 @@ test_that("glycan_structure handles mixed valid and NA", {
   expect_true(is.na(struct[2]))
   expect_false(is.na(struct[3]))
 })
+
+# Tests for vec_cast.character with NA handling --------------------------------
+
+test_that("vec_cast handles NA characters", {
+  chars <- c("Glc(a1-", NA)
+  struct <- as_glycan_structure(chars)
+  expect_equal(length(struct), 2)
+  expect_false(is.na(struct[1]))
+  expect_true(is.na(struct[2]))
+})
+
+test_that("vec_cast handles NA at beginning", {
+  chars <- c(NA, "Gal(b1-3)GalNAc(a1-")
+  struct <- as_glycan_structure(chars)
+  expect_equal(length(struct), 2)
+  expect_true(is.na(struct[1]))
+  expect_false(is.na(struct[2]))
+})
+
+test_that("vec_cast handles all NA characters", {
+  chars <- c(NA, NA)
+  struct <- as_glycan_structure(chars)
+  expect_equal(length(struct), 2)
+  expect_true(is.na(struct[1]))
+  expect_true(is.na(struct[2]))
+})
