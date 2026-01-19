@@ -83,6 +83,10 @@ count_mono.glyrepr_composition <- function(x, mono = NULL, include_subs = FALSE)
 
   # Count the number of monosaccharides or substituents
   count_one <- function(one_mono, mono) {
+    # Handle NULL elements (NA compositions) - return NA for them
+    if (is.null(one_mono) || length(one_mono) == 0) {
+      return(NA_integer_)
+    }
     if (mono %in% names(one_mono)) {
       n <- one_mono[[mono]]
       if (is.na(n)) {

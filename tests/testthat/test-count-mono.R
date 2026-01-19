@@ -100,16 +100,33 @@ test_that("count_mono works for substituents", {
 })
 
 test_that("count_mono preserves NA in compositions", {
-  # Composition with NA element
+  # Composition with NA element - total count (mono = NULL)
   comps <- glycan_composition(c(Gal = 1), NA)
   expect_equal(count_mono(comps), c(1L, NA_integer_))
 
-  # NA in different positions
+  # NA in different positions - total count
   comps2 <- glycan_composition(NA, c(Gal = 1))
   expect_equal(count_mono(comps2), c(NA_integer_, 1L))
 
   comps3 <- glycan_composition(c(Gal = 1), NA, c(GlcNAc = 2))
   expect_equal(count_mono(comps3), c(1L, NA_integer_, 2L))
+
+  # Composition with NA element - specific mono count
+  comps4 <- glycan_composition(c(Gal = 1), NA)
+  expect_equal(count_mono(comps4, "Gal"), c(1L, NA_integer_))
+  expect_equal(count_mono(comps4, "Hex"), c(1L, NA_integer_))
+  expect_equal(count_mono(comps4, "Glc"), c(0L, NA_integer_))
+
+  # NA in different positions - specific mono count
+  comps5 <- glycan_composition(NA, c(Gal = 1, GlcNAc = 1))
+  expect_equal(count_mono(comps5, "Gal"), c(NA_integer_, 1L))
+  expect_equal(count_mono(comps5, "HexNAc"), c(NA_integer_, 1L))
+  expect_equal(count_mono(comps5, "Man"), c(NA_integer_, 0L))
+
+  # Multiple NAs - specific mono count
+  comps6 <- glycan_composition(c(Gal = 1), NA, c(GlcNAc = 2), NA)
+  expect_equal(count_mono(comps6, "Gal"), c(1L, NA_integer_, 0L, NA_integer_))
+  expect_equal(count_mono(comps6, "HexNAc"), c(0L, NA_integer_, 2L, NA_integer_))
 })
 
 # Tests for count_mono with glycan structures ----------------------------
