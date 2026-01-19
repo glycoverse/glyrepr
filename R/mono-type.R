@@ -291,6 +291,10 @@ convert_mono_type_impl <- function(monos) {
   # Handle NA values - preserve them
   is_na <- is.na(monos)
   if (any(is_na)) {
+    # If all values are NA, return as-is
+    if (all(is_na)) {
+      return(monos)
+    }
     result <- monos
     # Convert non-NA values
     non_na <- !is_na
@@ -298,7 +302,7 @@ convert_mono_type_impl <- function(monos) {
     return(result)
   }
 
-  # Use base R vectorized operations to handle NA properly
+  # Non-NA case: convert using base R vectorized operations
   is_substituent <- monos %in% available_substituents()
   result <- to_[match(monos, from_)]
   result[is_substituent] <- monos[is_substituent]
