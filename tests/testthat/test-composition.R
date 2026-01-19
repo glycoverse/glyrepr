@@ -320,3 +320,28 @@ test_that("as.character works for compositions", {
   comp <- as_glycan_composition(chars)
   expect_equal(as.character(comp), chars)
 })
+
+# Tests for NA helper functions ----------------------------------------------
+
+test_that(".is_na_composition_elem detects NA correctly", {
+  expect_true(.is_na_composition_elem(NULL))
+  expect_false(.is_na_composition_elem(c(Hex = 5)))
+  expect_false(.is_na_composition_elem(integer(0)))
+})
+
+test_that(".valid_composition_element validates correctly", {
+  # Valid input
+  expect_equal(.valid_composition_element(c(Hex = 5, HexNAc = 2)), c(Hex = 5L, HexNAc = 2L))
+
+  # Invalid input - unnamed
+  expect_error(.valid_composition_element(c(5, 2)), "named integer")
+
+  # Invalid input - empty
+  expect_error(.valid_composition_element(integer(0)), "at least one residue")
+
+  # Invalid input - unknown monosaccharide
+  expect_error(.valid_composition_element(c(Unknown = 5)), "known monosaccharides")
+
+  # Invalid input - non-positive
+  expect_error(.valid_composition_element(c(Hex = 0)), "positive numbers")
+})

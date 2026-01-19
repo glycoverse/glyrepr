@@ -542,3 +542,42 @@ format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
 
   purrr::map_chr(comp_data, format_one_colored)
 }
+
+#' Check if a composition element is NA
+#'
+#' NA elements are stored as NULL in the list_of data field.
+#' @param x A single composition element (named integer vector or NULL)
+#' @returns TRUE if NA (NULL), FALSE otherwise
+#' @noRd
+.is_na_composition_elem <- function(x) {
+  is.null(x)
+}
+
+#' Validate a single composition element
+#'
+#' @param x A single composition element
+#' @returns The validated and converted integer vector
+#' @noRd
+.valid_composition_element <- function(x) {
+  if (!checkmate::test_integerish(x)) {
+    cli::cli_abort("Each composition must be a named integer vector.")
+  }
+  if (length(x) == 0) {
+    cli::cli_abort("Each composition must have at least one residue.")
+  }
+  if (!checkmate::test_named(x)) {
+    cli::cli_abort("Each composition must be a named integer vector.")
+  }
+  if (!all(is_known_composition_component(names(x)))) {
+    cli::cli_abort(c(
+      "Must have only known monosaccharides",
+      "i" = "Call {.fun available_monosaccharides} to see all known monosaccharides."
+    ))
+  }
+  if (!all(x > 0)) {
+    cli::cli_abort("Must have only positive numbers of residues.")
+  }
+  result <- as.integer(x)
+  names(result) <- names(x)
+  result
+}
