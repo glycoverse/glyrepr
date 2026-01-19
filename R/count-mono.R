@@ -58,7 +58,10 @@ count_mono.glyrepr_composition <- function(x, mono = NULL, include_subs = FALSE)
     if (!include_subs) {
       data <- purrr::map(data, ~ .x[names(.x) %in% available_monosaccharides()])
     }
-    return(purrr::map_int(data, sum))
+    # Handle NULL elements (NA compositions) - return NA for them
+    return(purrr::map_int(data, function(x) {
+      if (is.null(x) || length(x) == 0) NA_integer_ else sum(x)
+    }))
   }
 
   # Get the type of the monosaccharide
