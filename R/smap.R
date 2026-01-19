@@ -178,18 +178,8 @@ NULL
   idx <- match(valid_codes, unique_codes)
   valid_result <- unique_converted[idx]
 
-  # Combine with NA results
-  if (is.integer(unique_converted)) {
-    result <- rep(NA_integer_, length(codes))
-  } else if (is.double(unique_converted)) {
-    result <- rep(NA_real_, length(codes))
-  } else if (is.logical(unique_converted)) {
-    result <- rep(NA, length(codes))
-  } else if (is.character(unique_converted)) {
-    result <- rep(NA_character_, length(codes))
-  } else {
-    result <- rep(NA, length(codes))
-  }
+  # Initialize result with NA and assign valid results
+  result <- rep(NA, length(codes))
   result[!na_mask] <- valid_result
   names(result) <- input_names
   return(result)
