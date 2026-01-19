@@ -209,7 +209,14 @@ get_mono_type.glyrepr_structure <- function(x) {
     return(character())
   }
 
-  graphs1 <- attr(x, "graphs")[[1]]
+  graphs <- attr(x, "graphs")
+
+  # Handle all-NA vectors (empty graphs list)
+  if (length(graphs) == 0) {
+    return(NA_character_)
+  }
+
+  graphs1 <- graphs[[1]]
   monos1 <- igraph::V(graphs1)$mono
   get_mono_type_impl(monos1)
 }
