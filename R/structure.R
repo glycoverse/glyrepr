@@ -67,8 +67,19 @@
 #'   samples or conditions
 #' - **Structure-Function Analysis**: Studying relationships between glycan 
 #'   structures and biological functions
-#' - **Database Queries**: Performing structure matching and searches in glycan 
+#' - **Database Queries**: Performing structure matching and searches in glycan
 #'   databases
+#'
+#' # NA Support
+#'
+#' Glycan structure vectors support NA values for representing missing or
+#' unknown structures:
+#'
+#' - Create with `glycan_structure(NA)` or `glycan_structure(NULL)`
+#' - Combine with valid structures: `c(struct1, NA, struct2)`
+#' - Convert from character: `as_glycan_structure(c("Glc(a1-", NA))`
+#' - `smap` functions skip NA elements gracefully
+#' - `is.na()` returns `TRUE` for NA elements
 #'
 #' @param ... igraph graph objects to be converted to glycan structures, or existing 
 #'   glycan structure vectors. Supports mixed input of multiple objects.

@@ -107,6 +107,18 @@ databases
 }
 }
 
+\section{NA Support}{
+Glycan structure vectors support NA values for representing missing or
+unknown structures:
+\itemize{
+\item Create with \code{glycan_structure(NA)} or \code{glycan_structure(NULL)}
+\item Combine with valid structures: \code{c(struct1, NA, struct2)}
+\item Convert from character: \code{as_glycan_structure(c("Glc(a1-", NA))}
+\item \code{smap} functions skip NA elements gracefully
+\item \code{is.na()} returns \code{TRUE} for NA elements
+}
+}
+
 \examples{
 library(igraph)
 
