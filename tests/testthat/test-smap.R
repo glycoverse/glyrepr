@@ -1271,6 +1271,42 @@ test_that(".smap_base handles NA elements correctly", {
   expect_false(is.na(result_list[[3]]))
 })
 
+test_that(".smap_base handles all-NA vector with correct NA types", {
+  # All-NA vector
+  all_na_structs <- glycan_structure(NA, NA, NA)
+
+  # smap_chr should return NA_character_, not "NA" string
+  result_chr <- smap_chr(all_na_structs, ~ .x$anomer)
+  expect_equal(length(result_chr), 3)
+  expect_type(result_chr, "character")
+  expect_true(all(is.na(result_chr)))
+  # Verify it's true NA_character_, not the string "NA"
+  expect_identical(result_chr[1], NA_character_)
+
+  # smap_int should return NA_integer_
+  result_int <- smap_int(all_na_structs, igraph::vcount)
+  expect_equal(length(result_int), 3)
+  expect_type(result_int, "integer")
+  expect_true(all(is.na(result_int)))
+
+  # smap_dbl should return NA_real_
+  result_dbl <- smap_dbl(all_na_structs, igraph::vcount)
+  expect_equal(length(result_dbl), 3)
+  expect_type(result_dbl, "double")
+  expect_true(all(is.na(result_dbl)))
+
+  # smap_lgl should return NA (logical)
+  result_lgl <- smap_lgl(all_na_structs, ~ igraph::vcount(.x) > 0)
+  expect_equal(length(result_lgl), 3)
+  expect_type(result_lgl, "logical")
+  expect_true(all(is.na(result_lgl)))
+
+  # smap returns list with NULL for NA elements
+  result_list <- smap(all_na_structs, igraph::vcount)
+  expect_equal(length(result_list), 3)
+  expect_true(all(purrr::map_lgl(result_list, is.null)))
+})
+
 # Tests for NA handling in smap2 functions -----------------------------------
 
 test_that("smap2 handles NA elements", {

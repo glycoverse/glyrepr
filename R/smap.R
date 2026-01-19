@@ -130,7 +130,12 @@ NULL
     if (is.null(.convert_fn)) {
       result <- vector("list", length(codes))
     } else {
-      result <- .convert_fn(list(rep(NA_real_, na_count)))
+      # Get typed NA by running .convert_fn on a properly-typed NA
+      # Use NA_character_ for character output (as.character(NA) gives "NA" string)
+      # For other types, NA coerces correctly
+      test_na <- NA_character_  # Default to character type
+      typed_na <- .convert_fn(list(test_na))
+      result <- rep(typed_na, na_count)
     }
     names(result) <- input_names
     return(result)
