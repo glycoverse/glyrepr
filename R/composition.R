@@ -182,15 +182,16 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
       compositions <- purrr::map(parse_result, "composition")
     }
 
-    # Build result list by inserting compositions at correct positions
-    # Use purrr::map to handle NULL preservation correctly
-    comp_idx <- 0
+    # Build result list preserving order - no global state needed
+    # Use which(!na_mask) to get the mapping from non-NA positions to compositions
+    non_na_positions <- which(!na_mask)
     result_list <- purrr::map(seq_along(x), ~ {
       if (na_mask[.x]) {
-        NULL  # NA element
+        NULL
       } else {
-        comp_idx <<- comp_idx + 1
-        compositions[[comp_idx]]
+        # Find which composition this position corresponds to
+        pos_in_non_na <- match(.x, non_na_positions)
+        compositions[[pos_in_non_na]]
       }
     })
 
