@@ -398,6 +398,10 @@ format_glycan_structure_subset <- function(x, indices, colored = TRUE) {
 
   # For each structure, add colors if concrete type
   purrr::map_chr(codes, function(code) {
+    # Handle NA codes
+    if (is.na(code)) {
+      return(NA_character_)
+    }
     structure <- graphs[[code]]
     mono_names <- igraph::V(structure)$mono
 
@@ -459,6 +463,10 @@ pillar_shaft.glyrepr_structure <- function(x, ...) {
 
   # For each structure, add colors if concrete type
   formatted <- purrr::map_chr(codes, function(code) {
+    # Handle NA codes
+    if (is.na(code)) {
+      return(NA_character_)
+    }
     structure <- graphs[[code]]
     mono_names <- igraph::V(structure)$mono
 
