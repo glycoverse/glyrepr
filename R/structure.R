@@ -115,21 +115,45 @@ glycan_structure <- function(...) {
 
   # Handle different input types
   graphs <- list()
-  for (arg in args) {
-    if (inherits(arg, "igraph")) {
+  iupacs <- character()
+  na_positions <- logical()
+
+  for (i in seq_along(args)) {
+    arg <- args[[i]]
+    if (is.null(arg) || (is.atomic(arg) && length(arg) == 1 && is.na(arg))) {
+      # Track NA position
+      iupacs <- c(iupacs, NA_character_)
+      na_positions <- c(na_positions, TRUE)
+    } else if (inherits(arg, "igraph")) {
       graphs <- c(graphs, list(arg))
+      iupacs <- c(iupacs, NA_character_)  # placeholder
+      na_positions <- c(na_positions, FALSE)
     } else {
-      cli::cli_abort("All arguments must be igraph objects.")
+      cli::cli_abort("All arguments must be igraph objects or NA values.")
     }
   }
 
-  if (length(graphs) == 0) {
-    # Return empty vector
+  if (length(iupacs) == 0) {
     return(new_glycan_structure())
   }
 
-  # Validate and process each graph
-  processed_graphs <- purrr::map(graphs, function(graph) {
+  # Get indices of valid (non-NA) positions
+  valid_idx <- which(!na_positions)
+
+  if (length(valid_idx) == 0 && all(na_positions)) {
+    # All are NA
+    return(new_glycan_structure(rep(NA_character_, length(iupacs)), list()))
+  }
+
+  if (length(valid_idx) == 0) {
+    return(new_glycan_structure(character(), list()))
+  }
+
+  # Extract valid graphs
+  valid_graphs <- graphs
+
+  # Validate and process each valid graph
+  processed_graphs <- purrr::map(valid_graphs, function(graph) {
     checkmate::assert_class(graph, "igraph")
     graph %>%
       validate_single_glycan_structure() %>%
@@ -137,19 +161,30 @@ glycan_structure <- function(...) {
   })
 
   # Reorder the graphs to align with IUPAC-style sequence
-  reordered_graphs <- reorder_graphs(processed_graphs)
+  reordered_result <- reorder_graphs_with_indices(processed_graphs)
+  reordered_graphs <- reordered_result$graphs
+  reorder_indices <- reordered_result$indices
 
   # Validate that all structures have the same mono_type
   validate_glycan_structure_vector(reordered_graphs)
 
   # Use IUPAC codes directly as data for the glycan_structure vctrs vector
-  iupacs <- purrr::map_chr(reordered_graphs, .structure_to_iupac_single)
+  processed_iupacs <- purrr::map_chr(reordered_graphs, .structure_to_iupac_single)
 
   # Create a unique list based on uniqueness of IUPAC codes for structures storage
-  unique_indices <- which(!duplicated(iupacs))
+  unique_indices <- which(!duplicated(processed_iupacs))
   unique_graphs <- reordered_graphs[unique_indices]
-  unique_iupacs <- iupacs[unique_indices]
+  unique_iupacs <- processed_iupacs[unique_indices]
   names(unique_graphs) <- unique_iupacs
+
+  # Build final result - replace placeholders with actual IUPACs
+  # Map reordered positions back to original positions
+  for (i in seq_along(reorder_indices)) {
+    orig_pos <- reorder_indices[i]  # Original position in valid_graphs
+    final_pos <- valid_idx[orig_pos]  # Final position in result vector
+    iupac <- processed_iupacs[i]
+    iupacs[final_pos] <- iupac
+  }
 
   new_glycan_structure(iupacs, unique_graphs)
 }

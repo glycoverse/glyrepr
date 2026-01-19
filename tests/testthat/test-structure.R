@@ -1325,3 +1325,26 @@ test_that("is.na returns correct logical for structures with NA", {
   struct_all_na <- c(NA, NA)
   expect_equal(is.na(struct_all_na), c(TRUE, TRUE))
 })
+
+# Tests for NULL/NA handling in glycan_structure -----------------------------
+
+test_that("glycan_structure accepts NULL to create NA", {
+  struct <- glycan_structure(NULL)
+  expect_equal(length(struct), 1)
+  expect_true(is.na(struct))
+})
+
+test_that("glycan_structure accepts NA to create NA", {
+  struct <- glycan_structure(NA)
+  expect_equal(length(struct), 1)
+  expect_true(is.na(struct))
+})
+
+test_that("glycan_structure handles mixed valid and NA", {
+  graph <- o_glycan_core_1() |> get_structure_graphs(return_list = FALSE)
+  struct <- glycan_structure(graph, NULL, graph)
+  expect_equal(length(struct), 3)
+  expect_false(is.na(struct[1]))
+  expect_true(is.na(struct[2]))
+  expect_false(is.na(struct[3]))
+})
