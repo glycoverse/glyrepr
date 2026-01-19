@@ -172,6 +172,7 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
 
   # Handle NA by creating NA composition elements
   na_mask <- is.na(x)
+  non_na_positions <- which(!na_mask)
   if (any(na_mask)) {
     # Process non-NA characters
     non_na_x <- x[!na_mask]
@@ -184,8 +185,8 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
 
       # Check for invalid characters
       invalid_indices <- which(!valid_flags)
-      # Map back to original indices
-      original_invalid <- seq_along(non_na_x)[invalid_indices]
+      # Map back to original indices in x (not indices in non_na_x)
+      original_invalid <- non_na_positions[invalid_indices]
       if (length(original_invalid) > 0) {
         cli::cli_abort(c(
           "Characters cannot be parsed as glycan compositions at index {original_invalid}",
@@ -197,8 +198,6 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
     }
 
     # Build result list preserving order - no global state needed
-    # Use which(!na_mask) to get the mapping from non-NA positions to compositions
-    non_na_positions <- which(!na_mask)
     result_list <- purrr::map(seq_along(x), ~ {
       if (na_mask[.x]) {
         NULL

@@ -410,6 +410,24 @@ test_that("as_glycan_composition handles all NA characters", {
   expect_true(is.na(comp[2]))
 })
 
+test_that("as_glycan_composition reports correct index with NA and invalid chars", {
+  # Regression test: error message should report original indices, not filtered indices
+  # When mixing NA and invalid strings, index 3 (not 2) should be reported
+  chars <- c("Hex(5)", NA, "invalid")
+  expect_error(
+    as_glycan_composition(chars),
+    "at index 3"
+  )
+})
+
+test_that("as_glycan_composition reports correct index with NA at beginning and invalid", {
+  chars <- c(NA, NA, "HexNAc(1)", "also_invalid")
+  expect_error(
+    as_glycan_composition(chars),
+    "at index 4"
+  )
+})
+
 # Tests for NA handling in format -----------------------------------------
 
 test_that("format shows <NA> for NA compositions", {
