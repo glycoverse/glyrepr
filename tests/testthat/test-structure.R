@@ -1374,3 +1374,45 @@ test_that("vec_cast handles all NA characters", {
   expect_true(is.na(struct[1]))
   expect_true(is.na(struct[2]))
 })
+
+# Tests for vec_restore NA handling -----------------------------------------
+
+test_that("vec_restore skips NA in type checking", {
+  struct1 <- o_glycan_core_1()
+  struct2 <- glycan_structure(NA)
+
+  # Should not error - NA should be skipped in type check
+  combined <- c(struct1, struct2)
+  expect_equal(length(combined), 2)
+  expect_false(is.na(combined[1]))
+  expect_true(is.na(combined[2]))
+})
+
+test_that("combining with NA at beginning works", {
+  struct <- o_glycan_core_1()
+  # c(NA, struct) doesn't preserve type in base R
+  combined <- vctrs::vec_c(NA, struct)
+  expect_equal(length(combined), 2)
+  expect_true(is.na(combined[1]))
+  expect_false(is.na(combined[2]))
+})
+
+test_that("vec_restore handles all NA vector", {
+  struct_na <- glycan_structure(NA, NA)
+  expect_equal(length(struct_na), 2)
+  expect_equal(is.na(struct_na), c(TRUE, TRUE))
+  expect_length(attr(struct_na, "graphs"), 0)  # No graphs for NA elements
+})
+
+test_that("vec_restore preserves graphs for non-NA with mixed NA", {
+  struct1 <- o_glycan_core_1()
+  struct2 <- n_glycan_core()
+  combined <- c(struct1, NA, struct2)
+
+  expect_equal(length(combined), 3)
+  expect_false(is.na(combined[1]))
+  expect_true(is.na(combined[2]))
+  expect_false(is.na(combined[3]))
+  # Should have 2 unique structures (not counting NA)
+  expect_length(attr(combined, "graphs"), 2)
+})
