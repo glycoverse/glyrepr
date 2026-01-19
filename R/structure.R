@@ -321,6 +321,12 @@ is_glycan_structure <- function(x) {
 }
 
 #' @export
+is.na.glyrepr_structure <- function(x, ...) {
+  iupacs <- vctrs::vec_data(x)
+  is.na(iupacs)
+}
+
+#' @export
 vec_ptype_full.glyrepr_structure <- function(x, ...) "glycan_structure"
 
 #' @export

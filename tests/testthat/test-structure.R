@@ -1312,3 +1312,16 @@ test_that("all glyrepr_structure functions preserve names", {
   # Vector combination
   expect_equal(names(c(structures)), c("A", "B", "C"))
 })
+
+# Tests for is.na method ----------------------------------------------------
+
+test_that("is.na returns correct logical for structures with NA", {
+  struct <- o_glycan_core_1()
+  expect_equal(is.na(struct), FALSE)
+
+  struct_na <- c(o_glycan_core_1(), NA)
+  expect_equal(is.na(struct_na), c(FALSE, TRUE))
+
+  struct_all_na <- c(NA, NA)
+  expect_equal(is.na(struct_all_na), c(TRUE, TRUE))
+})
