@@ -101,3 +101,27 @@ test_that("convert_to_generic with empty composition returns empty composition",
   result <- convert_to_generic(comp_empty)
   expect_equal(result, comp_empty)
 })
+
+test_that("convert_to_generic preserves NA in compositions", {
+  # NA as second element
+  comps1 <- glycan_composition(c(Gal = 1), NA)
+  result1 <- convert_to_generic(comps1)
+  expect_equal(length(result1), 2)
+  expect_equal(as.character(result1[1]), "Hex(1)")
+  expect_true(is.na(result1[2]))
+
+  # NA as first element
+  comps2 <- glycan_composition(NA, c(Gal = 1))
+  result2 <- convert_to_generic(comps2)
+  expect_equal(length(result2), 2)
+  expect_true(is.na(result2[1]))
+  expect_equal(as.character(result2[2]), "Hex(1)")
+
+  # NA in the middle
+  comps3 <- glycan_composition(c(Gal = 1), NA, c(GlcNAc = 2))
+  result3 <- convert_to_generic(comps3)
+  expect_equal(length(result3), 3)
+  expect_equal(as.character(result3[1]), "Hex(1)")
+  expect_true(is.na(result3[2]))
+  expect_equal(as.character(result3[3]), "HexNAc(2)")
+})
