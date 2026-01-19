@@ -1210,3 +1210,38 @@ test_that("get_structure_level preserves names", {
   result <- get_structure_level(structures)
   expect_equal(names(result), c("A", "B", "C"))
 })
+
+# Tests for NA handling in smap functions -----------------------------------
+
+test_that("smap skips NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+  counts <- smap_int(structs, igraph::vcount)
+  expect_equal(length(counts), 3)
+  expect_false(is.na(counts[1]))
+  expect_true(is.na(counts[2]))
+  expect_false(is.na(counts[3]))
+})
+
+test_that("smap_structure skips NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+  result <- smap_structure(structs, identity)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+})
+
+test_that("ssome skips NA elements", {
+  structs <- c(glycan_structure(NA), o_glycan_core_1())
+  expect_true(ssome(structs, function(g) igraph::vcount(g) > 1))
+})
+
+test_that("severy skips NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA))
+  expect_true(severy(structs, function(g) igraph::vcount(g) > 1))
+})
+
+test_that("snone skips NA elements", {
+  structs <- glycan_structure(NA, NA)
+  expect_true(snone(structs, function(g) igraph::vcount(g) > 100))
+})
