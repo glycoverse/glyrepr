@@ -340,6 +340,11 @@ test_that("glycan_composition handles mixed valid and NA", {
   expect_false(is.na(comp[3]))
 })
 
+test_that("glycan_composition rejects named NA (likely typo)", {
+  # c(Hex = NA) is likely a typo for c(Hex = 5), should error
+  expect_error(glycan_composition(c(Hex = NA)), "positive")
+})
+
 test_that(".is_na_composition_elem detects NA correctly", {
   expect_true(.is_na_composition_elem(NULL))
   expect_false(.is_na_composition_elem(c(Hex = 5)))

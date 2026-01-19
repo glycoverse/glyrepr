@@ -45,9 +45,12 @@ glycan_composition <- function(...) {
   args <- rlang::list2(...)
 
   # Handle NULL/NA inputs - convert to list elements that will be stored as NULL
+  # Only unnamed NA/NULL are treated as missing; named NA (e.g., c(Hex = NA)) is invalid
   x <- purrr::map(args, ~ {
-    if (is.null(.x) || (is.atomic(.x) && length(.x) == 1 && is.na(.x))) {
+    if (is.null(.x)) {
       NULL  # Store as NULL to represent NA
+    } else if (is.atomic(.x) && length(.x) == 1 && is.na(.x) && is.null(names(.x))) {
+      NULL  # Unnamed scalar NA treated as missing
     } else {
       .valid_composition_element(.x)
     }
@@ -684,7 +687,7 @@ format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
       "i" = "Call {.fun available_monosaccharides} to see all known monosaccharides."
     ))
   }
-  if (!all(x > 0)) {
+  if (any(is.na(x)) || !all(x > 0)) {
     cli::cli_abort("Must have only positive numbers of residues.")
   }
   result <- as.integer(x)
