@@ -40,13 +40,16 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
-<p>We have redesigned the internal implementation of <code>glyrepr_composition</code> and <code>glyrepr_structure</code>. Importantly, <code>glyrepr_structure</code> is now built on <code><a href="https://vctrs.r-lib.org/reference/new_vctr.html" class="external-link">vctrs::new_vctr()</a></code> instead of <code><a href="https://vctrs.r-lib.org/reference/new_rcrd.html" class="external-link">vctrs::new_rcrd()</a></code>. The direct benefit is that <code>glyrepr_structure</code> now supports custom names. We’re testing the naming feature now.</p>
+<p>We have redesigned the internal implementation of <code>glyrepr_composition</code> and <code>glyrepr_structure</code>. This brought native support for names to <code>glyrepr_structure</code>, and NA values to both <code>glyrepr_structure</code> and <code>glyrepr_composition</code>.</p>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>
 <code><a href="../reference/smap.html">smap()</a></code>, <code><a href="../reference/smap2.html">smap2()</a></code>, <code><a href="../reference/spmap.html">spmap()</a></code>, <code><a href="../reference/simap.html">simap()</a></code> and their variants now preserve names from input <code>glyrepr_structure</code> vectors in their output.</li>
 <li>
 <code>glyrepr_structure</code> now formally supports names. All operations on a named <code>glyrepr_structure</code> vectors preserve the names.</li>
+<li>NA values are supported for <code>glyrepr_structure</code> and <code>glyrepr_composition</code>. Any operation on a <code>glyrepr_structure</code> or <code>glyrepr_composition</code> vector with NA values behave intuitively. <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> now works for these two classes.</li>
+<li>
+<code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> now accepts another <code>glyrepr_composition</code> vector as input, returning it as-is.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>

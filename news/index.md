@@ -3,13 +3,9 @@
 ## glyrepr (development version)
 
 We have redesigned the internal implementation of `glyrepr_composition`
-and `glyrepr_structure`. Importantly, `glyrepr_structure` is now built
-on
-[`vctrs::new_vctr()`](https://vctrs.r-lib.org/reference/new_vctr.html)
-instead of
-[`vctrs::new_rcrd()`](https://vctrs.r-lib.org/reference/new_rcrd.html).
-The direct benefit is that `glyrepr_structure` now supports custom
-names. We’re testing the naming feature now.
+and `glyrepr_structure`. This brought native support for names to
+`glyrepr_structure`, and NA values to both `glyrepr_structure` and
+`glyrepr_composition`.
 
 ### New features
 
@@ -21,6 +17,14 @@ names. We’re testing the naming feature now.
   vectors in their output.
 - `glyrepr_structure` now formally supports names. All operations on a
   named `glyrepr_structure` vectors preserve the names.
+- NA values are supported for `glyrepr_structure` and
+  `glyrepr_composition`. Any operation on a `glyrepr_structure` or
+  `glyrepr_composition` vector with NA values behave intuitively.
+  [`is.na()`](https://rdrr.io/r/base/NA.html) now works for these two
+  classes.
+- [`glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/glycan_composition.md)
+  now accepts another `glyrepr_composition` vector as input, returning
+  it as-is.
 
 ### Breaking changes
 
