@@ -829,6 +829,7 @@ spmap <- function(.l, .f, ..., .parallel = FALSE) {
   # This function had a similar bug to smap2 where data.frame() would unwrap
   # nested list arguments, causing incorrect row expansion. Fixed by using tibble
   # and proper hash-based key generation for complex objects.
+  # Also fixed NA handling to skip NA elements in the structure vector.
 
   # Check if it's actually a plain list, not a vctrs object that looks like a list
   if (!inherits(.l, "list") || inherits(.l, "vctrs_vctr") || length(.l) == 0) {
@@ -856,21 +857,44 @@ spmap <- function(.l, .f, ..., .parallel = FALSE) {
   codes <- vctrs::vec_data(.l[[1]])
   graphs <- attr(.l[[1]], "graphs")
 
+  # Handle NA elements in the structure vector
+  na_mask <- is.na(codes)
+  na_count <- sum(na_mask)
+
+  # If all elements are NA, return NA results
+  if (na_count == length(codes)) {
+    result <- vector("list", length(codes))
+    result[na_mask] <- list(NA)
+    names(result) <- input_names
+    return(result)
+  }
+
+  # Filter out NA elements for processing
+  if (na_count > 0) {
+    valid_codes <- codes[!na_mask]
+    valid_l <- purrr::map(.l, ~ .x[!na_mask])
+    valid_names <- input_names[!na_mask]
+  } else {
+    valid_codes <- codes
+    valid_l <- .l
+    valid_names <- input_names
+  }
+
   # Create unique combinations data frame for proper handling
   # BUG FIX: Use tibble to prevent unwanted expansion of nested lists
   combinations_df <- tibble::tibble(
-    code = codes
+    code = valid_codes
   )
 
   # Add other arguments as columns - using tibble prevents list expansion
-  for (i in seq_along(.l)[-1]) {
-    combinations_df[[paste0("arg", i)]] <- .l[[i]]
+  for (i in seq_along(valid_l)[-1]) {
+    combinations_df[[paste0("arg", i)]] <- valid_l[[i]]
   }
 
   # Create combination key with proper handling of complex objects
-  key_components <- list(codes)
-  for (i in seq_along(.l)[-1]) {
-    arg_values <- .l[[i]]
+  key_components <- list(valid_codes)
+  for (i in seq_along(valid_l)[-1]) {
+    arg_values <- valid_l[[i]]
     key_component <- purrr::map_chr(arg_values, .generate_value_key)
     key_components <- append(key_components, list(key_component))
   }
@@ -883,8 +907,8 @@ spmap <- function(.l, .f, ..., .parallel = FALSE) {
     row <- unique_combinations_df[i, ]
     # Build full argument list: first is structure, then other args
     args <- list(graphs[[row$code]])
-    if (length(.l) > 1) {
-      for (j in 2:length(.l)) {
+    if (length(valid_l) > 1) {
+      for (j in 2:length(valid_l)) {
         # BUG FIX: Proper extraction from tibble list-columns
         col_val <- row[[paste0("arg", j)]]
         args[[j]] <- .extract_from_list_column(col_val)
@@ -894,8 +918,14 @@ spmap <- function(.l, .f, ..., .parallel = FALSE) {
   }, use_parallel = .parallel)
   names(unique_results) <- unique_combinations_df$combo_key
 
-  # Map results back to original vector positions
-  result <- purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+  # Map results back to original positions
+  valid_results <- purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+  names(valid_results) <- valid_names
+
+  # Combine with NA results
+  result <- vector("list", length(codes))
+  result[!na_mask] <- valid_results
+  result[na_mask] <- list(NA)
   names(result) <- input_names
   result
 }
@@ -937,6 +967,7 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
   # FUNCTION-LEVEL BUG FIX DOCUMENTATION:
   # This function had the same nested list expansion bug as spmap and smap2.
   # Fixed by using tibble and proper list-column handling.
+  # Also fixed NA handling to skip NA elements in the structure vector.
 
   if (!is.list(.l) || length(.l) == 0) {
     cli::cli_abort("Input `.l` must be a non-empty list.")
@@ -963,21 +994,43 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
   codes <- vctrs::vec_data(.l[[1]])
   graphs <- attr(.l[[1]], "graphs")
 
+  # Handle NA elements in the structure vector
+  na_mask <- is.na(codes)
+  na_count <- sum(na_mask)
+
+  # If all elements are NA, return NA structure
+  if (na_count == length(codes)) {
+    result <- glycan_structure(rep(NA, length(codes)))
+    names(result) <- input_names
+    return(result)
+  }
+
+  # Filter out NA elements for processing
+  if (na_count > 0) {
+    valid_codes <- codes[!na_mask]
+    valid_l <- purrr::map(.l, ~ .x[!na_mask])
+    valid_names <- input_names[!na_mask]
+  } else {
+    valid_codes <- codes
+    valid_l <- .l
+    valid_names <- input_names
+  }
+
   # Create unique combinations data frame for proper handling
   # BUG FIX: Use tibble to prevent unwanted expansion of nested lists
   combinations_df <- tibble::tibble(
-    code = codes
+    code = valid_codes
   )
 
   # Add other arguments as columns - using tibble prevents list expansion
-  for (i in seq_along(.l)[-1]) {
-    combinations_df[[paste0("arg", i)]] <- .l[[i]]
+  for (i in seq_along(valid_l)[-1]) {
+    combinations_df[[paste0("arg", i)]] <- valid_l[[i]]
   }
 
   # Create combination key with proper handling of complex objects
-  key_components <- list(codes)
-  for (i in seq_along(.l)[-1]) {
-    arg_values <- .l[[i]]
+  key_components <- list(valid_codes)
+  for (i in seq_along(valid_l)[-1]) {
+    arg_values <- valid_l[[i]]
     key_component <- purrr::map_chr(arg_values, .generate_value_key)
     key_components <- append(key_components, list(key_component))
   }
@@ -990,8 +1043,8 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
     row <- unique_combinations_df[i, ]
     # Build full argument list: first is structure, then other args
     args <- list(graphs[[row$code]])
-    if (length(.l) > 1) {
-      for (j in 2:length(.l)) {
+    if (length(valid_l) > 1) {
+      for (j in 2:length(valid_l)) {
         # BUG FIX: Proper extraction from tibble list-columns
         col_val <- row[[paste0("arg", j)]]
         args[[j]] <- .extract_from_list_column(col_val)
@@ -1006,8 +1059,31 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
 
   # Rebuild glycan_structure with proper deduplication
   idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
-  result <- .rebuild_structure_with_dedup(new_graphs, idx)
-  names(result) <- input_names
+  valid_result <- .rebuild_structure_with_dedup(new_graphs, idx)
+  names(valid_result) <- valid_names
+
+  # Combine with NA results if needed
+  if (na_count > 0) {
+    # Get the IUPAC codes from valid_result
+    valid_iupacs <- vctrs::vec_data(valid_result)
+    # Get the graphs from valid_result
+    valid_graphs <- attr(valid_result, "graphs")
+
+    # Create the full result with NA placeholders
+    result_iupacs <- rep(NA_character_, length(codes))
+    result_iupacs[!na_mask] <- valid_iupacs
+
+    # Build the graphs list - only include graphs for valid positions
+    result_graphs <- valid_graphs
+
+    # Create final result
+    result <- new_glycan_structure(result_iupacs, result_graphs)
+    names(result) <- input_names
+  } else {
+    result <- valid_result
+    names(result) <- input_names
+  }
+
   result
 }
 

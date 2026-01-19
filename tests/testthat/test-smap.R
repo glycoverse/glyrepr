@@ -1331,3 +1331,30 @@ test_that("smap2_structure handles NA elements", {
   expect_equal(sum(is.na(result_codes)), 1)
   expect_equal(sum(!is.na(result_codes)), 2)
 })
+
+# Tests for NA handling in spmap functions -----------------------------------
+
+test_that("spmap handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  # spmap_dbl should return NA for position 2
+  result <- spmap_dbl(list(structs, c(1, 2, 3)), ~ igraph::vcount(..1) + ..2)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+
+  # spmap with lambda should work
+  result_lambda <- spmap_dbl(list(structs, c(1, 2, 3)), function(g, n) igraph::vcount(g) + n)
+  expect_equal(result, result_lambda)
+})
+
+test_that("spmap_structure handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  result <- spmap_structure(list(structs, c(1, 2, 3)), function(g, n) g)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+})
