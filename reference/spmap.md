@@ -69,9 +69,10 @@ spmap_structure(.l, .f, ..., .parallel = FALSE)
 
 These functions only compute `.f` once for each unique combination of
 structure and corresponding values from other vectors, then map the
-results back to the original vector positions. This is much more
-efficient than applying `.f` to each element combination individually
-when there are duplicate combinations.
+results back to the original vector positions.
+
+**NA Handling:** NA elements in the first argument (glycan structure
+vector) are preserved in the output.
 
 **Time Complexity Performance:**
 

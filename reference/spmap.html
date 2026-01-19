@@ -109,8 +109,9 @@ See examples in <code><a href="smap.html">smap</a></code> for how to set up and 
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>These functions only compute <code>.f</code> once for each unique combination of structure and corresponding
-values from other vectors, then map the results back to the original vector positions. This is much more efficient
-than applying <code>.f</code> to each element combination individually when there are duplicate combinations.</p>
+values from other vectors, then map the results back to the original vector positions.</p>
+<p><strong>NA Handling:</strong>
+NA elements in the first argument (glycan structure vector) are preserved in the output.</p>
 <p><strong>Time Complexity Performance:</strong></p>
 <p>Performance scales with unique combinations of all arguments rather than total vector length.
 When argument vectors are highly redundant, performance approaches O(unique_structures).

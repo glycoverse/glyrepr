@@ -110,6 +110,9 @@ See examples in <code><a href="smap.html">smap</a></code> for how to set up and 
     <p>These functions only compute <code>.f</code> once for each unique combination of structure and corresponding
 <code>.y</code> value, then map the results back to the original vector positions. This is much more efficient
 than applying <code>.f</code> to each element pair individually when there are duplicate structure-value combinations.</p>
+<p><strong>NA Handling:</strong>
+NA elements in <code>.x</code> are preserved in the output - the function is not applied to NA positions,
+and the corresponding results are set to NA.</p>
 <p><strong>Return Types:</strong></p><ul><li><p><code>smap2()</code>: Returns a list with the same length as <code>.x</code></p></li>
 <li><p><code>smap2_vec()</code>: Returns an atomic vector with the same length as <code>.x</code></p></li>
 <li><p><code>smap2_lgl()</code>: Returns a logical vector</p></li>

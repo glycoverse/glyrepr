@@ -73,6 +73,10 @@ original vector positions. This is much more efficient than applying
 `.f` to each element pair individually when there are duplicate
 structure-value combinations.
 
+**NA Handling:** NA elements in `.x` are preserved in the output - the
+function is not applied to NA positions, and the corresponding results
+are set to NA.
+
 **Return Types:**
 
 - `smap2()`: Returns a list with the same length as `.x`

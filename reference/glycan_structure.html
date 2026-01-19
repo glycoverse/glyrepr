@@ -148,6 +148,15 @@ structures and biological functions</p></li>
 <li><p><strong>Database Queries</strong>: Performing structure matching and searches in glycan
 databases</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="na-support">NA Support<a class="anchor" aria-label="anchor" href="#na-support"></a></h2>
+    <p>Glycan structure vectors support NA values for representing missing or
+unknown structures:</p><ul><li><p>Create with <code>glycan_structure(NA)</code> or <code>glycan_structure(NULL)</code></p></li>
+<li><p>Combine with valid structures: <code>c(struct1, NA, struct2)</code></p></li>
+<li><p>Convert from character: <code>as_glycan_structure(c("Glc(a1-", NA))</code></p></li>
+<li><p><code>smap</code> functions skip NA elements gracefully</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> returns <code>TRUE</code> for NA elements</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

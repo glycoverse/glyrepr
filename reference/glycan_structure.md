@@ -119,6 +119,22 @@ print a `glycan_structure()`. For example, for the glycan
 - **Database Queries**: Performing structure matching and searches in
   glycan databases
 
+## NA Support
+
+Glycan structure vectors support NA values for representing missing or
+unknown structures:
+
+- Create with `glycan_structure(NA)` or `glycan_structure(NULL)`
+
+- Combine with valid structures: `c(struct1, NA, struct2)`
+
+- Convert from character: `as_glycan_structure(c("Glc(a1-", NA))`
+
+- `smap` functions skip NA elements gracefully
+
+- [`is.na()`](https://rdrr.io/r/base/NA.html) returns `TRUE` for NA
+  elements
+
 ## Examples
 
 ``` r
