@@ -156,35 +156,61 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
     return(glycan_composition())
   }
 
-  # Handling NA
-  if (any(is.na(x))) {
-    cli::cli_abort("Cannot parse NA as glycan composition.")
+  # Handle NA by creating NA composition elements
+  na_mask <- is.na(x)
+  if (any(na_mask)) {
+    # Process non-NA characters
+    non_na_x <- x[!na_mask]
+    compositions <- list()
+
+    if (length(non_na_x) > 0) {
+      # Parse non-NA characters
+      parse_result <- purrr::map(non_na_x, parse_single_composition)
+      valid_flags <- purrr::map_lgl(parse_result, "valid")
+
+      # Check for invalid characters
+      invalid_indices <- which(!valid_flags)
+      # Map back to original indices
+      original_invalid <- seq_along(non_na_x)[invalid_indices]
+      if (length(original_invalid) > 0) {
+        cli::cli_abort(c(
+          "Characters cannot be parsed as glycan compositions at index {original_invalid}",
+          "i" = "Expected format: 'Hex(5)HexNAc(2)' with monosaccharide names followed by counts in parentheses."
+        ))
+      }
+
+      compositions <- purrr::map(parse_result, "composition")
+    }
+
+    # Build result list by inserting compositions at correct positions
+    # Use purrr::map to handle NULL preservation correctly
+    comp_idx <- 0
+    result_list <- purrr::map(seq_along(x), ~ {
+      if (na_mask[.x]) {
+        NULL  # NA element
+      } else {
+        comp_idx <<- comp_idx + 1
+        compositions[[comp_idx]]
+      }
+    })
+
+    return(do.call(glycan_composition, result_list))
   }
 
-  # Parse each character string using the helper function
+  # Original logic for non-NA case (unchanged)
   parse_result <- purrr::map(x, parse_single_composition)
-
-  # Extract validity and compositions
   valid_flags <- purrr::map_lgl(parse_result, "valid")
   compositions <- purrr::map(parse_result, "composition")
-
-  # Find invalid indices
   invalid_indices <- which(!valid_flags)
-
-  # Check for invalid characters
   if (length(invalid_indices) > 0) {
     cli::cli_abort(c(
       "Characters cannot be parsed as glycan compositions at index {invalid_indices}",
       "i" = "Expected format: 'Hex(5)HexNAc(2)' with monosaccharide names followed by counts in parentheses."
     ))
   }
-
-  # Handle case where all strings were empty
   if (length(compositions) == 0) {
     return(glycan_composition())
   }
-
-  # Create composition vector
   do.call(glycan_composition, compositions)
 }
 
@@ -242,9 +268,18 @@ vec_cast.glyrepr_composition.double <- function(x, to, ...) {
 #' @export
 vec_restore.glyrepr_composition <- function(x, to, ...) {
   data <- vctrs::field(x, "data")
-  monos_list <- purrr::map(data, names)
-  monos_list <- purrr::map(monos_list, ~ .x[!.x %in% available_substituents()])
+
+  # Skip NA elements (NULL) when checking types
+  na_mask <- purrr::map_lgl(data, .is_na_composition_elem)
+  non_na_data <- data[!na_mask]
+
+  if (length(non_na_data) == 0) {
+    return(new_glycan_composition(data))
+  }
+
+  monos_list <- purrr::map(non_na_data, ~ names(.x)[!names(.x) %in% available_substituents()])
   mono_types <- purrr::map_chr(monos_list, get_mono_type_impl)
+
   if (length(unique(mono_types)) > 1) {
     cli::cli_abort(c(
       "Can't combine `glyrepr_composition`s with different monosaccharide types.",
@@ -252,6 +287,7 @@ vec_restore.glyrepr_composition <- function(x, to, ...) {
       "i" = "Use {.fn convert_to_generic} to convert concrete to generic, or ensure both compositions use the same type."
     ))
   }
+
   new_glycan_composition(data)
 }
 

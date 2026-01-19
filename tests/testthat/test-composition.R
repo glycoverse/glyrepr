@@ -288,10 +288,7 @@ test_that("as_glycan_composition works for simple compositions", {
   expect_equal(as_glycan_composition(chars), expected)
 })
 
-test_that("as_glycan_composition rejects NA", {
-  chars <- c("Hex(5)HexNAc(2)", NA)
-  expect_error(as_glycan_composition(chars), "Cannot parse NA as glycan composition.")
-})
+# This test is replaced by tests for NA handling in character casting above
 
 test_that("as_glycan_composition works for empty characters", {
   expect_equal(as_glycan_composition(character()), glycan_composition())
@@ -364,4 +361,51 @@ test_that(".valid_composition_element validates correctly", {
 
   # Invalid input - non-positive
   expect_error(.valid_composition_element(c(Hex = 0)), "positive numbers")
+})
+
+# Tests for NA handling in vec_restore --------------------------------
+
+test_that("vec_restore skips NA in type checking", {
+  comp1 <- glycan_composition(c(Hex = 5, HexNAc = 2))
+  comp2 <- glycan_composition(NULL)
+
+  # This should not error - NA should be skipped in type check
+  combined <- c(comp1, comp2)
+  expect_equal(length(combined), 2)
+  expect_false(is.na(combined[1]))
+  expect_true(is.na(combined[2]))
+})
+
+test_that("combining with NA at beginning works", {
+  comp1 <- glycan_composition(c(Hex = 5, HexNAc = 2))
+  combined <- c(NA, comp1)
+  expect_equal(length(combined), 2)
+  expect_true(is.na(combined[1]))
+  expect_false(is.na(combined[2]))
+})
+
+# Tests for NA handling in character casting --------------------------------
+
+test_that("as_glycan_composition handles NA characters", {
+  chars <- c("Hex(5)HexNAc(2)", NA)
+  comp <- as_glycan_composition(chars)
+  expect_equal(length(comp), 2)
+  expect_false(is.na(comp[1]))
+  expect_true(is.na(comp[2]))
+})
+
+test_that("as_glycan_composition handles NA at beginning", {
+  chars <- c(NA, "Hex(5)HexNAc(2)")
+  comp <- as_glycan_composition(chars)
+  expect_equal(length(comp), 2)
+  expect_true(is.na(comp[1]))
+  expect_false(is.na(comp[2]))
+})
+
+test_that("as_glycan_composition handles all NA characters", {
+  chars <- c(NA, NA)
+  comp <- as_glycan_composition(chars)
+  expect_equal(length(comp), 2)
+  expect_true(is.na(comp[1]))
+  expect_true(is.na(comp[2]))
 })
