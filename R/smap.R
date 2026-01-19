@@ -121,10 +121,34 @@ NULL
   codes <- vctrs::vec_data(.x)
   graphs <- attr(.x, "graphs")
 
+  # Handle NA elements: identify NA positions and filter them out
+  na_mask <- is.na(codes)
+  na_count <- sum(na_mask)
+
+  # If all elements are NA, return NA results
+  if (na_count == length(codes)) {
+    if (is.null(.convert_fn)) {
+      result <- vector("list", length(codes))
+    } else {
+      result <- .convert_fn(list(rep(NA_real_, na_count)))
+    }
+    names(result) <- input_names
+    return(result)
+  }
+
+  # Filter out NA elements for processing
+  if (na_count > 0) {
+    valid_codes <- codes[!na_mask]
+    valid_names <- input_names[!na_mask]
+  } else {
+    valid_codes <- codes
+    valid_names <- input_names
+  }
+
   # Extract dots without .parallel
   dots <- list(...)
 
-  # Apply function only to unique graphs
+  # Apply function only to unique graphs (NA already filtered out)
   unique_codes <- names(graphs)
   unique_results <- .smap_apply(unique_codes, function(code) {
     do.call(.f, c(list(graphs[[code]]), dots))
@@ -134,8 +158,14 @@ NULL
   # If no conversion function provided, return list (for smap)
   if (is.null(.convert_fn)) {
     # Optimized mapping: use match() instead of individual lookups
-    idx <- match(codes, unique_codes)
-    result <- unique_results[idx]
+    idx <- match(valid_codes, unique_codes)
+    valid_results <- unique_results[idx]
+    names(valid_results) <- valid_names
+
+    # Combine with NA results - use NULL for NA elements (compatible with glycan_composition)
+    result <- vector("list", length(codes))
+    result[!na_mask] <- valid_results
+    result[na_mask] <- list(NULL)
     names(result) <- input_names
     return(result)
   }
@@ -145,8 +175,22 @@ NULL
   names(unique_converted) <- unique_codes
 
   # Optimized mapping: use match() instead of individual lookups
-  idx <- match(codes, unique_codes)
-  result <- unique_converted[idx]
+  idx <- match(valid_codes, unique_codes)
+  valid_result <- unique_converted[idx]
+
+  # Combine with NA results
+  if (is.integer(unique_converted)) {
+    result <- rep(NA_integer_, length(codes))
+  } else if (is.double(unique_converted)) {
+    result <- rep(NA_real_, length(codes))
+  } else if (is.logical(unique_converted)) {
+    result <- rep(NA, length(codes))
+  } else if (is.character(unique_converted)) {
+    result <- rep(NA_character_, length(codes))
+  } else {
+    result <- rep(NA, length(codes))
+  }
+  result[!na_mask] <- valid_result
   names(result) <- input_names
   return(result)
 }

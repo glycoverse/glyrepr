@@ -1245,3 +1245,28 @@ test_that("snone skips NA elements", {
   structs <- glycan_structure(NA, NA)
   expect_true(snone(structs, function(g) igraph::vcount(g) > 100))
 })
+
+test_that(".smap_base handles NA elements correctly", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  # smap_int should return NA for position 2
+  result <- smap_int(structs, igraph::vcount)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+
+  # smap_chr should return NA for position 2
+  result_chr <- smap_chr(structs, ~ .x$anomer)
+  expect_equal(length(result_chr), 3)
+  expect_false(is.na(result_chr[1]))
+  expect_true(is.na(result_chr[2]))
+  expect_false(is.na(result_chr[3]))
+
+  # smap should return NULL for position 2 (for composition compatibility)
+  result_list <- smap(structs, igraph::vcount)
+  expect_equal(length(result_list), 3)
+  expect_false(is.na(result_list[[1]]))
+  expect_true(is.null(result_list[[2]]))
+  expect_false(is.na(result_list[[3]]))
+})
