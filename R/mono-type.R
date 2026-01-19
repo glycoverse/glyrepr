@@ -104,6 +104,11 @@ convert_to_generic.glyrepr_composition <- function(x) {
   # Convert each composition
   compositions <- vctrs::field(x, "data")
   new_compositions <- purrr::map(compositions, function(comp) {
+    # Handle NULL/empty compositions (from NA elements)
+    if (is.null(comp) || length(comp) == 0) {
+      return(NULL)  # NA elements are stored as NULL
+    }
+
     # Convert monosaccharide names
     old_names <- names(comp)
     new_names <- convert_mono_type_impl(old_names)
@@ -282,11 +287,22 @@ convert_mono_type_impl <- function(monos) {
   }
   from_ <- monosaccharides[["concrete"]]
   to_ <- monosaccharides[["generic"]]
-  dplyr::if_else(
-    monos %in% available_substituents(),
-    monos,
-    to_[match(monos, from_)]
-  )
+
+  # Handle NA values - preserve them
+  is_na <- is.na(monos)
+  if (any(is_na)) {
+    result <- monos
+    # Convert non-NA values
+    non_na <- !is_na
+    result[non_na] <- convert_mono_type_impl(monos[non_na])
+    return(result)
+  }
+
+  # Use base R vectorized operations to handle NA properly
+  is_substituent <- monos %in% available_substituents()
+  result <- to_[match(monos, from_)]
+  result[is_substituent] <- monos[is_substituent]
+  result
 }
 
 convert_glycan_mono_type_impl <- function(glycan, from, to) {
