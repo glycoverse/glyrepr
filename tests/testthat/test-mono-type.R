@@ -125,3 +125,26 @@ test_that("convert_to_generic preserves NA in compositions", {
   expect_true(is.na(result3[2]))
   expect_equal(as.character(result3[3]), "HexNAc(2)")
 })
+
+test_that("convert_to_generic handles NA in glyrepr_structure", {
+  # Create structure vector with NA
+  # Use valid IUPAC-condensed strings from existing structures
+  glycans <- as_glycan_structure(c("Gal(b1-3)GalNAc(a1-", NA, "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"))
+
+  result <- convert_to_generic(glycans)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+
+  # Verify non-NA elements are converted
+  expect_true(all(grepl("Hex", as.character(result[!is.na(result)]))))
+})
+
+test_that("convert_to_generic with all NA structures", {
+  # All NA elements
+  glycans <- as_glycan_structure(c(NA, NA))
+  result <- convert_to_generic(glycans)
+  expect_equal(length(result), 2)
+  expect_true(all(is.na(result)))
+})

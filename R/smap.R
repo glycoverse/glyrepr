@@ -677,7 +677,8 @@ smap2_structure <- function(.x, .y, .f, ..., .parallel = FALSE) {
 
   # If all elements are NA, return NA structure
   if (na_count == length(codes)) {
-    result <- glycan_structure(rep(NA, length(codes)))
+    # Use do.call to pass individual NA values as separate arguments
+    result <- do.call(glycan_structure, as.list(rep(NA_real_, length(codes))))
     names(result) <- input_names
     return(result)
   }
@@ -1000,7 +1001,8 @@ spmap_structure <- function(.l, .f, ..., .parallel = FALSE) {
 
   # If all elements are NA, return NA structure
   if (na_count == length(codes)) {
-    result <- glycan_structure(rep(NA, length(codes)))
+    # Use do.call to pass individual NA values as separate arguments
+    result <- do.call(glycan_structure, as.list(rep(NA_real_, length(codes))))
     names(result) <- input_names
     return(result)
   }
