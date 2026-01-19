@@ -1270,3 +1270,64 @@ test_that(".smap_base handles NA elements correctly", {
   expect_true(is.null(result_list[[2]]))
   expect_false(is.na(result_list[[3]]))
 })
+
+# Tests for NA handling in smap2 functions -----------------------------------
+
+test_that("smap2 handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  # smap2_dbl should return NA for position 2
+  result <- smap2_dbl(structs, c(1, 2, 3), function(g, n) igraph::vcount(g) + n)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+
+  # smap2 with lambda should work
+  result_lambda <- smap2_dbl(structs, c(1, 2, 3), ~ igraph::vcount(.x) + .y)
+  expect_equal(result, result_lambda)
+})
+
+test_that("smap2 handles NA at different positions", {
+  # NA at beginning
+  structs1 <- c(glycan_structure(NA), o_glycan_core_1(), n_glycan_core())
+  result1 <- smap2_dbl(structs1, c(1, 2, 3), ~ igraph::vcount(.x) + .y)
+  expect_true(is.na(result1[1]))
+  expect_false(is.na(result1[2]))
+  expect_false(is.na(result1[3]))
+
+  # NA at end
+  structs3 <- c(o_glycan_core_1(), n_glycan_core(), glycan_structure(NA))
+  result3 <- smap2_dbl(structs3, c(1, 2, 3), ~ igraph::vcount(.x) + .y)
+  expect_false(is.na(result3[1]))
+  expect_false(is.na(result3[2]))
+  expect_true(is.na(result3[3]))
+})
+
+test_that("smap2_structure handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+  names(structs) <- c("A", "B", "C")
+  values <- c(1, 2, 3)
+
+  add_attr <- function(g, v) {
+    igraph::set_graph_attr(g, "value", v)
+  }
+
+  result <- smap2_structure(structs, values, add_attr)
+
+  expect_equal(length(result), 3)
+  expect_equal(names(result), c("A", "B", "C"))
+
+  # Check the graphs directly - there should be 2 unique graphs
+  result_graphs <- attr(result, "graphs")
+  expect_equal(length(result_graphs), 2)
+
+  # Check that attributes were set correctly on the graphs
+  expect_equal(igraph::graph_attr(result_graphs[[1]], "value"), 1)
+  expect_equal(igraph::graph_attr(result_graphs[[2]], "value"), 3)
+
+  # Verify result has correct codes (2 actual codes + 1 NA)
+  result_codes <- vctrs::vec_data(result)
+  expect_equal(sum(is.na(result_codes)), 1)
+  expect_equal(sum(!is.na(result_codes)), 2)
+})
