@@ -1210,3 +1210,187 @@ test_that("get_structure_level preserves names", {
   result <- get_structure_level(structures)
   expect_equal(names(result), c("A", "B", "C"))
 })
+
+# Tests for NA handling in smap functions -----------------------------------
+
+test_that("smap skips NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+  counts <- smap_int(structs, igraph::vcount)
+  expect_equal(length(counts), 3)
+  expect_false(is.na(counts[1]))
+  expect_true(is.na(counts[2]))
+  expect_false(is.na(counts[3]))
+})
+
+test_that("smap_structure skips NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+  result <- smap_structure(structs, identity)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+})
+
+test_that("ssome skips NA elements", {
+  structs <- c(glycan_structure(NA), o_glycan_core_1())
+  expect_true(ssome(structs, function(g) igraph::vcount(g) > 1))
+})
+
+test_that("severy skips NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA))
+  expect_true(severy(structs, function(g) igraph::vcount(g) > 1))
+})
+
+test_that("snone skips NA elements", {
+  structs <- glycan_structure(NA, NA)
+  expect_true(snone(structs, function(g) igraph::vcount(g) > 100))
+})
+
+test_that(".smap_base handles NA elements correctly", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  # smap_int should return NA for position 2
+  result <- smap_int(structs, igraph::vcount)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+
+  # smap_chr should return NA for position 2
+  result_chr <- smap_chr(structs, ~ .x$anomer)
+  expect_equal(length(result_chr), 3)
+  expect_false(is.na(result_chr[1]))
+  expect_true(is.na(result_chr[2]))
+  expect_false(is.na(result_chr[3]))
+
+  # smap should return NULL for position 2 (for composition compatibility)
+  result_list <- smap(structs, igraph::vcount)
+  expect_equal(length(result_list), 3)
+  expect_false(is.na(result_list[[1]]))
+  expect_true(is.null(result_list[[2]]))
+  expect_false(is.na(result_list[[3]]))
+})
+
+test_that(".smap_base handles all-NA vector with correct NA types", {
+  # All-NA vector
+  all_na_structs <- glycan_structure(NA, NA, NA)
+
+  # smap_chr should return NA_character_, not "NA" string
+  result_chr <- smap_chr(all_na_structs, ~ .x$anomer)
+  expect_equal(length(result_chr), 3)
+  expect_type(result_chr, "character")
+  expect_true(all(is.na(result_chr)))
+  # Verify it's true NA_character_, not the string "NA"
+  expect_identical(result_chr[1], NA_character_)
+
+  # smap_int should return NA_integer_
+  result_int <- smap_int(all_na_structs, igraph::vcount)
+  expect_equal(length(result_int), 3)
+  expect_type(result_int, "integer")
+  expect_true(all(is.na(result_int)))
+
+  # smap_dbl should return NA_real_
+  result_dbl <- smap_dbl(all_na_structs, igraph::vcount)
+  expect_equal(length(result_dbl), 3)
+  expect_type(result_dbl, "double")
+  expect_true(all(is.na(result_dbl)))
+
+  # smap_lgl should return NA (logical)
+  result_lgl <- smap_lgl(all_na_structs, ~ igraph::vcount(.x) > 0)
+  expect_equal(length(result_lgl), 3)
+  expect_type(result_lgl, "logical")
+  expect_true(all(is.na(result_lgl)))
+
+  # smap returns list with NULL for NA elements
+  result_list <- smap(all_na_structs, igraph::vcount)
+  expect_equal(length(result_list), 3)
+  expect_true(all(purrr::map_lgl(result_list, is.null)))
+})
+
+# Tests for NA handling in smap2 functions -----------------------------------
+
+test_that("smap2 handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  # smap2_dbl should return NA for position 2
+  result <- smap2_dbl(structs, c(1, 2, 3), function(g, n) igraph::vcount(g) + n)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+
+  # smap2 with lambda should work
+  result_lambda <- smap2_dbl(structs, c(1, 2, 3), ~ igraph::vcount(.x) + .y)
+  expect_equal(result, result_lambda)
+})
+
+test_that("smap2 handles NA at different positions", {
+  # NA at beginning
+  structs1 <- c(glycan_structure(NA), o_glycan_core_1(), n_glycan_core())
+  result1 <- smap2_dbl(structs1, c(1, 2, 3), ~ igraph::vcount(.x) + .y)
+  expect_true(is.na(result1[1]))
+  expect_false(is.na(result1[2]))
+  expect_false(is.na(result1[3]))
+
+  # NA at end
+  structs3 <- c(o_glycan_core_1(), n_glycan_core(), glycan_structure(NA))
+  result3 <- smap2_dbl(structs3, c(1, 2, 3), ~ igraph::vcount(.x) + .y)
+  expect_false(is.na(result3[1]))
+  expect_false(is.na(result3[2]))
+  expect_true(is.na(result3[3]))
+})
+
+test_that("smap2_structure handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+  names(structs) <- c("A", "B", "C")
+  values <- c(1, 2, 3)
+
+  add_attr <- function(g, v) {
+    igraph::set_graph_attr(g, "value", v)
+  }
+
+  result <- smap2_structure(structs, values, add_attr)
+
+  expect_equal(length(result), 3)
+  expect_equal(names(result), c("A", "B", "C"))
+
+  # Check the graphs directly - there should be 2 unique graphs
+  result_graphs <- attr(result, "graphs")
+  expect_equal(length(result_graphs), 2)
+
+  # Check that attributes were set correctly on the graphs
+  expect_equal(igraph::graph_attr(result_graphs[[1]], "value"), 1)
+  expect_equal(igraph::graph_attr(result_graphs[[2]], "value"), 3)
+
+  # Verify result has correct codes (2 actual codes + 1 NA)
+  result_codes <- vctrs::vec_data(result)
+  expect_equal(sum(is.na(result_codes)), 1)
+  expect_equal(sum(!is.na(result_codes)), 2)
+})
+
+# Tests for NA handling in spmap functions -----------------------------------
+
+test_that("spmap handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  # spmap_dbl should return NA for position 2
+  result <- spmap_dbl(list(structs, c(1, 2, 3)), ~ igraph::vcount(..1) + ..2)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+
+  # spmap with lambda should work
+  result_lambda <- spmap_dbl(list(structs, c(1, 2, 3)), function(g, n) igraph::vcount(g) + n)
+  expect_equal(result, result_lambda)
+})
+
+test_that("spmap_structure handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  result <- spmap_structure(list(structs, c(1, 2, 3)), function(g, n) g)
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+})

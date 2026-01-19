@@ -56,8 +56,10 @@ Similar to purrr pmap functions, but optimized for glycan structure vectors.
 }
 \details{
 These functions only compute \code{.f} once for each unique combination of structure and corresponding
-values from other vectors, then map the results back to the original vector positions. This is much more efficient
-than applying \code{.f} to each element combination individually when there are duplicate combinations.
+values from other vectors, then map the results back to the original vector positions.
+
+\strong{NA Handling:}
+NA elements in the first argument (glycan structure vector) are preserved in the output.
 
 \strong{Time Complexity Performance:}
 
