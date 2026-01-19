@@ -127,7 +127,17 @@ vec_ptype_abbr.glyrepr_composition <- function(x, ...) "comp"
 
 #' @export
 format.glyrepr_composition <- function(x, ...) {
-  vec_cast(x, character())
+  data <- vctrs::field(vctrs::vec_data(x), "data")
+
+  formatted <- purrr::map_chr(data, ~ {
+    if (.is_na_composition_elem(.x)) {
+      "<NA>"
+    } else {
+      paste0(names(.x), "(", .x, ")", collapse = "")
+    }
+  })
+
+  formatted
 }
 
 #' @export
@@ -143,7 +153,11 @@ vec_cast.glyrepr_composition.glyrepr_composition <- function(x, to, ...) {
 #' @export
 vec_cast.character.glyrepr_composition <- function(x, to, ...) {
   convert_one <- function(comp) {
-    paste0(names(comp), "(", comp, ")", collapse = "")
+    if (.is_na_composition_elem(comp)) {
+      "<NA>"
+    } else {
+      paste0(names(comp), "(", comp, ")", collapse = "")
+    }
   }
   data <- vctrs::vec_data(x)
   purrr::map_chr(vctrs::field(data, "data"), convert_one)
@@ -593,12 +607,14 @@ format_glycan_composition_subset <- function(x, indices, colored = TRUE) {
 
   # Format with colors if concrete type
   format_one_colored <- function(comp) {
-    mono_names <- names(comp)
-    # Add colors to monosaccharides (generic monos automatically get black color)
-    if (colored) {
+    if (.is_na_composition_elem(comp)) {
+      "<NA>"
+    } else {
+      mono_names <- names(comp)
+      # Add colors to monosaccharides (generic monos automatically get black color)
       mono_names <- add_colors(mono_names, colored = TRUE)
+      paste0(mono_names, "(", comp, ")", collapse = "")
     }
-    paste0(mono_names, "(", comp, ")", collapse = "")
   }
 
   data <- vctrs::vec_data(x)

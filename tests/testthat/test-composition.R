@@ -409,3 +409,28 @@ test_that("as_glycan_composition handles all NA characters", {
   expect_true(is.na(comp[1]))
   expect_true(is.na(comp[2]))
 })
+
+# Tests for NA handling in format -----------------------------------------
+
+test_that("format shows <NA> for NA compositions", {
+  comp <- c(glycan_composition(c(Hex = 5)), NA)
+  expect_equal(format(comp), c("Hex(5)", "<NA>"))
+})
+
+test_that("as.character shows <NA> for NA compositions", {
+  comp <- c(glycan_composition(c(Hex = 5)), NA)
+  expect_equal(as.character(comp), c("Hex(5)", "<NA>"))
+})
+
+test_that("print handles NA compositions", {
+  comp <- c(glycan_composition(c(Hex = 5)), NA, glycan_composition(c(Hex = 3)))
+  output <- capture.output(print(comp))
+  expect_true(any(grepl("<NA>", output)))
+})
+
+test_that("tibble printing handles NA compositions", {
+  comp <- c(glycan_composition(c(Hex = 5)), NA)
+  tibble <- tibble::tibble(comp = comp, a = 1:2)
+  output <- capture.output(print(tibble))
+  expect_true(any(grepl("<NA>", output)))
+})
