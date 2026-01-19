@@ -43,12 +43,25 @@
 #' @export
 glycan_composition <- function(...) {
   args <- rlang::list2(...)
-  .valid_glycan_composition_input(args)
+
+  # Handle NULL/NA inputs - convert to list elements that will be stored as NULL
   x <- purrr::map(args, ~ {
+    if (is.null(.x) || (is.atomic(.x) && length(.x) == 1 && is.na(.x))) {
+      NULL  # Store as NULL to represent NA
+    } else {
+      .valid_composition_element(.x)
+    }
+  })
+
+  # Process non-NA elements
+  x <- purrr::map(x, ~ {
+    if (is.null(.x)) return(.x)
     result <- as.integer(.x)
     names(result) <- names(.x)
     .reorder_composition_components(result)
   })
+
+  .valid_glycan_composition_input(x)
   new_glycan_composition(x)
 }
 
@@ -242,6 +255,12 @@ vec_restore.glyrepr_composition <- function(x, to, ...) {
   new_glycan_composition(data)
 }
 
+#' @export
+is.na.glyrepr_composition <- function(x, ...) {
+  data <- vctrs::field(x, "data")
+  purrr::map_lgl(data, .is_na_composition_elem)
+}
+
 .cast_named_vector <- function(x, to, ...) {
   if (length(x) == 0) {
     return(glycan_composition())
@@ -308,37 +327,45 @@ new_glycan_composition <- function(x = list()) {
     return()
   }
 
-  # 1. Type check
-  if (!purrr::every(x, checkmate::test_integerish)) {
+  # Filter out NA elements (NULL in list) for validation
+  x_valid <- purrr::keep(x, ~ !is.null(.x))
+
+  # 0b. If all elements are NA (NULL), skip further validation
+  if (length(x_valid) == 0) {
+    return()
+  }
+
+  # 1. Type check (skip NA elements)
+  if (!purrr::every(x_valid, checkmate::test_integerish)) {
     cli::cli_abort(c(
       "Must be one or more named integer vectors.",
       "i" = "You might want to use {.fn as_glycan_composition} for more flexible input."
     ))
   }
 
-  # 2. Empty check
-  if (purrr::some(x, ~ length(.x) == 0)) {
+  # 2. Empty check (skip NA elements)
+  if (purrr::some(x_valid, ~ length(.x) == 0)) {
     cli::cli_abort("Each composition must have at least one residue.")
   }
 
-  # 3. Name check
-  if (!purrr::every(x, ~ checkmate::test_named(.x))) {
+  # 3. Name check (skip NA elements)
+  if (!purrr::every(x_valid, ~ checkmate::test_named(.x))) {
     cli::cli_abort(c(
       "Must be one or more named integer vectors.",
       "x" = "The input doesn't have names."
     ))
   }
 
-  # 4. Known monosaccharide check
-  if (!purrr::every(x, ~ all(is_known_composition_component(names(.x))))) {
+  # 4. Known monosaccharide check (skip NA elements)
+  if (!purrr::every(x_valid, ~ all(is_known_composition_component(names(.x))))) {
     cli::cli_abort(c(
       "Must have only known monosaccharides",
       "i" = "Call {.fun available_monosaccharides} to see all known monosaccharides."
     ))
   }
 
-  # 5. Mono type check
-  mono_types <- .get_comp_mono_types(x)
+  # 5. Mono type check (skip NA elements)
+  mono_types <- .get_comp_mono_types(x_valid)
   if (any(mono_types == "mixed")) {
     cli::cli_abort(c(
       "Must have only one type of monosaccharide.",
@@ -352,8 +379,8 @@ new_glycan_composition <- function(x = list()) {
     ))
   }
 
-  # 6. Positive number check
-  if (!purrr::every(x, ~ all(.x > 0))) {
+  # 6. Positive number check (skip NA elements)
+  if (!purrr::every(x_valid, ~ all(.x > 0))) {
     cli::cli_abort("Must have only positive numbers of residues.")
   }
 }

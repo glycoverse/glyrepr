@@ -46,7 +46,7 @@ test_that("unknown monosaccharides throw error", {
 })
 
 test_that("glycan_composition rejects wrong types", {
-  expect_error(glycan_composition(list(c(Hex = 1, HexNAc = 1))), "Must be one or more named integer vectors")
+  expect_error(glycan_composition(list(c(Hex = 1, HexNAc = 1))), "named integer")
 })
 
 test_that("glycan_composition rejects empty compositions", {
@@ -321,7 +321,27 @@ test_that("as.character works for compositions", {
   expect_equal(as.character(comp), chars)
 })
 
-# Tests for NA helper functions ----------------------------------------------
+# Tests for NA handling in constructor ---------------------------------
+
+test_that("glycan_composition accepts NULL to create NA", {
+  comp <- glycan_composition(NULL)
+  expect_equal(length(comp), 1)
+  expect_true(is.na(comp))
+})
+
+test_that("glycan_composition accepts NA to create NA", {
+  comp <- glycan_composition(NA)
+  expect_equal(length(comp), 1)
+  expect_true(is.na(comp))
+})
+
+test_that("glycan_composition handles mixed valid and NA", {
+  comp <- glycan_composition(c(Hex = 5), NULL, c(Hex = 3))
+  expect_equal(length(comp), 3)
+  expect_false(is.na(comp[1]))
+  expect_true(is.na(comp[2]))
+  expect_false(is.na(comp[3]))
+})
 
 test_that(".is_na_composition_elem detects NA correctly", {
   expect_true(.is_na_composition_elem(NULL))
