@@ -308,9 +308,13 @@ vec_cast.glyrepr_composition.logical <- function(x, to, ...) {
 
 #' @export
 vec_cast.logical.glyrepr_composition <- function(x, to, ...) {
-  # Cast glyrepr_composition to logical: returns TRUE for NA compositions and FALSE for valid compositions
+  # Cast glyrepr_composition to logical:
+  # - NA compositions become NA (preserving missingness)
+  # - Valid compositions become FALSE
   is_na <- is.na(x)
-  as.logical(is_na)
+  result <- rep(FALSE, length(x))
+  result[is_na] <- NA
+  result
 }
 
 #' @export

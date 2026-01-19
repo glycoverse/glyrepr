@@ -471,6 +471,18 @@ test_that("is.na returns correct logical for compositions with NA", {
   expect_equal(is.na(comp_all_na), c(TRUE, TRUE))
 })
 
+test_that("as.logical preserves NA semantics", {
+  # NA compositions should become NA, not TRUE
+  comp <- glycan_composition(c(Hex = 5))
+  expect_equal(as.logical(comp), FALSE)
+
+  comp_na <- c(glycan_composition(c(Hex = 5)), NA)
+  expect_equal(as.logical(comp_na), c(FALSE, NA))
+
+  comp_all_na <- glycan_composition(NA_integer_, NA_integer_)
+  expect_equal(as.logical(comp_all_na), c(NA, NA))
+})
+
 test_that("anyNA detects NA compositions", {
   comp <- glycan_composition(c(Hex = 5))
   expect_false(anyNA(comp))
