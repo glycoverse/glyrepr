@@ -32,28 +32,28 @@ parameter).
 structures <- c(o_glycan_core_1(), n_glycan_core())
 get_structure_graphs(structures)
 #> [[1]]
-#> IGRAPH 2b986d5 DN-- 2 1 -- 
+#> IGRAPH 98be25c DN-- 2 1 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 2b986d5 (vertex names):
+#> + edge from 98be25c (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 2de3ae8 DN-- 5 4 -- 
+#> IGRAPH 46862df DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 2de3ae8 (vertex names):
+#> + edges from 46862df (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 #> 
 get_structure_graphs(structures)
 #> [[1]]
-#> IGRAPH 2b986d5 DN-- 2 1 -- 
+#> IGRAPH 98be25c DN-- 2 1 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 2b986d5 (vertex names):
+#> + edge from 98be25c (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 2de3ae8 DN-- 5 4 -- 
+#> IGRAPH 46862df DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 2de3ae8 (vertex names):
+#> + edges from 46862df (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 #> 
 ```

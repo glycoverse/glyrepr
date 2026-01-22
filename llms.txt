@@ -13,13 +13,26 @@ probably already using or will use.
 
 ## Installation
 
-You can install the latest release of glyrepr from CRAN with:
+You can install the latest release of glyrepr from
+[CRAN](https://CRAN.R-project.org/package=glyrepr):
 
 ``` r
 install.packages("glyrepr")
 ```
 
-Or install the development version from GitHub:
+Or from [r-universe](https://glycoverse.r-universe.dev/glyrepr):
+
+``` r
+install.packages('glyrepr', repos = c('https://glycoverse.r-universe.dev', 'https://cloud.r-project.org'))
+```
+
+Or from [GitHub](https://github.com/glycoverse/glyrepr):
+
+``` r
+remotes::install_github("glycoverse/glyrepr@*release")
+```
+
+Or install the development version:
 
 ``` r
 remotes::install_github("glycoverse/glyrepr")
