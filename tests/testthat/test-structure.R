@@ -1677,3 +1677,63 @@ test_that("count_mono handles single valid structure", {
   expect_equal(length(count), 1)
   expect_false(is.na(count))
 })
+
+# Tests for class duplication fix (issue #30) -------------------------------------
+
+test_that("class is not duplicated after c()", {
+  g1 <- o_glycan_core_1()
+  g2 <- n_glycan_core()
+
+  # Individual structures should have correct class
+  expect_true(inherits(g1, "glyrepr_structure"))
+  expect_equal(sum(class(g1) == "vctrs_vctr"), 1)
+  expect_true(inherits(g2, "glyrepr_structure"))
+  expect_equal(sum(class(g2) == "vctrs_vctr"), 1)
+
+  # After c(), class should still be correct (not duplicated)
+  combined <- c(g1, g2)
+  expect_true(inherits(combined, "glyrepr_structure"))
+  expect_equal(sum(class(combined) == "vctrs_vctr"), 1)
+  expect_equal(length(unique(class(combined))), length(class(combined)))
+})
+
+test_that("class is not duplicated after subsetting", {
+  glycans <- c(o_glycan_core_1(), n_glycan_core())
+
+  # Before subsetting
+  expect_true(inherits(glycans, "glyrepr_structure"))
+  expect_equal(sum(class(glycans) == "vctrs_vctr"), 1)
+  expect_equal(length(unique(class(glycans))), length(class(glycans)))
+
+  # After subsetting
+  subset1 <- glycans[1]
+  expect_true(inherits(subset1, "glyrepr_structure"))
+  expect_equal(sum(class(subset1) == "vctrs_vctr"), 1)
+  expect_equal(length(unique(class(subset1))), length(class(subset1)))
+
+  subset2 <- glycans[c(1, 2)]
+  expect_true(inherits(subset2, "glyrepr_structure"))
+  expect_equal(sum(class(subset2) == "vctrs_vctr"), 1)
+  expect_equal(length(unique(class(subset2))), length(class(subset2)))
+
+  subset_empty <- glycans[integer(0)]
+  expect_true(inherits(subset_empty, "glyrepr_structure"))
+  expect_equal(sum(class(subset_empty) == "vctrs_vctr"), 1)
+  expect_equal(length(unique(class(subset_empty))), length(class(subset_empty)))
+})
+
+test_that("vec_restore does not duplicate class", {
+  g1 <- o_glycan_core_1()
+  g2 <- n_glycan_core()
+
+  ptype <- vctrs::vec_ptype2(g1, g2)
+  # Prototype should have correct class
+  expect_true(inherits(ptype, "glyrepr_structure"))
+  expect_equal(sum(class(ptype) == "vctrs_vctr"), 1)
+
+  # vec_restore should not duplicate class
+  restored <- vctrs::vec_restore(g1, ptype)
+  expect_true(inherits(restored, "glyrepr_structure"))
+  expect_equal(sum(class(restored) == "vctrs_vctr"), 1)
+  expect_equal(length(unique(class(restored))), length(class(restored)))
+})
