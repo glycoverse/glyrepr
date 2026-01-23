@@ -632,7 +632,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 
   # If prototype has no graphs, return with empty graphs
   if (length(graphs) == 0) {
-    out <- vctrs::new_vctr(x, graphs = list(), class = class(to))
+    out <- vctrs::new_vctr(x, graphs = list(), class = "glyrepr_structure")
     return(out)
   }
 
@@ -641,7 +641,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 
   # If x is empty (e.g., during vec_ptype2), keep all graphs from prototype
   if (length(iupacs) == 0) {
-    out <- vctrs::new_vctr(x, graphs = graphs, class = class(to))
+    out <- vctrs::new_vctr(x, graphs = graphs, class = "glyrepr_structure")
     return(out)
   }
 
@@ -652,7 +652,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
   # Remove any NULL elements (can happen with empty list indexing)
   used_graphs <- used_graphs[!vapply(used_graphs, is.null, logical(1))]
 
-  out <- vctrs::new_vctr(x, graphs = used_graphs, class = class(to))
+  out <- vctrs::new_vctr(x, graphs = used_graphs, class = "glyrepr_structure")
   out
 }
 
