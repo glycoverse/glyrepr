@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,14 +35,17 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/glycoverse/glyrepr/blob/v0.10.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/glycoverse/glyrepr/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.10.0" id="glyrepr-0100">glyrepr 0.10.0<a class="anchor" aria-label="anchor" href="#glyrepr-0100"></a></h2><p class="text-muted">CRAN release: 2026-01-24</p>
 <p>We have redesigned the internal implementation of <code>glyrepr_composition</code> and <code>glyrepr_structure</code>. This brought native support for names to <code>glyrepr_structure</code>, and NA values to both <code>glyrepr_structure</code> and <code>glyrepr_composition</code>.</p>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-10-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-10-0"></a></h3>
 <ul><li>
 <code><a href="../reference/smap.html">smap()</a></code>, <code><a href="../reference/smap2.html">smap2()</a></code>, <code><a href="../reference/spmap.html">spmap()</a></code>, <code><a href="../reference/simap.html">simap()</a></code> and their variants now preserve names from input <code>glyrepr_structure</code> vectors in their output.</li>
 <li>
@@ -52,7 +55,7 @@
 <code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> now accepts another <code>glyrepr_composition</code> vector as input, returning it as-is.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-0-10-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-10-0"></a></h3>
 <ul><li>
 <code>glyrepr_composition</code> and <code>glyrepr_structure</code> now enforce the same monosaccharide type (“concrete” or “generic”) within a vector. Mixed types are not allowed anymore. This invariant is enforced both when creating new vectors and when combining existing vectors.</li>
 <li>
@@ -61,7 +64,7 @@
 <code><a href="../reference/get_mono_type.html">get_mono_type()</a></code> now returns a character scalar instead of a character vector for <code>glyrepr_structure</code> and <code>glyrepr_composition</code>.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-0-10-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-10-0"></a></h3>
 <ul><li>Subsetting <code>glyrepr_structure</code> with <code>integer(0)</code> and <code>NULL</code> correctly removes all underlying graphs.</li>
 <li>
 <code>[[&lt;-</code> is forbidden on <code>glyrepr_structure</code> vectors. Previously, the operation could be performed silently, but resulted in an invalid object.</li>

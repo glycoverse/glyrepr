@@ -2,6 +2,10 @@
 
 ## glyrepr (development version)
 
+## glyrepr 0.10.0
+
+CRAN release: 2026-01-24
+
 We have redesigned the internal implementation of `glyrepr_composition`
 and `glyrepr_structure`. This brought native support for names to
 `glyrepr_structure`, and NA values to both `glyrepr_structure` and
