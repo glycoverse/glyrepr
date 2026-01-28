@@ -405,7 +405,7 @@ sessionInfo()
 #>  [5] jquerylib_0.1.4   systemfonts_1.3.1 textshaping_1.0.4 yaml_2.3.12      
 #>  [9] fastmap_1.2.0     R6_2.6.1          generics_0.1.4    igraph_2.2.1     
 #> [13] knitr_1.51        backports_1.5.0   checkmate_2.3.3   rstackdeque_1.1.1
-#> [17] desc_1.4.3        bslib_0.9.0       pillar_1.11.1     rlang_1.1.7      
+#> [17] desc_1.4.3        bslib_0.10.0      pillar_1.11.1     rlang_1.1.7      
 #> [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.56        
 #> [25] fs_1.6.6          sass_0.4.10       cli_3.6.5         pkgdown_2.2.0    
 #> [29] magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.1      
