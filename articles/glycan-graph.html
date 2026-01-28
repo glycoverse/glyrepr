@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,7 +61,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/glycoverse/glyrepr/blob/main/vignettes/glycan-graph.Rmd" class="external-link"><code>vignettes/glycan-graph.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/glycoverse/glyrepr/blob/v0.10.0/vignettes/glycan-graph.Rmd" class="external-link"><code>vignettes/glycan-graph.Rmd</code></a></small>
       <div class="d-none name"><code>glycan-graph.Rmd</code></div>
     </div>
 
@@ -122,9 +122,9 @@ Instead, let’s extract the underlying graph using
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span>
 <span><span class="va">graph</span></span>
-<span><span class="co">#&gt; IGRAPH c0d1517 DN-- 5 4 -- </span></span>
+<span><span class="co">#&gt; IGRAPH 042985a DN-- 5 4 -- </span></span>
 <span><span class="co">#&gt; + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span></span>
-<span><span class="co">#&gt; + edges from c0d1517 (vertex names):</span></span>
+<span><span class="co">#&gt; + edges from 042985a (vertex names):</span></span>
 <span><span class="co">#&gt; [1] 3-&gt;1 3-&gt;2 4-&gt;3 5-&gt;4</span></span></code></pre></div>
 <p>Let’s decode what we’re seeing here 🕵️:</p>
 <p><strong>First line:</strong> Directed Named (“DN”) graph with 5
@@ -251,7 +251,7 @@ search:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bfs_result</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/bfs.html" class="external-link">bfs</a></span><span class="op">(</span><span class="va">graph</span>, root <span class="op">=</span> <span class="fl">1</span>, mode <span class="op">=</span> <span class="st">"out"</span><span class="op">)</span></span>
 <span><span class="va">bfs_result</span><span class="op">$</span><span class="va">order</span></span>
-<span><span class="co">#&gt; + 5/5 vertices, named, from c0d1517:</span></span>
+<span><span class="co">#&gt; + 5/5 vertices, named, from 042985a:</span></span>
 <span><span class="co">#&gt; [1] 1 2 3 4 5</span></span></code></pre></div>
 </div>
 <div class="section level3">
