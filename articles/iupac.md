@@ -290,7 +290,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] glyrepr_0.10.0
+#> [1] glyrepr_0.10.0.9000
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] vctrs_0.7.1       cli_3.6.5         knitr_1.51        rlang_1.1.7      
@@ -298,7 +298,7 @@ sessionInfo()
 #>  [9] textshaping_1.0.4 jsonlite_2.0.0    glue_1.8.0        htmltools_0.5.9  
 #> [13] ragg_1.5.0        sass_0.4.10       rmarkdown_2.30    tibble_3.3.1     
 #> [17] evaluate_1.0.5    jquerylib_0.1.4   fastmap_1.2.0     yaml_2.3.12      
-#> [21] lifecycle_1.0.5   stringr_1.6.0     compiler_4.5.2    dplyr_1.1.4      
+#> [21] lifecycle_1.0.5   stringr_1.6.0     compiler_4.5.2    dplyr_1.2.0      
 #> [25] fs_1.6.6          pkgconfig_2.0.3   systemfonts_1.3.1 digest_0.6.39    
 #> [29] R6_2.6.1          tidyselect_1.2.1  pillar_1.11.1     magrittr_2.0.4   
 #> [33] bslib_0.10.0      tools_4.5.2       pkgdown_2.2.0     cachem_1.1.0     

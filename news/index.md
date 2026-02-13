@@ -2,6 +2,14 @@
 
 ## glyrepr (development version)
 
+### Minor improvements and bug fixes
+
+- Use
+  [`dplyr::recode_values()`](https://dplyr.tidyverse.org/reference/recode-and-replace-values.html)
+  to replace deprecated
+  [`dplyr::case_match()`](https://dplyr.tidyverse.org/reference/case_match.html)
+  to prevent warnings from `dplyr`.
+
 ## glyrepr 0.10.0
 
 CRAN release: 2026-01-24

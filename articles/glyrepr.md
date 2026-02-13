@@ -179,12 +179,12 @@ library(tictoc)
 tic("Converting 5 structures")
 result_small <- convert_to_generic(struc)
 toc()
-#> Converting 5 structures: 0.02 sec elapsed
+#> Converting 5 structures: 0.023 sec elapsed
 
 tic("Converting 5,000 structures")
 result_large <- convert_to_generic(large_struc)
 toc()
-#> Converting 5,000 structures: 0.021 sec elapsed
+#> Converting 5,000 structures: 0.023 sec elapsed
 ```
 
 **Mind = blown!** 🤯 The performance is nearly identical because
@@ -397,13 +397,14 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] dplyr_1.1.4    tibble_3.3.1   tictoc_1.2.1   glyrepr_0.10.0
+#> [1] dplyr_1.2.0         tibble_3.3.1        tictoc_1.2.1       
+#> [4] glyrepr_0.10.0.9000
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] jsonlite_2.0.0    compiler_4.5.2    tidyselect_1.2.1  stringr_1.6.0    
 #>  [5] jquerylib_0.1.4   systemfonts_1.3.1 textshaping_1.0.4 yaml_2.3.12      
-#>  [9] fastmap_1.2.0     R6_2.6.1          generics_0.1.4    igraph_2.2.1     
-#> [13] knitr_1.51        backports_1.5.0   checkmate_2.3.3   rstackdeque_1.1.1
+#>  [9] fastmap_1.2.0     R6_2.6.1          generics_0.1.4    igraph_2.2.2     
+#> [13] knitr_1.51        backports_1.5.0   checkmate_2.3.4   rstackdeque_1.1.1
 #> [17] desc_1.4.3        bslib_0.10.0      pillar_1.11.1     rlang_1.1.7      
 #> [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.56        
 #> [25] fs_1.6.6          sass_0.4.10       cli_3.6.5         pkgdown_2.2.0    
