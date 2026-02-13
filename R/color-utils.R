@@ -7,7 +7,7 @@ get_mono_color <- function(mono) {
   # Extract base monosaccharide name (without substituents)
   base_mono <- .extract_base_mono(mono)
 
-  dplyr::case_match(
+  dplyr::recode_values(
     base_mono,
     c("Glc", "GlcNAc", "GlcN", "GlcA", "Qui", "QuiNAc", "Oli", "Bac", "Api") ~ "#0072BC",
     c("Man", "ManNAc", "ManN", "ManA", "Rha", "RhaNAc", "Tyv", "Ara", "Kdn", "Pse", "LDmanHep", "Fru") ~ "#00A651",
@@ -18,7 +18,7 @@ get_mono_color <- function(mono) {
     c("Tal", "TalNAc", "TalN", "TalA", "6dTal", "6dTalNAc", "Col", "Neu5Gc", "4eLeg", "MurNGc") ~ "#8FCCE9",
     c("Ido", "IdoNAc", "IdoN", "IdoA", "Neu", "Mur") ~ "#A17A4D",
     c("Fuc", "FucNAc", "Sia") ~ "#ED1C24",
-    .default = "black"
+    default = "black"
   )
 }
 

@@ -600,7 +600,7 @@ parse_single_composition <- function(char) {
   })
 
   mono_names <- purrr::map_chr(parsed_matches, "name")
-  mono_names <- dplyr::case_match(mono_names,
+  mono_names <- dplyr::recode_values(mono_names,
     "H" ~ "Hex",
     "N" ~ "HexNAc",
     "F" ~ "dHex",
