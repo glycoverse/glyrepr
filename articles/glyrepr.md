@@ -397,8 +397,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] dplyr_1.2.0         tibble_3.3.1        tictoc_1.2.1       
-#> [4] glyrepr_0.10.0.9000
+#> [1] dplyr_1.2.0    tibble_3.3.1   tictoc_1.2.1   glyrepr_0.10.1
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] jsonlite_2.0.0    compiler_4.5.2    tidyselect_1.2.1  stringr_1.6.0    

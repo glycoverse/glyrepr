@@ -1,6 +1,6 @@
 # Changelog
 
-## glyrepr (development version)
+## glyrepr 0.10.1
 
 ### Minor improvements and bug fixes
 
