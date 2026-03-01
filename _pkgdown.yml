@@ -2,6 +2,9 @@ url: https://glycoverse.github.io/glyrepr/
 template:
   bootstrap: 5
 
+development:
+  mode: auto
+
 reference:
 - title: "Glycan Composition and Structure Creation"
   contents:
