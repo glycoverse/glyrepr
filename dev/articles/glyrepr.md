@@ -179,7 +179,7 @@ library(tictoc)
 tic("Converting 5 structures")
 result_small <- convert_to_generic(struc)
 toc()
-#> Converting 5 structures: 0.021 sec elapsed
+#> Converting 5 structures: 0.02 sec elapsed
 
 tic("Converting 5,000 structures")
 result_large <- convert_to_generic(large_struc)
@@ -376,9 +376,9 @@ The glycoverse is your oyster! 🦪
 
 ``` r
 sessionInfo()
-#> R version 4.5.2 (2025-10-31)
+#> R version 4.5.3 (2026-03-11)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
+#> Running under: Ubuntu 24.04.4 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -401,14 +401,14 @@ sessionInfo()
 #> [4] glyrepr_0.10.1.9000
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] jsonlite_2.0.0    compiler_4.5.2    tidyselect_1.2.1  stringr_1.6.0    
-#>  [5] jquerylib_0.1.4   systemfonts_1.3.1 textshaping_1.0.4 yaml_2.3.12      
+#>  [1] jsonlite_2.0.0    compiler_4.5.3    tidyselect_1.2.1  stringr_1.6.0    
+#>  [5] jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5 yaml_2.3.12      
 #>  [9] fastmap_1.2.0     R6_2.6.1          generics_0.1.4    igraph_2.2.2     
 #> [13] knitr_1.51        backports_1.5.0   checkmate_2.3.4   rstackdeque_1.1.1
 #> [17] desc_1.4.3        bslib_0.10.0      pillar_1.11.1     rlang_1.1.7      
-#> [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.56        
-#> [25] fs_1.6.6          sass_0.4.10       cli_3.6.5         pkgdown_2.2.0    
-#> [29] magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.1      
-#> [33] evaluate_1.0.5    glue_1.8.0        ragg_1.5.0        rmarkdown_2.30   
-#> [37] purrr_1.2.1       tools_4.5.2       pkgconfig_2.0.3   htmltools_0.5.9
+#> [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.57        
+#> [25] fs_2.0.1          sass_0.4.10       cli_3.6.5         pkgdown_2.2.0    
+#> [29] magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.2      
+#> [33] evaluate_1.0.5    glue_1.8.0        ragg_1.5.2        rmarkdown_2.31   
+#> [37] purrr_1.2.1       tools_4.5.3       pkgconfig_2.0.3   htmltools_0.5.9
 ```

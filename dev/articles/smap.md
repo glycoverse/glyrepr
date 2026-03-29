@@ -260,7 +260,7 @@ tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.235 sec elapsed
+#> Naive approach (all graphs): 0.24 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -390,9 +390,9 @@ tools. Go forth and analyze! 🌟
 
 ``` r
 sessionInfo()
-#> R version 4.5.2 (2025-10-31)
+#> R version 4.5.3 (2026-03-11)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
+#> Running under: Ubuntu 24.04.4 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -414,15 +414,15 @@ sessionInfo()
 #> [1] tictoc_1.2.1        lobstr_1.2.0        glyrepr_0.10.1.9000
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] jsonlite_2.0.0    dplyr_1.2.0       compiler_4.5.2    tidyselect_1.2.1 
-#>  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.1 textshaping_1.0.4
+#>  [1] jsonlite_2.0.0    dplyr_1.2.0       compiler_4.5.3    tidyselect_1.2.1 
+#>  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5
 #>  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   
 #> [13] igraph_2.2.2      knitr_1.51        backports_1.5.0   checkmate_2.3.4  
 #> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.10.0     
 #> [21] pillar_1.11.1     rlang_1.1.7       cachem_1.1.0      stringi_1.8.7    
-#> [25] xfun_0.56         fs_1.6.6          sass_0.4.10       cli_3.6.5        
+#> [25] xfun_0.57         fs_2.0.1          sass_0.4.10       cli_3.6.5        
 #> [29] pkgdown_2.2.0     magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.5  
-#> [33] prettyunits_1.2.0 vctrs_0.7.1       evaluate_1.0.5    glue_1.8.0       
-#> [37] ragg_1.5.0        rmarkdown_2.30    purrr_1.2.1       tools_4.5.2      
+#> [33] prettyunits_1.2.0 vctrs_0.7.2       evaluate_1.0.5    glue_1.8.0       
+#> [37] ragg_1.5.2        rmarkdown_2.31    purrr_1.2.1       tools_4.5.3      
 #> [41] pkgconfig_2.0.3   htmltools_0.5.9
 ```

@@ -269,9 +269,9 @@ Happy glycan hunting! 🕵️‍♀️✨
 
 ``` r
 sessionInfo()
-#> R version 4.5.2 (2025-10-31)
+#> R version 4.5.3 (2026-03-11)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
+#> Running under: Ubuntu 24.04.4 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -293,14 +293,14 @@ sessionInfo()
 #> [1] glyrepr_0.10.1.9000
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] vctrs_0.7.1       cli_3.6.5         knitr_1.51        rlang_1.1.7      
-#>  [5] xfun_0.56         stringi_1.8.7     purrr_1.2.1       generics_0.1.4   
-#>  [9] textshaping_1.0.4 jsonlite_2.0.0    glue_1.8.0        htmltools_0.5.9  
-#> [13] ragg_1.5.0        sass_0.4.10       rmarkdown_2.30    tibble_3.3.1     
+#>  [1] vctrs_0.7.2       cli_3.6.5         knitr_1.51        rlang_1.1.7      
+#>  [5] xfun_0.57         stringi_1.8.7     purrr_1.2.1       generics_0.1.4   
+#>  [9] textshaping_1.0.5 jsonlite_2.0.0    glue_1.8.0        htmltools_0.5.9  
+#> [13] ragg_1.5.2        sass_0.4.10       rmarkdown_2.31    tibble_3.3.1     
 #> [17] evaluate_1.0.5    jquerylib_0.1.4   fastmap_1.2.0     yaml_2.3.12      
-#> [21] lifecycle_1.0.5   stringr_1.6.0     compiler_4.5.2    dplyr_1.2.0      
-#> [25] fs_1.6.6          pkgconfig_2.0.3   systemfonts_1.3.1 digest_0.6.39    
+#> [21] lifecycle_1.0.5   stringr_1.6.0     compiler_4.5.3    dplyr_1.2.0      
+#> [25] fs_2.0.1          pkgconfig_2.0.3   systemfonts_1.3.2 digest_0.6.39    
 #> [29] R6_2.6.1          tidyselect_1.2.1  pillar_1.11.1     magrittr_2.0.4   
-#> [33] bslib_0.10.0      tools_4.5.2       pkgdown_2.2.0     cachem_1.1.0     
+#> [33] bslib_0.10.0      tools_4.5.3       pkgdown_2.2.0     cachem_1.1.0     
 #> [37] desc_1.4.3
 ```
