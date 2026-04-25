@@ -73,10 +73,11 @@ because the "partial" level is not deterministic.</p>
 
 <dt id="arg-to-level">to_level<a class="anchor" aria-label="anchor" href="#arg-to-level"></a></dt>
 <dd><p>The resolution level to reduce to. Can be "basic" or "topological".
-Must be a lower resolution level than any structure in <code>x</code>
+Must be a lower resolution level than <code>x</code>
 ("intact" &gt; "partial" &gt; "topological" &gt; "basic").
-If <code>to_level</code> is the same as some structure in <code>x</code>, the result will be the same as the input.
-You can use <code><a href="get_structure_level.html">get_structure_level()</a></code> to check the structure levels of <code>x</code>.</p></dd>
+If <code>to_level</code> is the same as the structure level of <code>x</code>,
+the result will be the same as the input.
+You can use <code><a href="get_structure_level.html">get_structure_level()</a></code> to check the structure level of <code>x</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -41,6 +41,11 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
 <div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> now returns one character scalar for a <code>glyrepr_structure</code> vector instead of one value per element. The vector-wide level is “intact”, “partial”, “topological”, or “basic” according to the combined residue and linkage detail of the non-missing structures in the vector (<a href="https://github.com/glycoverse/glyrepr/issues/42" class="external-link">#42</a>).</li>
+</ul></div>
+<div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>
 <code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> now supports parsing “E” and “L” in the input composition strings as “NeuAc”. For example, <code>as_glycan_composition("H5N4F1L1E1")</code> is now correctly parsed as <code>Hex(5)HexNAc(4)Fuc(1)NeuAc(2)</code>, with a warning about dropping the sialic acid linkage information (<a href="https://github.com/glycoverse/glyrepr/issues/41" class="external-link">#41</a>).</li>
@@ -51,9 +56,9 @@
 <li>
 <code>as_glycan_structure(NA_character_)</code> now creates a missing structure instead of erroring.</li>
 <li>
-<code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> now preserves missing structures as NA instead of treating them as “basic”.</li>
+<code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> now ignores missing structures when determining the vector-wide level, and returns <code>NA_character_</code> for empty or all-missing structure vectors.</li>
 <li>
-<code><a href="../reference/reduce_structure_level.html">reduce_structure_level()</a></code> skips missing structures when checking level ranks and preserves them in output.</li>
+<code><a href="../reference/reduce_structure_level.html">reduce_structure_level()</a></code> preserves missing structures in output.</li>
 <li>
 <code><a href="../reference/simap.html">simap()</a></code> and `<code><a href="../reference/simap.html">simap_structure()</a></code> now skip missing structures like the other smap variants.</li>
 <li>

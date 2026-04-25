@@ -3,16 +3,17 @@
 Glycan structures can have four possible levels of resolution:
 
 - "intact": All monosaccharides are concrete (e.g. "Man", "GlcNAc"), and
-  all linkages are fully determined (e.g. "a2-3", "b1-4").
+  no linkage or anomer contains "?".
 
-- "partial": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-  but some linkage information is missing (e.g. "a2-?").
+- "partial": All monosaccharides are concrete (e.g. "Man", "GlcNAc"), at
+  least one linkage or anomer contains "?", and at least one linkage or
+  anomer has a non-"?" annotation.
 
 - "topological": All monosaccharides are concrete (e.g. "Man",
-  "GlcNAc"), but the linkage information is completely unknown ("??-?").
+  "GlcNAc"), and all linkages and anomers are completely unknown
+  ("??-?"/"??").
 
-- "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc"), and
-  the linkage information is completely unknown ("??-?").
+- "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc").
 
 Note that in theory you can have a glycan with generic monosaccharides
 with all linkages determined. For example, "Hex(b1-3)HexNAc(a1-" is a
@@ -37,8 +38,8 @@ get_structure_level(x)
 
 ## Value
 
-A character vector of the same length as `x`, containing the structure
-level for each element.
+A character scalar containing the structure level for `x`. If `x` is
+empty or all structures in `x` are NA, returns NA_character\_.
 
 ## See also
 

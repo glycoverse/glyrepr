@@ -268,12 +268,12 @@ copy of each book, no matter how many people want to read it.</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5 structures: 0.023 sec elapsed</span></span>
+<span><span class="co">#&gt; Converting 5 structures: 0.021 sec elapsed</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5,000 structures"</span><span class="op">)</span></span>
 <span><span class="va">result_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">large_struc</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5,000 structures: 0.028 sec elapsed</span></span></code></pre></div>
+<span><span class="co">#&gt; Converting 5,000 structures: 0.027 sec elapsed</span></span></code></pre></div>
 <p><strong>Mind = blown!</strong> 🤯 The performance is nearly identical
 because <code>glyrepr</code> only processes each unique structure once,
 then cleverly expands the results.</p>
@@ -287,20 +287,20 @@ recognizes four resolution levels:</p>
 <ul>
 <li>
 <strong>“intact”</strong>: The full picture — all monosaccharides
-are concrete (e.g., “Man”, “GlcNAc”), and all linkages are fully
-determined (e.g., “a2-3”, “b1-4”).</li>
+are concrete (e.g., “Man”, “GlcNAc”), and no linkage or anomer contains
+“?”.</li>
 <li>
 <strong>“partial”</strong>: Almost there — all monosaccharides are
-concrete (e.g., “Man”, “GlcNAc”), but some linkage information is
-missing (e.g., “a2-?”).</li>
+concrete (e.g., “Man”, “GlcNAc”), at least one linkage or anomer
+contains “?”, and at least one linkage or anomer has a non-“?”
+annotation.</li>
 <li>
 <strong>“topological”</strong>: We know what’s there, but not how
 they connect — all monosaccharides are concrete (e.g., “Man”, “GlcNAc”),
-but the linkage information is completely unknown (“??-?”).</li>
+and all linkages and anomers are completely unknown (“??-?”/“??”).</li>
 <li>
 <strong>“basic”</strong>: The minimalist view — all monosaccharides
-are generic (e.g., “Hex”, “HexNAc”), and the linkage information is
-completely unknown (“??-?”).</li>
+are generic (e.g., “Hex”, “HexNAc”).</li>
 </ul>
 <p>💡 <strong>Fun fact</strong>: In theory, you could have a glycan with
 generic monosaccharides but fully determined linkages (e.g.,
@@ -308,8 +308,8 @@ generic monosaccharides but fully determined linkages (e.g.,
 linkage information is much harder to obtain than monosaccharide
 information. That’s why <code>glyrepr</code> assigns these structures to
 the “basic” level too.</p>
-<p>You can get the structure level for a glycan structure vector with
-<code><a href="../reference/get_structure_level.html">get_structure_level()</a></code>:</p>
+<p>You can get the vector-wide structure level for a glycan structure
+vector with <code><a href="../reference/get_structure_level.html">get_structure_level()</a></code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Concrete structures (various linkage detail levels)</span></span>
 <span><span class="va">concrete_glycans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -318,7 +318,7 @@ the “basic” level too.</p>
 <span>  <span class="st">"Gal(??-?)GalNAc(??-"</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="va">concrete_glycans</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "intact"      "partial"     "topological"</span></span>
+<span><span class="co">#&gt; [1] "partial"</span></span>
 <span></span>
 <span><span class="co"># Generic structures</span></span>
 <span><span class="va">generic_glycans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -326,7 +326,9 @@ the “basic” level too.</p>
 <span>  <span class="st">"Hex(b1-3)HexNAc(a1-"</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="va">generic_glycans</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "basic" "basic"</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Generic glycan structures with linkage annotations are treated as <span style="color: #0000BB;">"basic"</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Linkage information is ignored when residues are generic.</span></span>
+<span><span class="co">#&gt; [1] "basic"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="structure-manipulation-tools">Structure Manipulation Tools<a class="anchor" aria-label="anchor" href="#structure-manipulation-tools"></a>

@@ -59,7 +59,7 @@ Smaller linkages are placed on the backbone, larger ones in branches.
 structure_to_iupac(o_glycan_core_1())
 #> [1] "Gal(b1-3)GalNAc(a1-"
 
-# Branched structure  
+# Branched structure
 structure_to_iupac(n_glycan_core())
 #> [1] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 

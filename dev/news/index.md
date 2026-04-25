@@ -2,6 +2,15 @@
 
 ## glyrepr (development version)
 
+### Breaking changes
+
+- [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md)
+  now returns one character scalar for a `glyrepr_structure` vector
+  instead of one value per element. The vector-wide level is “intact”,
+  “partial”, “topological”, or “basic” according to the combined residue
+  and linkage detail of the non-missing structures in the vector
+  ([\#42](https://github.com/glycoverse/glyrepr/issues/42)).
+
 ### New features
 
 - [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_composition.md)
@@ -24,11 +33,11 @@
 - `as_glycan_structure(NA_character_)` now creates a missing structure
   instead of erroring.
 - [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md)
-  now preserves missing structures as NA instead of treating them as
-  “basic”.
+  now ignores missing structures when determining the vector-wide level,
+  and returns `NA_character_` for empty or all-missing structure
+  vectors.
 - [`reduce_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/reduce_structure_level.md)
-  skips missing structures when checking level ranks and preserves them
-  in output.
+  preserves missing structures in output.
 - [`simap()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md)
   and
   \`[`simap_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md)

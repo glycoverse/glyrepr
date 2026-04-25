@@ -179,12 +179,12 @@ library(tictoc)
 tic("Converting 5 structures")
 result_small <- convert_to_generic(struc)
 toc()
-#> Converting 5 structures: 0.023 sec elapsed
+#> Converting 5 structures: 0.021 sec elapsed
 
 tic("Converting 5,000 structures")
 result_large <- convert_to_generic(large_struc)
 toc()
-#> Converting 5,000 structures: 0.028 sec elapsed
+#> Converting 5,000 structures: 0.027 sec elapsed
 ```
 
 **Mind = blown!** 🤯 The performance is nearly identical because
@@ -198,17 +198,15 @@ levels of detail, like zoom levels on a map. `glyrepr` recognizes four
 resolution levels:
 
 - **“intact”**: The full picture — all monosaccharides are concrete
-  (e.g., “Man”, “GlcNAc”), and all linkages are fully determined (e.g.,
-  “a2-3”, “b1-4”).
+  (e.g., “Man”, “GlcNAc”), and no linkage or anomer contains “?”.
 - **“partial”**: Almost there — all monosaccharides are concrete (e.g.,
-  “Man”, “GlcNAc”), but some linkage information is missing (e.g.,
-  “a2-?”).
+  “Man”, “GlcNAc”), at least one linkage or anomer contains “?”, and at
+  least one linkage or anomer has a non-“?” annotation.
 - **“topological”**: We know what’s there, but not how they connect —
-  all monosaccharides are concrete (e.g., “Man”, “GlcNAc”), but the
-  linkage information is completely unknown (“??-?”).
+  all monosaccharides are concrete (e.g., “Man”, “GlcNAc”), and all
+  linkages and anomers are completely unknown (“??-?”/“??”).
 - **“basic”**: The minimalist view — all monosaccharides are generic
-  (e.g., “Hex”, “HexNAc”), and the linkage information is completely
-  unknown (“??-?”).
+  (e.g., “Hex”, “HexNAc”).
 
 💡 **Fun fact**: In theory, you could have a glycan with generic
 monosaccharides but fully determined linkages (e.g.,
@@ -217,7 +215,8 @@ linkage information is much harder to obtain than monosaccharide
 information. That’s why `glyrepr` assigns these structures to the
 “basic” level too.
 
-You can get the structure level for a glycan structure vector with
+You can get the vector-wide structure level for a glycan structure
+vector with
 [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md):
 
 ``` r
@@ -228,7 +227,7 @@ concrete_glycans <- as_glycan_structure(c(
   "Gal(??-?)GalNAc(??-"
 ))
 get_structure_level(concrete_glycans)
-#> [1] "intact"      "partial"     "topological"
+#> [1] "partial"
 
 # Generic structures
 generic_glycans <- as_glycan_structure(c(
@@ -236,7 +235,9 @@ generic_glycans <- as_glycan_structure(c(
   "Hex(b1-3)HexNAc(a1-"
 ))
 get_structure_level(generic_glycans)
-#> [1] "basic" "basic"
+#> Warning: Generic glycan structures with linkage annotations are treated as "basic".
+#> ℹ Linkage information is ignored when residues are generic.
+#> [1] "basic"
 ```
 
 ### Structure Manipulation Tools
