@@ -10,3 +10,12 @@
       2 Hex(2)HexNAc(1)     1
       3 Hex(3)dHex(1)       1
 
+# as_glycan_composition works for E and L
+
+    Code
+      comps <- as_glycan_composition(chars)
+    Condition
+      Warning:
+      Simple composition codes "E" and "L" are parsed as "NeuAc".
+      i Linkage-specific Neu5Ac information is discarded in glycan compositions.
+
