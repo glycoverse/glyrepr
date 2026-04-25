@@ -1,5 +1,9 @@
 # glyrepr (development version)
 
+## Minor improvements and bug fixes
+
+* Fix the bug that `glycan_composition()` and `as_glycan_composition()` cannot handle duplications in the input. For example, `as_glycan_composition("Hex(2)Hex(1)HexNAc(2)")` is correctly regared as `Hex(3)HexNAc(2)` now.
+
 # glyrepr 0.10.1
 
 ## Minor improvements and bug fixes
