@@ -151,7 +151,7 @@ remove_linkages <- function(glycan) {
       "i" = "Use `glycan_structure()` to create a glyrepr_structure from igraph objects."
     ))
   }
-  
+
   smap_structure(glycan, .remove_linkages_single)
 }
 

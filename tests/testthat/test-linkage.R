@@ -6,7 +6,7 @@ test_that("has_linkages() works for glycans with intact linkages", {
 
 test_that("has_linkages() works for glycan with partial linkages", {
   glycan_vec <- o_glycan_core_2(linkage = TRUE)
-  glycan <- get_structure_graphs(glycan_vec, return_list = FALSE)  # Extract the igraph
+  glycan <- get_structure_graphs(glycan_vec, return_list = FALSE) # Extract the igraph
   glycan <- igraph::set_edge_attr(glycan, "linkage", value = c("??-?", "b1-6"))
 
   # Create a new vectorized structure with the modified graph
@@ -27,7 +27,10 @@ test_that("has_linkages() works in strict mode", {
 })
 
 test_that("has_linkages() considers anomers", {
-  glycans <- as_glycan_structure(c("Gal(b1-3)GalNAc(a1-", "Gal(a1-3)GalNAc(?1-"))
+  glycans <- as_glycan_structure(c(
+    "Gal(b1-3)GalNAc(a1-",
+    "Gal(a1-3)GalNAc(?1-"
+  ))
   expect_equal(has_linkages(glycans, strict = TRUE), c(TRUE, FALSE))
 
   glycan <- as_glycan_structure("Gal(??-?)GalNAc(a1-")
@@ -87,7 +90,12 @@ test_that("possible_linkages() rejects multiple linkages", {
 })
 
 test_that("possible_linkages() works with custom ranges", {
-  result <- possible_linkages("??-?", anomer_range = "a", pos1_range = 2, pos2_range = c(3, 6))
+  result <- possible_linkages(
+    "??-?",
+    anomer_range = "a",
+    pos1_range = 2,
+    pos2_range = c(3, 6)
+  )
   expected <- c("a2-3", "a2-6")
   expect_identical(result, expected)
 })

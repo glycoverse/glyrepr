@@ -18,7 +18,11 @@ has_vertex_attrs <- function(graph, attrs) {
 
 # Does the graph have these edge attributes?
 has_edge_attrs <- function(graph, attrs) {
-  if (getRversion() < "4.4.0" && .Platform$OS.type == "windows" && igraph::vcount(graph) == 1) {
+  if (
+    getRversion() < "4.4.0" &&
+      .Platform$OS.type == "windows" &&
+      igraph::vcount(graph) == 1
+  ) {
     # It seems like when the graph has no edges,
     # setting edge attributes will not work on Windows with R < 4.4.0.
     # So we skip this check to circumvent R CMD check.
@@ -57,25 +61,31 @@ valid_substituent <- function(sub) {
     if (single_sub == "") {
       return(TRUE)
     }
-    
+
     # Split by commas to handle multiple substituents
     individual_subs <- stringr::str_split(single_sub, ",")[[1]]
-    
+
     # Check if each individual substituent is valid
     subs_pattern <- stringr::str_c(available_substituents(), collapse = "|")
     pattern <- stringr::str_glue("^[\\d\\?]({subs_pattern})$")
-    
-    individual_valid <- purrr::map_lgl(individual_subs, ~ stringr::str_detect(.x, pattern))
-    
+
+    individual_valid <- purrr::map_lgl(
+      individual_subs,
+      ~ stringr::str_detect(.x, pattern)
+    )
+
     # All individual substituents must be valid
     if (!all(individual_valid)) {
       return(FALSE)
     }
-    
+
     # Check if substituents are properly sorted by position
     # Extract positions from individual substituents
-    positions <- purrr::map_chr(individual_subs, ~ stringr::str_extract(.x, "^[\\d\\?]"))
-    
+    positions <- purrr::map_chr(
+      individual_subs,
+      ~ stringr::str_extract(.x, "^[\\d\\?]")
+    )
+
     # For sorting, convert ? to a high numeric value
     numeric_positions <- purrr::map_dbl(positions, function(pos) {
       if (pos == "?") {
@@ -84,13 +94,13 @@ valid_substituent <- function(sub) {
         return(as.numeric(pos))
       }
     })
-    
+
     # Check if positions are sorted in ascending order
     is_sorted <- all(numeric_positions == sort(numeric_positions))
-    
+
     # Check for duplicate positions (not allowed)
     has_duplicates <- any(duplicated(positions))
-    
+
     return(is_sorted && !has_duplicates)
   })
 }

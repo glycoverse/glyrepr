@@ -27,7 +27,7 @@ test_that("normalize_substituents sorts multiple substituents by position", {
 
 test_that("normalize_substituents handles ? positions correctly", {
   expect_equal(normalize_substituents("?S,3Me"), "3Me,?S")
-  expect_equal(normalize_substituents("?Ac,?Me"), "?Ac,?Me")  # Original order preserved for same position
+  expect_equal(normalize_substituents("?Ac,?Me"), "?Ac,?Me") # Original order preserved for same position
   expect_equal(normalize_substituents("4Ac,?S,2Me"), "2Me,4Ac,?S")
 })
 
@@ -43,22 +43,22 @@ test_that("normalize_substituents input validation", {
 
 test_that("remove_substituents works on glycan structures", {
   # Create a test glycan with substituents
-  graph <- igraph::make_graph(~ 1-+2)
+  graph <- igraph::make_graph(~ 1 - +2)
   igraph::V(graph)$mono <- c("Glc", "Gal")
   igraph::V(graph)$sub <- c("3Me,4Ac", "6S")
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
   graph$alditol <- FALSE
-  
+
   glycan <- glycan_structure(graph)
-  
+
   # Remove substituents
   clean_glycan <- remove_substituents(glycan)
-  
+
   # Check that substituents are removed
   clean_graph <- get_structure_graphs(clean_glycan, return_list = FALSE)
   expect_equal(igraph::V(clean_graph)$sub, c("", ""))
-  expect_equal(igraph::V(clean_graph)$mono, c("Gal", "Glc"))  # Monos should be unchanged
+  expect_equal(igraph::V(clean_graph)$mono, c("Gal", "Glc")) # Monos should be unchanged
 })
 
 test_that("remove_substituents input validation", {

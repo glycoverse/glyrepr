@@ -106,7 +106,7 @@ build_example_graph <- function(linkage, mono_type, builder) {
 
 
 n_glycan_core_base <- function() {
-  graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 3 - +4, 3 - +5)
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
@@ -116,7 +116,7 @@ n_glycan_core_base <- function() {
 
 
 o_glycan_core_1_base <- function() {
-  graph <- igraph::make_graph(~ 1-+2)
+  graph <- igraph::make_graph(~ 1 - +2)
   igraph::V(graph)$mono <- c("GalNAc", "Gal")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-3"
@@ -126,7 +126,7 @@ o_glycan_core_1_base <- function() {
 
 
 o_glycan_core_2_base <- function() {
-  graph <- igraph::make_graph(~ 1-+2, 1-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 1 - +3)
   igraph::V(graph)$mono <- c("GalNAc", "Gal", "GlcNAc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-3", "b1-6")

@@ -109,7 +109,7 @@ convert_to_generic.glyrepr_composition <- function(x) {
   new_compositions <- purrr::map(compositions, function(comp) {
     # Handle NULL/empty compositions (from NA elements)
     if (is.null(comp) || length(comp) == 0) {
-      return(NULL)  # NA elements are stored as NULL
+      return(NULL) # NA elements are stored as NULL
     }
 
     # Convert monosaccharide names

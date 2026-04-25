@@ -3,16 +3,16 @@ test_that("structure_to_iupac works with basic linear structures", {
   glycan1 <- o_glycan_core_1()
   result1 <- structure_to_iupac(glycan1)
   expect_equal(result1, "Gal(b1-3)GalNAc(a1-")
-  
+
   # Create simple linear structure: Glc -> GlcNAc -> Gal
   # This should produce: Gal(b1-3)GlcNAc(b1-4)Glc(?1-
-  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph)$mono <- c("Glc", "GlcNAc", "Gal")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-3")
   graph$anomer <- "?1"
   glycan2 <- glycan_structure(graph)
-  
+
   result2 <- structure_to_iupac(glycan2)
   expect_equal(result2, "Gal(b1-3)GlcNAc(b1-4)Glc(?1-")
 })
@@ -22,7 +22,7 @@ test_that("structure_to_iupac works with branched structures", {
   glycan <- n_glycan_core()
   result <- structure_to_iupac(glycan)
   expect_equal(result, "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
-  
+
   # Test with O-glycan core 2
   glycan2 <- o_glycan_core_2()
   result2 <- structure_to_iupac(glycan2)
@@ -34,46 +34,46 @@ test_that("structure_to_iupac handles single node structures", {
   graph <- igraph::make_graph(edges = integer(0), n = 1)
   igraph::V(graph)$mono <- "Glc"
   igraph::V(graph)$sub <- ""
-  igraph::E(graph)$linkage <- character(0)  # Empty linkage for no edges
+  igraph::E(graph)$linkage <- character(0) # Empty linkage for no edges
   graph$anomer <- "a1"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   expect_equal(result, "Glc(a1-")
 })
 
 test_that("structure_to_iupac handles two-node structures", {
   # Two node structure: A -> B
-  graph <- igraph::make_graph(~ 1-+2)
+  graph <- igraph::make_graph(~ 1 - +2)
   igraph::V(graph)$mono <- c("Man", "Glc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "a1-3"
   graph$anomer <- "b1"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   expect_equal(result, "Glc(a1-3)Man(b1-")
 })
 
 test_that("structure_to_iupac ensures isomorphic graphs produce same sequence", {
   # Create first graph: Man with a1-3 and a1-6 branches (in that order)
-  graph1 <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)
+  graph1 <- igraph::make_graph(~ 1 - +2, 2 - +3, 3 - +4, 3 - +5)
   igraph::V(graph1)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
   igraph::V(graph1)$sub <- ""
   igraph::E(graph1)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
   graph1$anomer <- "?1"
   graph1$alditol <- FALSE
   glycan1 <- glycan_structure(graph1)
-  
+
   # Create second graph: Same structure but with a1-6 and a1-3 branches (swapped order)
-  graph2 <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)
+  graph2 <- igraph::make_graph(~ 1 - +2, 2 - +3, 3 - +4, 3 - +5)
   igraph::V(graph2)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
   igraph::V(graph2)$sub <- ""
-  igraph::E(graph2)$linkage <- c("b1-4", "b1-4", "a1-6", "a1-3")  # Swapped order
+  igraph::E(graph2)$linkage <- c("b1-4", "b1-4", "a1-6", "a1-3") # Swapped order
   graph2$anomer <- "?1"
   graph2$alditol <- FALSE
   glycan2 <- glycan_structure(graph2)
-  
+
   # Both should produce the same sequence
   result1 <- structure_to_iupac(glycan1)
   result2 <- structure_to_iupac(glycan2)
@@ -85,9 +85,9 @@ test_that("structure_to_iupac handles complex branched structures", {
   # Create a more complex structure with multiple levels of branching
   # Glc -> Man -> GlcNAc -> Gal
   #                |        ├─ Fuc
-  #                |        └─ NeuAc  
+  #                |        └─ NeuAc
   #                └─ Hex
-  graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5, 2-+6)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 3 - +4, 3 - +5, 2 - +6)
   igraph::V(graph)$mono <- c("Glc", "Man", "GlcNAc", "Gal", "Fuc", "GalNAc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "a1-3", "a1-2", "a1-6", "b1-3")
@@ -96,20 +96,23 @@ test_that("structure_to_iupac handles complex branched structures", {
 
   result <- structure_to_iupac(glycan)
   # Based on actual algorithm output
-  expect_equal(result, "Fuc(b1-3)[Gal(a1-6)]GlcNAc(a1-3)[GalNAc(a1-2)]Man(b1-4)Glc(a1-")
+  expect_equal(
+    result,
+    "Fuc(b1-3)[Gal(a1-6)]GlcNAc(a1-3)[GalNAc(a1-2)]Man(b1-4)Glc(a1-"
+  )
 })
 
 test_that("structure_to_iupac selects correct backbone based on depth", {
   # Create structure where backbone selection matters
   # Glc -> Man -> Gal (depth 2)
   #           └─ GlcNAc -> Fuc (depth 3) <- this should be backbone
-  graph <- igraph::make_graph(~ 1-+2, 2-+3, 2-+4, 4-+5)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 2 - +4, 4 - +5)
   igraph::V(graph)$mono <- c("Glc", "Man", "Gal", "GlcNAc", "Fuc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "a1-3", "a1-6", "b1-2")
   graph$anomer <- "?1"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   # GlcNAc->Fuc path is longer, so should be backbone
   # Expected: Fuc(b1-2)GlcNAc(a1-6)[Gal(a1-3)]Man(b1-4)Glc(?1-
@@ -121,13 +124,13 @@ test_that("structure_to_iupac selects backbone by linkage when depths are equal"
   # Glc -> Man ├─ Gal (linkage a1-3)
   #            └─ Fuc (linkage a1-6)
   # Both have same depth, but a1-3 < a1-6, so Gal should be backbone
-  graph <- igraph::make_graph(~ 1-+2, 2-+3, 2-+4)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 2 - +4)
   igraph::V(graph)$mono <- c("Glc", "Man", "Gal", "Fuc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "a1-3", "a1-6")
   graph$anomer <- "b2"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   # Gal should be backbone (a1-3), Fuc should be branch (a1-6)
   expect_equal(result, "Gal(a1-3)[Fuc(a1-6)]Man(b1-4)Glc(b2-")
@@ -138,13 +141,13 @@ test_that("structure_to_iupac selects backbone by linkage when depths are equal 
   # Glc -> Man ├─ Gal (linkage a1-?)
   #            └─ Fuc (linkage a1-6)
   # Both have same depth, but a1-3 < a1-6, so Gal should be backbone
-  graph <- igraph::make_graph(~ 1-+2, 2-+3, 2-+4)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 2 - +4)
   igraph::V(graph)$mono <- c("Glc", "Man", "Gal", "Fuc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "a1-?", "a1-6")
   graph$anomer <- "b2"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   # Gal should be backbone (a1-?), Fuc should be branch (a1-6)
   expect_equal(result, "Gal(a1-?)[Fuc(a1-6)]Man(b1-4)Glc(b2-")
@@ -156,7 +159,7 @@ test_that("structure_to_iupac returns deterministic sequence for ties", {
   #     └─ Fuc (linkage a1-?)
 
   # glycan 1
-  graph1 <- igraph::make_graph(~ 1-+2, 1-+3)
+  graph1 <- igraph::make_graph(~ 1 - +2, 1 - +3)
   igraph::V(graph1)$mono <- c("Man", "Gal", "Fuc")
   igraph::V(graph1)$sub <- ""
   igraph::E(graph1)$linkage <- c("a1-?", "a1-?")
@@ -164,7 +167,7 @@ test_that("structure_to_iupac returns deterministic sequence for ties", {
   glycan1 <- glycan_structure(graph1)
 
   # glycan 2
-  graph2 <- igraph::make_graph(~ 1-+2, 1-+3)
+  graph2 <- igraph::make_graph(~ 1 - +2, 1 - +3)
   igraph::V(graph2)$mono <- c("Man", "Fuc", "Gal")
   igraph::V(graph2)$sub <- ""
   igraph::E(graph2)$linkage <- c("a1-?", "a1-?")
@@ -179,15 +182,15 @@ test_that("structure_to_iupac returns deterministic sequence for ties", {
 test_that("structure_to_iupac handles different anomer values", {
   # Test different anomer values
   anomers <- c("a1", "b1", "?1", "a2", "b2", "?2")
-  
+
   for (anomer in anomers) {
-    graph <- igraph::make_graph(~ 1-+2)
+    graph <- igraph::make_graph(~ 1 - +2)
     igraph::V(graph)$mono <- c("Glc", "Man")
     igraph::V(graph)$sub <- ""
     igraph::E(graph)$linkage <- "b1-4"
     graph$anomer <- anomer
     glycan <- glycan_structure(graph)
-    
+
     result <- structure_to_iupac(glycan)
     expected <- paste0("Man(b1-4)Glc(", anomer, "-")
     expect_equal(result, expected)
@@ -196,17 +199,17 @@ test_that("structure_to_iupac handles different anomer values", {
 
 test_that("structure_to_iupac handles multiple branches correctly 1", {
   # Create structure with 3 branches
-  # Glc -> Man 
+  # Glc -> Man
   #         ├─ Gal (a1-2) <- should be backbone (smallest)
   #         ├─ Fuc (a1-3) <- should be the first branch
   #         └─ Hex (a1-6) <- should be the second branch
-  graph <- igraph::make_graph(~ 1-+2, 2-+3, 2-+4, 2-+5)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 2 - +4, 2 - +5)
   igraph::V(graph)$mono <- c("Glc", "Man", "Gal", "Fuc", "GalNAc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "a1-2", "a1-3", "a1-6")
   graph$anomer <- "a1"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   # Gal should be backbone (a1-2 is smallest), Fuc and GalNAc should be branches
   # Branches should be ordered: a1-3 < a1-6
@@ -226,78 +229,78 @@ test_that("structure_to_iupac produces correct sequence for examples in document
   # Test example 1 from documentation
   # Glc (?1- └─GlcNAc (b1-4) └─Gal (b1-3)
   # Should produce: Gal(b1-3)GlcNAc(b1-4)Glc(?1-
-  graph1 <- igraph::make_graph(~ 1-+2, 2-+3)
+  graph1 <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph1)$mono <- c("Glc", "GlcNAc", "Gal")
   igraph::V(graph1)$sub <- ""
   igraph::E(graph1)$linkage <- c("b1-4", "b1-3")
   graph1$anomer <- "?1"
   graph1$alditol <- FALSE
   glycan1 <- glycan_structure(graph1)
-  
+
   result1 <- structure_to_iupac(glycan1)
   expect_equal(result1, "Gal(b1-3)GlcNAc(b1-4)Glc(?1-")
-  
+
   # Test example 2 from documentation (already covered by n_glycan_core test)
   # But let's create it explicitly to be sure
-  graph2 <- igraph::make_graph(~ 1-+2, 2-+3, 3-+4, 3-+5)
+  graph2 <- igraph::make_graph(~ 1 - +2, 2 - +3, 3 - +4, 3 - +5)
   igraph::V(graph2)$mono <- c("GlcNAc", "GlcNAc", "Man", "Man", "Man")
   igraph::V(graph2)$sub <- ""
   igraph::E(graph2)$linkage <- c("b1-4", "b1-4", "a1-3", "a1-6")
   graph2$anomer <- "?1"
   graph2$alditol <- FALSE
   glycan2 <- glycan_structure(graph2)
-  
+
   result2 <- structure_to_iupac(glycan2)
   expect_equal(result2, "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-")
 })
 
 test_that("structure_to_iupac handles edge cases with linkages", {
   # Test with ? in different positions
-  graph <- igraph::make_graph(~ 1-+2)
+  graph <- igraph::make_graph(~ 1 - +2)
   igraph::V(graph)$mono <- c("Glc", "Man")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "?2-?"
   graph$anomer <- "??"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   expect_equal(result, "Man(?2-?)Glc(??-")
-  
+
   # Test with high numbers
-  graph2 <- igraph::make_graph(~ 1-+2)
+  graph2 <- igraph::make_graph(~ 1 - +2)
   igraph::V(graph2)$mono <- c("Glc", "Gal")
   igraph::V(graph2)$sub <- ""
   igraph::E(graph2)$linkage <- "b1-8"
   graph2$anomer <- "a7"
   graph2$alditol <- FALSE
   glycan2 <- glycan_structure(graph2)
-  
+
   result2 <- structure_to_iupac(glycan2)
   expect_equal(result2, "Gal(b1-8)Glc(a7-")
-}) 
+})
 
 test_that("structure_to_iupac supports substituents", {
   # Create a simple structure with a substituent: Glc with 3Me
   graph <- igraph::make_graph(edges = integer(0), n = 1)
   igraph::V(graph)$mono <- "Glc"
-  igraph::V(graph)$sub <- "3Me"  # 3号位置有Me修饰
+  igraph::V(graph)$sub <- "3Me" # 3号位置有Me修饰
   igraph::E(graph)$linkage <- character(0)
   graph$anomer <- "a1"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   # Expected: Glc3Me(a1-
   expect_equal(result, "Glc3Me(a1-")
-  
+
   # Test with linear structure: Glc with 3Me -> GlcNAc with 6Ac
-  graph2 <- igraph::make_graph(~ 1-+2)
+  graph2 <- igraph::make_graph(~ 1 - +2)
   igraph::V(graph2)$mono <- c("Glc", "GlcNAc")
   igraph::V(graph2)$sub <- c("3Me", "6Ac")
   igraph::E(graph2)$linkage <- "b1-4"
   graph2$anomer <- "a1"
   graph2$alditol <- FALSE
   glycan2 <- glycan_structure(graph2)
-  
+
   result2 <- structure_to_iupac(glycan2)
   # Expected: GlcNAc6Ac(b1-4)Glc3Me(a1-
   expect_equal(result2, "GlcNAc6Ac(b1-4)Glc3Me(a1-")
@@ -305,13 +308,13 @@ test_that("structure_to_iupac supports substituents", {
 
 test_that("structure_to_iupac handles empty substituents", {
   # Test with empty substituents (should work as before)
-  graph <- igraph::make_graph(~ 1-+2)
+  graph <- igraph::make_graph(~ 1 - +2)
   igraph::V(graph)$mono <- c("Glc", "GlcNAc")
-  igraph::V(graph)$sub <- c("", "")  # No substituents
+  igraph::V(graph)$sub <- c("", "") # No substituents
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   # Expected: GlcNAc(b1-4)Glc(a1-
   expect_equal(result, "GlcNAc(b1-4)Glc(a1-")
@@ -319,14 +322,14 @@ test_that("structure_to_iupac handles empty substituents", {
 
 test_that("structure_to_iupac handles mixed substituents", {
   # Test with some having substituents, some not
-  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph)$mono <- c("Glc", "GlcNAc", "Gal")
-  igraph::V(graph)$sub <- c("3Me", "", "6S")  # Mixed substituents
+  igraph::V(graph)$sub <- c("3Me", "", "6S") # Mixed substituents
   igraph::E(graph)$linkage <- c("b1-4", "b1-3")
   graph$anomer <- "a1"
   glycan <- glycan_structure(graph)
-  
+
   result <- structure_to_iupac(glycan)
   # Expected: Gal6S(b1-3)GlcNAc(b1-4)Glc3Me(a1-
   expect_equal(result, "Gal6S(b1-3)GlcNAc(b1-4)Glc3Me(a1-")
-}) 
+})

@@ -49,7 +49,11 @@ count_mono <- function(x, mono = NULL, include_subs = FALSE) {
 
 #' @rdname count_mono
 #' @export
-count_mono.glyrepr_composition <- function(x, mono = NULL, include_subs = FALSE) {
+count_mono.glyrepr_composition <- function(
+  x,
+  mono = NULL,
+  include_subs = FALSE
+) {
   .check_count_mono_args(mono, include_subs)
 
   # Special behavior when `mono` is NULL: count all monosaccharides and substituents
@@ -66,13 +70,13 @@ count_mono.glyrepr_composition <- function(x, mono = NULL, include_subs = FALSE)
 
   # Get the type of the monosaccharide
   if (mono %in% available_substituents()) {
-    mono_type <- "substituent"  # the value is not used anywhere, just for readability
+    mono_type <- "substituent" # the value is not used anywhere, just for readability
   } else {
     mono_type <- get_mono_type(mono)
   }
   # special monosaccharides are those having the same name for both generic and concrete types
   if (is.na(mono_type)) {
-    mono_type <- "special"  # the value is not used anywhere, just for readability
+    mono_type <- "special" # the value is not used anywhere, just for readability
   }
 
   # Convert to generic if needed

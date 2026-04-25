@@ -1,32 +1,32 @@
 #' Convert Glycan Structure to IUPAC-like Sequence
 #'
 #' @description
-#' Convert a glycan structure to a sequence representation in the form of 
+#' Convert a glycan structure to a sequence representation in the form of
 #' mono(linkage)mono, with branches represented by square brackets [].
-#' The backbone is chosen as the longest path, and for branches, linkages are 
+#' The backbone is chosen as the longest path, and for branches, linkages are
 #' ordered lexicographically with smaller linkages on the backbone.
 #'
 #' @details
 #' # Sequence Format
-#' 
+#'
 #' The sequence follows the format mono(linkage)mono, where:
 #' - mono: monosaccharide name with optional substituents (e.g., Glc, GlcNAc, Glc3Me)
 #' - linkage: glycosidic linkage (e.g., b1-4, a1-3)
 #' - Branches are enclosed in square brackets []
 #' - Substituents are appended directly to monosaccharide names (e.g., Glc3Me for Glc with 3Me substituent)
-#' 
+#'
 #' # Backbone Selection
-#' 
+#'
 #' The backbone is selected as the longest path in the tree. For branches,
 #' the same rule applies recursively.
-#' 
+#'
 #' # Linkage Comparison
-#' 
+#'
 #' Linkages are compared lexicographically:
 #' 1. First by anomeric configuration: ? > b > a
 #' 2. Then by first position: ? > numbers (numerically)
 #' 3. Finally by second position: ? > numbers (numerically)
-#' 
+#'
 #' Smaller linkages are placed on the backbone, larger ones in branches.
 #'
 #' @param glycan A glyrepr_structure vector.
@@ -36,10 +36,10 @@
 #' @examples
 #' # Simple linear structure
 #' structure_to_iupac(o_glycan_core_1())
-#' 
-#' # Branched structure  
+#'
+#' # Branched structure
 #' structure_to_iupac(n_glycan_core())
-#' 
+#'
 #' # Structure with substituents
 #' graph <- igraph::make_graph(~ 1-+2)
 #' igraph::V(graph)$mono <- c("Glc", "GlcNAc")
@@ -92,7 +92,7 @@ structure_to_iupac <- function(glycan) {
 #' @returns Numeric rank of the linkage.
 #' @noRd
 calculate_linkage_rank <- function(linkages) {
-  pos2 <- stringr::str_split_i(linkages, "-", 2)  # second position
+  pos2 <- stringr::str_split_i(linkages, "-", 2) # second position
   suppressWarnings(
     dplyr::if_else(
       pos2 == "?" | stringr::str_detect(pos2, "/"),
@@ -180,12 +180,15 @@ build_seq_cache <- function(glycan, root) {
 
     children[[parent]] <- c(children[[parent]], child)
     parent_edge_ids[[parent]] <- c(parent_edge_ids[[parent]], edge_id)
-    parent_linkages[[parent]] <- c(parent_linkages[[parent]], edge_linkages[edge_id])
+    parent_linkages[[parent]] <- c(
+      parent_linkages[[parent]],
+      edge_linkages[edge_id]
+    )
   }
 
   # ===== Calculate node signatures =====
   mono_vec <- igraph::vertex_attr(glycan, "mono")
-  sub_vec  <- igraph::vertex_attr(glycan, "sub")
+  sub_vec <- igraph::vertex_attr(glycan, "sub")
   mono_sub <- ifelse(
     is.na(sub_vec) | sub_vec == "",
     mono_vec,
@@ -273,7 +276,14 @@ seq_glycan <- function(node, cache) {
 
   # Combine: backbone + E<edge_index> + branches + V<node_index>
   branches_str <- paste0(branch_seqs, collapse = "")
-  paste0(backbone_seq, "E", backbone_edge_id, branches_str, "V", as.character(node))
+  paste0(
+    backbone_seq,
+    "E",
+    backbone_edge_id,
+    branches_str,
+    "V",
+    as.character(node)
+  )
 }
 
 #' Order branches
@@ -295,7 +305,12 @@ order_branches <- function(node, cache) {
   child_linkages <- cache$linkages[[node]]
   linkage_ranks <- calculate_linkage_rank(child_linkages)
   child_sigs <- cache$signatures[children]
-  backbone_child_index <- order(child_depths, linkage_ranks, child_sigs, decreasing = TRUE)[[1]]
+  backbone_child_index <- order(
+    child_depths,
+    linkage_ranks,
+    child_sigs,
+    decreasing = TRUE
+  )[[1]]
 
   # Order the rest of the children
   if (length(children) > 1) {
@@ -335,7 +350,9 @@ replace_mono_and_link <- function(pseudo_seq, glycan) {
 
       # Replace V<index> with actual monosaccharide
       pseudo_seq <- stringr::str_replace(
-        pseudo_seq, paste0("V", vertex_index), mono_with_sub
+        pseudo_seq,
+        paste0("V", vertex_index),
+        mono_with_sub
       )
     }
   }
@@ -350,7 +367,9 @@ replace_mono_and_link <- function(pseudo_seq, glycan) {
       linkage <- igraph::edge_attr(glycan, "linkage", edge_index)
       # Replace E<index> with actual linkage wrapped in parentheses
       pseudo_seq <- stringr::str_replace(
-        pseudo_seq, paste0("E", edge_index), paste0("(", linkage, ")")
+        pseudo_seq,
+        paste0("E", edge_index),
+        paste0("(", linkage, ")")
       )
     }
   }

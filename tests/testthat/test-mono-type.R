@@ -18,11 +18,17 @@ test_that("get_mono_type of special monosaccharides", {
 })
 
 test_that("get_mono_type of unknown monosaccharides", {
-  expect_error(get_mono_type(c("Unknown", "Unknown2")), "Unknown monosaccharide")
+  expect_error(
+    get_mono_type(c("Unknown", "Unknown2")),
+    "Unknown monosaccharide"
+  )
 })
 
 test_that("get mono type of composition", {
-  comp_generic <- glycan_composition(c(Hex = 4, HexNAc = 1), c(Hex = 1, HexNAc = 1))
+  comp_generic <- glycan_composition(
+    c(Hex = 4, HexNAc = 1),
+    c(Hex = 1, HexNAc = 1)
+  )
   comp_concrete <- glycan_composition(c(Gal = 4, GlcNAc = 1))
 
   expect_equal(get_mono_type(comp_generic), "generic")
@@ -66,7 +72,10 @@ test_that("convert_to_generic works with glycan structures", {
 
   expect_true(is_glycan_structure(glycan_generic))
   graph <- get_structure_graphs(glycan_generic, return_list = FALSE)
-  expect_equal(igraph::V(graph)$mono, c("Hex", "Hex", "Hex", "HexNAc", "HexNAc"))
+  expect_equal(
+    igraph::V(graph)$mono,
+    c("Hex", "Hex", "Hex", "HexNAc", "HexNAc")
+  )
 })
 
 test_that("convert_to_generic with already generic structure returns same", {
@@ -129,7 +138,11 @@ test_that("convert_to_generic preserves NA in compositions", {
 test_that("convert_to_generic handles NA in glyrepr_structure", {
   # Create structure vector with NA
   # Use valid IUPAC-condensed strings from existing structures
-  glycans <- as_glycan_structure(c("Gal(b1-3)GalNAc(a1-", NA, "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"))
+  glycans <- as_glycan_structure(c(
+    "Gal(b1-3)GalNAc(a1-",
+    NA,
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  ))
 
   result <- convert_to_generic(glycans)
   expect_equal(length(result), 3)

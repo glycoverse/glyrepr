@@ -1,7 +1,7 @@
 # Tests for glycan structure functions
 
 good_glycan_graph <- function() {
-  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph)$name <- as.character(1:igraph::vcount(graph))
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")
   igraph::V(graph)$sub <- c("", "", "")
@@ -20,7 +20,7 @@ test_that("glycan_structure works", {
 
 
 test_that("glycan_structure fails for invalid graphs", {
-  bad_graph <- igraph::make_graph(~ 1-+2, 2-+3, 3-+1)
+  bad_graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 3 - +1)
   expect_error(glycan_structure(bad_graph))
 })
 
@@ -46,7 +46,7 @@ test_that("glycan_structure accepts valid graphs", {
 
 test_that("glycan_structure rejects invalid graphs", {
   # Test undirected graph
-  graph <- igraph::make_graph(~ 1--2)
+  graph <- igraph::make_graph(~ 1 - -2)
   igraph::V(graph)$mono <- c("Glc", "Gal")
   igraph::V(graph)$sub <- c("", "")
   igraph::E(graph)$linkage <- "b1-4"
@@ -58,7 +58,7 @@ test_that("glycan_structure rejects invalid graphs", {
 # Tests for ensure_name_vertex_attr ------------------------------------------
 
 test_that("ensure_name_vertex_attr adds names when missing", {
-  graph <- igraph::make_graph(~ 1-+2)
+  graph <- igraph::make_graph(~ 1 - +2)
   graph <- igraph::delete_vertex_attr(graph, "name")
   result <- ensure_name_vertex_attr(graph)
   expect_true("name" %in% igraph::vertex_attr_names(result))
@@ -66,7 +66,7 @@ test_that("ensure_name_vertex_attr adds names when missing", {
 
 
 test_that("ensure_name_vertex_attr preserves existing names", {
-  graph <- igraph::make_graph(~ A-+B)
+  graph <- igraph::make_graph(~ A - +B)
   result <- ensure_name_vertex_attr(graph)
   expect_equal(igraph::V(result)$name, c("A", "B"))
 })
@@ -85,7 +85,7 @@ test_that("glycan structure class", {
 
 
 test_that("validating undirected graphs", {
-  graph <- igraph::make_graph(~ 1--2)
+  graph <- igraph::make_graph(~ 1 - -2)
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
@@ -109,7 +109,10 @@ test_that("validating graph without monosaccharide attribute", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
-  expect_error(glycan_structure(graph), "Glycan structure must have a vertex attribute 'mono'")
+  expect_error(
+    glycan_structure(graph),
+    "Glycan structure must have a vertex attribute 'mono'"
+  )
 })
 
 
@@ -118,7 +121,10 @@ test_that("validating graph without substituent attribute", {
   igraph::V(graph)$mono <- "GlcNAc"
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
-  expect_error(glycan_structure(graph), "Glycan structure must have a vertex attribute 'sub'")
+  expect_error(
+    glycan_structure(graph),
+    "Glycan structure must have a vertex attribute 'sub'"
+  )
 })
 
 
@@ -128,7 +134,10 @@ test_that("validating graph with NA in monosaccharide attribute", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
-  expect_error(glycan_structure(graph), "Glycan structure must have no NA in vertex attribute 'mono'")
+  expect_error(
+    glycan_structure(graph),
+    "Glycan structure must have no NA in vertex attribute 'mono'"
+  )
 })
 
 
@@ -138,26 +147,33 @@ test_that("validating graph with NA in substitude attribute", {
   igraph::V(graph)$sub <- c("", NA, "")
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
-  expect_error(glycan_structure(graph), "Glycan structure must have no NA in vertex attribute 'sub'")
+  expect_error(
+    glycan_structure(graph),
+    "Glycan structure must have no NA in vertex attribute 'sub'"
+  )
 })
 
 
-patrick::with_parameters_test_that("valid substituents", {
-  skip_on_old_win()
-  graph <- igraph::make_empty_graph(n = 1)
-  igraph::V(graph)$mono <- "GlcNAc"
-  igraph::V(graph)$sub <- sub
-  igraph::E(graph)$linkage <- character(0)
-  graph$anomer <- "b1"
-  expect_no_error(glycan_structure(graph))
-}, sub = c("6S", "9Ac", "2P", "?S"))
+patrick::with_parameters_test_that(
+  "valid substituents",
+  {
+    skip_on_old_win()
+    graph <- igraph::make_empty_graph(n = 1)
+    igraph::V(graph)$mono <- "GlcNAc"
+    igraph::V(graph)$sub <- sub
+    igraph::E(graph)$linkage <- character(0)
+    graph$anomer <- "b1"
+    expect_no_error(glycan_structure(graph))
+  },
+  sub = c("6S", "9Ac", "2P", "?S")
+)
 
 
 test_that("multiple substituents are supported", {
   skip_on_old_win()
   graph <- igraph::make_empty_graph(n = 1)
   igraph::V(graph)$mono <- "Glc"
-  igraph::V(graph)$sub <- "3Me,4Ac"  # Multiple substituents
+  igraph::V(graph)$sub <- "3Me,4Ac" # Multiple substituents
   igraph::E(graph)$linkage <- character(0)
   graph$anomer <- "a1"
   expect_no_error(glycan_structure(graph))
@@ -168,7 +184,7 @@ test_that("multiple substituents must be sorted by position", {
   skip_on_old_win()
   graph <- igraph::make_empty_graph(n = 1)
   igraph::V(graph)$mono <- "Glc"
-  igraph::V(graph)$sub <- "4Ac,3Me"  # Wrong order - should be "3Me,4Ac"
+  igraph::V(graph)$sub <- "4Ac,3Me" # Wrong order - should be "3Me,4Ac"
   igraph::E(graph)$linkage <- character(0)
   graph$anomer <- "a1"
   expect_error(glycan_structure(graph), "Unknown substituent")
@@ -179,7 +195,7 @@ test_that("duplicate positions in substituents are not allowed", {
   skip_on_old_win()
   graph <- igraph::make_empty_graph(n = 1)
   igraph::V(graph)$mono <- "Glc"
-  igraph::V(graph)$sub <- "3Me,3Ac"  # Same position (3) with different substituents
+  igraph::V(graph)$sub <- "3Me,3Ac" # Same position (3) with different substituents
   igraph::E(graph)$linkage <- character(0)
   graph$anomer <- "a1"
   expect_error(glycan_structure(graph), "Unknown substituent")
@@ -200,12 +216,15 @@ test_that("validating graph without linkage attribute", {
   igraph::V(graph)$mono <- c("GlcNAc", "GlcNAc", "GlcNAc")
   igraph::V(graph)$sub <- ""
   graph$anomer <- "a1"
-  expect_error(glycan_structure(graph), "Glycan structure must have an edge attribute 'linkage'")
+  expect_error(
+    glycan_structure(graph),
+    "Glycan structure must have an edge attribute 'linkage'"
+  )
 })
 
 
 test_that("validating one non-existing monosaccharide", {
-  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph)$mono <- c("Hex", "Fuc", "Bad")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
@@ -220,7 +239,7 @@ test_that("validating one non-existing monosaccharide", {
 
 
 test_that("validating two non-existing monosaccharide", {
-  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph)$mono <- c("Hex", "Bad1", "Bad2")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
@@ -233,7 +252,7 @@ test_that("validating two non-existing monosaccharide", {
 
 
 test_that("validating duplicated non-existing monosaccharide", {
-  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph)$mono <- c("Hex", "Bad", "Bad")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
@@ -246,7 +265,7 @@ test_that("validating duplicated non-existing monosaccharide", {
 
 
 test_that("validating bad subtituent", {
-  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
   igraph::V(graph)$sub <- c("", "6S", "Bad")
   igraph::E(graph)$linkage <- c("b1-4", "b1-4")
@@ -259,8 +278,10 @@ test_that("validating bad subtituent", {
 })
 
 
-patrick::with_parameters_test_that("validating bad linkage", {
-    graph <- igraph::make_graph(~ 1-+2, 2-+3)
+patrick::with_parameters_test_that(
+  "validating bad linkage",
+  {
+    graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
     igraph::V(graph)$mono <- c("Hex", "Fuc", "Hex")
     igraph::V(graph)$sub <- ""
     igraph::E(graph)$linkage <- bad_linkage
@@ -275,7 +296,7 @@ patrick::with_parameters_test_that("validating bad linkage", {
 
 
 test_that("validating NA linkages", {
-  graph <- igraph::make_graph(~ 1-+2, 2-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph)$mono <- c("Hex", "Hex", "Hex")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-4", NA)
@@ -286,7 +307,7 @@ test_that("validating NA linkages", {
 
 
 test_that("validating duplicated linkage positions", {
-  graph <- igraph::make_graph(~ 1-+2, 1-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 1 - +3)
   igraph::V(graph)$mono <- c("GalNAc", "Gal", "Neu5Ac")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-3", "a2-3")
@@ -297,7 +318,7 @@ test_that("validating duplicated linkage positions", {
 
 
 test_that("duplicated ? linkages are OK", {
-  graph <- igraph::make_graph(~ 1-+2, 1-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 1 - +3)
   igraph::V(graph)$mono <- c("GalNAc", "Gal", "Neu5Ac")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-?", "a2-?")
@@ -308,7 +329,7 @@ test_that("duplicated ? linkages are OK", {
 
 
 test_that("duplicated x/y linkages are OK", {
-  graph <- igraph::make_graph(~ 1-+2, 1-+3)
+  graph <- igraph::make_graph(~ 1 - +2, 1 - +3)
   igraph::V(graph)$mono <- c("GalNAc", "Gal", "Neu5Ac")
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("b1-3/6", "a2-3/6")
@@ -325,7 +346,10 @@ test_that("validating mixed generic and concrete monosaccharides", {
   igraph::E(graph)$linkage <- "b1-4"
   graph$anomer <- "a1"
 
-  expect_error(glycan_structure(graph), "Monosaccharides must be either all generic or all concrete")
+  expect_error(
+    glycan_structure(graph),
+    "Monosaccharides must be either all generic or all concrete"
+  )
 })
 
 
@@ -335,7 +359,10 @@ test_that("missing anomer attr", {
   igraph::V(graph)$sub <- ""
   igraph::E(graph)$linkage <- c("a1-3", "b1-4")
 
-  expect_error(glycan_structure(graph), "Glycan structure must have a graph attribute 'anomer'")
+  expect_error(
+    glycan_structure(graph),
+    "Glycan structure must have a graph attribute 'anomer'"
+  )
 })
 
 
@@ -365,7 +392,7 @@ create_simple_glycan_graph <- function(mono_names, linkages, anomer = "?1") {
     }
     graph <- igraph::make_graph(edges = edges, directed = TRUE)
   }
-  
+
   igraph::V(graph)$name <- as.character(1:igraph::vcount(graph))
   igraph::V(graph)$mono <- mono_names
   igraph::V(graph)$sub <- ""
@@ -404,12 +431,12 @@ test_that("glycan_structure works with multiple different glycan structures", {
 
 test_that("glycan_structure removes duplicates based on IUPAC codes", {
   glycan1 <- o_glycan_core_1()
-  glycan2 <- o_glycan_core_1()  # Same structure
+  glycan2 <- o_glycan_core_1() # Same structure
   sv <- c(glycan1, glycan2)
 
   expect_s3_class(sv, "glyrepr_structure")
-  expect_equal(length(sv), 2)  # Original vector has 2 elements
-  expect_length(attr(sv, "graphs"), 1)  # But only 1 unique structure
+  expect_equal(length(sv), 2) # Original vector has 2 elements
+  expect_length(attr(sv, "graphs"), 1) # But only 1 unique structure
 })
 
 test_that("glycan_structure handles structures with different IUPAC but same graph topology", {
@@ -420,7 +447,7 @@ test_that("glycan_structure handles structures with different IUPAC but same gra
   sv <- glycan_structure(graph1, graph2)
 
   expect_equal(length(sv), 2)
-  expect_length(attr(sv, "graphs"), 2)  # Different IUPAC codes
+  expect_length(attr(sv, "graphs"), 2) # Different IUPAC codes
 })
 
 test_that("glycan_structure validates input", {
@@ -452,7 +479,7 @@ test_that("as_glycan_structure works with empty inputs", {
 test_that("is_glycan_structure correctly identifies glycan_structure objects", {
   sv <- glycan_structure()
   expect_true(is_glycan_structure(sv))
-  
+
   expect_false(is_glycan_structure(1))
   expect_false(is_glycan_structure("test"))
   expect_false(is_glycan_structure(list()))
@@ -471,16 +498,19 @@ test_that("format.glyrepr_structure displays correct IUPAC sequences", {
   formatted <- format(sv)
 
   expect_type(formatted, "character")
-  expect_equal(formatted, c(
-    "Gal(b1-3)GalNAc(a1-                                ",
-    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
-  ))
+  expect_equal(
+    formatted,
+    c(
+      "Gal(b1-3)GalNAc(a1-                                ",
+      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+    )
+  )
 })
 
 test_that("format.glyrepr_structure handles empty vector", {
   sv <- glycan_structure()
   formatted <- format(sv)
-  
+
   expect_type(formatted, "character")
   expect_length(formatted, 0)
 })
@@ -493,7 +523,7 @@ test_that("format.glyrepr_structure handles duplicates correctly", {
   formatted <- format(sv)
 
   expect_length(formatted, 2)
-  expect_equal(formatted[1], formatted[2])  # Both should show same IUPAC
+  expect_equal(formatted[1], formatted[2]) # Both should show same IUPAC
   expect_equal(formatted[1], "Gal(b1-3)GalNAc(a1-")
 })
 
@@ -535,20 +565,20 @@ test_that("vec_ptype_full.glyrepr_structure returns correct full type", {
 test_that("obj_print_footer.glyrepr_structure displays unique count", {
   glycan1 <- o_glycan_core_1()
   glycan2 <- n_glycan_core()
-  glycan3 <- o_glycan_core_1()  # Duplicate
+  glycan3 <- o_glycan_core_1() # Duplicate
   sv <- c(glycan1, glycan2, glycan3)
-  
+
   output <- capture.output(obj_print_footer.glyrepr_structure(sv))
-  
+
   expect_length(output, 1)
   expect_match(output, "# Unique structures: 2")
 })
 
 test_that("obj_print_footer.glyrepr_structure handles empty vector", {
   sv <- glycan_structure()
-  
+
   output <- capture.output(obj_print_footer.glyrepr_structure(sv))
-  
+
   expect_length(output, 1)
   expect_match(output, "# Unique structures: 0")
 })
@@ -626,14 +656,14 @@ test_that("glycan_structure preserves glycan structures correctly", {
 
 test_that("glycan_structure handles complex branched structures", {
   # Create a more complex branched structure
-  complex_graph <- igraph::make_graph(~ 1-+2, 1-+3, 1-+4)
+  complex_graph <- igraph::make_graph(~ 1 - +2, 1 - +3, 1 - +4)
   igraph::V(complex_graph)$mono <- c("Man", "GlcNAc", "Gal", "Fuc")
   igraph::V(complex_graph)$sub <- ""
   igraph::E(complex_graph)$linkage <- c("b1-4", "a1-3", "a1-6")
   complex_graph$anomer <- "a1"
-  
+
   sv <- glycan_structure(complex_graph)
-  
+
   expect_s3_class(sv, "glyrepr_structure")
   expect_equal(length(sv), 1)
   expect_length(attr(sv, "graphs"), 1)
@@ -641,14 +671,18 @@ test_that("glycan_structure handles complex branched structures", {
 
 test_that("glycan_structure maintains hash uniqueness property", {
   # Create multiple identical structures
-  graphs <- replicate(5, {
-    create_simple_glycan_graph(c("Glc", "Gal"), "b1-4")
-  }, simplify = FALSE)
+  graphs <- replicate(
+    5,
+    {
+      create_simple_glycan_graph(c("Glc", "Gal"), "b1-4")
+    },
+    simplify = FALSE
+  )
 
   sv <- as_glycan_structure(graphs)
 
-  expect_equal(length(sv), 5)  # 5 elements in vector
-  expect_length(attr(sv, "graphs"), 1)  # But only 1 unique structure
+  expect_equal(length(sv), 5) # 5 elements in vector
+  expect_length(attr(sv, "graphs"), 1) # But only 1 unique structure
 })
 
 # Tests for c() function (vec_ptype2 method) ------------------------------------
@@ -664,33 +698,36 @@ test_that("c() combines glycan_structure vectors correctly", {
 
   expect_s3_class(combined, "glyrepr_structure")
   expect_equal(length(combined), 2)
-  expect_length(attr(combined, "graphs"), 2)  # Two unique structures
+  expect_length(attr(combined, "graphs"), 2) # Two unique structures
 
   # Check that both structures are preserved
-  expect_equal(structure_to_iupac(combined), c(
-    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
-    "Gal(b1-3)GalNAc(a1-"
-  ))
+  expect_equal(
+    structure_to_iupac(combined),
+    c(
+      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
+      "Gal(b1-3)GalNAc(a1-"
+    )
+  )
 })
 
 test_that("c() handles duplicate structures across vectors", {
   sv1 <- c(o_glycan_core_1(), n_glycan_core())
-  sv2 <- o_glycan_core_1()  # Duplicate of first structure in sv1
-  
+  sv2 <- o_glycan_core_1() # Duplicate of first structure in sv1
+
   combined <- c(sv1, sv2)
-  
+
   expect_s3_class(combined, "glyrepr_structure")
-  expect_equal(length(combined), 3)  # Total elements
-  expect_length(attr(combined, "graphs"), 2)  # Only 2 unique structures
+  expect_equal(length(combined), 3) # Total elements
+  expect_length(attr(combined, "graphs"), 2) # Only 2 unique structures
 })
 
 test_that("c() works with empty vectors", {
   sv1 <- glycan_structure()
   sv2 <- o_glycan_core_1()
-  
+
   combined1 <- c(sv1, sv2)
   combined2 <- c(sv2, sv1)
-  
+
   expect_s3_class(combined1, "glyrepr_structure")
   expect_s3_class(combined2, "glyrepr_structure")
   expect_equal(length(combined1), 1)
@@ -703,21 +740,24 @@ test_that("c() combines multiple structure vectors efficiently", {
   # Test combining multiple vectors with various duplicates
   sv1 <- o_glycan_core_1()
   sv2 <- n_glycan_core()
-  sv3 <- c(o_glycan_core_1(), n_glycan_core())  # Contains both
+  sv3 <- c(o_glycan_core_1(), n_glycan_core()) # Contains both
 
   combined <- c(sv1, sv2, sv3)
 
   expect_s3_class(combined, "glyrepr_structure")
-  expect_equal(length(combined), 4)  # 1 + 1 + 2 = 4 total elements
-  expect_length(attr(combined, "graphs"), 2)  # Only 2 unique structures
+  expect_equal(length(combined), 4) # 1 + 1 + 2 = 4 total elements
+  expect_length(attr(combined, "graphs"), 2) # Only 2 unique structures
 
   # Check all elements are present
-  expect_equal(structure_to_iupac(combined), c(
-    "Gal(b1-3)GalNAc(a1-",
-    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
-    "Gal(b1-3)GalNAc(a1-",
-    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
-  ))
+  expect_equal(
+    structure_to_iupac(combined),
+    c(
+      "Gal(b1-3)GalNAc(a1-",
+      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
+      "Gal(b1-3)GalNAc(a1-",
+      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+    )
+  )
 })
 
 test_that("c() preserves structure integrity across combinations", {
@@ -739,7 +779,7 @@ test_that("c() preserves structure integrity across combinations", {
   # n_glycan_core has Man and GlcNAc
   expect_true("GalNAc" %in% igraph::V(extracted_graphs[[1]])$mono)
   expect_true("Gal" %in% igraph::V(extracted_graphs[[1]])$mono)
-  expect_true("Man" %in% igraph::V(extracted_graphs[[2]])$mono) 
+  expect_true("Man" %in% igraph::V(extracted_graphs[[2]])$mono)
   expect_true("GlcNAc" %in% igraph::V(extracted_graphs[[2]])$mono)
 })
 
@@ -768,24 +808,24 @@ test_that("glycan_structure vectors can be subset with necessary structure prese
   expect_equal(length(subset5), 0)
 
   # Check that unique structure tracking is maintained
-  expect_length(attr(sv, "graphs"), 2)  # Original has 2 unique
-  expect_length(attr(subset1, "graphs"), 1)  # Subset preserves 1 unique
-  expect_length(attr(subset2, "graphs"), 1)  # Subset preserves 1 unique
-  expect_length(attr(subset3, "graphs"), 2)  # Subset preserves 2 unique
-  expect_length(attr(subset4, "graphs"), 0)  # Subset preserves 0 unique
-  expect_length(attr(subset5, "graphs"), 0)  # Subset preserves 0 unique
+  expect_length(attr(sv, "graphs"), 2) # Original has 2 unique
+  expect_length(attr(subset1, "graphs"), 1) # Subset preserves 1 unique
+  expect_length(attr(subset2, "graphs"), 1) # Subset preserves 1 unique
+  expect_length(attr(subset3, "graphs"), 2) # Subset preserves 2 unique
+  expect_length(attr(subset4, "graphs"), 0) # Subset preserves 0 unique
+  expect_length(attr(subset5, "graphs"), 0) # Subset preserves 0 unique
 })
 
 test_that("glycan_structure vectors can be repeated", {
   sv <- o_glycan_core_1()
-  
+
   # Test rep() function which uses vctrs casting methods
   repeated <- rep(sv, 3)
-  
+
   expect_s3_class(repeated, "glyrepr_structure")
   expect_equal(length(repeated), 3)
-  expect_length(attr(repeated, "graphs"), 1)  # Still only 1 unique structure
-  
+  expect_length(attr(repeated, "graphs"), 1) # Still only 1 unique structure
+
   formatted <- format(repeated)
   expect_equal(formatted, rep("Gal(b1-3)GalNAc(a1-", 3))
 })
@@ -794,15 +834,15 @@ test_that("complex vector operations work correctly", {
   # Test more complex vector operations
   sv1 <- c(o_glycan_core_1(), n_glycan_core())
   sv2 <- c(n_glycan_core(), o_glycan_core_1())
-  
+
   # Combine and then subset
   combined <- c(sv1, sv2)
   reordered <- combined[c(4, 3, 2, 1)]
-  
+
   expect_s3_class(reordered, "glyrepr_structure")
   expect_equal(length(reordered), 4)
   expect_length(attr(reordered, "graphs"), 2)
-  
+
   # Check that reordering worked correctly
   formatted_original <- format(combined)
   formatted_reordered <- format(reordered)
@@ -812,17 +852,17 @@ test_that("complex vector operations work correctly", {
 test_that("structure vector methods handle edge cases", {
   # Test with single element vector
   single <- o_glycan_core_1()
-  
+
   # Test combining with itself
   doubled <- c(single, single)
   expect_equal(length(doubled), 2)
   expect_length(attr(doubled, "graphs"), 1)
-  
+
   # Test empty + non-empty combinations in different orders
   empty <- glycan_structure()
   combined1 <- c(empty, single, empty)
   combined2 <- c(single, empty, single)
-  
+
   expect_equal(length(combined1), 1)
   expect_equal(length(combined2), 2)
   expect_length(attr(combined1, "graphs"), 1)
@@ -833,29 +873,29 @@ test_that("structure vector methods handle edge cases", {
 
 test_that("tibble row subsetting optimizes structure storage", {
   skip_if_not_installed("tibble")
-  
+
   # Create test data with duplicates
   sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv, name = c("A", "B", "C"))
-  
+
   # Original should have 2 unique structures
   expect_length(attr(sv, "graphs"), 2)
-  
+
   # Single row subsetting should optimize to 1 unique structure
   subset1 <- df[1, ]
   expect_equal(length(subset1$structure), 1)
   expect_length(attr(subset1$structure, "graphs"), 1)
-  
+
   # Multiple row subsetting with same structure should optimize to 1 unique
-  subset2 <- df[c(1, 3), ]  # Both point to same structure
+  subset2 <- df[c(1, 3), ] # Both point to same structure
   expect_equal(length(subset2$structure), 2)
   expect_length(attr(subset2$structure, "graphs"), 1)
-  
+
   # Multiple row subsetting with different structures should keep both
   subset3 <- df[2:3, ]
   expect_equal(length(subset3$structure), 2)
   expect_length(attr(subset3$structure, "graphs"), 2)
-  
+
   # Single row with different structure
   subset4 <- df[2, ]
   expect_equal(length(subset4$structure), 1)
@@ -864,26 +904,26 @@ test_that("tibble row subsetting optimizes structure storage", {
 
 test_that("dplyr filter operations optimize structure storage", {
   skip_if_not_installed("dplyr")
-  
+
   # Create test data with duplicates
   sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv, score = c(10, 20, 30))
-  
+
   # Filter to single row should optimize to 1 unique structure
   filtered1 <- df %>% dplyr::filter(id == 1)
   expect_equal(length(filtered1$structure), 1)
   expect_length(attr(filtered1$structure, "graphs"), 1)
-  
+
   # Filter to multiple rows with same structure should optimize
-  filtered2 <- df %>% dplyr::filter(id != 2)  # Keeps rows 1 and 3 (same structure)
+  filtered2 <- df %>% dplyr::filter(id != 2) # Keeps rows 1 and 3 (same structure)
   expect_equal(length(filtered2$structure), 2)
   expect_length(attr(filtered2$structure, "graphs"), 1)
-  
+
   # Filter to multiple rows with different structures should keep both
-  filtered3 <- df %>% dplyr::filter(id >= 2)  # Keeps rows 2 and 3 (different structures)
+  filtered3 <- df %>% dplyr::filter(id >= 2) # Keeps rows 2 and 3 (different structures)
   expect_equal(length(filtered3$structure), 2)
   expect_length(attr(filtered3$structure, "graphs"), 2)
-  
+
   # Filter by score
   filtered4 <- df %>% dplyr::filter(score >= 20)
   expect_equal(length(filtered4$structure), 2)
@@ -892,29 +932,29 @@ test_that("dplyr filter operations optimize structure storage", {
 
 test_that("dplyr slice operations optimize structure storage", {
   skip_if_not_installed("dplyr")
-  
+
   # Create test data
   sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv)
-  
+
   # slice() operations
   sliced1 <- df %>% dplyr::slice(1)
   expect_equal(length(sliced1$structure), 1)
   expect_length(attr(sliced1$structure, "graphs"), 1)
-  
+
   sliced2 <- df %>% dplyr::slice(c(1, 3))
   expect_equal(length(sliced2$structure), 2)
   expect_length(attr(sliced2$structure, "graphs"), 1)
-  
+
   sliced3 <- df %>% dplyr::slice(2:3)
   expect_equal(length(sliced3$structure), 2)
   expect_length(attr(sliced3$structure, "graphs"), 2)
-  
+
   # slice_head() and slice_tail()
   head_slice <- df %>% dplyr::slice_head(n = 1)
   expect_equal(length(head_slice$structure), 1)
   expect_length(attr(head_slice$structure, "graphs"), 1)
-  
+
   tail_slice <- df %>% dplyr::slice_tail(n = 1)
   expect_equal(length(tail_slice$structure), 1)
   expect_length(attr(tail_slice$structure, "graphs"), 1)
@@ -922,43 +962,47 @@ test_that("dplyr slice operations optimize structure storage", {
 
 test_that("dplyr arrange and other operations preserve structure optimization", {
   skip_if_not_installed("dplyr")
-  
+
   # Create test data
   sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv, score = c(30, 10, 20))
-  
+
   # arrange() should maintain all structures
   arranged <- df %>% dplyr::arrange(score)
   expect_equal(length(arranged$structure), 3)
   expect_length(attr(arranged$structure, "graphs"), 2)
-  
+
   # arrange() + slice() should optimize
   arranged_sliced <- df %>% dplyr::arrange(score) %>% dplyr::slice(1)
   expect_equal(length(arranged_sliced$structure), 1)
   expect_length(attr(arranged_sliced$structure, "graphs"), 1)
-  
+
   # top_n() operations
   top2 <- df %>% dplyr::top_n(2, score)
   expect_equal(length(top2$structure), 2)
-  expect_length(attr(top2$structure, "graphs"), 1)  # top_n selects id=1 and id=3, both have same structure
-  
+  expect_length(attr(top2$structure, "graphs"), 1) # top_n selects id=1 and id=3, both have same structure
+
   # distinct() operations with duplicated structures
   df_with_dups <- tibble::tibble(
     id = rep(1:3, each = 2),
     structure = rep(sv, each = 2)
   )
-  distinct_result <- df_with_dups %>% dplyr::distinct(structure, .keep_all = TRUE)
+  distinct_result <- df_with_dups %>%
+    dplyr::distinct(structure, .keep_all = TRUE)
   expect_equal(length(distinct_result$structure), 2)
   expect_length(attr(distinct_result$structure, "graphs"), 2)
 })
 
 test_that("complex tibble and dplyr workflows maintain optimization", {
   skip_if_not_installed("dplyr")
-  
+
   # Create more complex test data
   sv <- c(
-    o_glycan_core_1(), n_glycan_core(), o_glycan_core_1(),
-    n_glycan_core(), o_glycan_core_1()
+    o_glycan_core_1(),
+    n_glycan_core(),
+    o_glycan_core_1(),
+    n_glycan_core(),
+    o_glycan_core_1()
   )
   df <- tibble::tibble(
     id = 1:5,
@@ -966,55 +1010,58 @@ test_that("complex tibble and dplyr workflows maintain optimization", {
     type = c("A", "B", "A", "B", "A"),
     score = c(10, 20, 15, 25, 30)
   )
-  
+
   # Original should have 2 unique structures
   expect_length(attr(sv, "graphs"), 2)
-  
+
   # Complex workflow: filter + arrange + slice
   result1 <- df %>%
     dplyr::filter(type == "A") %>%
     dplyr::arrange(desc(score)) %>%
     dplyr::slice(1:2)
-  
+
   expect_equal(length(result1$structure), 2)
-  expect_length(attr(result1$structure, "graphs"), 1)  # All type A have same structure
-  
+  expect_length(attr(result1$structure, "graphs"), 1) # All type A have same structure
+
   # Another complex workflow: group operations
   result2 <- df %>%
     dplyr::group_by(type) %>%
     dplyr::slice_max(score, n = 1) %>%
     dplyr::ungroup()
-  
+
   expect_equal(length(result2$structure), 2)
-  expect_length(attr(result2$structure, "graphs"), 2)  # One from each type
-  
+  expect_length(attr(result2$structure, "graphs"), 2) # One from each type
+
   # Workflow with structure column operations
   result3 <- df %>%
     dplyr::filter(score >= 20) %>%
     dplyr::select(structure, score)
-  
-  expect_equal(length(result3$structure), 3)  # score >= 20 selects 3 rows (id=2,4,5)
-  expect_length(attr(result3$structure, "graphs"), 2)  # These have 2 different structures
+
+  expect_equal(length(result3$structure), 3) # score >= 20 selects 3 rows (id=2,4,5)
+  expect_length(attr(result3$structure, "graphs"), 2) # These have 2 different structures
 })
 
 test_that("tibble operations preserve structure content integrity", {
   skip_if_not_installed("dplyr")
-  
+
   # Create test data
   sv <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   df <- tibble::tibble(id = 1:3, structure = sv)
-  
+
   # Verify that optimization doesn't affect structure content
   subset_df <- df %>% dplyr::filter(id == 1)
-  
+
   # Extract the structure and verify it's correct
-  structure_graph <- get_structure_graphs(subset_df$structure, return_list = FALSE)
+  structure_graph <- get_structure_graphs(
+    subset_df$structure,
+    return_list = FALSE
+  )
   expect_s3_class(structure_graph, "igraph")
-  
+
   # Verify structure content (o_glycan_core_1 has GalNAc and Gal)
   expect_true("GalNAc" %in% igraph::V(structure_graph)$mono)
   expect_true("Gal" %in% igraph::V(structure_graph)$mono)
-  
+
   # Verify IUPAC representation is preserved
   expect_equal(format(subset_df$structure)[1], "Gal(b1-3)GalNAc(a1-")
 })
@@ -1027,13 +1074,13 @@ test_that("converting to character", {
 
 # Tests for vertex and edge reordering -------------------------
 test_that("vertices and edges are reordered correctly", {
-  graph1 <- igraph::make_graph(~ 1-+2, 1-+3)
+  graph1 <- igraph::make_graph(~ 1 - +2, 1 - +3)
   igraph::V(graph1)$mono <- c("GalNAc", "Gal", "GlcNAc")
   igraph::V(graph1)$sub <- ""
   igraph::E(graph1)$linkage <- c("b1-3", "b1-6")
   graph1$anomer <- "a1"
 
-  graph2 <- igraph::make_graph(~ 1-+2, 1-+3)
+  graph2 <- igraph::make_graph(~ 1 - +2, 1 - +3)
   igraph::V(graph2)$mono <- c("GalNAc", "GlcNAc", "Gal")
   igraph::V(graph2)$sub <- ""
   igraph::E(graph2)$linkage <- c("b1-6", "b1-3")
@@ -1068,8 +1115,8 @@ test_that("glycan_structure accepts multiple generic structures", {
 })
 
 test_that("glycan_structure rejects mixing concrete and generic structures", {
-  graph1 <- create_simple_glycan_graph(c("Glc", "Gal"), "b1-4")  # concrete
-  graph2 <- create_simple_glycan_graph(c("Hex", "HexNAc"), "b1-4")  # generic
+  graph1 <- create_simple_glycan_graph(c("Glc", "Gal"), "b1-4") # concrete
+  graph2 <- create_simple_glycan_graph(c("Hex", "HexNAc"), "b1-4") # generic
   expect_error(
     glycan_structure(graph1, graph2),
     "All structures must have the same monosaccharide type"
@@ -1077,8 +1124,8 @@ test_that("glycan_structure rejects mixing concrete and generic structures", {
 })
 
 test_that("c() rejects combining concrete and generic structure vectors", {
-  sv1 <- o_glycan_core_1()  # concrete: Gal, GalNAc
-  sv2 <- n_glycan_core(mono_type = "generic")  # generic: Hex, HexNAc
+  sv1 <- o_glycan_core_1() # concrete: Gal, GalNAc
+  sv2 <- n_glycan_core(mono_type = "generic") # generic: Hex, HexNAc
   expect_error(
     c(sv1, sv2),
     "All structures must have the same monosaccharide type"
@@ -1307,7 +1354,10 @@ test_that("all glyrepr_structure functions preserve names", {
   expect_equal(names(convert_to_generic(structs_concrete)), c("X", "Y"))
 
   # Level reduction
-  expect_equal(names(reduce_structure_level(structures, "topological")), c("A", "B", "C"))
+  expect_equal(
+    names(reduce_structure_level(structures, "topological")),
+    c("A", "B", "C")
+  )
 
   # Vector combination
   expect_equal(names(c(structures)), c("A", "B", "C"))
@@ -1401,7 +1451,7 @@ test_that("vec_restore handles all NA vector", {
   struct_na <- glycan_structure(NA, NA)
   expect_equal(length(struct_na), 2)
   expect_equal(is.na(struct_na), c(TRUE, TRUE))
-  expect_length(attr(struct_na, "graphs"), 0)  # No graphs for NA elements
+  expect_length(attr(struct_na, "graphs"), 0) # No graphs for NA elements
 })
 
 test_that("vec_restore preserves graphs for non-NA with mixed NA", {
@@ -1468,7 +1518,10 @@ test_that("reduce_structure_level handles structures with NA", {
   structs <- c(o_glycan_core_1(), NA)
   # Note: reduce_structure_level uses smap which currently doesn't handle NA
   # This test verifies the function works for non-NA structures
-  reduced_valid <- reduce_structure_level(o_glycan_core_1(), to_level = "topological")
+  reduced_valid <- reduce_structure_level(
+    o_glycan_core_1(),
+    to_level = "topological"
+  )
   expect_equal(get_structure_level(reduced_valid), "topological")
 })
 
@@ -1484,14 +1537,14 @@ test_that("reduce_structure_level handles NA when reducing to basic", {
 test_that("get_mono_type handles mixed NA and valid structures", {
   structs <- c(o_glycan_core_1(), NA)
   types <- get_mono_type(structs)
-  expect_equal(length(types), 1)  # Returns scalar for glyrepr_structure
+  expect_equal(length(types), 1) # Returns scalar for glyrepr_structure
   expect_equal(types, "concrete")
 })
 
 test_that("get_mono_type handles all NA structures", {
   structs <- glycan_structure(NA, NA)
   types <- get_mono_type(structs)
-  expect_equal(length(types), 1)  # Returns scalar for glyrepr_structure
+  expect_equal(length(types), 1) # Returns scalar for glyrepr_structure
   expect_true(is.na(types))
 })
 
@@ -1543,16 +1596,16 @@ test_that("format preserves order with mixed NA and valid", {
   structs <- c(struct1, NA, struct2, NA)
   formatted <- format(structs)
   expect_false(is.na(formatted[1]))
-  expect_true(grepl("^NA", formatted[2]))  # format() pads with spaces
+  expect_true(grepl("^NA", formatted[2])) # format() pads with spaces
   expect_false(is.na(formatted[3]))
-  expect_true(grepl("^NA", formatted[4]))  # format() pads with spaces
+  expect_true(grepl("^NA", formatted[4])) # format() pads with spaces
 })
 
 test_that("format handles all NA structures", {
   structs <- glycan_structure(NA, NA)
   formatted <- format(structs)
   expect_equal(length(formatted), 2)
-  expect_true(all(grepl("^NA", formatted)))  # format() pads with spaces
+  expect_true(all(grepl("^NA", formatted))) # format() pads with spaces
 })
 
 # Tests for tibble printing with NA ------------------------------------------------
@@ -1573,7 +1626,7 @@ test_that("tibble printing handles multiple NA structures", {
   output <- capture.output(print(df))
   # Count occurrences of "NA" string (appears once per NA element in data rows)
   na_count <- sum(grepl("NA", output))
-  expect_true(na_count >= 2)  # At least two NA entries should appear
+  expect_true(na_count >= 2) # At least two NA entries should appear
 })
 
 # Tests for c() combining with NA --------------------------------------------------
@@ -1603,7 +1656,7 @@ test_that("all NA structure vector has correct properties", {
   structs <- glycan_structure(NA, NA)
   expect_equal(length(structs), 2)
   expect_true(all(is.na(structs)))
-  expect_equal(length(attr(structs, "graphs")), 0)  # No graphs for NA
+  expect_equal(length(attr(structs, "graphs")), 0) # No graphs for NA
 })
 
 # Tests for vec_slice with NA ------------------------------------------------------

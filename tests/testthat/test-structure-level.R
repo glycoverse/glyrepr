@@ -27,17 +27,26 @@ test_that("reduce_structure_level works for each glycan separately", {
 
   # intact to topological
   expect_equal(
-    as.character(reduce_structure_level(glycan_intact, to_level = "topological")),
+    as.character(reduce_structure_level(
+      glycan_intact,
+      to_level = "topological"
+    )),
     "Gal(??-?)GalNAc(??-"
   )
   # partial to topological
   expect_equal(
-    as.character(reduce_structure_level(glycan_partial, to_level = "topological")),
+    as.character(reduce_structure_level(
+      glycan_partial,
+      to_level = "topological"
+    )),
     "Gal(??-?)GalNAc(??-"
   )
   # topological to topological (identity)
   expect_equal(
-    as.character(reduce_structure_level(glycan_topological, to_level = "topological")),
+    as.character(reduce_structure_level(
+      glycan_topological,
+      to_level = "topological"
+    )),
     "Gal(??-?)GalNAc(??-"
   )
 
@@ -53,14 +62,20 @@ test_that("reduce_structure_level works for each glycan separately", {
   )
   # topological to basic
   expect_equal(
-    as.character(reduce_structure_level(glycan_topological, to_level = "basic")),
+    as.character(reduce_structure_level(
+      glycan_topological,
+      to_level = "basic"
+    )),
     "Hex(??-?)HexNAc(??-"
   )
 })
 
 test_that("reduce_structure_level rejects higher level", {
   glycan <- as_glycan_structure("Hex(??-?)HexNAc(??-")
-  expect_snapshot(reduce_structure_level(glycan, to_level = "topological"), error = TRUE)
+  expect_snapshot(
+    reduce_structure_level(glycan, to_level = "topological"),
+    error = TRUE
+  )
 })
 
 test_that("reduce_structure_level works for multiple glycans", {

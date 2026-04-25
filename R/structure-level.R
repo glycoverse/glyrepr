@@ -49,7 +49,9 @@ get_structure_level <- function(x) {
 
   result[non_na] <- dplyr::case_when(
     mono_type == "concrete" & has_linkages_strict ~ "intact",
-    mono_type == "concrete" & (!has_linkages_strict) & has_linkages_lenient ~ "partial",
+    mono_type == "concrete" &
+      (!has_linkages_strict) &
+      has_linkages_lenient ~ "partial",
     mono_type == "concrete" & (!has_linkages_lenient) ~ "topological",
     mono_type == "generic" & (!has_linkages_strict) ~ "basic",
     .default = "basic"
@@ -114,7 +116,8 @@ reduce_structure_level <- function(x, to_level) {
   if (to_level == "basic") {
     x <- remove_linkages(x)
     x <- convert_to_generic(x)
-  } else { # `to_level` is "topological"
+  } else {
+    # `to_level` is "topological"
     x <- remove_linkages(x)
   }
   x

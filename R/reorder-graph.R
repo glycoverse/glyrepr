@@ -54,7 +54,7 @@ reorder_graphs_with_indices <- function(graphs) {
   edges <- igraph::as_data_frame(g, what = "edges")
   verts <- igraph::as_data_frame(g, what = "vertices")
   edges <- edges[order, , drop = FALSE]
-  
+
   # Ensure 'name' column is first in vertices data frame if it exists
   # This is required by igraph::graph_from_data_frame() to avoid "Duplicate vertex names" error
   if ("name" %in% names(verts)) {
@@ -62,8 +62,12 @@ reorder_graphs_with_indices <- function(graphs) {
     other_cols <- verts[, !names(verts) %in% "name", drop = FALSE]
     verts <- cbind(name = name_col, other_cols)
   }
-  
-  new_g <- igraph::graph_from_data_frame(edges, directed = igraph::is_directed(g), vertices = verts)
+
+  new_g <- igraph::graph_from_data_frame(
+    edges,
+    directed = igraph::is_directed(g),
+    vertices = verts
+  )
   new_g$anomer <- g$anomer
   new_g
 }
