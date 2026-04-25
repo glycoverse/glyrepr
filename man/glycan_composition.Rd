@@ -34,7 +34,8 @@ generic or concrete monosaccharides.
 
 Components are automatically sorted with monosaccharides first (according to
 their order in the monosaccharides table), followed by substituents (according
-to their order in \code{available_substituents()}).
+to their order in \code{available_substituents()}). Duplicate components are
+automatically summed.
 }
 \examples{
 # A vector with one composition (generic monosaccharides)
