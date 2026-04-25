@@ -1,12 +1,12 @@
 # glyrepr (development version)
 
+## Breaking changes
+
+* `get_structure_level()` now returns one character scalar for a `glyrepr_structure` vector instead of one value per element. The vector-wide level is "intact", "partial", "topological", or "basic" according to the combined residue and linkage detail of the non-missing structures in the vector (#42).
+
 ## New features
 
 * `as_glycan_composition()` now supports parsing "E" and "L" in the input composition strings as "NeuAc". For example, `as_glycan_composition("H5N4F1L1E1")` is now correctly parsed as `Hex(5)HexNAc(4)Fuc(1)NeuAc(2)`, with a warning about dropping the sialic acid linkage information (#41).
-
-## Breaking changes
-
-* `get_structure_level()` now returns one character scalar for a `glyrepr_structure` vector instead of one value per element. The vector-wide level is "intact", "partial", "topological", or "basic" according to the combined residue and linkage detail of the non-missing structures in the vector.
 
 ## Minor improvements and bug fixes
 
