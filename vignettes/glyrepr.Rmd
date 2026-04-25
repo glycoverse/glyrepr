@@ -176,16 +176,16 @@ like zoom levels on a map.
 
 - **"intact"**: The full picture — 
   all monosaccharides are concrete (e.g., "Man", "GlcNAc"), 
-  and all linkages are fully determined (e.g., "a2-3", "b1-4").
+  and no linkage or anomer contains "?".
 - **"partial"**: Almost there — 
   all monosaccharides are concrete (e.g., "Man", "GlcNAc"), 
-  but some linkage information is missing (e.g., "a2-?").
+  at least one linkage or anomer contains "?",
+  and at least one linkage or anomer has a non-"?" annotation.
 - **"topological"**: We know what's there, but not how they connect — 
   all monosaccharides are concrete (e.g., "Man", "GlcNAc"), 
-  but the linkage information is completely unknown ("??-?").
+  and all linkages and anomers are completely unknown ("??-?"/"??").
 - **"basic"**: The minimalist view — 
-  all monosaccharides are generic (e.g., "Hex", "HexNAc"), 
-  and the linkage information is completely unknown ("??-?").
+  all monosaccharides are generic (e.g., "Hex", "HexNAc").
 
 💡 **Fun fact**: 
 In theory, you could have a glycan with generic monosaccharides but fully determined linkages 
@@ -194,7 +194,7 @@ But in practice, this is almost unheard of —
 linkage information is much harder to obtain than monosaccharide information. 
 That's why `glyrepr` assigns these structures to the "basic" level too.
 
-You can get the structure level for a glycan structure vector with `get_structure_level()`:
+You can get the vector-wide structure level for a glycan structure vector with `get_structure_level()`:
 
 ```{r}
 # Concrete structures (various linkage detail levels)
