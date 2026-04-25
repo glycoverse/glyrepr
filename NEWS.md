@@ -4,12 +4,16 @@
 
 * `as_glycan_composition()` now supports parsing "E" and "L" in the input composition strings as "NeuAc". For example, `as_glycan_composition("H5N4F1L1E1")` is now correctly parsed as `Hex(5)HexNAc(4)Fuc(1)NeuAc(2)`, with a warning about dropping the sialic acid linkage information (#41).
 
+## Breaking changes
+
+* `get_structure_level()` now returns one character scalar for a `glyrepr_structure` vector instead of one value per element. The vector-wide level is "intact", "partial", "topological", or "basic" according to the combined residue and linkage detail of the non-missing structures in the vector.
+
 ## Minor improvements and bug fixes
 
 * Fix the bug that `glycan_composition()` and `as_glycan_composition()` cannot handle duplications in the input. For example, `as_glycan_composition("Hex(2)Hex(1)HexNAc(2)")` is correctly regared as `Hex(3)HexNAc(2)` now (#40).
 * `as_glycan_structure(NA_character_)` now creates a missing structure instead of erroring.
-* `get_structure_level()` now preserves missing structures as NA instead of treating them as "basic".
-* `reduce_structure_level()` skips missing structures when checking level ranks and preserves them in output.
+* `get_structure_level()` now ignores missing structures when determining the vector-wide level, and returns `NA_character_` for empty or all-missing structure vectors.
+* `reduce_structure_level()` preserves missing structures in output.
 * `simap()` and ``simap_structure()` now skip missing structures like the other smap variants.
 * `get_mono_type.glyrepr_composition()` now ignores missing composition elements and returns `NA_character_` for all-NA composition vectors.
 
