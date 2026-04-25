@@ -41,6 +41,11 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
 <div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> now supports parsing “E” and “L” in the input composition strings as “NeuAc”. For example, <code>as_glycan_composition("H5N4F1L1E1")</code> is now correctly parsed as <code>Hex(5)HexNAc(4)Fuc(1)NeuAc(2)</code>, with a warning about dropping the sialic acid linkage information.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
 <ul><li>Fix the bug that <code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> and <code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> cannot handle duplications in the input. For example, <code>as_glycan_composition("Hex(2)Hex(1)HexNAc(2)")</code> is correctly regared as <code>Hex(3)HexNAc(2)</code> now (<a href="https://github.com/glycoverse/glyrepr/issues/40" class="external-link">#40</a>).</li>
 <li>

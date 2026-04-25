@@ -2,6 +2,14 @@
 
 ## glyrepr (development version)
 
+### New features
+
+- [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_composition.md)
+  now supports parsing “E” and “L” in the input composition strings as
+  “NeuAc”. For example, `as_glycan_composition("H5N4F1L1E1")` is now
+  correctly parsed as `Hex(5)HexNAc(4)Fuc(1)NeuAc(2)`, with a warning
+  about dropping the sialic acid linkage information.
+
 ### Minor improvements and bug fixes
 
 - Fix the bug that
