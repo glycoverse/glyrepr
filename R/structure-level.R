@@ -34,9 +34,9 @@ get_structure_level <- function(x) {
   non_na <- !structure_na_mask(x)
 
   if (!any(non_na)) {
-    if (length(x) == 0) {
-      return(NA_character_)
-    }
+    return(NA_character_)
+  }
+  if (length(x) == 0) {
     return(NA_character_)
   }
 
