@@ -16,6 +16,6 @@
       comps <- as_glycan_composition(chars)
     Condition
       Warning:
-      Simple composition codes "E" and "L" are parsed as "NeuAc".
+      Simple composition codes "E" and/or "L" are parsed as "NeuAc".
       i Linkage-specific Neu5Ac information is discarded in glycan compositions.
 

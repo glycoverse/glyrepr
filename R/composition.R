@@ -558,13 +558,14 @@ parse_single_composition <- function(char) {
 }
 
 #' Warn when simple NeuAc linkage codes are converted to composition counts
-#' @param parse_result A list returned by `parse_single_composition()`.
+#' @param parse_result A list of per-element results returned by
+#'   `parse_single_composition()`.
 #' @returns Nothing. Called for its warning side effect.
 #' @noRd
 .warn_lossy_neuac_linkage <- function(parse_result) {
   if (purrr::some(parse_result, ~ isTRUE(.x$lossy_neuac_linkage))) {
     cli::cli_warn(c(
-      "Simple composition codes {.val E} and {.val L} are parsed as {.val NeuAc}.",
+      "Simple composition codes {.val E} and/or {.val L} are parsed as {.val NeuAc}.",
       "i" = "Linkage-specific Neu5Ac information is discarded in glycan compositions."
     ))
   }
