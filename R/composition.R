@@ -98,6 +98,12 @@ is_glycan_composition <- function(x) {
 #' vertex in the structure. For example, a vertex with `sub = "3Me"`
 #' contributes one "Me" substituent to the composition.
 #'
+#' Simple composition strings use one-letter residue codes: "H" for "Hex",
+#' "N" for "HexNAc", "F" for "dHex", "S"/"A" for "NeuAc", and "G" for
+#' "NeuGc". "E" and "L" are also accepted as linkage-specific Neu5Ac codes;
+#' they are converted to "NeuAc" with a warning because composition objects do
+#' not preserve linkage information.
+#'
 #' @examples
 #' # From a single named vector
 #' as_glycan_composition(c(Hex = 5, HexNAc = 2))
@@ -200,6 +206,7 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
       }
 
       compositions <- purrr::map(parse_result, "composition")
+      .warn_lossy_neuac_linkage(parse_result)
     }
 
     # Build result list preserving order - no global state needed
@@ -227,6 +234,7 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
       "i" = "Expected format: 'Hex(5)HexNAc(2)' with monosaccharide names followed by counts in parentheses."
     ))
   }
+  .warn_lossy_neuac_linkage(parse_result)
   if (length(compositions) == 0) {
     return(glycan_composition())
   }
@@ -530,7 +538,13 @@ parse_single_composition <- function(char) {
     result <- tryCatch(
       {
         composition <- parser(char)
-        list(composition = composition, valid = TRUE)
+        lossy_neuac_linkage <- isTRUE(attr(composition, "lossy_neuac_linkage"))
+        attr(composition, "lossy_neuac_linkage") <- NULL
+        list(
+          composition = composition,
+          valid = TRUE,
+          lossy_neuac_linkage = lossy_neuac_linkage
+        )
       },
       error = function(e) NULL
     )
@@ -541,6 +555,20 @@ parse_single_composition <- function(char) {
 
   # All parsers failed
   list(composition = NULL, valid = FALSE)
+}
+
+#' Warn when simple NeuAc linkage codes are converted to composition counts
+#' @param parse_result A list of per-element results returned by
+#'   `parse_single_composition()`.
+#' @returns Nothing. Called for its warning side effect.
+#' @noRd
+.warn_lossy_neuac_linkage <- function(parse_result) {
+  if (purrr::some(parse_result, ~ isTRUE(.x$lossy_neuac_linkage))) {
+    cli::cli_warn(c(
+      "Simple composition codes {.val E} and/or {.val L} are parsed as {.val NeuAc}.",
+      "i" = "Linkage-specific Neu5Ac information is discarded in glycan compositions."
+    ))
+  }
 }
 
 .parse_byonic_comp <- function(x) {
@@ -579,7 +607,7 @@ parse_single_composition <- function(char) {
 
 .parse_simple_comp <- function(x) {
   # "S" and "A" are both NeuAc, "G" is NeuGc
-  mono_pattern <- "([HNFSAG])(\\d+)"
+  mono_pattern <- "([HNFSAGEL])(\\d+)"
   matches <- stringr::str_extract_all(x, mono_pattern, simplify = FALSE)[[1]]
 
   # Check if no monos were matched
@@ -602,12 +630,15 @@ parse_single_composition <- function(char) {
   })
 
   mono_names <- purrr::map_chr(parsed_matches, "name")
+  lossy_neuac_linkage <- any(mono_names %in% c("E", "L"))
   mono_names <- dplyr::recode_values(mono_names,
     "H" ~ "Hex",
     "N" ~ "HexNAc",
     "F" ~ "dHex",
     "S" ~ "NeuAc",
     "A" ~ "NeuAc",
+    "E" ~ "NeuAc",
+    "L" ~ "NeuAc",
     "G" ~ "NeuGc"
   )
   mono_counts <- purrr::map_int(parsed_matches, "count")
@@ -615,6 +646,7 @@ parse_single_composition <- function(char) {
   # Create named vector
   comp <- mono_counts
   names(comp) <- mono_names
+  attr(comp, "lossy_neuac_linkage") <- lossy_neuac_linkage
   comp
 }
 

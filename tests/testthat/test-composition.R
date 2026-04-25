@@ -274,6 +274,17 @@ test_that("as_glycan_composition works for simple compositions", {
   expect_equal(as_glycan_composition(chars), expected)
 })
 
+test_that("as_glycan_composition works for E and L", {
+  chars <- c("H5N4E1", "H5N4L1", "H5N4E1L1")
+  expected <- glycan_composition(
+    c(Hex = 5, HexNAc = 4, NeuAc = 1),
+    c(Hex = 5, HexNAc = 4, NeuAc = 1),
+    c(Hex = 5, HexNAc = 4, NeuAc = 2)
+  )
+  expect_snapshot(comps <- as_glycan_composition(chars))  # should warn about E/L ambiguity
+  expect_equal(comps, expected)
+})
+
 # This test is replaced by tests for NA handling in character casting above
 
 test_that("as_glycan_composition works for empty characters", {
