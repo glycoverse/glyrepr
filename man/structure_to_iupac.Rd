@@ -48,7 +48,7 @@ Smaller linkages are placed on the backbone, larger ones in branches.
 # Simple linear structure
 structure_to_iupac(o_glycan_core_1())
 
-# Branched structure  
+# Branched structure
 structure_to_iupac(n_glycan_core())
 
 # Structure with substituents

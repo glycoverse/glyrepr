@@ -9,15 +9,89 @@ test_that("get_structure_level works for each glycan separately", {
   expect_equal(get_structure_level(glycan2), "partial")
   expect_equal(get_structure_level(glycan3), "topological")
   expect_equal(get_structure_level(glycan4), "basic")
-  expect_equal(get_structure_level(glycan5), "basic")
+  expect_warning(
+    expect_equal(get_structure_level(glycan5), "basic"),
+    class = "glyrepr_warning_generic_structure_linkages"
+  )
 })
 
-test_that("get_structure_level works for multiple glycans", {
+test_that("get_structure_level works for an intact glycan vector", {
   glycans <- as_glycan_structure(c(
     "Gal(b1-3)GalNAc(a1-",
     "GalNAc(a1-"
   ))
-  expect_equal(get_structure_level(glycans), c("intact", "intact"))
+  expect_equal(get_structure_level(glycans), "intact")
+})
+
+test_that("get_structure_level works for a partial glycan vector with only one unknown linkage", {
+  glycans <- as_glycan_structure(c(
+    "Gal(b1-?)GalNAc(a1-",
+    "GalNAc(a1-"
+  ))
+  expect_equal(get_structure_level(glycans), "partial")
+})
+
+test_that("get_structure_level works for a partial glycan vector with only one known linkage", {
+  glycans <- as_glycan_structure(c(
+    "Gal(?1-?)GalNAc(??-",
+    "GalNAc(??-"
+  ))
+  expect_equal(get_structure_level(glycans), "partial")
+})
+
+test_that("get_structure_level works for a partial glycan vector with only one known reducing end configuration", {
+  glycans <- as_glycan_structure(c(
+    "Gal(??-?)GalNAc(??-",
+    "GalNAc(?1-"
+  ))
+  expect_equal(get_structure_level(glycans), "partial")
+})
+
+test_that("get_structure_level works for a topological glycan vector", {
+  glycans <- as_glycan_structure(c(
+    "Gal(??-?)GalNAc(??-",
+    "GalNAc(??-"
+  ))
+  expect_equal(get_structure_level(glycans), "topological")
+})
+
+test_that("get_structure_level works for a basic glycan vector", {
+  glycans <- as_glycan_structure(c(
+    "Hex(??-?)HexNAc(??-",
+    "HexNAc(??-"
+  ))
+  expect_equal(get_structure_level(glycans), "basic")
+})
+
+test_that("get_structure_level works for a basic glycan vector with linkages", {
+  glycans <- as_glycan_structure(c(
+    "Hex(b1-3)HexNAc(a1-",
+    "HexNAc(a1-"
+  ))
+  expect_snapshot(res <- get_structure_level(glycans))
+  # should warn about the rare case of a generic glycan with linkages,
+  # and tell the user that it will be treated as basic
+
+  expect_equal(res, "basic")
+})
+
+test_that("get_structure_level ignores NA", {
+  glycans <- as_glycan_structure(c(
+    "Hex(??-?)HexNAc(??-",
+    "HexNAc(??-",
+    NA
+  ))
+  expect_equal(get_structure_level(glycans), "basic")
+})
+
+test_that("get_structure_level return NA_character_ for all-NA vector", {
+  glycans <- as_glycan_structure(c(NA, NA))
+  expect_equal(get_structure_level(glycans), NA_character_)
+})
+
+test_that("get_structure_level returns NA_character_ for empty vector", {
+  glycans <- as_glycan_structure(character())
+  expect_equal(get_structure_level(glycans), NA_character_)
 })
 
 test_that("reduce_structure_level works for each glycan separately", {
@@ -88,4 +162,14 @@ test_that("reduce_structure_level works for multiple glycans", {
     as.character(reduce_structure_level(glycans, to_level = "topological")),
     c("Gal(??-?)GalNAc(??-", "Gal(??-?)GalNAc(??-", "Gal(??-?)GalNAc(??-")
   )
+})
+
+test_that("reduce_structure_level works for all-NA vectors", {
+  glycans <- as_glycan_structure(c(NA, NA))
+  expect_equal(reduce_structure_level(glycans, to_level = "topological"), glycans)
+})
+
+test_that("reduce_structure_level works for empty vectors", {
+  glycans <- as_glycan_structure(character())
+  expect_equal(reduce_structure_level(glycans, to_level = "topological"), glycans)
 })

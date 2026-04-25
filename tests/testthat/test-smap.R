@@ -1286,14 +1286,15 @@ test_that("smap_unique documents behavior with named input", {
   expect_true(is.null(names(result)) || startsWith(names(result), "Gal"))
 })
 
-test_that("get_structure_level preserves names", {
+test_that("get_structure_level returns one unnamed level for a named vector", {
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
   structures <- c(core1, core2, core1)
   names(structures) <- c("A", "B", "C")
 
   result <- get_structure_level(structures)
-  expect_equal(names(result), c("A", "B", "C"))
+  expect_equal(result, "intact")
+  expect_null(names(result))
 })
 
 # Tests for NA handling in smap functions -----------------------------------

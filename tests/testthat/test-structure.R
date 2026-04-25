@@ -1337,9 +1337,11 @@ test_that("all glyrepr_structure functions preserve names", {
   # Accessor functions (return atomic vectors)
   expect_equal(names(get_anomer(structures)), c("A", "B", "C"))
   expect_equal(names(has_linkages(structures)), c("A", "B", "C"))
-  expect_equal(names(get_structure_level(structures)), c("A", "B", "C"))
   expect_equal(names(count_mono(structures)), c("A", "B", "C"))
   expect_equal(names(structure_to_iupac(structures)), c("A", "B", "C"))
+
+  # get_structure_level() returns one scalar level for the whole vector.
+  expect_null(names(get_structure_level(structures)))
 
   # Accessor functions (return list)
   expect_equal(names(get_structure_graphs(structures)), c("A", "B", "C"))
@@ -1805,8 +1807,7 @@ test_that("get_structure_level preserves NA structures", {
 
   result <- get_structure_level(structures)
 
-  expect_equal(result[1], "intact")
-  expect_true(is.na(result[2]))
+  expect_equal(result, "intact")
 })
 
 test_that("reduce_structure_level skips NA structures when checking level rank", {
