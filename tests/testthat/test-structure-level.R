@@ -75,6 +75,25 @@ test_that("get_structure_level works for a basic glycan vector with linkages", {
   expect_equal(res, "basic")
 })
 
+test_that("get_structure_level ignores NA", {
+  glycans <- as_glycan_structure(c(
+    "Hex(??-?)HexNAc(??-",
+    "HexNAc(??-",
+    NA
+  ))
+  expect_equal(get_structure_level(glycans), "basic")
+})
+
+test_that("get_structure_level return NA_character_ for all-NA vector", {
+  glycans <- as_glycan_structure(c(NA, NA))
+  expect_equal(get_structure_level(glycans), NA_character_)
+})
+
+test_that("get_structure_level returns NA_character_ for empty vector", {
+  glycans <- as_glycan_structure(character())
+  expect_equal(get_structure_level(glycans), NA_character_)
+})
+
 test_that("reduce_structure_level works for each glycan separately", {
   glycan_intact <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
   glycan_partial <- as_glycan_structure("Gal(b1-?)GalNAc(a1-")

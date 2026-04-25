@@ -20,6 +20,7 @@
 #' @param x A [glycan_structure()] vector.
 #'
 #' @returns A character scalar containing the structure level for `x`.
+#'   If `x` is empty or all structures in `x` are NA, returns NA_character_.
 #'
 #' @examples
 #' glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
@@ -34,7 +35,7 @@ get_structure_level <- function(x) {
 
   if (!any(non_na)) {
     if (length(x) == 0) {
-      return(character())
+      return(NA_character_)
     }
     return(NA_character_)
   }
