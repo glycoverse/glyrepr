@@ -2,6 +2,10 @@
 
     Code
       res <- get_structure_level(glycans)
+    Condition
+      Warning:
+      Generic glycan structures with linkage annotations are treated as "basic".
+      i Linkage information is ignored when residues are generic.
 
 # reduce_structure_level rejects higher level
 

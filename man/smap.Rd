@@ -78,7 +78,7 @@ smap_int(structures, igraph::vcount)
 # Map a function that returns logical
 smap_lgl(structures, function(g) igraph::vcount(g) > 5)
 
-# Use purrr-style lambda functions  
+# Use purrr-style lambda functions
 smap_int(structures, ~ igraph::vcount(.x))
 smap_lgl(structures, ~ igraph::vcount(.x) > 5)
 

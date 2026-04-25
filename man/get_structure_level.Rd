@@ -10,20 +10,19 @@ get_structure_level(x)
 \item{x}{A \code{\link[=glycan_structure]{glycan_structure()}} vector.}
 }
 \value{
-A character vector of the same length as \code{x},
-containing the structure level for each element.
+A character scalar containing the structure level for \code{x}.
 }
 \description{
 Glycan structures can have four possible levels of resolution:
 \itemize{
 \item "intact": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-and all linkages are fully determined (e.g. "a2-3", "b1-4").
+and no linkage or anomer contains "?".
 \item "partial": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-but some linkage information is missing (e.g. "a2-?").
+at least one linkage or anomer contains "?",
+and at least one linkage or anomer has a non-"?" annotation.
 \item "topological": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-but the linkage information is completely unknown ("??-?").
-\item "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc"),
-and the linkage information is completely unknown ("??-?").
+and all linkages and anomers are completely unknown ("??-?"/"??").
+\item "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc").
 }
 
 Note that in theory you can have a glycan with generic monosaccharides with all linkages determined.

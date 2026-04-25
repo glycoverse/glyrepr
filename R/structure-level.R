@@ -3,13 +3,13 @@
 #' @description
 #' Glycan structures can have four possible levels of resolution:
 #' - "intact": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-#'   and all linkages are fully determined (e.g. "a2-3", "b1-4").
+#'   and no linkage or anomer contains "?".
 #' - "partial": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-#'   but some linkage information is missing (e.g. "a2-?").
+#'   at least one linkage or anomer contains "?",
+#'   and at least one linkage or anomer has a non-"?" annotation.
 #' - "topological": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-#'   but the linkage information is completely unknown ("??-?").
-#' - "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc"),
-#'   and the linkage information is completely unknown ("??-?").
+#'   and all linkages and anomers are completely unknown ("??-?"/"??").
+#' - "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc").
 #'
 #' Note that in theory you can have a glycan with generic monosaccharides with all linkages determined.
 #' For example, "Hex(b1-3)HexNAc(a1-" is a valid glycan structure.
@@ -19,8 +19,7 @@
 #'
 #' @param x A [glycan_structure()] vector.
 #'
-#' @returns A character vector of the same length as `x`,
-#'   containing the structure level for each element.
+#' @returns A character scalar containing the structure level for `x`.
 #'
 #' @examples
 #' glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
@@ -31,15 +30,13 @@
 get_structure_level <- function(x) {
   checkmate::assert_class(x, "glyrepr_structure")
 
-  # Capture input names for preservation
-  input_names <- names(x)
-
-  result <- rep(NA_character_, length(x))
   non_na <- !structure_na_mask(x)
 
   if (!any(non_na)) {
-    names(result) <- input_names
-    return(result)
+    if (length(x) == 0) {
+      return(character())
+    }
+    return(NA_character_)
   }
 
   x_valid <- x[non_na]
@@ -47,20 +44,38 @@ get_structure_level <- function(x) {
   has_linkages_strict <- has_linkages(x_valid, strict = TRUE)
   has_linkages_lenient <- has_linkages(x_valid, strict = FALSE)
 
-  result[non_na] <- dplyr::case_when(
-    mono_type == "concrete" & has_linkages_strict ~ "intact",
-    mono_type == "concrete" &
-      (!has_linkages_strict) &
-      has_linkages_lenient ~ "partial",
-    mono_type == "concrete" & (!has_linkages_lenient) ~ "topological",
-    mono_type == "generic" & (!has_linkages_strict) ~ "basic",
-    .default = "basic"
-  )
+  if (mono_type == "generic") {
+    .warn_generic_linkage_structure_level(has_linkages_lenient)
+    return("basic")
+  }
 
-  # Restore names
-  names(result) <- input_names
+  if (all(has_linkages_strict)) {
+    return("intact")
+  }
 
-  result
+  if (any(has_linkages_lenient)) {
+    return("partial")
+  }
+
+  "topological"
+}
+
+#' Warn About Generic Structures With Linkage Annotation
+#'
+#' Generic structures are always treated as basic resolution,
+#' even if they contain linkage or anomer annotations.
+#'
+#' @param has_linkages_lenient A logical vector returned by [has_linkages()]
+#'   with `strict = FALSE`.
+#' @returns Nothing. Called for its warning side effect.
+#' @noRd
+.warn_generic_linkage_structure_level <- function(has_linkages_lenient) {
+  if (any(has_linkages_lenient)) {
+    cli::cli_warn(c(
+      "Generic glycan structures with linkage annotations are treated as {.val basic}.",
+      "i" = "Linkage information is ignored when residues are generic."
+    ), class = "glyrepr_warning_generic_structure_linkages")
+  }
 }
 
 #' Reduce a Glycan Structure to a Lower Resolution Level

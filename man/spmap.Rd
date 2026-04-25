@@ -87,7 +87,7 @@ weights <- c(1.0, 2.0, 1.0)  # corresponding weights
 factors <- c(2, 3, 2)  # corresponding factors
 
 # Map a function that uses structure, weight, and factor
-spmap_dbl(list(structures, weights, factors), 
+spmap_dbl(list(structures, weights, factors),
           function(g, w, f) igraph::vcount(g) * w * f)
 
 # Use purrr-style lambda functions

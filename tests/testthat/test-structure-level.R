@@ -9,7 +9,10 @@ test_that("get_structure_level works for each glycan separately", {
   expect_equal(get_structure_level(glycan2), "partial")
   expect_equal(get_structure_level(glycan3), "topological")
   expect_equal(get_structure_level(glycan4), "basic")
-  expect_equal(get_structure_level(glycan5), "basic")
+  expect_warning(
+    expect_equal(get_structure_level(glycan5), "basic"),
+    class = "glyrepr_warning_generic_structure_linkages"
+  )
 })
 
 test_that("get_structure_level works for an intact glycan vector", {
@@ -69,7 +72,7 @@ test_that("get_structure_level works for a basic glycan vector with linkages", {
   # should warn about the rare case of a generic glycan with linkages,
   # and tell the user that it will be treated as basic
 
-  expect_equal(get_structure_level(glycans), "basic")
+  expect_equal(res, "basic")
 })
 
 test_that("reduce_structure_level works for each glycan separately", {
