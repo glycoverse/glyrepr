@@ -184,7 +184,7 @@ toc()
 tic("Converting 5,000 structures")
 result_large <- convert_to_generic(large_struc)
 toc()
-#> Converting 5,000 structures: 0.026 sec elapsed
+#> Converting 5,000 structures: 0.027 sec elapsed
 ```
 
 **Mind = blown!** 🤯 The performance is nearly identical because
