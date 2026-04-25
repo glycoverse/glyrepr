@@ -53,6 +53,11 @@ test_that("glycan_composition rejects empty compositions", {
   expect_error(glycan_composition(integer(0)), "at least one residue")
 })
 
+test_that("glycan_composition deals with duplications", {
+  comp <- glycan_composition(c(Hex = 1, HexNAc = 1, Hex = 2))
+  expect_equal(as.character(comp), "Hex(3)HexNAc(1)")
+})
+
 test_that("as_glycan_composition works with list of named vectors", {
   vec_list <- list(c(Hex = 5, HexNAc = 2), c(Hex = 3, HexNAc = 1))
   comp <- as_glycan_composition(vec_list)
@@ -291,6 +296,11 @@ test_that("as_glycan_composition reorder residues", {
   comp <- as_glycan_composition(chars)
   expected <- c("Hex(2)HexNAc(1)", "Hex(2)HexNAc(1)")
   expect_equal(format(comp), expected)
+})
+
+test_that("as_glycan_composition works for duplications", {
+  comp <- as_glycan_composition("Hex(2)Hex(3)HexNAc(1)HexNAc(2)")
+  expect_equal(as.character(comp), "Hex(5)HexNAc(3)")
 })
 
 test_that("as.character works for compositions", {

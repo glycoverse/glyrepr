@@ -20,7 +20,8 @@
 #'
 #' Components are automatically sorted with monosaccharides first (according to
 #' their order in the monosaccharides table), followed by substituents (according
-#' to their order in `available_substituents()`).
+#' to their order in `available_substituents()`). Duplicate components are
+#' automatically summed.
 #'
 #' @examples
 #' # A vector with one composition (generic monosaccharides)
@@ -61,6 +62,7 @@ glycan_composition <- function(...) {
     if (is.null(.x)) return(.x)
     result <- as.integer(.x)
     names(result) <- names(.x)
+    result <- .aggregate_composition_components(result)
     .reorder_composition_components(result)
   })
 
@@ -634,6 +636,24 @@ parse_single_composition <- function(char) {
   sub_orders <- available_substituents()
   orders <- c(mono_orders, sub_orders)
   components[order(match(names(components), orders))]
+}
+
+#' Aggregate duplicated composition components
+#'
+#' Components with the same name are summed while preserving the first occurrence
+#' of each component name. The final display order is handled separately by
+#' `.reorder_composition_components()`.
+#'
+#' @param components A named integer vector of composition components.
+#' @returns A named integer vector with unique component names.
+#' @noRd
+.aggregate_composition_components <- function(components) {
+  component_names <- unique(names(components))
+  groups <- factor(names(components), levels = component_names)
+  aggregated <- tapply(components, groups, sum)
+  aggregated <- as.integer(aggregated)
+  names(aggregated) <- component_names
+  aggregated
 }
 
 # Helper function to format a subset of compositions
