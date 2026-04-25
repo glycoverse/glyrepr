@@ -99,8 +99,8 @@ test_that("as_glycan_structure.character error handling", {
   # Empty string
   expect_error(as_glycan_structure(""), "Cannot parse empty")
 
-  # NA
-  expect_error(as_glycan_structure(NA_character_), "Cannot parse empty")
+  # NA is treated as a missing structure
+  expect_true(is.na(as_glycan_structure(NA_character_)))
 
   # Invalid format - unknown monosaccharide
   expect_error(as_glycan_structure("invalid_format"), "Could not parse")

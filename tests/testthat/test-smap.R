@@ -1394,3 +1394,27 @@ test_that("spmap_structure handles NA elements", {
   expect_true(is.na(result[2]))
   expect_false(is.na(result[3]))
 })
+
+# Tests for NA handling in simap functions -----------------------------------
+
+test_that("simap handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  result <- simap_int(structs, function(g, i) igraph::vcount(g) + i)
+
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+})
+
+test_that("simap_structure handles NA elements", {
+  structs <- c(o_glycan_core_1(), glycan_structure(NA), n_glycan_core())
+
+  result <- simap_structure(structs, function(g, i) g)
+
+  expect_equal(length(result), 3)
+  expect_false(is.na(result[1]))
+  expect_true(is.na(result[2]))
+  expect_false(is.na(result[3]))
+})

@@ -1737,3 +1737,30 @@ test_that("vec_restore does not duplicate class", {
   expect_equal(sum(class(restored) == "vctrs_vctr"), 1)
   expect_equal(length(unique(class(restored))), length(class(restored)))
 })
+
+test_that("as_glycan_structure treats scalar NA character as missing structure", {
+  result <- as_glycan_structure(NA_character_)
+
+  expect_s3_class(result, "glyrepr_structure")
+  expect_length(result, 1)
+  expect_true(is.na(result))
+  expect_equal(attr(result, "graphs"), list())
+})
+
+test_that("get_structure_level preserves NA structures", {
+  structures <- c(o_glycan_core_1(), glycan_structure(NA))
+
+  result <- get_structure_level(structures)
+
+  expect_equal(result[1], "intact")
+  expect_true(is.na(result[2]))
+})
+
+test_that("reduce_structure_level skips NA structures when checking level rank", {
+  structures <- c(o_glycan_core_1(), glycan_structure(NA))
+
+  result <- reduce_structure_level(structures, "topological")
+
+  expect_false(has_linkages(result[1]))
+  expect_true(is.na(result[2]))
+})

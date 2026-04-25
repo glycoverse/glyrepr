@@ -97,6 +97,9 @@ convert_to_generic.glyrepr_composition <- function(x) {
 
   # Get current mono types
   current_type <- get_mono_type.glyrepr_composition(x)
+  if (is.na(current_type)) {
+    return(x)
+  }
   if (current_type == "generic") {
     return(x)
   }
@@ -235,10 +238,16 @@ get_mono_type.glyrepr_composition <- function(x) {
     return(character())
   }
 
-  # All compositions in a composition vector must be of the same type.
-  # Therefore, we just need to check the first composition.
+  # All non-missing compositions in a composition vector must be of the same type.
+  # Therefore, we just need to check the first non-missing composition.
   # Filter out substituents before determining monosaccharide type.
-  comp_names <- names(vctrs::field(x, "data")[[1]])
+  compositions <- vctrs::field(x, "data")
+  compositions <- purrr::discard(compositions, .is_na_composition_elem)
+  if (length(compositions) == 0) {
+    return(NA_character_)
+  }
+
+  comp_names <- names(compositions[[1]])
   mono_names <- comp_names[!comp_names %in% available_substituents()]
   get_mono_type_impl(mono_names)
 }

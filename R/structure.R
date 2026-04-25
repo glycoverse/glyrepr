@@ -352,6 +352,36 @@ new_glycan_structure <- function(iupac = character(), graphs = list()) {
   vctrs::new_vctr(iupac, graphs = graphs, class = "glyrepr_structure")
 }
 
+#' Create a missing glycan structure vector
+#'
+#' @param n Number of missing elements.
+#' @returns A `glyrepr_structure` vector containing only missing values.
+#' @noRd
+new_na_glycan_structure <- function(n) {
+  new_glycan_structure(rep(NA_character_, n), list())
+}
+
+#' Get the missing-value mask for a glycan structure vector
+#'
+#' @param x A `glyrepr_structure` vector.
+#' @returns A logical vector.
+#' @noRd
+structure_na_mask <- function(x) {
+  is.na(vctrs::vec_data(x))
+}
+
+#' Keep only graphs used by non-missing structure codes
+#'
+#' @param iupacs Character vector of structure codes.
+#' @param graphs Named list of structure graphs.
+#' @returns A named list of graphs.
+#' @noRd
+filter_used_structure_graphs <- function(iupacs, graphs) {
+  used_codes <- unique(iupacs[!is.na(iupacs)])
+  used_graphs <- graphs[used_codes]
+  used_graphs[!vapply(used_graphs, is.null, logical(1))]
+}
+
 ensure_name_vertex_attr <- function(glycan) {
   if (!("name" %in% igraph::vertex_attr_names(glycan))) {
     names <- as.character(seq_len(igraph::vcount(glycan)))
@@ -563,14 +593,11 @@ vec_cast.glyrepr_structure.character <- function(x, to, ...) {
   # Handle NA values
   na_mask <- is.na(x)
 
-  if (length(x) == 1 && na_mask[1]) {
-    # Single NA should error for backward compatibility
-    cli::cli_abort("Cannot parse empty or NA IUPAC-condensed string.")
-  }
-
   if (all(na_mask)) {
     # All NA - return vector of NAs with empty graphs
-    return(new_glycan_structure(rep(NA_character_, length(x)), list()))
+    result <- new_na_glycan_structure(length(x))
+    names(result) <- names(x)
+    return(result)
   }
 
   if (any(na_mask)) {
@@ -647,10 +674,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 
   # Filter graphs to only include those used in the subset
   # Use unique iupacs to handle duplicates correctly
-  unique_iupacs <- unique(iupacs)
-  used_graphs <- graphs[unique_iupacs]
-  # Remove any NULL elements (can happen with empty list indexing)
-  used_graphs <- used_graphs[!vapply(used_graphs, is.null, logical(1))]
+  used_graphs <- filter_used_structure_graphs(iupacs, graphs)
 
   out <- vctrs::new_vctr(x, graphs = used_graphs, class = "glyrepr_structure")
   out
@@ -669,9 +693,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
     return(out)
   }
   if (length(graphs) > 0) {
-    unique_iupacs <- unique(iupacs)
-    used_graphs <- graphs[unique_iupacs]
-    used_graphs <- used_graphs[!vapply(used_graphs, is.null, logical(1))]
+    used_graphs <- filter_used_structure_graphs(iupacs, graphs)
     attr(out, "graphs") <- used_graphs
   }
   out

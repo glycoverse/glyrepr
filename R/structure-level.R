@@ -34,11 +34,20 @@ get_structure_level <- function(x) {
   # Capture input names for preservation
   input_names <- names(x)
 
-  mono_type <- get_mono_type.glyrepr_structure(x)
-  has_linkages_strict <- has_linkages(x, strict = TRUE)
-  has_linkages_lenient <- has_linkages(x, strict = FALSE)
+  result <- rep(NA_character_, length(x))
+  non_na <- !structure_na_mask(x)
 
-  result <- dplyr::case_when(
+  if (!any(non_na)) {
+    names(result) <- input_names
+    return(result)
+  }
+
+  x_valid <- x[non_na]
+  mono_type <- get_mono_type.glyrepr_structure(x_valid)
+  has_linkages_strict <- has_linkages(x_valid, strict = TRUE)
+  has_linkages_lenient <- has_linkages(x_valid, strict = FALSE)
+
+  result[non_na] <- dplyr::case_when(
     mono_type == "concrete" & has_linkages_strict ~ "intact",
     mono_type == "concrete" & (!has_linkages_strict) & has_linkages_lenient ~ "partial",
     mono_type == "concrete" & (!has_linkages_lenient) ~ "topological",
@@ -88,10 +97,11 @@ reduce_structure_level <- function(x, to_level) {
   # Check if the target level is lower than any structure in `x`
   struc_levels <- get_structure_level(x)
   level_ranks <- c("basic" = 1, "topological" = 2, "partial" = 3, "intact" = 4)
-  from_level_ranks <- level_ranks[struc_levels]
+  non_na_levels <- struc_levels[!is.na(struc_levels)]
+  from_level_ranks <- level_ranks[non_na_levels]
   to_level_rank <- level_ranks[to_level]
   if (any(from_level_ranks < to_level_rank)) {
-    larger_levels <- unique(struc_levels[from_level_ranks < to_level_rank])
+    larger_levels <- unique(non_na_levels[from_level_ranks < to_level_rank])
     cli::cli_abort(c(
       "Cannot reduce a structure to a higher resolution level.",
       "x" = "Some structures in {.arg x} have levels: {.val {larger_levels}}.",

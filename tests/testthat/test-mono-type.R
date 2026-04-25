@@ -148,3 +148,13 @@ test_that("convert_to_generic with all NA structures", {
   expect_equal(length(result), 2)
   expect_true(all(is.na(result)))
 })
+
+test_that("get_mono_type skips NA compositions", {
+  concrete <- glycan_composition(NA, c(Gal = 1))
+  generic <- glycan_composition(NA, c(Hex = 1))
+  all_na <- glycan_composition(NA, NA)
+
+  expect_equal(get_mono_type(concrete), "concrete")
+  expect_equal(get_mono_type(generic), "generic")
+  expect_true(is.na(get_mono_type(all_na)))
+})

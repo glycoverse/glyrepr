@@ -1178,6 +1178,15 @@ simap <- function(.x, .f, ...) {
 
   codes <- vctrs::vec_data(.x)
   graphs <- attr(.x, "graphs")
+  na_mask <- is.na(codes)
+  na_count <- sum(na_mask)
+
+  if (na_count == length(codes)) {
+    result <- vector("list", length(codes))
+    result[na_mask] <- list(NA)
+    names(result) <- names(.x)
+    return(result)
+  }
 
   # Get indices or names
   if (!is.null(names(.x))) {
@@ -1186,10 +1195,13 @@ simap <- function(.x, .f, ...) {
     indices <- seq_along(.x)
   }
 
+  valid_codes <- codes[!na_mask]
+  valid_indices <- indices[!na_mask]
+
   # Create unique combinations data frame for proper handling
   combinations_df <- data.frame(
-    code = codes,
-    index = indices,
+    code = valid_codes,
+    index = valid_indices,
     stringsAsFactors = FALSE
   )
   combinations_df$combo_key <- paste0(combinations_df$code, "|||", combinations_df$index)
@@ -1205,6 +1217,16 @@ simap <- function(.x, .f, ...) {
 
   # Map results back to original vector positions
   result <- purrr::map(combinations_df$combo_key, ~ unique_results[[.x]])
+  names(result) <- valid_indices
+
+  if (na_count > 0) {
+    full_result <- vector("list", length(codes))
+    full_result[!na_mask] <- result
+    full_result[na_mask] <- list(NA)
+    names(full_result) <- names(.x)
+    return(full_result)
+  }
+
   names(result) <- names(.x)
   result
 }
@@ -1256,6 +1278,14 @@ simap_structure <- function(.x, .f, ...) {
 
   codes <- vctrs::vec_data(.x)
   graphs <- attr(.x, "graphs")
+  na_mask <- is.na(codes)
+  na_count <- sum(na_mask)
+
+  if (na_count == length(codes)) {
+    result <- new_na_glycan_structure(length(codes))
+    names(result) <- names(.x)
+    return(result)
+  }
 
   # Get indices or names
   if (!is.null(names(.x))) {
@@ -1264,10 +1294,13 @@ simap_structure <- function(.x, .f, ...) {
     indices <- seq_along(.x)
   }
 
+  valid_codes <- codes[!na_mask]
+  valid_indices <- indices[!na_mask]
+
   # Create unique combinations data frame for proper handling
   combinations_df <- data.frame(
-    code = codes,
-    index = indices,
+    code = valid_codes,
+    index = valid_indices,
     stringsAsFactors = FALSE
   )
   combinations_df$combo_key <- paste0(combinations_df$code, "|||", combinations_df$index)
@@ -1287,7 +1320,22 @@ simap_structure <- function(.x, .f, ...) {
   # Rebuild glycan_structure with proper deduplication
   idx <- match(combinations_df$combo_key, unique_combinations_df$combo_key)
   input_names <- names(.x)
-  result <- .rebuild_structure_with_dedup(new_graphs, idx)
+  valid_result <- .rebuild_structure_with_dedup(new_graphs, idx)
+  names(valid_result) <- valid_indices
+
+  if (na_count > 0) {
+    valid_iupacs <- vctrs::vec_data(valid_result)
+    valid_graphs <- attr(valid_result, "graphs")
+
+    result_iupacs <- rep(NA_character_, length(codes))
+    result_iupacs[!na_mask] <- valid_iupacs
+
+    result <- new_glycan_structure(result_iupacs, valid_graphs)
+    names(result) <- input_names
+    return(result)
+  }
+
+  result <- valid_result
   names(result) <- input_names
   result
 }
