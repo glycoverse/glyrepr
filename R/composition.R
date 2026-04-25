@@ -649,10 +649,9 @@ parse_single_composition <- function(char) {
 #' @noRd
 .aggregate_composition_components <- function(components) {
   component_names <- unique(names(components))
-  aggregated <- purrr::map_int(
-    component_names,
-    ~ sum(components[names(components) == .x])
-  )
+  groups <- factor(names(components), levels = component_names)
+  aggregated <- tapply(components, groups, sum)
+  aggregated <- as.integer(aggregated)
   names(aggregated) <- component_names
   aggregated
 }
