@@ -1,3 +1,8 @@
+# get_structure_level works for a basic glycan vector with linkages
+
+    Code
+      res <- get_structure_level(glycans)
+
 # reduce_structure_level rejects higher level
 
     Code

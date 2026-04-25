@@ -12,12 +12,64 @@ test_that("get_structure_level works for each glycan separately", {
   expect_equal(get_structure_level(glycan5), "basic")
 })
 
-test_that("get_structure_level works for multiple glycans", {
+test_that("get_structure_level works for an intact glycan vector", {
   glycans <- as_glycan_structure(c(
     "Gal(b1-3)GalNAc(a1-",
     "GalNAc(a1-"
   ))
-  expect_equal(get_structure_level(glycans), c("intact", "intact"))
+  expect_equal(get_structure_level(glycans), "intact")
+})
+
+test_that("get_structure_level works for a partial glycan vector with only one unknown linkage", {
+  glycans <- as_glycan_structure(c(
+    "Gal(b1-?)GalNAc(a1-",
+    "GalNAc(a1-"
+  ))
+  expect_equal(get_structure_level(glycans), "partial")
+})
+
+test_that("get_structure_level works for a partial glycan vector with only one known linkage", {
+  glycans <- as_glycan_structure(c(
+    "Gal(?1-?)GalNAc(??-",
+    "GalNAc(??-"
+  ))
+  expect_equal(get_structure_level(glycans), "partial")
+})
+
+test_that("get_structure_level works for a partial glycan vector with only one known reducing end configuration", {
+  glycans <- as_glycan_structure(c(
+    "Gal(??-?)GalNAc(??-",
+    "GalNAc(?1-"
+  ))
+  expect_equal(get_structure_level(glycans), "partial")
+})
+
+test_that("get_structure_level works for a topological glycan vector", {
+  glycans <- as_glycan_structure(c(
+    "Gal(??-?)GalNAc(??-",
+    "GalNAc(??-"
+  ))
+  expect_equal(get_structure_level(glycans), "topological")
+})
+
+test_that("get_structure_level works for a basic glycan vector", {
+  glycans <- as_glycan_structure(c(
+    "Hex(??-?)HexNAc(??-",
+    "HexNAc(??-"
+  ))
+  expect_equal(get_structure_level(glycans), "basic")
+})
+
+test_that("get_structure_level works for a basic glycan vector with linkages", {
+  glycans <- as_glycan_structure(c(
+    "Hex(b1-3)HexNAc(a1-",
+    "HexNAc(a1-"
+  ))
+  expect_snapshot(res <- get_structure_level(glycans))
+  # should warn about the rare case of a generic glycan with linkages,
+  # and tell the user that it will be treated as basic
+
+  expect_equal(get_structure_level(glycans), "basic")
 })
 
 test_that("reduce_structure_level works for each glycan separately", {
