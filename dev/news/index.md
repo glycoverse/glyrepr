@@ -2,6 +2,16 @@
 
 ## glyrepr (development version)
 
+### Minor improvements and bug fixes
+
+- Fix the bug that
+  [`glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_composition.md)
+  and
+  [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_composition.md)
+  cannot handle duplications in the input. For example,
+  `as_glycan_composition("Hex(2)Hex(1)HexNAc(2)")` is correctly regared
+  as `Hex(3)HexNAc(2)` now.
+
 ## glyrepr 0.10.1
 
 CRAN release: 2026-02-13

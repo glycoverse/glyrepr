@@ -42,6 +42,7 @@ Components are automatically sorted with monosaccharides first
 (according to their order in the monosaccharides table), followed by
 substituents (according to their order in
 [`available_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/available_substituents.md)).
+Duplicate components are automatically summed.
 
 ## See also
 
