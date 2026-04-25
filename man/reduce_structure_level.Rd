@@ -10,10 +10,11 @@ reduce_structure_level(x, to_level)
 \item{x}{A \code{\link[=glycan_structure]{glycan_structure()}} vector.}
 
 \item{to_level}{The resolution level to reduce to. Can be "basic" or "topological".
-Must be a lower resolution level than any structure in \code{x}
+Must be a lower resolution level than \code{x}
 ("intact" > "partial" > "topological" > "basic").
-If \code{to_level} is the same as some structure in \code{x}, the result will be the same as the input.
-You can use \code{\link[=get_structure_level]{get_structure_level()}} to check the structure levels of \code{x}.}
+If \code{to_level} is the same as the structure level of \code{x},
+the result will be the same as the input.
+You can use \code{\link[=get_structure_level]{get_structure_level()}} to check the structure level of \code{x}.}
 }
 \value{
 A \code{\link[=glycan_structure]{glycan_structure()}} vector reduced to the given resolution level.

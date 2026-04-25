@@ -96,10 +96,11 @@ get_structure_level <- function(x) {
 #'
 #' @param x A [glycan_structure()] vector.
 #' @param to_level The resolution level to reduce to. Can be "basic" or "topological".
-#'   Must be a lower resolution level than any structure in `x`
+#'   Must be a lower resolution level than `x`
 #'   ("intact" > "partial" > "topological" > "basic").
-#'   If `to_level` is the same as some structure in `x`, the result will be the same as the input.
-#'   You can use [get_structure_level()] to check the structure levels of `x`.
+#'   If `to_level` is the same as the structure level of `x`,
+#'   the result will be the same as the input.
+#'   You can use [get_structure_level()] to check the structure level of `x`.
 #'
 #' @returns A [glycan_structure()] vector reduced to the given resolution level.
 #' @examples
@@ -112,29 +113,29 @@ reduce_structure_level <- function(x, to_level) {
   checkmate::assert_class(x, "glyrepr_structure")
   checkmate::assert_choice(to_level, c("basic", "topological"))
 
-  # Check if the target level is lower than any structure in `x`
-  struc_levels <- get_structure_level(x)
+  from_level <- get_structure_level(x)
+
+  if (is.na(from_level)) {
+    # Two situations can lead to NA structure level:
+    #. 1. x is empty.
+    #. 2. All structures in x are NA.
+    # In both cases, we can just return x without any modification.
+    return(x)
+  }
+
   level_ranks <- c("basic" = 1, "topological" = 2, "partial" = 3, "intact" = 4)
-  non_na_levels <- struc_levels[!is.na(struc_levels)]
-  from_level_ranks <- level_ranks[non_na_levels]
-  to_level_rank <- level_ranks[to_level]
-  if (any(from_level_ranks < to_level_rank)) {
-    larger_levels <- unique(non_na_levels[from_level_ranks < to_level_rank])
+  if (level_ranks[[from_level]] < level_ranks[[to_level]]) {
     cli::cli_abort(c(
       "Cannot reduce a structure to a higher resolution level.",
-      "x" = "Some structures in {.arg x} have levels: {.val {larger_levels}}.",
-      "i" = "Target level: {.val {to_level}} (> {.val {larger_levels}}).",
-      "i" = "You can use {.fn get_structure_level} to check the structure levels of {.arg x}."
+      "x" = "Structure level of {.arg x}: {.val {from_level}}.",
+      "i" = "Target level: {.val {to_level}} (> {.val {from_level}}).",
+      "i" = "You can use {.fn get_structure_level} to check the structure level of {.arg x}."
     ))
   }
 
-  # Reduce the structure level
+  x <- remove_linkages(x)
   if (to_level == "basic") {
-    x <- remove_linkages(x)
     x <- convert_to_generic(x)
-  } else {
-    # `to_level` is "topological"
-    x <- remove_linkages(x)
   }
   x
 }

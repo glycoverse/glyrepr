@@ -14,7 +14,7 @@
     Condition
       Error in `reduce_structure_level()`:
       ! Cannot reduce a structure to a higher resolution level.
-      x Some structures in `x` have levels: "basic".
+      x Structure level of `x`: "basic".
       i Target level: "topological" (> "basic").
-      i You can use `get_structure_level()` to check the structure levels of `x`.
+      i You can use `get_structure_level()` to check the structure level of `x`.
 
