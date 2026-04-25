@@ -163,3 +163,13 @@ test_that("reduce_structure_level works for multiple glycans", {
     c("Gal(??-?)GalNAc(??-", "Gal(??-?)GalNAc(??-", "Gal(??-?)GalNAc(??-")
   )
 })
+
+test_that("reduce_structure_level works for all-NA vectors", {
+  glycans <- as_glycan_structure(c(NA, NA))
+  expect_equal(reduce_structure_level(glycans, to_level = "topological"), glycans)
+})
+
+test_that("reduce_structure_level works for empty vectors", {
+  glycans <- as_glycan_structure(character())
+  expect_equal(reduce_structure_level(glycans, to_level = "topological"), glycans)
+})
