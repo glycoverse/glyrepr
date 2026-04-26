@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Glycan Graphs: The Network Behind Your Sugar Structures 🕸️ • glyrepr</title>
+<title>Glycan Graphs: The Network Behind Glycan Structures • glyrepr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Glycan Graphs: The Network Behind Your Sugar Structures 🕸️">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Glycan Graphs: The Network Behind Glycan Structures">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -35,9 +35,9 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</a></li>
-    <li><a class="dropdown-item" href="../articles/iupac.html">Decoding Glycans: Your Guide to IUPAC-Condensed Format</a></li>
-    <li><a class="dropdown-item" href="../articles/smap.html">Power User Guide: Efficient Glycan Manipulation</a></li>
+<li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Glycan Structures</a></li>
+    <li><a class="dropdown-item" href="../articles/iupac.html">IUPAC-Condensed Glycan Notation</a></li>
+    <li><a class="dropdown-item" href="../articles/smap.html">Efficient Glycan Manipulation with smap</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -59,7 +59,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Glycan Graphs: The Network Behind Glycan Structures</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/glycoverse/glyrepr/blob/main/vignettes/glycan-graph.Rmd" class="external-link"><code>vignettes/glycan-graph.Rmd</code></a></small>
@@ -68,136 +68,121 @@
 
     
     
-<p><strong>⚠️ Advanced Users Alert:</strong> This vignette is tailored
-for those already familiar with graph theory and the <code>igraph</code>
-package. If you’re new to these concepts, we recommend checking out the
-<a href="https://r.igraph.org" class="external-link">igraph documentation</a> first!</p>
+<p>This vignette is for users who want to understand how
+<code>glyrepr</code> stores glycan structures internally. Some
+familiarity with graph theory and the <code>igraph</code> package will
+help. If those concepts are new to you, the <a href="https://r.igraph.org" class="external-link">igraph documentation</a> is a useful
+companion reference.</p>
 <div class="section level2">
-<h2 id="the-hidden-graph-universe-of-glycans">The Hidden Graph Universe of Glycans 🌌<a class="anchor" aria-label="anchor" href="#the-hidden-graph-universe-of-glycans"></a>
+<h2 id="glycans-as-graphs">Glycans as Graphs<a class="anchor" aria-label="anchor" href="#glycans-as-graphs"></a>
 </h2>
-<p>Think of glycans as nature’s own social networks – they’re naturally
-represented as directed graphs, specifically as outwardly-directed trees
-where each sugar “talks” to its neighbors in a very structured way.</p>
-<p>Behind the scenes, every <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> object is
-actually powered by an <code>igraph</code> object. The beauty of
-<code>glycoverse</code> is that most users can work with the intuitive
-concept of “glycan structures” without getting lost in the graph theory
-weeds 🌾. But for you power users who want to peek under the hood – this
-guide is your treasure map! 🗺️</p>
+<p>Glycans are naturally represented as directed graphs. In
+<code>glyrepr</code>, a glycan structure is stored as an
+outward-directed tree, where each vertex represents a monosaccharide and
+each edge represents a glycosidic linkage.</p>
+<p>Behind the scenes, each <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> object is
+backed by an <code>igraph</code> object. Most workflows can stay at the
+<code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> level, but the graph representation is
+useful when you need custom structure analysis.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glycoverse.github.io/glyrepr/">glyrepr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="whats-actually-stored-in-memory">What’s Actually Stored in Memory? 🧠<a class="anchor" aria-label="anchor" href="#whats-actually-stored-in-memory"></a>
+<h2 id="what-is-stored-in-memory">What Is Stored in Memory?<a class="anchor" aria-label="anchor" href="#what-is-stored-in-memory"></a>
 </h2>
-<p>Representing a glycan in computer memory is like trying to pack for a
-month-long trip in a carry-on bag – you need to decide what’s absolutely
-essential!</p>
-<p>A glycan has tons of information: linear oriented C-atoms, basetype
-(the stereochemical skeleton), substituents, configuration, anomeric
-center, ring size, linkage positions… the list goes on! 📝</p>
-<p>Some packages (like Python’s <code>glypy</code>) take the “pack
-everything” approach 🎒, storing every tiny detail. This comprehensive
-strategy is fantastic for specialized tasks like MS/MS spectra
-simulation, but it can be overkill for everyday omics research.</p>
-<p><code>glyrepr</code> takes a more minimalist approach ✨. Our
-philosophy: <strong>if you can derive it from an IUPAC-condensed text
-representation, we’ll store it</strong>. Everything else? We let it go.
-This means we skip details like configuration and ring size – and that’s
-usually just fine, since common carbohydrates have predictable
-properties anyway.</p>
-<blockquote>
-<p>💡 <strong>Pro Tip:</strong> Want to master IUPAC-condensed notation?
-Check out <a href="https://glycoverse.github.io/glyrepr/articles/iupac.html">this
-comprehensive guide</a>.</p>
-</blockquote>
+<p>A glycan can carry many kinds of information: linear oriented
+C-atoms, basetype, substituents, configuration, anomeric center, ring
+size, linkage positions, and more.</p>
+<p>Some packages, such as Python’s <code>glypy</code>, store a very
+detailed glycan model. That comprehensive strategy is useful for
+specialized tasks such as MS/MS spectra simulation, but it can be
+overkill for everyday omics research.</p>
+<p><code>glyrepr</code> takes a more compact approach: if a feature can
+be derived from an IUPAC-condensed text representation,
+<code>glyrepr</code> stores it. Details such as configuration and ring
+size are not stored directly, because they are often predictable for
+common carbohydrates and are not needed for many glycomics
+workflows.</p>
+<p>For a closer look at IUPAC-condensed notation, see the <a href="https://glycoverse.github.io/glyrepr/articles/iupac.html">IUPAC-condensed
+vignette</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="extracting-the-graph-show-me-the-network">Extracting the Graph: Show Me the Network! 🔍<a class="anchor" aria-label="anchor" href="#extracting-the-graph-show-me-the-network"></a>
+<h2 id="extracting-the-graph">Extracting the Graph<a class="anchor" aria-label="anchor" href="#extracting-the-graph"></a>
 </h2>
-<p>You can’t just throw <code>igraph</code> functions at a
-<code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> object – they speak different languages!
-Instead, let’s extract the underlying graph using
-<code><a href="../reference/get_structure_graphs.html">get_structure_graphs()</a></code>:</p>
+<p>You cannot pass a <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> object directly to
+most <code>igraph</code> functions. First, extract the underlying graph
+with <code><a href="../reference/get_structure_graphs.html">get_structure_graphs()</a></code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span>
 <span><span class="va">graph</span></span>
-<span><span class="co">#&gt; IGRAPH 320de1c DN-- 5 4 -- </span></span>
+<span><span class="co">#&gt; IGRAPH 67b25b7 DN-- 5 4 -- </span></span>
 <span><span class="co">#&gt; + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span></span>
-<span><span class="co">#&gt; + edges from 320de1c (vertex names):</span></span>
+<span><span class="co">#&gt; + edges from 67b25b7 (vertex names):</span></span>
 <span><span class="co">#&gt; [1] 3-&gt;1 3-&gt;2 4-&gt;3 5-&gt;4</span></span></code></pre></div>
-<p>Let’s decode what we’re seeing here 🕵️:</p>
+<p>The printed graph contains several pieces of information.</p>
 <p><strong>First line:</strong> Directed Named (“DN”) graph with 5
-vertices (sugar units) and 4 edges (bonds). Think of it as a family tree
-with 5 people and 4 relationships.</p>
+vertices (sugar units) and 4 edges (bonds).</p>
 <p><strong>Graph-level attributes:</strong></p>
 <ul>
 <li>
-<code>anomer</code> 🔄: The anomeric configuration of the reducing
-end (the “root” of our tree)</li>
+<code>anomer</code>: the anomeric configuration of the reducing
+end.</li>
 </ul>
-<p><strong>Vertex attributes (the sugar units themselves):</strong></p>
+<p><strong>Vertex attributes:</strong></p>
 <ul>
 <li>
-<code>name</code> 🏷️: Unique ID for each sugar (like social security
-numbers)</li>
+<code>name</code>: a unique ID for each monosaccharide.</li>
 <li>
-<code>mono</code> 🍬: The actual sugar type (“Hex”, “HexNAc”,
-etc.)</li>
+<code>mono</code>: the monosaccharide type, such as “Hex” or
+“HexNAc”.</li>
 <li>
-<code>sub</code> ⚗️: Any chemical decorations attached to the
-sugar</li>
+<code>sub</code>: chemical decorations attached to the
+monosaccharide.</li>
 </ul>
-<p><strong>Edge attributes (the connections):</strong></p>
+<p><strong>Edge attributes:</strong></p>
 <ul>
 <li>
-<code>linkage</code> 🔗: How the sugars are connected (including
-bond positions and configurations)</li>
+<code>linkage</code>: how the monosaccharides are connected,
+including bond positions and configurations.</li>
 </ul>
 <p><strong>Connection pattern:</strong> “1-&gt;2” means vertex 1
-connects to vertex 2. We treat bonds as arrows pointing from the core
-toward the branches (even though real glycosidic bonds aren’t actually
-directional – it just makes coding easier! 😅)</p>
-<p>Want to see it visually? <code>igraph</code> has got you covered:</p>
+connects to vertex 2. <code>glyrepr</code> treats bonds as arrows
+pointing from the core toward the branches. The direction is a modeling
+choice that makes traversal and structure operations easier.</p>
+<p>You can also plot the graph with <code>igraph</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glycan-graph_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
-<h2 id="deep-dive-dissecting-the-components">Deep Dive: Dissecting the Components 🔬<a class="anchor" aria-label="anchor" href="#deep-dive-dissecting-the-components"></a>
+<h2 id="graph-components">Graph Components<a class="anchor" aria-label="anchor" href="#graph-components"></a>
 </h2>
 <div class="section level3">
-<h3 id="vertices-meet-your-sugar-cast">Vertices: Meet Your Sugar Cast 🎭<a class="anchor" aria-label="anchor" href="#vertices-meet-your-sugar-cast"></a>
+<h3 id="vertices">Vertices<a class="anchor" aria-label="anchor" href="#vertices"></a>
 </h3>
 <p>Each vertex represents a monosaccharide with three key
 properties:</p>
-<p><strong>🏷️ Names (Unique IDs):</strong> These are auto-generated
-identifiers – usually simple integers, but they could be anything as
-long as they’re unique:</p>
+<p><strong>Names:</strong> These are auto-generated identifiers, usually
+simple integers, but they could be anything as long as they’re
+unique:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span><span class="op">$</span><span class="va">name</span></span>
 <span><span class="co">#&gt; [1] "1" "2" "3" "4" "5"</span></span></code></pre></div>
-<p><strong>🍬 Monosaccharides (The Star Players):</strong> These are
-IUPAC-condensed names like “Hex”, “HexNAc”, “Glc”, “GlcNAc”. Think of
-them as the “job titles” of your sugars:</p>
+<p><strong>Monosaccharides:</strong> These are IUPAC-condensed names
+like “Hex”, “HexNAc”, “Glc”, “GlcNAc”.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span><span class="op">$</span><span class="va">mono</span></span>
 <span><span class="co">#&gt; [1] "Man"    "Man"    "Man"    "GlcNAc" "GlcNAc"</span></span></code></pre></div>
-<blockquote>
-<p>📚 <strong>Reference:</strong> For the complete cast of available
-monosaccharides, check <a href="https://www.ncbi.nlm.nih.gov/glycans/snfg.html" class="external-link">SNFG notation</a>
+<p>For the full list of available monosaccharides, check <a href="https://www.ncbi.nlm.nih.gov/glycans/snfg.html" class="external-link">SNFG notation</a>
 or run <code><a href="../reference/available_monosaccharides.html">available_monosaccharides()</a></code>.</p>
-</blockquote>
-<p><strong>⚗️ Substituents (The Accessories):</strong> Chemical
-decorations like “Me” (methyl), “Ac” (acetyl), “S” (sulfate), etc.
-Position matters! “3Me” = methyl at position 3, “?S” = sulfate at
-unknown position:</p>
+<p><strong>Substituents:</strong> Chemical decorations like “Me”
+(methyl), “Ac” (acetyl), “S” (sulfate), etc. Position matters. “3Me” =
+methyl at position 3, “?S” = sulfate at unknown position:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">graph</span><span class="op">)</span><span class="op">$</span><span class="va">sub</span></span>
 <span><span class="co">#&gt; [1] "" "" "" "" ""</span></span></code></pre></div>
-<p>Got multiple decorations? No problem! They’re comma-separated and
-sorted by position:</p>
+<p>Multiple decorations are comma-separated and sorted by position:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="st">"Glc3Me6S(a1-"</span><span class="op">)</span></span>
 <span><span class="va">graph2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">glycan2</span><span class="op">)</span></span>
@@ -205,43 +190,40 @@ sorted by position:</p>
 <span><span class="co">#&gt; [1] "3Me,6S"</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="edges-the-relationship-status">Edges: The Relationship Status 💕<a class="anchor" aria-label="anchor" href="#edges-the-relationship-status"></a>
+<h3 id="edges">Edges<a class="anchor" aria-label="anchor" href="#edges"></a>
 </h3>
 <p>Edges represent glycosidic bonds with a simple but powerful
 format:</p>
 <pre><code>&lt;target anomeric config&gt;&lt;target position&gt; - &lt;source position&gt;</code></pre>
-<p>Here’s a real example where “Gal” has an “a” anomeric configuration,
+<p>Here is an example where “Gal” has an “a” anomeric configuration,
 linking from position 3 of “GalNAc” to position 1 of “Gal”:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="st">"Gal(a1-3)GalNAc(b1-"</span><span class="op">)</span></span>
 <span><span class="va">graph3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">glycan3</span><span class="op">)</span></span>
 <span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">graph3</span><span class="op">)</span><span class="op">$</span><span class="va">linkage</span></span>
 <span><span class="co">#&gt; [1] "a1-3"</span></span></code></pre></div>
-<blockquote>
-<p>🤔 <strong>Why encode anomer info in edges?</strong> We debated this!
-It might seem more natural to store it with vertices, but thinking
-“Neu5Ac with a2-3 linkage” flows better mentally and matches IUPAC
-notation perfectly.</p>
-</blockquote>
+<p><code>glyrepr</code> stores anomer information in edges rather than
+vertices. This follows the way linkages are written in IUPAC-condensed
+notation, for example “Neu5Ac with an a2-3 linkage”.</p>
 </div>
 <div class="section level3">
-<h3 id="graph-level-attributes-the-global-settings">Graph-Level Attributes: The Global Settings ⚙️<a class="anchor" aria-label="anchor" href="#graph-level-attributes-the-global-settings"></a>
+<h3 id="graph-level-attributes">Graph-Level Attributes<a class="anchor" aria-label="anchor" href="#graph-level-attributes"></a>
 </h3>
-<p><strong>🔄 Anomer:</strong> The anomeric configuration of the
-reducing end (the “root” sugar that doesn’t link to anything else)</p>
+<p><strong>Anomer:</strong> The anomeric configuration of the reducing
+end.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">graph</span><span class="op">$</span><span class="va">anomer</span></span>
 <span><span class="co">#&gt; [1] "b1"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="now-for-the-fun-part-what-can-you-do">Now for the Fun Part: What Can You Do? 🎉<a class="anchor" aria-label="anchor" href="#now-for-the-fun-part-what-can-you-do"></a>
+<h2 id="working-with-the-graph">Working with the Graph<a class="anchor" aria-label="anchor" href="#working-with-the-graph"></a>
 </h2>
 <div class="section level3">
-<h3 id="unleash-the-power-of-igraph">Unleash the Power of <code>igraph</code> 💪<a class="anchor" aria-label="anchor" href="#unleash-the-power-of-igraph"></a>
+<h3 id="using-igraph">Using <code>igraph</code><a class="anchor" aria-label="anchor" href="#using-igraph"></a>
 </h3>
-<p>Once you understand the graph structure, the entire
-<code>igraph</code> universe opens up!</p>
+<p>Once you understand the graph structure, you can use
+<code>igraph</code> functions for custom structure analysis.</p>
 <p><strong>Example 1:</strong> Count branched structures (sugars with
 multiple children):</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -252,11 +234,11 @@ search:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bfs_result</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/bfs.html" class="external-link">bfs</a></span><span class="op">(</span><span class="va">graph</span>, root <span class="op">=</span> <span class="fl">1</span>, mode <span class="op">=</span> <span class="st">"out"</span><span class="op">)</span></span>
 <span><span class="va">bfs_result</span><span class="op">$</span><span class="va">order</span></span>
-<span><span class="co">#&gt; + 5/5 vertices, named, from 320de1c:</span></span>
+<span><span class="co">#&gt; + 5/5 vertices, named, from 67b25b7:</span></span>
 <span><span class="co">#&gt; [1] 1 2 3 4 5</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="level-up-with-smap-functions">Level Up with <code>smap</code> Functions 🚀<a class="anchor" aria-label="anchor" href="#level-up-with-smap-functions"></a>
+<h3 id="using-smap-functions">Using <code>smap</code> Functions<a class="anchor" aria-label="anchor" href="#using-smap-functions"></a>
 </h3>
 <p>Working with multiple glycans? You could use <code>purrr</code>:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -266,51 +248,45 @@ search:</p>
 <span><span class="va">graphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">glycans</span><span class="op">)</span>  <span class="co"># Extract graphs first</span></span>
 <span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">graphs</span>, <span class="op">~</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span>    <span class="co"># Then analyze</span></span>
 <span><span class="co">#&gt; [1] 5 2 3</span></span></code></pre></div>
-<p>But <code>glyrepr</code>’s <code>smap</code> functions are way more
-elegant:</p>
+<p>For glycan structure vectors, <code>glyrepr</code>’s
+<code>smap</code> functions are usually a better fit:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/smap.html">smap_int</a></span><span class="op">(</span><span class="va">glycans</span>, <span class="op">~</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Direct analysis - no intermediate step!</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/smap.html">smap_int</a></span><span class="op">(</span><span class="va">glycans</span>, <span class="op">~</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Direct analysis, no intermediate step.</span></span>
 <span><span class="co">#&gt; [1] 5 2 3</span></span></code></pre></div>
-<p>The real magic ✨ of <code>smap</code> functions is their
-intelligence with duplicates. Real datasets often have many identical
-structures, and <code>smap</code> optimizes by processing unique
-structures once, then efficiently expanding results back to the original
-dimensions.</p>
-<blockquote>
-<p>📖 <strong>Learn More:</strong> Dive deeper into <code>smap</code>
-wizardry in the <a href="https://glycoverse.github.io/glyrepr/articles/smap.html">dedicated
-vignette</a>.</p>
-</blockquote>
+<p>The main advantage of <code>smap</code> functions is how they handle
+duplicates. Real datasets often contain many repeated structures, and
+<code>smap</code> optimizes by processing unique structures once, then
+efficiently expanding results back to the original dimensions.</p>
+<p>The <a href="https://glycoverse.github.io/glyrepr/articles/smap.html">smap
+vignette</a> covers this workflow in more detail.</p>
 </div>
 <div class="section level3">
-<h3 id="motif-hunting-with-glymotif">Motif Hunting with <code>glymotif</code> 🔍<a class="anchor" aria-label="anchor" href="#motif-hunting-with-glymotif"></a>
+<h3 id="motif-analysis-with-glymotif">Motif Analysis with <code>glymotif</code><a class="anchor" aria-label="anchor" href="#motif-analysis-with-glymotif"></a>
 </h3>
-<p>One of the most exciting applications is identifying biologically
-meaningful motifs (functional substructures). The <code>glymotif</code>
-package, built on this graph foundation, specializes in exactly this
-task.</p>
-<blockquote>
-<p>🎯 <strong>Get Started:</strong> Check out the <a href="https://glycoverse.github.io/glymotif/articles/glymotif.html" class="external-link"><code>glymotif</code>
-introduction</a> to start your motif hunting adventure!</p>
-</blockquote>
+<p>One important application is identifying biologically meaningful
+motifs, or functional substructures. The <code>glymotif</code> package,
+built on this graph foundation, specializes in exactly this task.</p>
+<p>See the <a href="https://glycoverse.github.io/glymotif/articles/glymotif.html" class="external-link"><code>glymotif</code>
+introduction</a> for examples.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="wrapping-up-your-graph-journey-continues">Wrapping Up: Your Graph Journey Continues 🎯<a class="anchor" aria-label="anchor" href="#wrapping-up-your-graph-journey-continues"></a>
+<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
-<p>You’ve just unlocked the graph-powered engine behind
-<code>glyrepr</code>! You now understand:</p>
+<p>In this vignette, you saw:</p>
 <ul>
-<li>🏗️ How glycan structures map to directed graphs</li>
-<li>📊 What information is stored (and what’s deliberately omitted)</li>
-<li>🔧 How to extract and manipulate the underlying graphs</li>
-<li>🚀 How to leverage <code>igraph</code>, <code>smap</code>, and
-<code>glymotif</code> for powerful analyses</li>
+<li>how glycan structures map to directed graphs.</li>
+<li>what information is stored and what is deliberately omitted.</li>
+<li>how to extract and inspect the underlying graphs.</li>
+<li>how <code>igraph</code>, <code>smap</code>, and
+<code>glymotif</code> can build on this representation.</li>
 </ul>
 <p>The graph representation might seem complex at first, but it’s this
 solid foundation that enables all the sophisticated glycan analysis
-capabilities in the <code>glycoverse</code>. Now go forth and explore
-your glycan networks! 🌟</p>
+capabilities in the <code>glycoverse</code>. Most users will not need to
+manipulate the graph directly, but understanding the model makes it
+easier to extend <code>glyrepr</code> when custom analysis is
+needed.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

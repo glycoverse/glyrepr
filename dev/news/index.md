@@ -45,6 +45,8 @@
 - [`get_mono_type.glyrepr_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.md)
   now ignores missing composition elements and returns `NA_character_`
   for all-NA composition vectors.
+- Rewrite the Getting Started vignette for better readability and adopt
+  a calmer tone for all vignettes.
 
 ## glyrepr 0.10.1
 

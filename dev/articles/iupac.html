@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Decoding Glycans: Your Guide to IUPAC-Condensed Format • glyrepr</title>
+<title>IUPAC-Condensed Glycan Notation • glyrepr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Decoding Glycans: Your Guide to IUPAC-Condensed Format">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="IUPAC-Condensed Glycan Notation">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -35,9 +35,9 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</a></li>
-    <li><a class="dropdown-item" href="../articles/iupac.html">Decoding Glycans: Your Guide to IUPAC-Condensed Format</a></li>
-    <li><a class="dropdown-item" href="../articles/smap.html">Power User Guide: Efficient Glycan Manipulation</a></li>
+<li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Glycan Structures</a></li>
+    <li><a class="dropdown-item" href="../articles/iupac.html">IUPAC-Condensed Glycan Notation</a></li>
+    <li><a class="dropdown-item" href="../articles/smap.html">Efficient Glycan Manipulation with smap</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -59,7 +59,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Decoding Glycans: Your Guide to IUPAC-Condensed Format</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>IUPAC-Condensed Glycan Notation</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/glycoverse/glyrepr/blob/main/vignettes/articles/iupac.Rmd" class="external-link"><code>vignettes/articles/iupac.Rmd</code></a></small>
@@ -68,139 +68,139 @@
 
     
     
-<p>Welcome to the fascinating world of glycan notation! If you’ve ever
-looked at a glycan structure and wondered, “How on earth do I turn this
-beautiful tree-like molecule into text?”, you’re in exactly the right
-place. Today we’re diving into IUPAC-condensed format — the goldilocks
-of glycan notation that’s “just right” for most glycomics work.</p>
+<p>This article introduces IUPAC-condensed glycan notation, the main
+text format used by <code>glyrepr</code> for representing glycan
+structures. The goal is to show how a branched glycan structure can be
+written as a compact, readable string.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glycoverse.github.io/glyrepr/">glyrepr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="the-tower-of-babel-why-so-many-glycan-formats">The Tower of Babel: Why So Many Glycan Formats? 🏗️<a class="anchor" aria-label="anchor" href="#the-tower-of-babel-why-so-many-glycan-formats"></a>
+<h2 id="why-are-there-so-many-glycan-formats">Why Are There So Many Glycan Formats?<a class="anchor" aria-label="anchor" href="#why-are-there-so-many-glycan-formats"></a>
 </h2>
-<p>Picture this: you’re at an international conference, and everyone is
-speaking a different language. That’s exactly what happened in the
-glycomics world! Different communities developed their own ways to
-describe glycans, each optimized for their specific needs.</p>
-<p>Let’s take a famous N-glycan as our example:</p>
+<p>Different communities have developed different ways to describe
+glycans, each optimized for a specific use case. Some formats are easy
+for people to read, some are better for databases and software, and
+others preserve detailed chemical information.</p>
+<p>Let’s use one N-glycan as an example:</p>
 <p><img src="resources/H5N4F1S2.png"></p>
-<p><strong>The same molecule, many faces:</strong></p>
-<p><strong>The Human-Friendly Version (IUPAC-condensed):</strong></p>
+<p><strong>The same molecule can be written in several
+formats:</strong></p>
+<p><strong>IUPAC-condensed:</strong></p>
 <pre><code>Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc(b1-</code></pre>
-<p><strong>The Chemistry Professor’s Dream
-(IUPAC-extended):</strong></p>
+<p><strong>IUPAC-extended:</strong></p>
 <pre><code>α-D-Neup5Ac-(2→3)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)-α-D-Manp-(1→3)[α-D-Neup5Ac-(2→3)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)-α-D-Manp-(1→6)]-β-D-Manp-(1→4)-β-D-GlcpNAc-(1→4)[α-L-Fucp-(1→6)]-β-D-GlcpNAc-(1→</code></pre>
-<p><strong>The Computer’s Favorite (WURCS):</strong></p>
+<p><strong>WURCS:</strong></p>
 <pre><code>WURCS=2.0/6,12,11/[a2122h-1b_1-5_2*NCC/3=O][a1122h-1b_1-5][a1122h-1a_1-5][a2112h-1b_1-5][Aad21122h-2a_2-6_5*NCC/3=O][a1221m-1a_1-5]/1-1-2-3-1-4-5-3-1-4-5-6/a4-b1_a6-l1_b4-c1_c3-d1_c6-h1_d2-e1_e4-f1_f3-g2_h2-i1_i4-j1_j3-k2</code></pre>
-<p><strong>The Chemical Database’s Language (InChI):</strong></p>
+<p><strong>InChI:</strong></p>
 <pre><code>InChI=1S/C90H148N6O66/c1-21-47(116)59(128)62(131)81(142-21)140-20-40-69(55(124)43(77(135)143-40)93-24(4)108)152-78-44(94-25(5)109)56(125)66(36(16-103)148-78)153-82-63(132)72(156-86-76(61(130)51(120)33(13-100)147-86)158-80-46(96-27(7)111)58(127)68(38(18-105)150-80)155-84-65(134)74(53(122)35(15-102)145-84)162-90(88(138)139)9-29(113)42(92-23(3)107)71(160-90)49(118)31(115)11-98)54(123)39(151-82)19-141-85-75(60(129)50(119)32(12-99)146-85)157-79-45(95-26(6)110)57(126)67(37(17-104)149-79)154-83-64(133)73(52(121)34(14-101)144-83)161-89(87(136)137)8-28(112)41(91-22(2)106)70(159-89)48(117)30(114)10-97/h21,28-86,97-105,112-135H,8-20H2,1-7H3,(H,91,106)(H,92,107)(H,93,108)(H,94,109)(H,95,110)(H,96,111)(H,136,137)(H,138,139)/t21-,28-,29-,30+,31+,32+,33+,34+,35+,36+,37+,38+,39+,40+,41+,42+,43+,44+,45+,46+,47+,48+,49+,50+,51+,52-,53-,54+,55+,56+,57+,58+,59+,60-,61-,62-,63-,64+,65+,66+,67+,68+,69+,70+,71+,72-,73-,74-,75-,76-,77+,78-,79-,80-,81+,82-,83-,84-,85-,86+,89-,90-/m0/s1</code></pre>
-<p><strong>Feeling dizzy yet?</strong> 😵‍💫 That’s completely normal! Each
-format serves its purpose:</p>
+<p>Each format serves its purpose:</p>
 <ul>
-<li>🧑‍🔬 <strong>IUPAC formats</strong>: Perfect for humans to read and
-understand</li>
-<li>🤖 <strong>WURCS/GlycoCT</strong>: Optimized for computers and
-databases</li>
-<li>🔗 <strong>Semantic formats</strong>: Great for linking data across
-platforms</li>
-<li>⚗️ <strong>Chemical formats</strong>: Ideal for rigorous chemical
-analysis</li>
+<li>
+<strong>IUPAC formats</strong>: readable text formats for describing
+glycan structures.</li>
+<li>
+<strong>WURCS/GlycoCT</strong>: structured formats designed for
+databases and software.</li>
+<li>
+<strong>Semantic formats</strong>: formats designed for linking data
+across platforms.</li>
+<li>
+<strong>Chemical formats</strong>: formats used for detailed
+chemical representation.</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="why-we-chose-iupac-condensed-for-glyrepr">Why We Chose IUPAC-Condensed for <code>glyrepr</code> 🎯<a class="anchor" aria-label="anchor" href="#why-we-chose-iupac-condensed-for-glyrepr"></a>
+<h2 id="why-glyrepr-uses-iupac-condensed">Why <code>glyrepr</code> Uses IUPAC-Condensed<a class="anchor" aria-label="anchor" href="#why-glyrepr-uses-iupac-condensed"></a>
 </h2>
-<p>When we were building the <code>glycoverse</code>, we faced a classic
-engineering decision: which format should be our “native language”?</p>
-<p>After much deliberation (and probably too much coffee ☕), we settled
-on <strong>IUPAC-condensed</strong> because it hits the sweet spot:</p>
-<p>✅ <strong>Human-readable</strong>: You can actually understand what
-you’re looking at<br>
-✅ <strong>Information-rich</strong>: Contains everything you need for
-most glycomics analyses<br>
-✅ <strong>Widely used</strong>: The glycomics community knows and loves
-it<br>
-✅ <strong>Flexible</strong>: Works for both simple and complex
-structures</p>
-<p>Think of it as the “Python of glycan formats” — powerful yet
-approachable!</p>
+<p>When building <code>glyrepr</code>, we needed a native text format
+for glycan structures. IUPAC-condensed is a practical choice because it
+balances readability and information content.</p>
+<ul>
+<li>
+<strong>Human-readable</strong>: structures can usually be
+interpreted without specialized software.</li>
+<li>
+<strong>Information-rich</strong>: it captures the monosaccharides,
+branches, linkages, anomers, and substituents needed for many glycomics
+analyses.</li>
+<li>
+<strong>Widely used</strong>: it is familiar to many researchers in
+the glycomics community.</li>
+<li>
+<strong>Flexible</strong>: it can represent both simple and complex
+glycan structures.</li>
+</ul>
+<p>For other formats such as WURCS or GlycoCT, the broader
+<code>glycoverse</code> workflow can use parser packages such as
+<code>glyparse</code>.</p>
 </div>
 <div class="section level2">
-<h2 id="mastering-iupac-condensed-a-step-by-step-journey">Mastering IUPAC-Condensed: A Step-by-Step Journey 🗺️<a class="anchor" aria-label="anchor" href="#mastering-iupac-condensed-a-step-by-step-journey"></a>
+<h2 id="reading-iupac-condensed-notation">Reading IUPAC-Condensed Notation<a class="anchor" aria-label="anchor" href="#reading-iupac-condensed-notation"></a>
 </h2>
 <div class="section level3">
-<h3 id="step-1-the-building-blocks-monosaccharide-symbols">Step 1: The Building Blocks — Monosaccharide Symbols<a class="anchor" aria-label="anchor" href="#step-1-the-building-blocks-monosaccharide-symbols"></a>
+<h3 id="step-1-monosaccharide-symbols">Step 1: Monosaccharide Symbols<a class="anchor" aria-label="anchor" href="#step-1-monosaccharide-symbols"></a>
 </h3>
-<p>Every glycan is built from monosaccharide units, and IUPAC gives each
-one a memorable abbreviation:</p>
+<p>Every glycan is built from monosaccharide units, and IUPAC notation
+gives each one a short abbreviation:</p>
 <table class="table">
 <thead><tr class="header">
 <th>Full Name</th>
 <th>Symbol</th>
-<th>Think of it as…</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td>Galactose</td>
 <td><code>Gal</code></td>
-<td>“<strong>Gal</strong>axy sugar”</td>
 </tr>
 <tr class="even">
 <td>Glucose</td>
 <td><code>Glc</code></td>
-<td>“<strong>Glc</strong>ucose” (easy!)</td>
 </tr>
 <tr class="odd">
 <td>Mannose</td>
 <td><code>Man</code></td>
-<td>“<strong>Man</strong>nose”</td>
 </tr>
 <tr class="even">
 <td>N-Acetylglucosamine</td>
 <td><code>GlcNAc</code></td>
-<td>“Glc + NAc”</td>
 </tr>
 <tr class="odd">
 <td>Fucose</td>
 <td><code>Fuc</code></td>
-<td>“<strong>Fuc</strong>ose”</td>
 </tr>
 </tbody>
 </table>
-<p>💡 <strong>Pro tip</strong>: Check out the <a href="https://www.ncbi.nlm.nih.gov/glycans/snfg.html" class="external-link">SNFG website</a>
-for the complete symbol library — it’s like a cheat sheet for glycan
-notation!</p>
+<p>For a broader list of symbols, see the <a href="https://www.ncbi.nlm.nih.gov/glycans/snfg.html" class="external-link">SNFG website</a>
+or run <code><a href="../reference/available_monosaccharides.html">available_monosaccharides()</a></code>.</p>
 </div>
 <div class="section level3">
-<h3 id="step-2-the-decorations-substituents">Step 2: The Decorations — Substituents<a class="anchor" aria-label="anchor" href="#step-2-the-decorations-substituents"></a>
+<h3 id="step-2-substituents">Step 2: Substituents<a class="anchor" aria-label="anchor" href="#step-2-substituents"></a>
 </h3>
-<p>Just like proteins can have post-translational modifications, glycans
-can have their own decorations! These are called
-<strong>substituents</strong>.</p>
-<p>Think of substituents as “accessories” for your monosaccharides:</p>
+<p>Glycans can contain chemical modifications called
+<strong>substituents</strong>. In IUPAC-condensed notation, substituents
+are written after the monosaccharide name.</p>
 <ul>
 <li>
-<code>Neu5Ac9Ac</code> = A sialic acid wearing an extra acetyl group
-at position 9</li>
+<code>Neu5Ac9Ac</code> = a sialic acid with an extra acetyl group at
+position 9.</li>
 <li>
-<code>Glc3Me</code> = A glucose sporting a methyl group at position
-3</li>
+<code>Glc3Me</code> = a glucose with a methyl group at position
+3.</li>
 <li>
-<code>GlcNAc6Ac</code> = An N-acetylglucosamine with bonus
-acetylation at position 6</li>
+<code>GlcNAc6Ac</code> = an N-acetylglucosamine with acetylation at
+position 6.</li>
 </ul>
 <p><strong>Format rule</strong>: Position number + Modification
 type<br>
 Example: <code>6Ac</code> = “acetyl group at position 6”</p>
 </div>
 <div class="section level3">
-<h3 id="step-3-the-connections-linkage-information">Step 3: The Connections — Linkage Information<a class="anchor" aria-label="anchor" href="#step-3-the-connections-linkage-information"></a>
+<h3 id="step-3-linkage-information">Step 3: Linkage Information<a class="anchor" aria-label="anchor" href="#step-3-linkage-information"></a>
 </h3>
-<p>This is where the magic happens! 🪄 Linkages tell us how
-monosaccharides are connected to each other.</p>
+<p>Linkages tell us how monosaccharides are connected to each other.</p>
 <p><strong>The anatomy of a linkage:</strong></p>
 <pre><code>MonosaccharideA(anomeric_config + anomeric_position - target_position)MonosaccharideB</code></pre>
-<p>Let’s decode <code>Neu5Ac(a2-3)Gal</code>:</p>
+<p>For example, <code>Neu5Ac(a2-3)Gal</code> means:</p>
 <ul>
 <li>
 <code>Neu5Ac</code> is connected to <code>Gal</code>
@@ -213,47 +213,42 @@ monosaccharides are connected to each other.</p>
 <li>To position <strong>3</strong> of <code>Gal</code>
 </li>
 </ul>
-<p><strong>Real-world analogy</strong>: Think of it like describing how
-LEGO blocks connect: “The red block connects from its 2nd peg (in up
-position) to the 3rd socket of the blue block.”</p>
-<p><strong>When life gets uncertain</strong> 🤷‍♀️: Sometimes we don’t know
-all the details, so we use <code>?</code> as a wildcard:</p>
+<p>Sometimes not all linkage details are known, so we use <code>?</code>
+as a wildcard:</p>
 <ul>
 <li>
-<code>a2-?</code> = “We know it’s alpha-2, but not sure where it
-connects”</li>
+<code>a2-?</code> = the anomer and donor position are known, but the
+acceptor position is unknown.</li>
 <li>
-<code>??-3</code> = “It connects to position 3, but the anomeric
-info is unclear”</li>
+<code>??-3</code> = the acceptor position is known, but the anomer
+and donor position are unknown.</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="step-4-the-architecture-topological-structure">Step 4: The Architecture — Topological Structure<a class="anchor" aria-label="anchor" href="#step-4-the-architecture-topological-structure"></a>
+<h3 id="step-4-topological-structure">Step 4: Topological Structure<a class="anchor" aria-label="anchor" href="#step-4-topological-structure"></a>
 </h3>
-<p>Now comes the fun part: turning a branched tree structure into a
-linear string! It’s like giving directions to a complex building.</p>
-<p><strong>The golden rules:</strong></p>
+<p>The main challenge in IUPAC-condensed notation is writing a branched
+tree as a linear string. Branches are placed in square brackets and
+inserted before the residue they attach to.</p>
+<p>The basic rules are:</p>
 <ol style="list-style-type: decimal">
-<li>
-<strong>Find the longest backbone</strong> (like the main
-hallway)</li>
-<li>
-<strong>Everything else is a branch</strong> (like rooms off the
-hallway)</li>
+<li><strong>Find the longest backbone</strong></li>
+<li><strong>Treat everything else as a branch</strong></li>
 <li><strong>Branches go in square brackets <code>[]</code></strong></li>
 <li><strong>Write branches just before the monosaccharide they connect
 to</strong></li>
-<li><strong>Perform 1-4 for each branch</strong></li>
+<li><strong>Apply the same rules recursively inside each
+branch</strong></li>
 </ol>
 <div class="section level4">
-<h4 id="example-1-a-simple-o-glycan">Example 1: A Simple O-Glycan 🌿<a class="anchor" aria-label="anchor" href="#example-1-a-simple-o-glycan"></a>
+<h4 id="example-1-a-simple-o-glycan">Example 1: A Simple O-Glycan<a class="anchor" aria-label="anchor" href="#example-1-a-simple-o-glycan"></a>
 </h4>
 <p><img src="resources/H2N2.png"></p>
 <p><strong>Step-by-step construction:</strong></p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Identify the main chain</strong>:
-<code>Gal → GlcNAc → GalNAc</code>
+<code>Gal -&gt; GlcNAc -&gt; GalNAc</code>
 </li>
 <li>
 <strong>Add linkage info</strong>:
@@ -273,17 +268,18 @@ connects to <code>GalNAc</code>
 <pre><code>Gal(b1-4)GlcNAc(b1-6)[Gal(b1-3)]GalNAc(a1-</code></pre>
 </div>
 <div class="section level4">
-<h4 id="example-2-the-famous-n-glycan-core">Example 2: The Famous N-Glycan Core 🌟<a class="anchor" aria-label="anchor" href="#example-2-the-famous-n-glycan-core"></a>
+<h4 id="example-2-the-n-glycan-core">Example 2: The N-Glycan Core<a class="anchor" aria-label="anchor" href="#example-2-the-n-glycan-core"></a>
 </h4>
 <p><img src="resources/H3N2.png"></p>
-<p><strong>The plot twist</strong>: Two chains of equal length! Which
-one becomes the main chain?</p>
+<p>This example has two chains of equal length. The tie-breaker rule
+decides which one becomes the main chain.</p>
 <p><strong>IUPAC’s tie-breaker rule</strong>: When chains are equal,
 choose the one that creates branches with <strong>lower position
 numbers</strong>.</p>
 <p><strong>Analysis:</strong> - Option A: <code>Man(a1-6)</code> branch
-→ position 6 - Option B: <code>Man(a1-3)</code> branch → position 3</p>
-<p><strong>Winner</strong>: Option B (lower number = 3)</p>
+-&gt; position 6 - Option B: <code>Man(a1-3)</code> branch -&gt;
+position 3</p>
+<p>Option B is chosen because 3 is lower than 6.</p>
 <p><strong>Final result</strong>:</p>
 <pre><code>Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-</code></pre>
 </div>
@@ -291,43 +287,37 @@ numbers</strong>.</p>
 <h4 id="example-3">Example 3:<a class="anchor" aria-label="anchor" href="#example-3"></a>
 </h4>
 <p><img src="resources/H9N2.png"></p>
-<p>Let’s look at one more example to solidify our understanding. This
-example is a bit more complex, as it has three branches with the same
+<p>This example is more complex: it has three branches with the same
 length, branching on different residues. In this case, we look for the
 first breaking point from right to left: the b4 Man. Two mannoses are
-connected to the Man, one with a1-3 linkage and the other with a1-6
-linkage. According to the tie breaking law, we choose the bottom one
-(a1-3) as the main chain. Let’s write out the main chain first.</p>
+connected to that Man, one with an a1-3 linkage and the other with an
+a1-6 linkage. According to the tie-breaker rule, we choose the a1-3
+branch as the main chain. First, write the main chain:</p>
 <pre><code>Man(a1-2)Man(a1-2)Man(a1-3)[BRANCH]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-</code></pre>
-<p>Now let’s look at the branch, which itself has branches too
-(highlighed part).</p>
+<p>Now look at the branch, which also contains its own branch.</p>
 <p><img src="resources/H9N2_highlighted.png"></p>
-<p>The IUPAC-condensed string of the branch goes (using the tie breaking
-law again):</p>
+<p>Using the tie-breaker rule again, the branch can be written as:</p>
 <pre><code>BRANCH = Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)</code></pre>
-<p>Let’s combine them together:</p>
+<p>Combining the main chain and the branch gives:</p>
 <pre><code>Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-</code></pre>
 </div>
 </div>
 <div class="section level3">
-<h3 id="step-5-the-root-mystery-anomeric-information">Step 5: The Root Mystery — Anomeric Information<a class="anchor" aria-label="anchor" href="#step-5-the-root-mystery-anomeric-information"></a>
+<h3 id="step-5-reducing-end-anomeric-information">Step 5: Reducing-End Anomeric Information<a class="anchor" aria-label="anchor" href="#step-5-reducing-end-anomeric-information"></a>
 </h3>
 <p>You might wonder: “Why does the last monosaccharide end with
 <code>(b1-</code> instead of a complete linkage?”</p>
-<p>Great question! 🤔 The root monosaccharide (rightmost) doesn’t
-connect to anything further, so its anomeric carbon is “free.” The
-format <code>(xy-</code> tells us about its anomeric state without a
-target.</p>
+<p>The root monosaccharide (rightmost) doesn’t connect to anything
+further, so its anomeric carbon is “free.” The format <code>(xy-</code>
+tells us about its anomeric state without a target.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="put-your-skills-to-the-test">Put Your Skills to the Test! 🧪<a class="anchor" aria-label="anchor" href="#put-your-skills-to-the-test"></a>
+<h2 id="practice">Practice<a class="anchor" aria-label="anchor" href="#practice"></a>
 </h2>
-<p>Ready to become an IUPAC-condensed master? Time for some hands-on
-practice!</p>
 <p><strong>Challenge</strong>: Look at the complex N-glycan at the
 beginning of this article and try to write its IUPAC-condensed string
-yourself. Don’t peek at the answer!</p>
+yourself.</p>
 <p><strong>Hint</strong>: Start by identifying the main chain, then work
 on the branches one by one.</p>
 <p><strong>Test your answer:</strong></p>
@@ -338,38 +328,38 @@ on the branches one by one.</p>
 <span><span class="co"># This will tell you if it's valid</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="va">my_attempt</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"🎉 Congratulations! Your IUPAC string is valid!\n"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Your IUPAC string is valid.\n"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"🔧 Oops! There might be a small issue. Keep trying!\n"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"The string could not be parsed.\n"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Error:"</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 🔧 Oops! There might be a small issue. Keep trying!</span></span>
+<span><span class="co">#&gt; The string could not be parsed.</span></span>
 <span><span class="co">#&gt; Error: In index: 1.</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="congratulations-youre-now-glycan-literate">Congratulations, You’re Now Glycan-Literate! 🎓<a class="anchor" aria-label="anchor" href="#congratulations-youre-now-glycan-literate"></a>
+<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
-<p>You’ve just mastered one of the most important skills in
-computational glycomics: reading and writing IUPAC-condensed notation.
-This knowledge will serve you well as you explore the
-<code>glycoverse</code> and analyze glycan structures.</p>
-<p><strong>What you’ve learned:</strong></p>
+<p>IUPAC-condensed notation is compact enough for routine analysis while
+still preserving the structural details that <code>glyrepr</code> needs.
+In this article, you saw:</p>
 <ul>
-<li>🧬 Why different glycan formats exist and when to use them</li>
-<li>🔤 How to decode monosaccharide symbols and substituents<br>
-</li>
-<li>🔗 The logic behind linkage notation</li>
-<li>🌳 How to convert tree structures into linear strings</li>
-<li>🎯 The art of identifying main chains and branches</li>
+<li>why different glycan formats exist and when IUPAC-condensed is
+useful.</li>
+<li>how to read monosaccharide symbols and substituents.</li>
+<li>how linkage notation encodes anomeric configuration and
+positions.</li>
+<li>how branched tree structures are converted into linear strings.</li>
+<li>how main chains and branches are selected with tie-breaker
+rules.</li>
 </ul>
-<p><strong>Next steps:</strong></p>
+<p>Next steps:</p>
 <ul>
 <li>Practice with more complex structures</li>
 <li>Explore the <code>glyrepr</code> package functions</li>
-<li>Dive into glycan analysis with confidence!</li>
+<li>Use <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> to validate and work with
+IUPAC-condensed strings</li>
 </ul>
-<p>Happy glycan hunting! 🕵️‍♀️✨</p>
 </div>
 <div class="section level2">
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>

@@ -1,415 +1,631 @@
 # Getting Started with glyrepr
 
-Welcome to the world of glycan analysis! If you’ve ever tried to work
-with glycans computationally, you know the struggle: these tree-like
-molecules are notoriously difficult to represent and analyze compared to
-their linear cousins like proteins or DNA. That’s where `glyrepr` comes
-to the rescue.
+R gives us many data structures for different jobs. For example,
+`c(1L, 2L, 3L)` represents an integer vector, `c("a", "b", "c")`
+represents a character vector, and data frames represent tabular data.
+Before we can inspect or manipulate a kind of data well, we first need a
+suitable structure for representing it.
 
-Think of `glyrepr` as your **glycan translator** — it teaches your
-computer how to “speak glycan” fluently. Whether you’re dealing with
-compositions (what’s in the glycan) or structures (how it’s connected),
-this package has got you covered.
+What about glycans?
+
+When we talk about glycans, we usually talk about two related things:
+their compositions and their structures. A composition can be
+represented as a named vector, for example
+`c(Hex = 3, HexNAc = 2, Neu5Ac = 1)`. A structure can be represented as
+a graph, for example with the `igraph` package. Those representations
+are useful, but managing the details by hand quickly becomes cumbersome,
+especially for complex glycans or large datasets. This is where the
+`glyrepr` package comes in.
+
+`glyrepr` provides two main vector types:
+[`glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_composition.md)
+and
+[`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md).
+These vectors are designed to feel like ordinary R vectors: you can
+subset them, concatenate them, sort them, put them in tibbles, and use
+them in vectorized workflows.
+
+These two representations are the foundation of `glycoverse`. Most
+higher-level packages in the ecosystem build on them, so it is worth
+taking a little time to get comfortable here.
 
 ``` r
 library(glyrepr)
 ```
 
-## Quick Start: What Are We Talking About?
+## Glycan Composition Vectors
 
-Before we dive in, let’s establish our vocabulary. Don’t worry — it’s
-simpler than it sounds!
+Let’s start with glycan composition vectors.
 
-| Term               | What It Means                                   | Example                    |
-|--------------------|-------------------------------------------------|----------------------------|
-| **Composition**    | The “ingredients list” — how many of each sugar | `Hex(5)HexNAc(2)`          |
-| **Structure**      | The “blueprint” — how sugars are connected      | `Man(a1-3)Man(b1-4)GlcNAc` |
-| **Monosaccharide** | A single sugar unit (the building blocks)       | `Gal`, `Man`, `Hex`        |
-| **Linkage**        | The “glue” between sugars                       | `a1-3`, `b1-4`             |
-| **Substitution**   | Chemical decorations on sugars                  | `6Ac`, `3Me`               |
+### Creating Glycan Composition Vectors
 
-🔍 **Pro tip**: We distinguish between **generic** sugars (like mystery
-boxes labeled “Hex”) and **concrete** sugars (like specific boxes
-labeled “Galactose”).
+A glycan composition vector can be created with either
+[`glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_composition.md)
+or
+[`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_composition.md).
 
-## Part 1: Compositions — The Easy Start
-
-Let’s start with something straightforward: glycan compositions. Think
-of these as ingredient lists for your favorite recipes.
-
-### Creating Your First Compositions
-
-There are three ways to create compositions, each with its own
-superpower:
-
-**Method 1: The Direct Approach**
+[`glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_composition.md)
+is the direct constructor. It takes one or more named vectors, where the
+names are monosaccharides and the values are counts.
 
 ``` r
-# Just tell R what you have
-glycan_composition(c(Man = 5, GlcNAc = 2), c(Gal = 1, GalNAc = 1))
-#> <glycan_composition[2]>
+comps <- glycan_composition(
+  c(Man = 5, GlcNAc = 2),
+  c(Man = 3, Gal = 2, GlcNAc = 4),
+  c(Man = 3, Gal = 2, GlcNAc = 4, Neu5Ac = 1, Fuc = 1)
+)
+comps
+#> <glycan_composition[3]>
 #> [1] Man(5)GlcNAc(2)
-#> [2] Gal(1)GalNAc(1)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
 ```
 
-**Method 2: The Programmatic Way**
+This creates a glycan composition vector called `comps` with three
+glycan compositions.
+
+[`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_composition.md)
+is more flexible and can convert several input types.
+
+From a list of named vectors:
 
 ``` r
-# Perfect when you're processing data from files or databases
-comp_list <- list(c(Man = 5, GlcNAc = 2), c(Gal = 1, GalNAc = 1))
+as_glycan_composition(list(
+  c(Man = 5, GlcNAc = 2),
+  c(Man = 3, Gal = 2, GlcNAc = 4),
+  c(Man = 3, Gal = 2, GlcNAc = 4, Neu5Ac = 1, Fuc = 1)
+))
+#> <glycan_composition[3]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+```
+
+This looks similar to
+[`glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_composition.md),
+but it is more convenient when your compositions are already stored in a
+list, for example after reading or generating them programmatically.
+
+``` r
+comp_list <- list(
+  c(Man = 5, GlcNAc = 2),
+  c(Man = 3, Gal = 2, GlcNAc = 4),
+  c(Man = 3, Gal = 2, GlcNAc = 4, Neu5Ac = 1, Fuc = 1)
+)
 as_glycan_composition(comp_list)
-#> <glycan_composition[2]>
+#> <glycan_composition[3]>
 #> [1] Man(5)GlcNAc(2)
-#> [2] Gal(1)GalNAc(1)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
 ```
 
-**Method 3: The Parser**
+From a character vector:
 
 ``` r
-# Copy-paste from your mass spec software? No problem!
-as_glycan_composition(c("Hex(5)HexNAc(2)", "H1N1"))
+as_glycan_composition(c("H5N2", "Hex(3)HexNAc(2)"))
 #> <glycan_composition[2]>
 #> [1] Hex(5)HexNAc(2)
-#> [2] Hex(1)HexNAc(1)
+#> [2] Hex(3)HexNAc(2)
 ```
 
-### The Magic of Colors 🌈
+Both compact notation (`"H5N2"`) and Byonic-style notation
+(`"Hex(3)HexNAc(2)"`) are supported.
 
-Here’s something cool: when you run these examples in your R console,
-you’ll see the concrete monosaccharides (like Gal and GalNAc) displayed
-in beautiful colors! These follow the [SNFG
-standard](https://www.ncbi.nlm.nih.gov/glycans/snfg.html) — the
-universal “color code” for glycans. Think of it as the glycan rainbow
-🌈.
-
-### Smart Counting with `count_mono()`
-
-Now here’s where `glyrepr` shows its intelligence:
+From a glycan structure vector, which we will discuss below:
 
 ``` r
-comp <- glycan_composition(c(Gal = 1, Man = 1, GalNAc = 1))
-
-# How many galactose residues?
-count_mono(comp, "Gal")
-#> [1] 1
-
-# How many hexose residues? (This includes Gal and Man!)
-count_mono(comp, "Hex")
-#> [1] 2
+strucs <- c(o_glycan_core_1(), o_glycan_core_2())
+as_glycan_composition(strucs)
+#> <glycan_composition[2]>
+#> [1] Gal(1)GalNAc(1)
+#> [2] Gal(1)GlcNAc(1)GalNAc(1)
 ```
 
-Notice how
+### Two Types of Monosaccharide Names
+
+Before we move on, let’s briefly discuss the two types of monosaccharide
+names used in `glyrepr`:
+
+1.  **Generic names**: Hex, HexNAc, dHex, etc.
+2.  **Specific names**: Man, GlcNAc, Fuc, etc.
+
+Generic names are common in mass spectrometry data, where it is often
+difficult to distinguish isomers from MS evidence alone. For example,
+one `Hex` residue could be Man, Gal, Glc, or another hexose. Specific
+names carry more biological detail and are common in glycan databases
+and literature.
+
+`glyrepr` supports both types of names, but you cannot mix them in the
+same vector.
+
+``` r
+# This raises an error because the monosaccharide names are mixed.
+try(as_glycan_composition(c("Hex(5)HexNAc(2)", "Man(5)GlcNAc(2)")), silent = TRUE)
+```
+
+The same rule applies to glycan structure vectors.
+
+### Inspecting Glycan Composition Vectors
+
+The main function for inspecting glycan compositions is
+[`count_mono()`](https://glycoverse.github.io/glyrepr/dev/reference/count_mono.md).
+Let’s demonstrate it using the `comps` vector we created earlier.
+
+``` r
+comps
+#> <glycan_composition[3]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+```
+
+The first argument is a glycan composition vector, and the second
+argument is the monosaccharide you want to count.
+
+``` r
+count_mono(comps, "Man")
+#> [1] 5 3 3
+```
+
+``` r
+count_mono(comps, "Neu5Ac")
+#> [1] 0 0 1
+```
+
 [`count_mono()`](https://glycoverse.github.io/glyrepr/dev/reference/count_mono.md)
-is smart enough to know that galactose and mannose are both hexoses?
-That’s the power of understanding glycan hierarchies!
-
-## Part 2: Structures — Where the Magic Happens
-
-Compositions are nice, but structures are where `glyrepr` truly shines.
-This is like going from knowing the ingredients to understanding the
-actual recipe and cooking method.
-
-### Your First Glycan Structures
-
-Let’s work with some real glycan structures. These strings below are
-called the “IUPAC-condensed” glycan text representations. They might
-look cryptic, but they’re actually quite readable once you get the hang
-of it. To learn about them, check out [this
-article](https://glycoverse.github.io/glyrepr/articles/iupac.html).
+works with both generic and specific monosaccharide names. It
+understands the relationship between them, so it can count at the level
+you ask for.
 
 ``` r
-iupacs <- c(
-  "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",  # The famous N-glycan core
-  "Gal(b1-3)GalNAc(a1-",                                  # O-glycan core 1
-  "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-",                    # O-glycan core 2
-  "Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-",      # A branched mannose tree
-  "GlcNAc6Ac(b1-4)Glc3Me(a1-"                             # With some decorations
+count_mono(comps, "Hex")
+#> [1] 5 5 5
+```
+
+Note that both “Man” and “Gal” are counted as “Hex” here.
+
+You can also omit the second argument to get the total monosaccharide
+count for each composition.
+
+``` r
+count_mono(comps)
+#> [1]  7  9 11
+```
+
+### Manipulating Glycan Composition Vectors
+
+One useful mental model for glycan composition vectors (and glycan
+structure vectors) is that they behave like atomic vectors. This means
+they support familiar operations like subsetting, concatenation, and
+sorting.
+
+**Concatenation**:
+
+``` r
+c(comps, comps)
+#> <glycan_composition[6]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+#> [4] Man(5)GlcNAc(2)
+#> [5] Man(3)Gal(2)GlcNAc(4)
+#> [6] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+```
+
+**Subsetting**:
+
+``` r
+comps[1:2]
+#> <glycan_composition[2]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+```
+
+``` r
+comps[integer()]
+#> <glycan_composition[0]>
+```
+
+**Length**:
+
+``` r
+length(comps)
+#> [1] 3
+```
+
+**Unique**:
+
+``` r
+dup_comps <- c(comps, comps)
+dup_comps
+#> <glycan_composition[6]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+#> [4] Man(5)GlcNAc(2)
+#> [5] Man(3)Gal(2)GlcNAc(4)
+#> [6] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+```
+
+``` r
+unique(dup_comps)
+#> <glycan_composition[3]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+```
+
+**Repeated**:
+
+``` r
+rep(comps, times = 2)
+#> <glycan_composition[6]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+#> [4] Man(5)GlcNAc(2)
+#> [5] Man(3)Gal(2)GlcNAc(4)
+#> [6] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+```
+
+**Sorting**:
+
+``` r
+sort(comps)
+#> <glycan_composition[3]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+```
+
+``` r
+sort(comps, decreasing = TRUE)
+#> <glycan_composition[3]>
+#> [1] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
+#> [2] Man(3)Gal(2)GlcNAc(4)
+#> [3] Man(5)GlcNAc(2)
+```
+
+### Working with Tibbles
+
+One of the most useful features of glycan composition vectors is that
+they work smoothly with tibbles and data frames.
+
+``` r
+library(tibble)
+
+tb <- tibble(
+  id = c("glycan1", "glycan2", "glycan3"),
+  composition = comps
 )
-
-struc <- as_glycan_structure(iupacs)
-struc
-#> <glycan_structure[5]>
-#> [1] Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
-#> [2] Gal(b1-3)GalNAc(a1-
-#> [3] Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-
-#> [4] Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-
-#> [5] GlcNAc6Ac(b1-4)Glc3Me(a1-
-#> # Unique structures: 5
+tb
+#> # A tibble: 3 × 2
+#>   id      composition                         
+#>   <chr>   <comp>                              
+#> 1 glycan1 Man(5)GlcNAc(2)                     
+#> 2 glycan2 Man(3)Gal(2)GlcNAc(4)               
+#> 3 glycan3 Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
 ```
 
-### The Secret Sauce: Unique Structure Optimization
-
-Here’s where `glyrepr` gets really clever. Notice that “# Unique
-structures: 5” message? This isn’t just informational — it’s the key to
-lightning-fast performance.
-
-Let’s see this optimization in action:
+You can use `tidyverse` functions to perform operations on the glycan
+composition column.
 
 ``` r
-# Create a big dataset with lots of repetition
-large_struc <- rep(struc, 1000)  # 5,000 structures total
-large_struc
-#> <glycan_structure[5000]>
-#> [1] Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
-#> [2] Gal(b1-3)GalNAc(a1-
-#> [3] Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-
-#> [4] Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-
-#> [5] GlcNAc6Ac(b1-4)Glc3Me(a1-
-#> [6] Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
-#> [7] Gal(b1-3)GalNAc(a1-
-#> [8] Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-
-#> [9] Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-
-#> [10] GlcNAc6Ac(b1-4)Glc3Me(a1-
-#> ... (4990 more not shown)
-#> # Unique structures: 5
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+
+tb |>
+  mutate(n_sia = count_mono(composition, "Neu5Ac")) |>
+  filter(n_sia > 0)
+#> # A tibble: 1 × 3
+#>   id      composition                          n_sia
+#>   <chr>   <comp>                               <int>
+#> 1 glycan3 Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)     1
 ```
 
-Still showing “# Unique structures: 5”! This means `glyrepr` is storing
-only 5 unique graphs internally, not 5,000. This is like having a smart
-library system that stores only one copy of each book, no matter how
-many people want to read it.
+### Missing Values and Names
 
-### Performance That Will Blow Your Mind 🚀
-
-Let’s put this to the test:
+Glycan composition vectors can also handle missing values.
 
 ``` r
-library(tictoc)
-
-tic("Converting 5 structures")
-result_small <- convert_to_generic(struc)
-toc()
-#> Converting 5 structures: 0.021 sec elapsed
-
-tic("Converting 5,000 structures")
-result_large <- convert_to_generic(large_struc)
-toc()
-#> Converting 5,000 structures: 0.027 sec elapsed
+comps_with_na <- glycan_composition(c(Man = 5, GlcNAc = 2), NA)
+comps_with_na
+#> <glycan_composition[2]>
+#> [1] Man(5)GlcNAc(2)
+#> [2] <NA>
 ```
 
-**Mind = blown!** 🤯 The performance is nearly identical because
-`glyrepr` only processes each unique structure once, then cleverly
-expands the results.
+``` r
+count_mono(comps_with_na, "Man")
+#> [1]  5 NA
+```
 
-### Understanding Structure Resolution Levels 🔬
+For technical reasons, glycan composition vectors cannot have element
+names right now. In practice, this is usually fine: the composition
+itself remains the data value, and identifiers can live in a separate
+tibble column.
 
-Not all glycan structures are created equal — they come in different
-levels of detail, like zoom levels on a map. `glyrepr` recognizes four
-resolution levels:
+## Glycan Structure Vectors
 
-- **“intact”**: The full picture — all monosaccharides are concrete
-  (e.g., “Man”, “GlcNAc”), and no linkage or anomer contains “?”.
-- **“partial”**: Almost there — all monosaccharides are concrete (e.g.,
-  “Man”, “GlcNAc”), at least one linkage or anomer contains “?”, and at
-  least one linkage or anomer has a non-“?” annotation.
-- **“topological”**: We know what’s there, but not how they connect —
-  all monosaccharides are concrete (e.g., “Man”, “GlcNAc”), and all
-  linkages and anomers are completely unknown (“??-?”/“??”).
-- **“basic”**: The minimalist view — all monosaccharides are generic
-  (e.g., “Hex”, “HexNAc”).
+Now let’s move on to the core of glycan representation: glycan structure
+vectors. Many of the same ideas apply, including the atomic vector
+nature, vectorized operations, and seamless integration with tibbles.
+Because structures are more complex than compositions, there are a few
+additional features and considerations to keep in mind.
 
-💡 **Fun fact**: In theory, you could have a glycan with generic
-monosaccharides but fully determined linkages (e.g.,
-“Hex(b1-3)HexNAc(a1-”)). But in practice, this is almost unheard of —
-linkage information is much harder to obtain than monosaccharide
-information. That’s why `glyrepr` assigns these structures to the
-“basic” level too.
+### Creating Glycan Structure Vectors
 
-You can get the vector-wide structure level for a glycan structure
-vector with
-[`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md):
+As with glycan composition vectors, you can create glycan structure
+vectors with either
+[`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+or
+[`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md).
+
+Under the hood, glycan structures are represented as `igraph` objects,
+because glycans are naturally graph-like. Most of the time, you do not
+need to work with those graphs directly: `glyrepr` gives you a
+higher-level interface for common structure operations.
+
+[`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+is the direct constructor and takes one or more `igraph` objects.
+Creating those graphs manually can be tedious, so you will usually start
+with
+[`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+instead. It can parse IUPAC-condensed strings into glycan structure
+vectors.
+
+If you are not familiar with IUPAC-condensed notation, check out this
+[article](https://glycoverse.github.io/glyrepr/articles/iupac.html) for
+a quick introduction. We recommend getting familiar with this notation,
+because it is the main text language for communicating glycan structures
+in `glycoverse`.
+
+Parsing IUPAC-condensed strings is straightforward with
+[`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md).
+(For parsing other formats like GlycoCT, use the
+[glyparse](https://github.com/glycoverse/glyparse) package.)
 
 ``` r
-# Concrete structures (various linkage detail levels)
-concrete_glycans <- as_glycan_structure(c(
+strucs <- as_glycan_structure(c(
   "Gal(b1-3)GalNAc(a1-",
-  "Gal(b1-?)GalNAc(a1-",
-  "Gal(??-?)GalNAc(??-"
+  "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
 ))
-get_structure_level(concrete_glycans)
-#> [1] "partial"
+strucs
+#> <glycan_structure[2]>
+#> [1] Gal(b1-3)GalNAc(a1-
+#> [2] Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-
+#> # Unique structures: 2
+```
 
-# Generic structures
-generic_glycans <- as_glycan_structure(c(
+### Inspecting Glycan Structure Vectors
+
+`strucs` prints a bit like a character vector with colors, but under the
+hood the glycan structures are stored as `igraph` objects. You can
+access the underlying `igraph` objects using
+[`get_structure_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_graphs.md).
+
+``` r
+get_structure_graphs(strucs)
+#> [[1]]
+#> IGRAPH 81ecad3 DN-- 2 1 -- 
+#> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
+#> + edge from 81ecad3 (vertex names):
+#> [1] 2->1
+#> 
+#> [[2]]
+#> IGRAPH 56a97d3 DN-- 3 2 -- 
+#> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
+#> + edges from 56a97d3 (vertex names):
+#> [1] 3->1 3->2
+```
+
+Details of how a glycan structure is modeled as a graph are covered in
+the [glycan graph
+vignette](https://glycoverse.github.io/glyrepr/articles/glycan-graph.html).
+You do not need all of those details for everyday use, but a quick skim
+can make the structure functions easier to understand.
+
+The
+[`count_mono()`](https://glycoverse.github.io/glyrepr/dev/reference/count_mono.md)
+function also works with glycan structure vectors.
+
+``` r
+count_mono(strucs, "Gal")
+#> [1] 1 1
+```
+
+Other functions, including
+[`has_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/has_linkages.md),
+[`get_mono_type()`](https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.md),
+and
+[`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md),
+inspect specific aspects of the structures.
+
+``` r
+# This function works element-wise
+has_linkages(strucs)
+#> [1] TRUE TRUE
+```
+
+``` r
+get_mono_type(strucs)
+#> [1] "concrete"
+```
+
+``` r
+get_structure_level(strucs)
+#> [1] "intact"
+```
+
+### Structure Levels
+
+The structures we have seen so far are “intact” structures. They contain
+specific monosaccharides and complete linkage information. In real
+datasets, though, glycan structures often have missing information. For
+example, we might know the topology but not the linkages, or we might
+only know generic monosaccharide classes.
+
+To accommodate these scenarios, `glyrepr` defines four levels of glycan
+structures:
+
+- **Intact**: specific monosaccharides and complete linkage information.
+- **Partial**: specific monosaccharides, with at least one missing
+  linkage annotation.
+- **Topological**: specific monosaccharides, but all linkage information
+  is missing.
+- **Basic**: generic monosaccharides, with linkage information treated
+  as missing.
+
+Structure levels are defined at the vector level, so one glycan
+structure vector has one level.
+
+Let’s see some examples.
+
+**Intact structures**:
+
+``` r
+as_glycan_structure(c(
+  "Gal(b1-3)GalNAc(a1-",
+  "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
+)) |> get_structure_level()
+#> [1] "intact"
+```
+
+**Partial structures**:
+
+``` r
+as_glycan_structure(c(
+  "Gal(b1-?)GalNAc(a1-",
+  "Gal(b1-?)[GlcNAc(b1-6)]GalNAc(a1-"
+)) |> get_structure_level()
+#> [1] "partial"
+```
+
+**Topological structures**:
+
+``` r
+as_glycan_structure(c(
+  "Gal(??-?)GalNAc(??-",
+  "Gal(??-?)[GlcNAc(??-?)]GalNAc(??-"
+)) |> get_structure_level()
+#> [1] "topological"
+```
+
+**Basic structures**:
+
+``` r
+as_glycan_structure(c(
   "Hex(??-?)HexNAc(??-",
-  "Hex(b1-3)HexNAc(a1-"
-))
-get_structure_level(generic_glycans)
+  "Hex(??-?)[HexNAc(??-?)]HexNAc(??-"
+)) |> get_structure_level()
+#> [1] "basic"
+```
+
+In theory, you can have something like `"Hex(b1-3)HexNAc(a1-"`, with
+generic monosaccharides but all linkages intact. In practice, linkage
+information is usually harder to obtain than monosaccharide identities,
+so this situation is rare.
+
+If you create such a vector, `glyrepr` classifies it as `"basic"` and
+warns you.
+
+``` r
+as_glycan_structure(c(
+  "Hex(a1-3)HexNAc(a1-",
+  "Hex(a1-3)[HexNAc(b1-6)]HexNAc(a1-"
+)) |> get_structure_level()
 #> Warning: Generic glycan structures with linkage annotations are treated as "basic".
 #> ℹ Linkage information is ignored when residues are generic.
 #> [1] "basic"
 ```
 
-### Structure Manipulation Tools
+### Manipulating Glycan Structure Vectors
 
-`glyrepr` comes with several handy tools for structure manipulation:
-
-**Strip away the connections:**
+Glycan structure vectors also support vectorized operations like
+subsetting and concatenation. They also have structure-specific helpers
+for reducing resolution, removing linkages, and removing substituents.
 
 ``` r
-remove_linkages(struc)
-#> <glycan_structure[5]>
-#> [1] Man(??-?)[Man(??-?)]Man(??-?)GlcNAc(??-?)GlcNAc(??-
-#> [2] Gal(??-?)GalNAc(??-
-#> [3] GlcNAc(??-?)[Gal(??-?)]GalNAc(??-
-#> [4] Man(??-?)[Man(??-?)]Man(??-?)[Man(??-?)]Man(??-
-#> [5] GlcNAc6Ac(??-?)Glc3Me(??-
-#> # Unique structures: 5
+strucs
+#> <glycan_structure[2]>
+#> [1] Gal(b1-3)GalNAc(a1-
+#> [2] Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-
+#> # Unique structures: 2
 ```
 
-**Remove the decorations:**
-
 ``` r
-# Let's look at our decorated structure first
-struc[5]
-#> <glycan_structure[1]>
-#> [1] GlcNAc6Ac(b1-4)Glc3Me(a1-
-#> # Unique structures: 1
-
-# Now remove the decorations (6Ac and 3Me)
-remove_substituents(struc[5])
-#> <glycan_structure[1]>
-#> [1] GlcNAc(b1-4)Glc(a1-
-#> # Unique structures: 1
+reduce_structure_level(strucs, to_level = "basic")
+#> <glycan_structure[2]>
+#> [1] Hex(??-?)HexNAc(??-
+#> [2] HexNAc(??-?)[Hex(??-?)]HexNAc(??-
+#> # Unique structures: 2
 ```
 
-**Convert monosaccharides to generic:**
-
 ``` r
-convert_to_generic(struc)
-#> <glycan_structure[5]>
-#> [1] Hex(a1-3)[Hex(a1-6)]Hex(b1-4)HexNAc(b1-4)HexNAc(b1-
-#> [2] Hex(b1-3)HexNAc(a1-
-#> [3] Hex(b1-3)[HexNAc(b1-6)]HexNAc(a1-
-#> [4] Hex(a1-3)[Hex(a1-6)]Hex(a1-3)[Hex(a1-6)]Hex(a1-
-#> [5] HexNAc6Ac(b1-4)Hex3Me(a1-
-#> # Unique structures: 5
+remove_linkages(strucs)  # same as reduce_structure_level(strucs, to_level = "topological")
+#> <glycan_structure[2]>
+#> [1] Gal(??-?)GalNAc(??-
+#> [2] GlcNAc(??-?)[Gal(??-?)]GalNAc(??-
+#> # Unique structures: 2
 ```
 
-**Reduce structure resolution level:**
-
 ``` r
-reduce_structure_level(struc, to_level = "basic")
-#> <glycan_structure[5]>
-#> [1] Hex(??-?)[Hex(??-?)]Hex(??-?)HexNAc(??-?)HexNAc(??-
-#> [2] Hex(??-?)HexNAc(??-
-#> [3] HexNAc(??-?)[Hex(??-?)]HexNAc(??-
-#> [4] Hex(??-?)[Hex(??-?)]Hex(??-?)[Hex(??-?)]Hex(??-
-#> [5] HexNAc6Ac(??-?)Hex3Me(??-
-#> # Unique structures: 5
-# Same as remove_linkages() then convert_to_generic()
+strucs_with_subs <- as_glycan_structure(c(
+  "Gal6S(b1-3)GalNAc(a1-",
+  "Gal6S(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
+))
+remove_substituents(strucs_with_subs)
+#> <glycan_structure[2]>
+#> [1] Gal(b1-3)GalNAc(a1-
+#> [2] Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-
+#> # Unique structures: 2
 ```
 
-## Part 3: Conversions and Integrations
+### Missing Values and Names
 
-### From Structure to Composition
+Like glycan composition vectors, glycan structure vectors can also
+handle missing values.
 
-Ever wondered what’s actually in those complex structures? Easy:
-
-``` r
-comp <- as_glycan_composition(struc)
-comp
-#> <glycan_composition[5]>
-#> [1] Man(3)GlcNAc(2)
-#> [2] Gal(1)GalNAc(1)
-#> [3] Gal(1)GlcNAc(1)GalNAc(1)
-#> [4] Man(5)
-#> [5] Glc(1)GlcNAc(1)Me(1)Ac(1)
-```
-
-### Back to Strings
-
-Need to export your data or use it elsewhere?
+Different from glycan composition vectors, though, glycan structure
+vectors can have names. This is a very useful feature we introduced in
+version 0.10.0.
 
 ``` r
-# Get the original string representations
-as.character(struc)
-#> [1] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
-#> [2] "Gal(b1-3)GalNAc(a1-"                                
-#> [3] "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"                  
-#> [4] "Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-"    
-#> [5] "GlcNAc6Ac(b1-4)Glc3Me(a1-"
-as.character(comp)
-#> [1] "Man(3)GlcNAc(2)"           "Gal(1)GalNAc(1)"          
-#> [3] "Gal(1)GlcNAc(1)GalNAc(1)"  "Man(5)"                   
-#> [5] "Glc(1)GlcNAc(1)Me(1)Ac(1)"
-```
-
-### Playing Nice with the Tidyverse
-
-`glyrepr` objects are first-class citizens in the tidyverse:
-
-``` r
-suppressPackageStartupMessages(library(tibble))
-suppressPackageStartupMessages(library(dplyr))
-
-df <- tibble(
-  id = seq_along(struc),
-  structures = struc,
-  names = c("N-glycan core", "Core 1", "Core 2", "Branched Man", "Decorated")
+strings <- c(
+  glycan1 = "Gal(b1-3)GalNAc(a1-",
+  glycan2 = "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
 )
-
-df %>% 
-  mutate(n_man = count_mono(structures, "Man")) %>%
-  filter(n_man > 1)
-#> # A tibble: 2 × 4
-#>      id structures                                          names         n_man
-#>   <int> <struct>                                            <chr>         <int>
-#> 1     1 Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1- N-glycan core     3
-#> 2     4 Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-     Branched Man      5
+as_glycan_structure(strings)
+#> <glycan_structure[2]>
+#> [1] glycan1  Gal(b1-3)GalNAc(a1-
+#> [2] glycan2  Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-
+#> # Unique structures: 2
 ```
+
+You will find the names useful when working with the `glymotif` package.
 
 ## What’s Next?
 
-Congratulations! You’ve just learned the fundamentals of glycan
-representation in R. Here’s what you can explore next:
+This vignette sets the foundation for working with glycan
+representations in `glycoverse`. From here, you can explore the packages
+that build on these representations:
 
-- 🔬 **Advanced analysis**: Check out the “Power User Guide: Efficient
-  Glycan Manipulation” vignette for power-user features
-- 🧬 **Motif searching**: Try the `glymotif` package for finding
-  patterns in glycan structures  
-- 📊 **Visualization**: Explore glycan visualization packages in the
-  glycoverse
+- [glyparse](https://github.com/glycoverse/glyparse): parsing text
+  nomenclatures into glycan representations.
+- [glymotif](https://github.com/glycoverse/glymotif): identifying and
+  analyzing glycan motifs.
+- [glydet](https://github.com/glycoverse/glydet): calculating derived
+  traits and quantifying motifs.
+- [glydraw](https://github.com/glycoverse/glydraw): visualizing glycan
+  structures with SNFG notation.
+- [glyenzy](https://github.com/glycoverse/glyenzy): inspecting and
+  modeling glycan biosynthesis.
 
-The glycoverse is your oyster! 🦪
-
-## Session Information
-
-``` r
-sessionInfo()
-#> R version 4.6.0 (2026-04-24)
-#> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.4 LTS
-#> 
-#> Matrix products: default
-#> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
-#> 
-#> locale:
-#>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
-#>  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   
-#>  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          
-#> [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
-#> 
-#> time zone: UTC
-#> tzcode source: system (glibc)
-#> 
-#> attached base packages:
-#> [1] stats     graphics  grDevices utils     datasets  methods   base     
-#> 
-#> other attached packages:
-#> [1] dplyr_1.2.1         tibble_3.3.1        tictoc_1.2.1       
-#> [4] glyrepr_0.10.1.9000
-#> 
-#> loaded via a namespace (and not attached):
-#>  [1] jsonlite_2.0.0    compiler_4.6.0    tidyselect_1.2.1  stringr_1.6.0    
-#>  [5] jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5 yaml_2.3.12      
-#>  [9] fastmap_1.2.0     R6_2.6.1          generics_0.1.4    igraph_2.3.0     
-#> [13] knitr_1.51        backports_1.5.1   checkmate_2.3.4   rstackdeque_1.1.1
-#> [17] desc_1.4.3        bslib_0.10.0      pillar_1.11.1     rlang_1.2.0      
-#> [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.57        
-#> [25] fs_2.1.0          sass_0.4.10       cli_3.6.6         pkgdown_2.2.0    
-#> [29] magrittr_2.0.5    digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.3      
-#> [33] evaluate_1.0.5    glue_1.8.1        ragg_1.5.2        rmarkdown_2.31   
-#> [37] purrr_1.2.2       tools_4.6.0       pkgconfig_2.0.3   htmltools_0.5.9
-```
+Happy exploring.

@@ -1,99 +1,93 @@
-# Glycan Graphs: The Network Behind Your Sugar Structures 🕸️
+# Glycan Graphs: The Network Behind Glycan Structures
 
-**⚠️ Advanced Users Alert:** This vignette is tailored for those already
-familiar with graph theory and the `igraph` package. If you’re new to
-these concepts, we recommend checking out the [igraph
-documentation](https://r.igraph.org) first!
+This vignette is for users who want to understand how `glyrepr` stores
+glycan structures internally. Some familiarity with graph theory and the
+`igraph` package will help. If those concepts are new to you, the
+[igraph documentation](https://r.igraph.org) is a useful companion
+reference.
 
-## The Hidden Graph Universe of Glycans 🌌
+## Glycans as Graphs
 
-Think of glycans as nature’s own social networks – they’re naturally
-represented as directed graphs, specifically as outwardly-directed trees
-where each sugar “talks” to its neighbors in a very structured way.
+Glycans are naturally represented as directed graphs. In `glyrepr`, a
+glycan structure is stored as an outward-directed tree, where each
+vertex represents a monosaccharide and each edge represents a glycosidic
+linkage.
 
-Behind the scenes, every
+Behind the scenes, each
 [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-object is actually powered by an `igraph` object. The beauty of
-`glycoverse` is that most users can work with the intuitive concept of
-“glycan structures” without getting lost in the graph theory weeds 🌾.
-But for you power users who want to peek under the hood – this guide is
-your treasure map! 🗺️
+object is backed by an `igraph` object. Most workflows can stay at the
+[`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+level, but the graph representation is useful when you need custom
+structure analysis.
 
 ``` r
 library(glyrepr)
 ```
 
-## What’s Actually Stored in Memory? 🧠
+## What Is Stored in Memory?
 
-Representing a glycan in computer memory is like trying to pack for a
-month-long trip in a carry-on bag – you need to decide what’s absolutely
-essential!
+A glycan can carry many kinds of information: linear oriented C-atoms,
+basetype, substituents, configuration, anomeric center, ring size,
+linkage positions, and more.
 
-A glycan has tons of information: linear oriented C-atoms, basetype (the
-stereochemical skeleton), substituents, configuration, anomeric center,
-ring size, linkage positions… the list goes on! 📝
+Some packages, such as Python’s `glypy`, store a very detailed glycan
+model. That comprehensive strategy is useful for specialized tasks such
+as MS/MS spectra simulation, but it can be overkill for everyday omics
+research.
 
-Some packages (like Python’s `glypy`) take the “pack everything”
-approach 🎒, storing every tiny detail. This comprehensive strategy is
-fantastic for specialized tasks like MS/MS spectra simulation, but it
-can be overkill for everyday omics research.
+`glyrepr` takes a more compact approach: if a feature can be derived
+from an IUPAC-condensed text representation, `glyrepr` stores it.
+Details such as configuration and ring size are not stored directly,
+because they are often predictable for common carbohydrates and are not
+needed for many glycomics workflows.
 
-`glyrepr` takes a more minimalist approach ✨. Our philosophy: **if you
-can derive it from an IUPAC-condensed text representation, we’ll store
-it**. Everything else? We let it go. This means we skip details like
-configuration and ring size – and that’s usually just fine, since common
-carbohydrates have predictable properties anyway.
+For a closer look at IUPAC-condensed notation, see the [IUPAC-condensed
+vignette](https://glycoverse.github.io/glyrepr/articles/iupac.html).
 
-> 💡 **Pro Tip:** Want to master IUPAC-condensed notation? Check out
-> [this comprehensive
-> guide](https://glycoverse.github.io/glyrepr/articles/iupac.html).
+## Extracting the Graph
 
-## Extracting the Graph: Show Me the Network! 🔍
-
-You can’t just throw `igraph` functions at a
+You cannot pass a
 [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-object – they speak different languages! Instead, let’s extract the
-underlying graph using
+object directly to most `igraph` functions. First, extract the
+underlying graph with
 [`get_structure_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_graphs.md):
 
 ``` r
 glycan <- n_glycan_core()
 graph <- get_structure_graphs(glycan)
 graph
-#> IGRAPH 320de1c DN-- 5 4 -- 
+#> IGRAPH 67b25b7 DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 320de1c (vertex names):
+#> + edges from 67b25b7 (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 ```
 
-Let’s decode what we’re seeing here 🕵️:
+The printed graph contains several pieces of information.
 
 **First line:** Directed Named (“DN”) graph with 5 vertices (sugar
-units) and 4 edges (bonds). Think of it as a family tree with 5 people
-and 4 relationships.
+units) and 4 edges (bonds).
 
 **Graph-level attributes:**
 
-- `anomer` 🔄: The anomeric configuration of the reducing end (the
-  “root” of our tree)
+- `anomer`: the anomeric configuration of the reducing end.
 
-**Vertex attributes (the sugar units themselves):**
+**Vertex attributes:**
 
-- `name` 🏷️: Unique ID for each sugar (like social security numbers)
-- `mono` 🍬: The actual sugar type (“Hex”, “HexNAc”, etc.)
-- `sub` ⚗️: Any chemical decorations attached to the sugar
+- `name`: a unique ID for each monosaccharide.
+- `mono`: the monosaccharide type, such as “Hex” or “HexNAc”.
+- `sub`: chemical decorations attached to the monosaccharide.
 
-**Edge attributes (the connections):**
+**Edge attributes:**
 
-- `linkage` 🔗: How the sugars are connected (including bond positions
-  and configurations)
+- `linkage`: how the monosaccharides are connected, including bond
+  positions and configurations.
 
-**Connection pattern:** “1-\>2” means vertex 1 connects to vertex 2. We
-treat bonds as arrows pointing from the core toward the branches (even
-though real glycosidic bonds aren’t actually directional – it just makes
-coding easier! 😅)
+**Connection pattern:** “1-\>2” means vertex 1 connects to vertex 2.
+`glyrepr` treats bonds as arrows pointing from the core toward the
+branches. The direction is a modeling choice that makes traversal and
+structure operations easier.
 
-Want to see it visually? `igraph` has got you covered:
+You can also plot the graph with `igraph`:
 
 ``` r
 plot(graph)
@@ -101,46 +95,42 @@ plot(graph)
 
 ![](glycan-graph_files/figure-html/unnamed-chunk-3-1.png)
 
-## Deep Dive: Dissecting the Components 🔬
+## Graph Components
 
-### Vertices: Meet Your Sugar Cast 🎭
+### Vertices
 
 Each vertex represents a monosaccharide with three key properties:
 
-**🏷️ Names (Unique IDs):** These are auto-generated identifiers –
-usually simple integers, but they could be anything as long as they’re
-unique:
+**Names:** These are auto-generated identifiers, usually simple
+integers, but they could be anything as long as they’re unique:
 
 ``` r
 igraph::V(graph)$name
 #> [1] "1" "2" "3" "4" "5"
 ```
 
-**🍬 Monosaccharides (The Star Players):** These are IUPAC-condensed
-names like “Hex”, “HexNAc”, “Glc”, “GlcNAc”. Think of them as the “job
-titles” of your sugars:
+**Monosaccharides:** These are IUPAC-condensed names like “Hex”,
+“HexNAc”, “Glc”, “GlcNAc”.
 
 ``` r
 igraph::V(graph)$mono
 #> [1] "Man"    "Man"    "Man"    "GlcNAc" "GlcNAc"
 ```
 
-> 📚 **Reference:** For the complete cast of available monosaccharides,
-> check [SNFG notation](https://www.ncbi.nlm.nih.gov/glycans/snfg.html)
-> or run
-> [`available_monosaccharides()`](https://glycoverse.github.io/glyrepr/dev/reference/available_monosaccharides.md).
+For the full list of available monosaccharides, check [SNFG
+notation](https://www.ncbi.nlm.nih.gov/glycans/snfg.html) or run
+[`available_monosaccharides()`](https://glycoverse.github.io/glyrepr/dev/reference/available_monosaccharides.md).
 
-**⚗️ Substituents (The Accessories):** Chemical decorations like “Me”
-(methyl), “Ac” (acetyl), “S” (sulfate), etc. Position matters! “3Me” =
-methyl at position 3, “?S” = sulfate at unknown position:
+**Substituents:** Chemical decorations like “Me” (methyl), “Ac”
+(acetyl), “S” (sulfate), etc. Position matters. “3Me” = methyl at
+position 3, “?S” = sulfate at unknown position:
 
 ``` r
 igraph::V(graph)$sub
 #> [1] "" "" "" "" ""
 ```
 
-Got multiple decorations? No problem! They’re comma-separated and sorted
-by position:
+Multiple decorations are comma-separated and sorted by position:
 
 ``` r
 glycan2 <- as_glycan_structure("Glc3Me6S(a1-")
@@ -149,13 +139,13 @@ igraph::V(graph2)$sub
 #> [1] "3Me,6S"
 ```
 
-### Edges: The Relationship Status 💕
+### Edges
 
 Edges represent glycosidic bonds with a simple but powerful format:
 
     <target anomeric config><target position> - <source position>
 
-Here’s a real example where “Gal” has an “a” anomeric configuration,
+Here is an example where “Gal” has an “a” anomeric configuration,
 linking from position 3 of “GalNAc” to position 1 of “Gal”:
 
 ``` r
@@ -165,26 +155,25 @@ igraph::E(graph3)$linkage
 #> [1] "a1-3"
 ```
 
-> 🤔 **Why encode anomer info in edges?** We debated this! It might seem
-> more natural to store it with vertices, but thinking “Neu5Ac with a2-3
-> linkage” flows better mentally and matches IUPAC notation perfectly.
+`glyrepr` stores anomer information in edges rather than vertices. This
+follows the way linkages are written in IUPAC-condensed notation, for
+example “Neu5Ac with an a2-3 linkage”.
 
-### Graph-Level Attributes: The Global Settings ⚙️
+### Graph-Level Attributes
 
-**🔄 Anomer:** The anomeric configuration of the reducing end (the
-“root” sugar that doesn’t link to anything else)
+**Anomer:** The anomeric configuration of the reducing end.
 
 ``` r
 graph$anomer
 #> [1] "b1"
 ```
 
-## Now for the Fun Part: What Can You Do? 🎉
+## Working with the Graph
 
-### Unleash the Power of `igraph` 💪
+### Using `igraph`
 
-Once you understand the graph structure, the entire `igraph` universe
-opens up!
+Once you understand the graph structure, you can use `igraph` functions
+for custom structure analysis.
 
 **Example 1:** Count branched structures (sugars with multiple
 children):
@@ -199,11 +188,11 @@ sum(igraph::degree(graph, mode = "out") > 1)
 ``` r
 bfs_result <- igraph::bfs(graph, root = 1, mode = "out")
 bfs_result$order
-#> + 5/5 vertices, named, from 320de1c:
+#> + 5/5 vertices, named, from 67b25b7:
 #> [1] 1 2 3 4 5
 ```
 
-### Level Up with `smap` Functions 🚀
+### Using `smap` Functions
 
 Working with multiple glycans? You could use `purrr`:
 
@@ -216,43 +205,44 @@ map_int(graphs, ~ igraph::vcount(.x))    # Then analyze
 #> [1] 5 2 3
 ```
 
-But `glyrepr`’s `smap` functions are way more elegant:
+For glycan structure vectors, `glyrepr`’s `smap` functions are usually a
+better fit:
 
 ``` r
-smap_int(glycans, ~ igraph::vcount(.x))  # Direct analysis - no intermediate step!
+smap_int(glycans, ~ igraph::vcount(.x))  # Direct analysis, no intermediate step.
 #> [1] 5 2 3
 ```
 
-The real magic ✨ of `smap` functions is their intelligence with
-duplicates. Real datasets often have many identical structures, and
-`smap` optimizes by processing unique structures once, then efficiently
+The main advantage of `smap` functions is how they handle duplicates.
+Real datasets often contain many repeated structures, and `smap`
+optimizes by processing unique structures once, then efficiently
 expanding results back to the original dimensions.
 
-> 📖 **Learn More:** Dive deeper into `smap` wizardry in the [dedicated
-> vignette](https://glycoverse.github.io/glyrepr/articles/smap.html).
+The [smap
+vignette](https://glycoverse.github.io/glyrepr/articles/smap.html)
+covers this workflow in more detail.
 
-### Motif Hunting with `glymotif` 🔍
+### Motif Analysis with `glymotif`
 
-One of the most exciting applications is identifying biologically
-meaningful motifs (functional substructures). The `glymotif` package,
-built on this graph foundation, specializes in exactly this task.
+One important application is identifying biologically meaningful motifs,
+or functional substructures. The `glymotif` package, built on this graph
+foundation, specializes in exactly this task.
 
-> 🎯 **Get Started:** Check out the [`glymotif`
-> introduction](https://glycoverse.github.io/glymotif/articles/glymotif.html)
-> to start your motif hunting adventure!
+See the [`glymotif`
+introduction](https://glycoverse.github.io/glymotif/articles/glymotif.html)
+for examples.
 
-## Wrapping Up: Your Graph Journey Continues 🎯
+## Summary
 
-You’ve just unlocked the graph-powered engine behind `glyrepr`! You now
-understand:
+In this vignette, you saw:
 
-- 🏗️ How glycan structures map to directed graphs
-- 📊 What information is stored (and what’s deliberately omitted)
-- 🔧 How to extract and manipulate the underlying graphs
-- 🚀 How to leverage `igraph`, `smap`, and `glymotif` for powerful
-  analyses
+- how glycan structures map to directed graphs.
+- what information is stored and what is deliberately omitted.
+- how to extract and inspect the underlying graphs.
+- how `igraph`, `smap`, and `glymotif` can build on this representation.
 
 The graph representation might seem complex at first, but it’s this
 solid foundation that enables all the sophisticated glycan analysis
-capabilities in the `glycoverse`. Now go forth and explore your glycan
-networks! 🌟
+capabilities in the `glycoverse`. Most users will not need to manipulate
+the graph directly, but understanding the model makes it easier to
+extend `glyrepr` when custom analysis is needed.
