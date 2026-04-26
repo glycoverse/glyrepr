@@ -29,22 +29,6 @@ is_glycan_structure(x)
 
 A `glyrepr_structure` class glycan structure vector object.
 
-## Core Features
-
-- **Efficient Storage**: Uses hash values of IUPAC codes for
-  deduplication, avoiding redundant storage of identical glycan
-  structures
-
-- **Graph Model Representation**: Each glycan structure is represented
-  as a directed graph where nodes are monosaccharides and edges are
-  glycosidic linkages
-
-- **Vectorized Operations**: Supports R's vectorized operations for
-  batch processing of glycan data
-
-- **Type Safety**: Built on the vctrs package, providing type-safe
-  operations
-
 ## Data Structure Overview
 
 A glycan structure vector is a vctrs record with an additional S3 class
@@ -105,20 +89,6 @@ print a `glycan_structure()`. For example, for the glycan
 "Man", "Man", "Man", "GlcNAc", "GlcNAc", and the linkages are "a1-3",
 "a1-6", "b1-4", "b1-4".
 
-## Use Cases
-
-- **Glycoproteomics Analysis**: Processing glycan structure information
-  from mass spectrometry data
-
-- **Glycomics Research**: Comparing glycan expression profiles across
-  different samples or conditions
-
-- **Structure-Function Analysis**: Studying relationships between glycan
-  structures and biological functions
-
-- **Database Queries**: Performing structure matching and searches in
-  glycan databases
-
 ## NA Support
 
 Glycan structure vectors support NA values for representing missing or
@@ -134,6 +104,26 @@ unknown structures:
 
 - [`is.na()`](https://rdrr.io/r/base/NA.html) returns `TRUE` for NA
   elements
+
+## Naming Support
+
+Glycan structure vectors can have names, which are preserved during
+operations. This is particularly useful when working with the `glymotif`
+package.
+
+## As characters
+
+One side-effect of the current implementation is that you can treat a
+glycan structure vector as a pure character vector of IUPAC-condensed
+strings. In fact,
+[`is.character()`](https://rdrr.io/r/base/character.html) returns `TRUE`
+for a glycan structure vector, and all `stringr` functions work directly
+on the vector.
+
+However, we still recommend using
+[`as.character()`](https://rdrr.io/r/base/character.html) to explicitly
+convert to character when needed, to avoid confusion and ensure that the
+intended behavior is clear.
 
 ## Examples
 
