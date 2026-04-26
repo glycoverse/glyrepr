@@ -24,18 +24,6 @@ processing glycan molecular structures. The function employs hash-based deduplic
 mechanisms, making it suitable for glycoproteomics, glycomics analysis, and glycan
 structure comparison studies.
 }
-\section{Core Features}{
-\itemize{
-\item \strong{Efficient Storage}: Uses hash values of IUPAC codes for deduplication,
-avoiding redundant storage of identical glycan structures
-\item \strong{Graph Model Representation}: Each glycan structure is represented as a directed
-graph where nodes are monosaccharides and edges are glycosidic linkages
-\item \strong{Vectorized Operations}: Supports R's vectorized operations for batch
-processing of glycan data
-\item \strong{Type Safety}: Built on the vctrs package, providing type-safe operations
-}
-}
-
 \section{Data Structure Overview}{
 A glycan structure vector is a vctrs record with an additional S3 class
 \code{glyrepr_structure}. Therefore, \code{sloop::s3_class()} returns the class hierarchy
@@ -94,19 +82,6 @@ the vertices are "Man", "Man", "Man", "GlcNAc", "GlcNAc",
 and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".
 }
 
-\section{Use Cases}{
-\itemize{
-\item \strong{Glycoproteomics Analysis}: Processing glycan structure information from
-mass spectrometry data
-\item \strong{Glycomics Research}: Comparing glycan expression profiles across different
-samples or conditions
-\item \strong{Structure-Function Analysis}: Studying relationships between glycan
-structures and biological functions
-\item \strong{Database Queries}: Performing structure matching and searches in glycan
-databases
-}
-}
-
 \section{NA Support}{
 Glycan structure vectors support NA values for representing missing or
 unknown structures:
@@ -117,6 +92,21 @@ unknown structures:
 \item \code{smap} functions skip NA elements gracefully
 \item \code{is.na()} returns \code{TRUE} for NA elements
 }
+}
+
+\section{Naming Support}{
+Glycan structure vectors can have names, which are preserved during operations.
+This is particularly useful when working with the \code{glymotif} package.
+}
+
+\section{As characters}{
+One side-effect of the current implementation is that you can treat a glycan structure vector
+as a pure character vector of IUPAC-condensed strings.
+In fact, \code{is.character()} returns \code{TRUE} for a glycan structure vector,
+and all \code{stringr} functions work directly on the vector.
+
+However, we still recommend using \code{as.character()} to explicitly convert to character when needed,
+to avoid confusion and ensure that the intended behavior is clear.
 }
 
 \examples{
