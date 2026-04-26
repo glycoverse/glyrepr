@@ -1,8 +1,8 @@
 ---
-title: "Power User Guide: Efficient Glycan Manipulation"
+title: "Efficient Glycan Manipulation with smap"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Power User Guide: Efficient Glycan Manipulation}
+  %\VignetteIndexEntry{Efficient Glycan Manipulation with smap}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,37 +14,33 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Welcome to the Advanced Zone! 🚀
+## Overview
 
-Ready to unlock the **full potential** of `glyrepr`? 
-This vignette is for those who want to peek under the hood and master the art of efficient glycan computation. 
-If you're writing custom functions for glycan analysis or building the next great glycomics tool, 
-you're in the right place!
+This vignette introduces the `smap` family of functions.
+These functions are useful when you want to apply custom `igraph`-based operations to glycan structure vectors.
 
-**Fair warning**: 
-This guide assumes you're comfortable with R programming and graph theory concepts. 
-If you're just getting started, 
-check out our "Getting Started with glyrepr" vignette first.
+This guide assumes you are comfortable with R programming and have some familiarity with graph concepts.
+If you are just getting started,
+read the "Getting Started with glyrepr" vignette first.
 
 ```{r setup}
 library(glyrepr)
 ```
 
-## The Secret Superpower: Unique Structure Optimization
+## Unique Structure Optimization
 
-Before we dive into the `smap` functions, 
-let's understand why they exist and why they're **game-changing** for glycan analysis.
+Before using `smap`, it helps to understand why these functions exist.
 
-### The Problem: Glycan Computation is Expensive 💸
+### The Problem
 
 Working with glycan structures means working with graphs, 
 and graph operations are computationally expensive. 
-When you're analyzing thousands of glycans from a large-scale study, 
+When you are analyzing thousands of glycans from a large-scale study,
 this becomes a real bottleneck.
 
-### The Solution: Work Smart, Not Hard 🧠
+### The Solution
 
-`glyrepr` implements a clever optimization called **unique structure storage**. 
+`glyrepr` implements an optimization called **unique structure storage**.
 Instead of storing thousands of identical graphs, 
 it stores only the unique ones and keeps track of which original positions they belong to.
 
@@ -62,15 +58,16 @@ iupacs <- c(
 
 struc <- as_glycan_structure(iupacs)
 
-# Now let's create a realistic dataset with lots of repetition
+# Now create a realistic dataset with lots of repetition.
 large_struc <- rep(struc, 1000)  # 5,000 total structures
 large_struc
 ```
 
-Notice that magical "# Unique structures: 5"? 
-That's your performance booster right there! 
+Notice that the object reports only 5 unique structures.
+The vector has 5,000 elements,
+but only 5 unique graphs are stored internally.
 
-Let's verify this optimization is real:
+We can verify that directly:
 
 ```{r}
 # Only 5 unique graphs are stored internally
@@ -80,48 +77,47 @@ length(attr(large_struc, "structures"))
 length(large_struc)
 ```
 
-### The Memory Savings Are Real
+### Memory Savings
 
 ```{r}
 library(lobstr)
 obj_sizes(struc, large_struc)
 ```
 
-**80 kB vs 15 MB?** 
-That's a 200x memory efficiency! 
-But the real magic happens with computation speed...
+The memory difference can be substantial.
+For repeated structures,
+the optimized representation can be much smaller than storing every graph independently.
 
-## Enter the `smap` Universe 🌌
+## The `smap` Family
 
-Now here's the problem: 
-if you try to use regular `lapply()` or `purrr::map()` functions on glycan structures, 
-you'll hit a wall:
+There is one important consequence of this internal representation:
+regular `lapply()` or `purrr::map()` functions do not operate directly on a glycan structure vector as if it were a list of graphs.
 
 ```{r}
-# This won't work and will throw an error
+# This will not work and will raise an error.
 tryCatch(
   purrr::map_int(large_struc, ~ igraph::vcount(.x)),
-  error = function(e) cat("💥 Error:", rlang::cnd_message(e))
+  error = function(e) cat("Error:", rlang::cnd_message(e))
 )
 ```
 
 **Why does this fail?** 
 Because `purrr` functions don't understand the internal structure optimization of `glycan_structure` objects.
 
-### The `smap` Family to the Rescue!
+### Structure-Aware Mapping
 
-The `smap` functions (think "**s**tructure map") are drop-in replacements for `purrr` functions that are **glycan-aware**. 
+The `smap` functions are structure-aware alternatives to `purrr` mapping functions.
 They understand the unique structure optimization and work directly with the underlying graph objects.
 
 ```{r}
-# This works beautifully!
 vertex_counts <- smap_int(large_struc, ~ igraph::vcount(.x))
 vertex_counts[1:10]
 ```
 
-**The "s" stands for "structure"** — these functions operate on the underlying `igraph` objects that represent your glycan structures.
+The "s" stands for "structure":
+these functions operate on the underlying `igraph` objects that represent glycan structures.
 
-## The Complete `smap` Toolkit 🛠️
+## The `smap` Toolkit
 
 The `smap` family provides glycan-aware equivalents for virtually all `purrr` functions:
 
@@ -137,12 +133,12 @@ The `smap` family provides glycan-aware equivalents for virtually all `purrr` fu
 | `none()` | `snone()` | `imap()` | `simap()` |
 | | | `imap_*()` | `simap_*()` |
 
-**Simple rule**: Replace `map` with `smap`, 
+As a simple rule, replace `map` with `smap`,
 `pmap` with `spmap`, 
 and `imap` with `simap`. 
-Everything else works exactly like `purrr`!
+The function signatures are designed to feel familiar if you already use `purrr`.
 
-### Let's Put Them to Work!
+### Basic Examples
 
 **Count vertices in each structure:**
 ```{r}
@@ -159,7 +155,7 @@ sum(has_many_vertices)
 **Get the degree sequence of each structure:**
 ```{r}
 degree_sequences <- smap(large_struc, ~ igraph::degree(.x))
-degree_sequences[1:3]  # Show first 3
+degree_sequences[1:3]
 ```
 
 **Check if any structure has isolated vertices:**
@@ -193,16 +189,16 @@ indexed_report <- simap_chr(large_struc[1:3], function(g, i) {
 indexed_report
 ```
 
-⚠️ **Performance Warning**: 
-`simap` functions don't benefit from the unique structure optimization! 
-Since each element has a different index, 
+**Performance note:**
+`simap` functions do not benefit from the unique structure optimization.
+Since each element has a different index,
 the combination of `(structure, index)` is always unique, 
 breaking the deduplication that makes other `smap` functions fast. 
 Use `simap` only when you truly need position information.
 
-## Performance: The Magic of Deduplication ⚡
+## Performance
 
-The beauty of `smap` functions lies in automatic deduplication:
+The main performance benefit of `smap` functions comes from automatic deduplication:
 
 ```{r}
 # Create a large dataset with high redundancy
@@ -229,11 +225,11 @@ toc()
 all.equal(vertex_counts_optimized, vertex_counts_naive)
 ```
 
-**The higher the redundancy, the bigger the performance gain!** 
+The higher the redundancy, the larger the performance gain.
 In real glycoproteomics datasets with repeated structures, 
 this optimization can provide about 10x speedups.
 
-## Advanced Patterns and Tips 💡
+## Additional Patterns
 
 ### Working with Complex Functions
 
@@ -249,7 +245,7 @@ summary(clustering_coeffs)
 ### Combining Multiple Metrics
 
 ```{r}
-# Create a comprehensive analysis
+# Create a compact structure summary.
 structure_analysis <- smap(large_struc, function(g) {
   list(
     vertices = igraph::vcount(g),
@@ -278,23 +274,23 @@ cat("Found", sum(has_five_vertices), "structures with exactly 5 vertices\n")
 
 **Use `smap` functions when:**
 
-- ✅ You need to apply `igraph`-based functions to glycan structures
-- ✅ You want maximum performance with datasets containing repeated structures
-- ✅ You're building custom glycan analysis pipelines
+- You need to apply `igraph`-based functions to glycan structures.
+- You want better performance with datasets containing repeated structures.
+- You are building custom glycan analysis pipelines.
 
-**Stick with regular R functions when:**
+**Use regular R functions when:**
 
-- ❌ Working with compositions
-- ❌ Operating on string representations
+- You are working with compositions.
+- You are operating on string representations.
 
-⚠️ **Special note on `simap`**: 
+**Special note on `simap`:**
 
 While `simap` functions are convenient for position-aware operations, 
-they **don't provide performance benefits** over regular `imap` functions. 
+they do not provide performance benefits over regular `imap` functions.
 The inclusion of index information breaks the unique structure optimization, 
 making each `(structure, index)` pair unique even when structures are identical.
 
-## Real-World Example: Custom Motif Detection
+## Example: Custom Motif Detection
 
 Here's how you might build a custom glycan analysis pipeline using `smap` functions:
 
@@ -305,7 +301,7 @@ detect_branching <- function(g) {
   any(degrees >= 3)
 }
 
-# Apply to large dataset - blazingly fast due to unique structure optimization
+# Apply to a large dataset using unique structure optimization.
 has_branching <- smap_lgl(large_struc, detect_branching)
 cat("Structures with branching:", sum(has_branching), "out of", length(large_struc), "\n")
 
@@ -317,19 +313,17 @@ meets_threshold <- smap2_lgl(large_struc, complexity_thresholds, function(g, thr
 cat("Structures meeting complexity threshold:", sum(meets_threshold), "out of", length(large_struc), "\n")
 ```
 
-## Final Thoughts: You're Now a Power User! 🎉
+## Summary
 
-Congratulations! 
-You now understand the core optimization that makes `glyrepr` blazingly fast and how to leverage it with the `smap` family of functions. 
+The `smap` family provides structure-aware mapping functions for glycan structure vectors.
+It lets you write custom graph-based analyses while preserving the unique structure optimization used by `glyrepr`.
 
-**Key takeaways:**
-- 🧠 **Unique structure optimization** is the secret sauce behind `glyrepr`'s performance
-- 🚀 **`smap` functions** are drop-in replacements for `purrr` that understand glycan structures
-- ⚡ **Performance gains** are dramatic with large datasets containing repeated structures
-- 🛠️ **Use `smap` for structures**, regular R functions for everything else
+Key takeaways:
 
-You're now equipped to build the next generation of glycomics analysis tools. 
-Go forth and analyze! 🌟
+- Unique structure optimization stores repeated structures efficiently.
+- `smap` functions are `purrr`-like tools that understand glycan structure vectors.
+- Performance gains are strongest when datasets contain repeated structures.
+- Use `smap` for structures, and use regular R or `purrr` functions for other data types.
 
 ## Session Information
 

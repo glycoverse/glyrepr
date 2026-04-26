@@ -16,6 +16,7 @@
 * `reduce_structure_level()` preserves missing structures in output.
 * `simap()` and ``simap_structure()` now skip missing structures like the other smap variants.
 * `get_mono_type.glyrepr_composition()` now ignores missing composition elements and returns `NA_character_` for all-NA composition vectors.
+* Rewrite the Getting Started vignette for better readability and adopt a calmer tone for all vignettes.
 
 # glyrepr 0.10.1
 
