@@ -259,7 +259,7 @@ tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.197 sec elapsed
+#> Naive approach (all graphs): 0.217 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -410,7 +410,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] tictoc_1.2.1        lobstr_1.2.1        glyrepr_0.10.1.9000
+#> [1] tictoc_1.2.1        lobstr_1.2.1        glyrepr_0.11.0.9000
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.0    tidyselect_1.2.1 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.10.1.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.11.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,18 +40,21 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.11.0" id="glyrepr-0110">glyrepr 0.11.0<a class="anchor" aria-label="anchor" href="#glyrepr-0110"></a></h2><p class="text-muted">CRAN release: 2026-04-26</p>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-0-11-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-11-0"></a></h3>
 <ul><li>
 <code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> now returns one character scalar for a <code>glyrepr_structure</code> vector instead of one value per element. The vector-wide level is “intact”, “partial”, “topological”, or “basic” according to the combined residue and linkage detail of the non-missing structures in the vector (<a href="https://github.com/glycoverse/glyrepr/issues/42" class="external-link">#42</a>).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-11-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-11-0"></a></h3>
 <ul><li>
 <code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> now supports parsing “E” and “L” in the input composition strings as “NeuAc”. For example, <code>as_glycan_composition("H5N4F1L1E1")</code> is now correctly parsed as <code>Hex(5)HexNAc(4)Fuc(1)NeuAc(2)</code>, with a warning about dropping the sialic acid linkage information (<a href="https://github.com/glycoverse/glyrepr/issues/41" class="external-link">#41</a>).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-0-11-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-11-0"></a></h3>
 <ul><li>Fix the bug that <code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> and <code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> cannot handle duplications in the input. For example, <code>as_glycan_composition("Hex(2)Hex(1)HexNAc(2)")</code> is correctly regared as <code>Hex(3)HexNAc(2)</code> now (<a href="https://github.com/glycoverse/glyrepr/issues/40" class="external-link">#40</a>).</li>
 <li>
 <code>as_glycan_structure(NA_character_)</code> now creates a missing structure instead of erroring.</li>

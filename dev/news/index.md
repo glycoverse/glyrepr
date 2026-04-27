@@ -2,6 +2,10 @@
 
 ## glyrepr (development version)
 
+## glyrepr 0.11.0
+
+CRAN release: 2026-04-26
+
 ### Breaking changes
 
 - [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md)
