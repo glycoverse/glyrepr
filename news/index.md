@@ -1,8 +1,58 @@
 # Changelog
 
-## glyrepr (development version)
+## glyrepr 0.11.0
+
+CRAN release: 2026-04-26
+
+### Breaking changes
+
+- [`get_structure_level()`](https://glycoverse.github.io/glyrepr/reference/get_structure_level.md)
+  now returns one character scalar for a `glyrepr_structure` vector
+  instead of one value per element. The vector-wide level is “intact”,
+  “partial”, “topological”, or “basic” according to the combined residue
+  and linkage detail of the non-missing structures in the vector
+  ([\#42](https://github.com/glycoverse/glyrepr/issues/42)).
+
+### New features
+
+- [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_composition.md)
+  now supports parsing “E” and “L” in the input composition strings as
+  “NeuAc”. For example, `as_glycan_composition("H5N4F1L1E1")` is now
+  correctly parsed as `Hex(5)HexNAc(4)Fuc(1)NeuAc(2)`, with a warning
+  about dropping the sialic acid linkage information
+  ([\#41](https://github.com/glycoverse/glyrepr/issues/41)).
+
+### Minor improvements and bug fixes
+
+- Fix the bug that
+  [`glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/glycan_composition.md)
+  and
+  [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_composition.md)
+  cannot handle duplications in the input. For example,
+  `as_glycan_composition("Hex(2)Hex(1)HexNAc(2)")` is correctly regared
+  as `Hex(3)HexNAc(2)` now
+  ([\#40](https://github.com/glycoverse/glyrepr/issues/40)).
+- `as_glycan_structure(NA_character_)` now creates a missing structure
+  instead of erroring.
+- [`get_structure_level()`](https://glycoverse.github.io/glyrepr/reference/get_structure_level.md)
+  now ignores missing structures when determining the vector-wide level,
+  and returns `NA_character_` for empty or all-missing structure
+  vectors.
+- [`reduce_structure_level()`](https://glycoverse.github.io/glyrepr/reference/reduce_structure_level.md)
+  preserves missing structures in output.
+- [`simap()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  and
+  \`[`simap_structure()`](https://glycoverse.github.io/glyrepr/reference/simap.md)
+  now skip missing structures like the other smap variants.
+- [`get_mono_type.glyrepr_composition()`](https://glycoverse.github.io/glyrepr/reference/get_mono_type.md)
+  now ignores missing composition elements and returns `NA_character_`
+  for all-NA composition vectors.
+- Rewrite the Getting Started vignette for better readability and adopt
+  a calmer tone for all vignettes.
 
 ## glyrepr 0.10.1
+
+CRAN release: 2026-02-13
 
 ### Minor improvements and bug fixes
 

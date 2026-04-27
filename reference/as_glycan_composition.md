@@ -39,6 +39,12 @@ are counted. Substituents are extracted from the `sub` attribute of each
 vertex in the structure. For example, a vertex with `sub = "3Me"`
 contributes one "Me" substituent to the composition.
 
+Simple composition strings use one-letter residue codes: "H" for "Hex",
+"N" for "HexNAc", "F" for "dHex", "S"/"A" for "NeuAc", and "G" for
+"NeuGc". "E" and "L" are also accepted as linkage-specific Neu5Ac codes;
+they are converted to "NeuAc" with a warning because composition objects
+do not preserve linkage information.
+
 ## Examples
 
 ``` r

@@ -13,7 +13,7 @@ structure comparison studies."><meta property="og:image" content="https://glycov
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.11.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,9 +25,9 @@ structure comparison studies."><meta property="og:image" content="https://glycov
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</a></li>
-    <li><a class="dropdown-item" href="../articles/iupac.html">Decoding Glycans: Your Guide to IUPAC-Condensed Format</a></li>
-    <li><a class="dropdown-item" href="../articles/smap.html">Power User Guide: Efficient Glycan Manipulation</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Glycan Structures</a></li>
+    <li><a class="dropdown-item" href="../articles/iupac.html">IUPAC-Condensed Glycan Notation</a></li>
+    <li><a class="dropdown-item" href="../articles/smap.html">Efficient Glycan Manipulation with smap</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -76,17 +76,6 @@ glycan structure vectors. Supports mixed input of multiple objects.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>glyrepr_structure</code> class glycan structure vector object.</p>
     </div>
-    <div class="section level2">
-    <h2 id="core-features">Core Features<a class="anchor" aria-label="anchor" href="#core-features"></a></h2>
-
-<ul><li><p><strong>Efficient Storage</strong>: Uses hash values of IUPAC codes for deduplication,
-avoiding redundant storage of identical glycan structures</p></li>
-<li><p><strong>Graph Model Representation</strong>: Each glycan structure is represented as a directed
-graph where nodes are monosaccharides and edges are glycosidic linkages</p></li>
-<li><p><strong>Vectorized Operations</strong>: Supports R's vectorized operations for batch
-processing of glycan data</p></li>
-<li><p><strong>Type Safety</strong>: Built on the vctrs package, providing type-safe operations</p></li>
-</ul></div>
     <div class="section level2">
     <h2 id="data-structure-overview">Data Structure Overview<a class="anchor" aria-label="anchor" href="#data-structure-overview"></a></h2>
     <p>A glycan structure vector is a vctrs record with an additional S3 class
@@ -137,18 +126,6 @@ the vertices are "Man", "Man", "Man", "GlcNAc", "GlcNAc",
 and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".</p>
     </div>
     <div class="section level2">
-    <h2 id="use-cases">Use Cases<a class="anchor" aria-label="anchor" href="#use-cases"></a></h2>
-
-<ul><li><p><strong>Glycoproteomics Analysis</strong>: Processing glycan structure information from
-mass spectrometry data</p></li>
-<li><p><strong>Glycomics Research</strong>: Comparing glycan expression profiles across different
-samples or conditions</p></li>
-<li><p><strong>Structure-Function Analysis</strong>: Studying relationships between glycan
-structures and biological functions</p></li>
-<li><p><strong>Database Queries</strong>: Performing structure matching and searches in glycan
-databases</p></li>
-</ul></div>
-    <div class="section level2">
     <h2 id="na-support">NA Support<a class="anchor" aria-label="anchor" href="#na-support"></a></h2>
     <p>Glycan structure vectors support NA values for representing missing or
 unknown structures:</p><ul><li><p>Create with <code>glycan_structure(NA)</code> or <code>glycan_structure(NULL)</code></p></li>
@@ -157,6 +134,20 @@ unknown structures:</p><ul><li><p>Create with <code>glycan_structure(NA)</code> 
 <li><p><code>smap</code> functions skip NA elements gracefully</p></li>
 <li><p><code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> returns <code>TRUE</code> for NA elements</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="naming-support">Naming Support<a class="anchor" aria-label="anchor" href="#naming-support"></a></h2>
+    <p>Glycan structure vectors can have names, which are preserved during operations.
+This is particularly useful when working with the <code>glymotif</code> package.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="as-characters">As characters<a class="anchor" aria-label="anchor" href="#as-characters"></a></h2>
+    <p>One side-effect of the current implementation is that you can treat a glycan structure vector
+as a pure character vector of IUPAC-condensed strings.
+In fact, <code><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character()</a></code> returns <code>TRUE</code> for a glycan structure vector,
+and all <code>stringr</code> functions work directly on the vector.</p>
+<p>However, we still recommend using <code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> to explicitly convert to character when needed,
+to avoid confusion and ensure that the intended behavior is clear.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

@@ -99,7 +99,7 @@ smap_int(structures, igraph::vcount)
 smap_lgl(structures, function(g) igraph::vcount(g) > 5)
 #> [1] FALSE FALSE FALSE
 
-# Use purrr-style lambda functions  
+# Use purrr-style lambda functions
 smap_int(structures, ~ igraph::vcount(.x))
 #> [1] 2 5 2
 smap_lgl(structures, ~ igraph::vcount(.x) > 5)

@@ -26,12 +26,11 @@ reduce_structure_level(x, to_level)
 - to_level:
 
   The resolution level to reduce to. Can be "basic" or "topological".
-  Must be a lower resolution level than any structure in `x` ("intact"
-  \> "partial" \> "topological" \> "basic"). If `to_level` is the same
-  as some structure in `x`, the result will be the same as the input.
-  You can use
+  Must be a lower resolution level than `x` ("intact" \> "partial" \>
+  "topological" \> "basic"). If `to_level` is the same as the structure
+  level of `x`, the result will be the same as the input. You can use
   [`get_structure_level()`](https://glycoverse.github.io/glyrepr/reference/get_structure_level.md)
-  to check the structure levels of `x`.
+  to check the structure level of `x`.
 
 ## Value
 

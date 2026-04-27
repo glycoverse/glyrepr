@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.11.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,9 +34,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Your Sugar Structures 🕸️</a></li>
-    <li><a class="dropdown-item" href="../articles/iupac.html">Decoding Glycans: Your Guide to IUPAC-Condensed Format</a></li>
-    <li><a class="dropdown-item" href="../articles/smap.html">Power User Guide: Efficient Glycan Manipulation</a></li>
+<li><a class="dropdown-item" href="../articles/glycan-graph.html">Glycan Graphs: The Network Behind Glycan Structures</a></li>
+    <li><a class="dropdown-item" href="../articles/iupac.html">IUPAC-Condensed Glycan Notation</a></li>
+    <li><a class="dropdown-item" href="../articles/smap.html">Efficient Glycan Manipulation with smap</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -67,433 +67,527 @@
 
     
     
-<p>Welcome to the world of glycan analysis! If you’ve ever tried to work
-with glycans computationally, you know the struggle: these tree-like
-molecules are notoriously difficult to represent and analyze compared to
-their linear cousins like proteins or DNA. That’s where
-<code>glyrepr</code> comes to the rescue.</p>
-<p>Think of <code>glyrepr</code> as your <strong>glycan
-translator</strong> — it teaches your computer how to “speak glycan”
-fluently. Whether you’re dealing with compositions (what’s in the
-glycan) or structures (how it’s connected), this package has got you
-covered.</p>
+<p>R gives us many data structures for different jobs. For example,
+<code>c(1L, 2L, 3L)</code> represents an integer vector,
+<code>c("a", "b", "c")</code> represents a character vector, and data
+frames represent tabular data. Before we can inspect or manipulate a
+kind of data well, we first need a suitable structure for representing
+it.</p>
+<p>What about glycans?</p>
+<p>When we talk about glycans, we usually talk about two related things:
+their compositions and their structures. A composition can be
+represented as a named vector, for example
+<code>c(Hex = 3, HexNAc = 2, Neu5Ac = 1)</code>. A structure can be
+represented as a graph, for example with the <code>igraph</code>
+package. Those representations are useful, but managing the details by
+hand quickly becomes cumbersome, especially for complex glycans or large
+datasets. This is where the <code>glyrepr</code> package comes in.</p>
+<p><code>glyrepr</code> provides two main vector types:
+<code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> and <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code>.
+These vectors are designed to feel like ordinary R vectors: you can
+subset them, concatenate them, sort them, put them in tibbles, and use
+them in vectorized workflows.</p>
+<p>These two representations are the foundation of
+<code>glycoverse</code>. Most higher-level packages in the ecosystem
+build on them, so it is worth taking a little time to get comfortable
+here.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glycoverse.github.io/glyrepr/">glyrepr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="quick-start-what-are-we-talking-about">Quick Start: What Are We Talking About?<a class="anchor" aria-label="anchor" href="#quick-start-what-are-we-talking-about"></a>
+<h2 id="glycan-composition-vectors">Glycan Composition Vectors<a class="anchor" aria-label="anchor" href="#glycan-composition-vectors"></a>
 </h2>
-<p>Before we dive in, let’s establish our vocabulary. Don’t worry — it’s
-simpler than it sounds!</p>
-<table class="table">
-<colgroup>
-<col width="20%">
-<col width="50%">
-<col width="30%">
-</colgroup>
-<thead><tr class="header">
-<th>Term</th>
-<th>What It Means</th>
-<th>Example</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><strong>Composition</strong></td>
-<td>The “ingredients list” — how many of each sugar</td>
-<td><code>Hex(5)HexNAc(2)</code></td>
-</tr>
-<tr class="even">
-<td><strong>Structure</strong></td>
-<td>The “blueprint” — how sugars are connected</td>
-<td><code>Man(a1-3)Man(b1-4)GlcNAc</code></td>
-</tr>
-<tr class="odd">
-<td><strong>Monosaccharide</strong></td>
-<td>A single sugar unit (the building blocks)</td>
-<td>
-<code>Gal</code>, <code>Man</code>, <code>Hex</code>
-</td>
-</tr>
-<tr class="even">
-<td><strong>Linkage</strong></td>
-<td>The “glue” between sugars</td>
-<td>
-<code>a1-3</code>, <code>b1-4</code>
-</td>
-</tr>
-<tr class="odd">
-<td><strong>Substitution</strong></td>
-<td>Chemical decorations on sugars</td>
-<td>
-<code>6Ac</code>, <code>3Me</code>
-</td>
-</tr>
-</tbody>
-</table>
-<p>🔍 <strong>Pro tip</strong>: We distinguish between
-<strong>generic</strong> sugars (like mystery boxes labeled “Hex”) and
-<strong>concrete</strong> sugars (like specific boxes labeled
-“Galactose”).</p>
-</div>
-<div class="section level2">
-<h2 id="part-1-compositions-the-easy-start">Part 1: Compositions — The Easy Start<a class="anchor" aria-label="anchor" href="#part-1-compositions-the-easy-start"></a>
-</h2>
-<p>Let’s start with something straightforward: glycan compositions.
-Think of these as ingredient lists for your favorite recipes.</p>
+<p>Let’s start with glycan composition vectors.</p>
 <div class="section level3">
-<h3 id="creating-your-first-compositions">Creating Your First Compositions<a class="anchor" aria-label="anchor" href="#creating-your-first-compositions"></a>
+<h3 id="creating-glycan-composition-vectors">Creating Glycan Composition Vectors<a class="anchor" aria-label="anchor" href="#creating-glycan-composition-vectors"></a>
 </h3>
-<p>There are three ways to create compositions, each with its own
-superpower:</p>
-<p><strong>Method 1: The Direct Approach</strong></p>
+<p>A glycan composition vector can be created with either
+<code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> or
+<code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code>.</p>
+<p><code><a href="../reference/glycan_composition.html">glycan_composition()</a></code> is the direct constructor. It takes
+one or more named vectors, where the names are monosaccharides and the
+values are counts.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Just tell R what you have</span></span>
-<span><span class="fu"><a href="../reference/glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">5</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Gal <span class="op">=</span> <span class="fl">1</span>, GalNAc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">comps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glycan_composition.html">glycan_composition</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">5</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, Gal <span class="op">=</span> <span class="fl">2</span>, GlcNAc <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, Gal <span class="op">=</span> <span class="fl">2</span>, GlcNAc <span class="op">=</span> <span class="fl">4</span>, Neu5Ac <span class="op">=</span> <span class="fl">1</span>, Fuc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">comps</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[3]&gt;</span></span>
 <span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
-<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span></span></code></pre></div>
-<p><strong>Method 2: The Programmatic Way</strong></p>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<p>This creates a glycan composition vector called <code>comps</code>
+with three glycan compositions.</p>
+<p><code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> is more flexible and can convert
+several input types.</p>
+<p>From a list of named vectors:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Perfect when you're processing data from files or databases</span></span>
-<span><span class="va">comp_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">5</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Gal <span class="op">=</span> <span class="fl">1</span>, GalNAc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="va">comp_list</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">5</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, Gal <span class="op">=</span> <span class="fl">2</span>, GlcNAc <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, Gal <span class="op">=</span> <span class="fl">2</span>, GlcNAc <span class="op">=</span> <span class="fl">4</span>, Neu5Ac <span class="op">=</span> <span class="fl">1</span>, Fuc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[3]&gt;</span></span>
 <span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
-<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span></span></code></pre></div>
-<p><strong>Method 3: The Parser</strong></p>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<p>This looks similar to <code><a href="../reference/glycan_composition.html">glycan_composition()</a></code>, but it is
+more convenient when your compositions are already stored in a list, for
+example after reading or generating them programmatically.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Copy-paste from your mass spec software? No problem!</span></span>
-<span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hex(5)HexNAc(2)"</span>, <span class="st">"H1N1"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">comp_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">5</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, Gal <span class="op">=</span> <span class="fl">2</span>, GlcNAc <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">3</span>, Gal <span class="op">=</span> <span class="fl">2</span>, GlcNAc <span class="op">=</span> <span class="fl">4</span>, Neu5Ac <span class="op">=</span> <span class="fl">1</span>, Fuc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="va">comp_list</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[3]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<p>From a character vector:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H5N2"</span>, <span class="st">"Hex(3)HexNAc(2)"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
 <span><span class="co">#&gt; [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span></span>
-<span><span class="co">#&gt; [2] <span style="color: #000000;">Hex</span>(1)<span style="color: #000000;">HexNAc</span>(1)</span></span></code></pre></div>
+<span><span class="co">#&gt; [2] <span style="color: #000000;">Hex</span>(3)<span style="color: #000000;">HexNAc</span>(2)</span></span></code></pre></div>
+<p>Both compact notation (<code>"H5N2"</code>) and Byonic-style notation
+(<code>"Hex(3)HexNAc(2)"</code>) are supported.</p>
+<p>From a glycan structure vector, which we will discuss below:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">strucs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/n_glycan_core.html">o_glycan_core_1</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="../reference/n_glycan_core.html">o_glycan_core_2</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #0087D7;">GlcNAc</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="the-magic-of-colors">The Magic of Colors 🌈<a class="anchor" aria-label="anchor" href="#the-magic-of-colors"></a>
+<h3 id="two-types-of-monosaccharide-names">Two Types of Monosaccharide Names<a class="anchor" aria-label="anchor" href="#two-types-of-monosaccharide-names"></a>
 </h3>
-<p>Here’s something cool: when you run these examples in your R console,
-you’ll see the concrete monosaccharides (like Gal and GalNAc) displayed
-in beautiful colors! These follow the <a href="https://www.ncbi.nlm.nih.gov/glycans/snfg.html" class="external-link">SNFG standard</a>
-— the universal “color code” for glycans. Think of it as the glycan
-rainbow 🌈.</p>
+<p>Before we move on, let’s briefly discuss the two types of
+monosaccharide names used in <code>glyrepr</code>:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Generic names</strong>: Hex, HexNAc, dHex, etc.</li>
+<li>
+<strong>Specific names</strong>: Man, GlcNAc, Fuc, etc.</li>
+</ol>
+<p>Generic names are common in mass spectrometry data, where it is often
+difficult to distinguish isomers from MS evidence alone. For example,
+one <code>Hex</code> residue could be Man, Gal, Glc, or another hexose.
+Specific names carry more biological detail and are common in glycan
+databases and literature.</p>
+<p><code>glyrepr</code> supports both types of names, but you cannot mix
+them in the same vector.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># This raises an error because the monosaccharide names are mixed.</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hex(5)HexNAc(2)"</span>, <span class="st">"Man(5)GlcNAc(2)"</span><span class="op">)</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>The same rule applies to glycan structure vectors.</p>
 </div>
 <div class="section level3">
-<h3 id="smart-counting-with-count_mono">Smart Counting with <code>count_mono()</code><a class="anchor" aria-label="anchor" href="#smart-counting-with-count_mono"></a>
+<h3 id="inspecting-glycan-composition-vectors">Inspecting Glycan Composition Vectors<a class="anchor" aria-label="anchor" href="#inspecting-glycan-composition-vectors"></a>
 </h3>
-<p>Now here’s where <code>glyrepr</code> shows its intelligence:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Gal <span class="op">=</span> <span class="fl">1</span>, Man <span class="op">=</span> <span class="fl">1</span>, GalNAc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<p>The main function for inspecting glycan compositions is
+<code><a href="../reference/count_mono.html">count_mono()</a></code>. Let’s demonstrate it using the
+<code>comps</code> vector we created earlier.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">comps</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[3]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<p>The first argument is a glycan composition vector, and the second
+argument is the monosaccharide you want to count.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">comps</span>, <span class="st">"Man"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 5 3 3</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">comps</span>, <span class="st">"Neu5Ac"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0 0 1</span></span></code></pre></div>
+<p><code><a href="../reference/count_mono.html">count_mono()</a></code> works with both generic and specific
+monosaccharide names. It understands the relationship between them, so
+it can count at the level you ask for.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">comps</span>, <span class="st">"Hex"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 5 5 5</span></span></code></pre></div>
+<p>Note that both “Man” and “Gal” are counted as “Hex” here.</p>
+<p>You can also omit the second argument to get the total monosaccharide
+count for each composition.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">comps</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1]  7  9 11</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="manipulating-glycan-composition-vectors">Manipulating Glycan Composition Vectors<a class="anchor" aria-label="anchor" href="#manipulating-glycan-composition-vectors"></a>
+</h3>
+<p>One useful mental model for glycan composition vectors (and glycan
+structure vectors) is that they behave like atomic vectors. This means
+they support familiar operations like subsetting, concatenation, and
+sorting.</p>
+<p><strong>Concatenation</strong>:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">comps</span>, <span class="va">comps</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[6]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span>
+<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [5] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [6] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<p><strong>Subsetting</strong>:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">comps</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">comps</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[0]&gt;</span></span></code></pre></div>
+<p><strong>Length</strong>:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">comps</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 3</span></span></code></pre></div>
+<p><strong>Unique</strong>:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dup_comps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">comps</span>, <span class="va">comps</span><span class="op">)</span></span>
+<span><span class="va">dup_comps</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[6]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span>
+<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [5] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [6] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dup_comps</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[3]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<p><strong>Repeated</strong>:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">comps</span>, times <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[6]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span>
+<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [5] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [6] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<p><strong>Sorting</strong>:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">comps</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[3]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">comps</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[3]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="working-with-tibbles">Working with Tibbles<a class="anchor" aria-label="anchor" href="#working-with-tibbles"></a>
+</h3>
+<p>One of the most useful features of glycan composition vectors is that
+they work smoothly with tibbles and data frames.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># How many galactose residues?</span></span>
-<span><span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">comp</span>, <span class="st">"Gal"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
+<span><span class="va">tb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"glycan1"</span>, <span class="st">"glycan2"</span>, <span class="st">"glycan3"</span><span class="op">)</span>,</span>
+<span>  composition <span class="op">=</span> <span class="va">comps</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">tb</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
+<span><span class="co">#&gt;   id      composition                         </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;comp&gt;</span>                              </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> glycan1 <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)                     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> glycan2 <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> glycan3 <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)</span></span></code></pre></div>
+<p>You can use <code>tidyverse</code> functions to perform operations on
+the glycan composition column.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span></span>
-<span><span class="co"># How many hexose residues? (This includes Gal and Man!)</span></span>
-<span><span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">comp</span>, <span class="st">"Hex"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
-<p>Notice how <code><a href="../reference/count_mono.html">count_mono()</a></code> is smart enough to know that
-galactose and mannose are both hexoses? That’s the power of
-understanding glycan hierarchies!</p>
+<span><span class="va">tb</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>n_sia <span class="op">=</span> <span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">composition</span>, <span class="st">"Neu5Ac"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">n_sia</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
+<span><span class="co">#&gt;   id      composition                          n_sia</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;comp&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> glycan3 <span style="color: #00AF5F;">Man</span>(3)<span style="color: #FFD700;">Gal</span>(2)<span style="color: #0087D7;">GlcNAc</span>(4)<span style="color: #FF0000;">Fuc</span>(1)<span style="color: #AF5FAF;">Neu5Ac</span>(1)     1</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="missing-values-and-names">Missing Values and Names<a class="anchor" aria-label="anchor" href="#missing-values-and-names"></a>
+</h3>
+<p>Glycan composition vectors can also handle missing values.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">comps_with_na</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glycan_composition.html">glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Man <span class="op">=</span> <span class="fl">5</span>, GlcNAc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, <span class="cn">NA</span><span class="op">)</span></span>
+<span><span class="va">comps_with_na</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] &lt;NA&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">comps_with_na</span>, <span class="st">"Man"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1]  5 NA</span></span></code></pre></div>
+<p>For technical reasons, glycan composition vectors cannot have element
+names right now. In practice, this is usually fine: the composition
+itself remains the data value, and identifiers can live in a separate
+tibble column.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="part-2-structures-where-the-magic-happens">Part 2: Structures — Where the Magic Happens<a class="anchor" aria-label="anchor" href="#part-2-structures-where-the-magic-happens"></a>
+<h2 id="glycan-structure-vectors">Glycan Structure Vectors<a class="anchor" aria-label="anchor" href="#glycan-structure-vectors"></a>
 </h2>
-<p>Compositions are nice, but structures are where <code>glyrepr</code>
-truly shines. This is like going from knowing the ingredients to
-understanding the actual recipe and cooking method.</p>
+<p>Now let’s move on to the core of glycan representation: glycan
+structure vectors. Many of the same ideas apply, including the atomic
+vector nature, vectorized operations, and seamless integration with
+tibbles. Because structures are more complex than compositions, there
+are a few additional features and considerations to keep in mind.</p>
 <div class="section level3">
-<h3 id="your-first-glycan-structures">Your First Glycan Structures<a class="anchor" aria-label="anchor" href="#your-first-glycan-structures"></a>
+<h3 id="creating-glycan-structure-vectors">Creating Glycan Structure Vectors<a class="anchor" aria-label="anchor" href="#creating-glycan-structure-vectors"></a>
 </h3>
-<p>Let’s work with some real glycan structures. These strings below are
-called the “IUPAC-condensed” glycan text representations. They might
-look cryptic, but they’re actually quite readable once you get the hang
-of it. To learn about them, check out <a href="https://glycoverse.github.io/glyrepr/articles/iupac.html">this
-article</a>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">iupacs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span>,  <span class="co"># The famous N-glycan core</span></span>
-<span>  <span class="st">"Gal(b1-3)GalNAc(a1-"</span>,                                  <span class="co"># O-glycan core 1</span></span>
-<span>  <span class="st">"Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"</span>,                    <span class="co"># O-glycan core 2</span></span>
-<span>  <span class="st">"Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-"</span>,      <span class="co"># A branched mannose tree</span></span>
-<span>  <span class="st">"GlcNAc6Ac(b1-4)Glc3Me(a1-"</span>                             <span class="co"># With some decorations</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">struc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="va">iupacs</span><span class="op">)</span></span>
-<span><span class="va">struc</span></span>
-<span><span class="co">#&gt; &lt;glycan_structure[5]&gt;</span></span>
-<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
-<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [3] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [5] <span style="color: #0087D7;">GlcNAc</span>6Ac(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">Glc</span>3Me(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; # Unique structures: 5</span></span></code></pre></div>
+<p>As with glycan composition vectors, you can create glycan structure
+vectors with either <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> or
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code>.</p>
+<p>Under the hood, glycan structures are represented as
+<code>igraph</code> objects, because glycans are naturally graph-like.
+Most of the time, you do not need to work with those graphs directly:
+<code>glyrepr</code> gives you a higher-level interface for common
+structure operations.</p>
+<p><code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> is the direct constructor and takes
+one or more <code>igraph</code> objects. Creating those graphs manually
+can be tedious, so you will usually start with
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> instead. It can parse IUPAC-condensed
+strings into glycan structure vectors.</p>
+<p>If you are not familiar with IUPAC-condensed notation, check out this
+<a href="https://glycoverse.github.io/glyrepr/articles/iupac.html">article</a>
+for a quick introduction. We recommend getting familiar with this
+notation, because it is the main text language for communicating glycan
+structures in <code>glycoverse</code>.</p>
+<p>Parsing IUPAC-condensed strings is straightforward with
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code>. (For parsing other formats like
+GlycoCT, use the <a href="https://github.com/glycoverse/glyparse" class="external-link">glyparse</a> package.)</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">strucs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Gal(b1-3)GalNAc(a1-"</span>,</span>
+<span>  <span class="st">"Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">strucs</span></span>
+<span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
+<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
+<span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="the-secret-sauce-unique-structure-optimization">The Secret Sauce: Unique Structure Optimization<a class="anchor" aria-label="anchor" href="#the-secret-sauce-unique-structure-optimization"></a>
+<h3 id="inspecting-glycan-structure-vectors">Inspecting Glycan Structure Vectors<a class="anchor" aria-label="anchor" href="#inspecting-glycan-structure-vectors"></a>
 </h3>
-<p>Here’s where <code>glyrepr</code> gets really clever. Notice that “#
-Unique structures: 5” message? This isn’t just informational — it’s the
-key to lightning-fast performance.</p>
-<p>Let’s see this optimization in action:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create a big dataset with lots of repetition</span></span>
-<span><span class="va">large_struc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">struc</span>, <span class="fl">1000</span><span class="op">)</span>  <span class="co"># 5,000 structures total</span></span>
-<span><span class="va">large_struc</span></span>
-<span><span class="co">#&gt; &lt;glycan_structure[5000]&gt;</span></span>
-<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
-<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [3] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [5] <span style="color: #0087D7;">GlcNAc</span>6Ac(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">Glc</span>3Me(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [6] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
-<span><span class="co">#&gt; [7] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [8] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [9] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [10] <span style="color: #0087D7;">GlcNAc</span>6Ac(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">Glc</span>3Me(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; ... (4990 more not shown)</span></span>
-<span><span class="co">#&gt; # Unique structures: 5</span></span></code></pre></div>
-<p>Still showing “# Unique structures: 5”! This means
-<code>glyrepr</code> is storing only 5 unique graphs internally, not
-5,000. This is like having a smart library system that stores only one
-copy of each book, no matter how many people want to read it.</p>
+<p><code>strucs</code> prints a bit like a character vector with colors,
+but under the hood the glycan structures are stored as
+<code>igraph</code> objects. You can access the underlying
+<code>igraph</code> objects using
+<code><a href="../reference/get_structure_graphs.html">get_structure_graphs()</a></code>.</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; IGRAPH 7b5b2c9 DN-- 2 1 -- </span></span>
+<span><span class="co">#&gt; + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span></span>
+<span><span class="co">#&gt; + edge from 7b5b2c9 (vertex names):</span></span>
+<span><span class="co">#&gt; [1] 2-&gt;1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]</span></span>
+<span><span class="co">#&gt; IGRAPH 4a74f38 DN-- 3 2 -- </span></span>
+<span><span class="co">#&gt; + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span></span>
+<span><span class="co">#&gt; + edges from 4a74f38 (vertex names):</span></span>
+<span><span class="co">#&gt; [1] 3-&gt;1 3-&gt;2</span></span></code></pre></div>
+<p>Details of how a glycan structure is modeled as a graph are covered
+in the <a href="https://glycoverse.github.io/glyrepr/articles/glycan-graph.html">glycan
+graph vignette</a>. You do not need all of those details for everyday
+use, but a quick skim can make the structure functions easier to
+understand.</p>
+<p>The <code><a href="../reference/count_mono.html">count_mono()</a></code> function also works with glycan
+structure vectors.</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">strucs</span>, <span class="st">"Gal"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 1</span></span></code></pre></div>
+<p>Other functions, including <code><a href="../reference/has_linkages.html">has_linkages()</a></code>,
+<code><a href="../reference/get_mono_type.html">get_mono_type()</a></code>, and <code><a href="../reference/get_structure_level.html">get_structure_level()</a></code>,
+inspect specific aspects of the structures.</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># This function works element-wise</span></span>
+<span><span class="fu"><a href="../reference/has_linkages.html">has_linkages</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_mono_type.html">get_mono_type</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "concrete"</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "intact"</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="performance-that-will-blow-your-mind">Performance That Will Blow Your Mind 🚀<a class="anchor" aria-label="anchor" href="#performance-that-will-blow-your-mind"></a>
+<h3 id="structure-levels">Structure Levels<a class="anchor" aria-label="anchor" href="#structure-levels"></a>
 </h3>
-<p>Let’s put this to the test:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jabiru/tictoc" class="external-link">tictoc</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5 structures"</span><span class="op">)</span></span>
-<span><span class="va">result_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5 structures: 0.02 sec elapsed</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Converting 5,000 structures"</span><span class="op">)</span></span>
-<span><span class="va">result_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">large_struc</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Converting 5,000 structures: 0.02 sec elapsed</span></span></code></pre></div>
-<p><strong>Mind = blown!</strong> 🤯 The performance is nearly identical
-because <code>glyrepr</code> only processes each unique structure once,
-then cleverly expands the results.</p>
-</div>
-<div class="section level3">
-<h3 id="understanding-structure-resolution-levels">Understanding Structure Resolution Levels 🔬<a class="anchor" aria-label="anchor" href="#understanding-structure-resolution-levels"></a>
-</h3>
-<p>Not all glycan structures are created equal — they come in different
-levels of detail, like zoom levels on a map. <code>glyrepr</code>
-recognizes four resolution levels:</p>
+<p>The structures we have seen so far are “intact” structures. They
+contain specific monosaccharides and complete linkage information. In
+real datasets, though, glycan structures often have missing information.
+For example, we might know the topology but not the linkages, or we
+might only know generic monosaccharide classes.</p>
+<p>To accommodate these scenarios, <code>glyrepr</code> defines four
+levels of glycan structures:</p>
 <ul>
 <li>
-<strong>“intact”</strong>: The full picture — all monosaccharides
-are concrete (e.g., “Man”, “GlcNAc”), and all linkages are fully
-determined (e.g., “a2-3”, “b1-4”).</li>
+<strong>Intact</strong>: specific monosaccharides and complete
+linkage information.</li>
 <li>
-<strong>“partial”</strong>: Almost there — all monosaccharides are
-concrete (e.g., “Man”, “GlcNAc”), but some linkage information is
-missing (e.g., “a2-?”).</li>
+<strong>Partial</strong>: specific monosaccharides, with at least
+one missing linkage annotation.</li>
 <li>
-<strong>“topological”</strong>: We know what’s there, but not how
-they connect — all monosaccharides are concrete (e.g., “Man”, “GlcNAc”),
-but the linkage information is completely unknown (“??-?”).</li>
+<strong>Topological</strong>: specific monosaccharides, but all
+linkage information is missing.</li>
 <li>
-<strong>“basic”</strong>: The minimalist view — all monosaccharides
-are generic (e.g., “Hex”, “HexNAc”), and the linkage information is
-completely unknown (“??-?”).</li>
+<strong>Basic</strong>: generic monosaccharides, with linkage
+information treated as missing.</li>
 </ul>
-<p>💡 <strong>Fun fact</strong>: In theory, you could have a glycan with
-generic monosaccharides but fully determined linkages (e.g.,
-“Hex(b1-3)HexNAc(a1-”)). But in practice, this is almost unheard of —
-linkage information is much harder to obtain than monosaccharide
-information. That’s why <code>glyrepr</code> assigns these structures to
-the “basic” level too.</p>
-<p>You can get the structure level for a glycan structure vector with
-<code><a href="../reference/get_structure_level.html">get_structure_level()</a></code>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Concrete structures (various linkage detail levels)</span></span>
-<span><span class="va">concrete_glycans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<p>Structure levels are defined at the vector level, so one glycan
+structure vector has one level.</p>
+<p>Let’s see some examples.</p>
+<p><strong>Intact structures</strong>:</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Gal(b1-3)GalNAc(a1-"</span>,</span>
+<span>  <span class="st">"Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"</span></span>
+<span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "intact"</span></span></code></pre></div>
+<p><strong>Partial structures</strong>:</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Gal(b1-?)GalNAc(a1-"</span>,</span>
-<span>  <span class="st">"Gal(??-?)GalNAc(??-"</span></span>
-<span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="va">concrete_glycans</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "intact"      "partial"     "topological"</span></span>
-<span></span>
-<span><span class="co"># Generic structures</span></span>
-<span><span class="va">generic_glycans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Gal(b1-?)[GlcNAc(b1-6)]GalNAc(a1-"</span></span>
+<span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "partial"</span></span></code></pre></div>
+<p><strong>Topological structures</strong>:</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Gal(??-?)GalNAc(??-"</span>,</span>
+<span>  <span class="st">"Gal(??-?)[GlcNAc(??-?)]GalNAc(??-"</span></span>
+<span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "topological"</span></span></code></pre></div>
+<p><strong>Basic structures</strong>:</p>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Hex(??-?)HexNAc(??-"</span>,</span>
-<span>  <span class="st">"Hex(b1-3)HexNAc(a1-"</span></span>
+<span>  <span class="st">"Hex(??-?)[HexNAc(??-?)]HexNAc(??-"</span></span>
+<span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "basic"</span></span></code></pre></div>
+<p>In theory, you can have something like
+<code>"Hex(b1-3)HexNAc(a1-"</code>, with generic monosaccharides but all
+linkages intact. In practice, linkage information is usually harder to
+obtain than monosaccharide identities, so this situation is rare.</p>
+<p>If you create such a vector, <code>glyrepr</code> classifies it as
+<code>"basic"</code> and warns you.</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Hex(a1-3)HexNAc(a1-"</span>,</span>
+<span>  <span class="st">"Hex(a1-3)[HexNAc(b1-6)]HexNAc(a1-"</span></span>
+<span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Generic glycan structures with linkage annotations are treated as <span style="color: #0000BB;">"basic"</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Linkage information is ignored when residues are generic.</span></span>
+<span><span class="co">#&gt; [1] "basic"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="manipulating-glycan-structure-vectors">Manipulating Glycan Structure Vectors<a class="anchor" aria-label="anchor" href="#manipulating-glycan-structure-vectors"></a>
+</h3>
+<p>Glycan structure vectors also support vectorized operations like
+subsetting and concatenation. They also have structure-specific helpers
+for reducing resolution, removing linkages, and removing
+substituents.</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">strucs</span></span>
+<span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
+<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
+<span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/reduce_structure_level.html">reduce_structure_level</a></span><span class="op">(</span><span class="va">strucs</span>, to_level <span class="op">=</span> <span class="st">"basic"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #000000;">Hex</span>(??-?)<span style="color: #000000;">HexNAc</span>(??-</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #000000;">HexNAc</span>(??-?)[<span style="color: #000000;">Hex</span>(??-?)]<span style="color: #000000;">HexNAc</span>(??-</span></span>
+<span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_linkages.html">remove_linkages</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span>  <span class="co"># same as reduce_structure_level(strucs, to_level = "topological")</span></span>
+<span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #FFD700;">Gal</span>(??-?)<span style="color: #FFD700;">GalNAc</span>(??-</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #0087D7;">GlcNAc</span>(??-?)[<span style="color: #FFD700;">Gal</span>(??-?)]<span style="color: #FFD700;">GalNAc</span>(??-</span></span>
+<span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">strucs_with_subs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Gal6S(b1-3)GalNAc(a1-"</span>,</span>
+<span>  <span class="st">"Gal6S(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="va">generic_glycans</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "basic" "basic"</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/remove_substituents.html">remove_substituents</a></span><span class="op">(</span><span class="va">strucs_with_subs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
+<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
+<span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="structure-manipulation-tools">Structure Manipulation Tools<a class="anchor" aria-label="anchor" href="#structure-manipulation-tools"></a>
+<h3 id="missing-values-and-names-1">Missing Values and Names<a class="anchor" aria-label="anchor" href="#missing-values-and-names-1"></a>
 </h3>
-<p><code>glyrepr</code> comes with several handy tools for structure
-manipulation:</p>
-<p><strong>Strip away the connections:</strong></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_linkages.html">remove_linkages</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;glycan_structure[5]&gt;</span></span>
-<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(??-?)[<span style="color: #00AF5F;">Man</span>(??-?)]<span style="color: #00AF5F;">Man</span>(??-?)<span style="color: #0087D7;">GlcNAc</span>(??-?)<span style="color: #0087D7;">GlcNAc</span>(??-</span></span>
-<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(??-?)<span style="color: #FFD700;">GalNAc</span>(??-</span></span>
-<span><span class="co">#&gt; [3] <span style="color: #0087D7;">GlcNAc</span>(??-?)[<span style="color: #FFD700;">Gal</span>(??-?)]<span style="color: #FFD700;">GalNAc</span>(??-</span></span>
-<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(??-?)[<span style="color: #00AF5F;">Man</span>(??-?)]<span style="color: #00AF5F;">Man</span>(??-?)[<span style="color: #00AF5F;">Man</span>(??-?)]<span style="color: #00AF5F;">Man</span>(??-</span></span>
-<span><span class="co">#&gt; [5] <span style="color: #0087D7;">GlcNAc</span>6Ac(??-?)<span style="color: #0087D7;">Glc</span>3Me(??-</span></span>
-<span><span class="co">#&gt; # Unique structures: 5</span></span></code></pre></div>
-<p><strong>Remove the decorations:</strong></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Let's look at our decorated structure first</span></span>
-<span><span class="va">struc</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span></span>
-<span><span class="co">#&gt; &lt;glycan_structure[1]&gt;</span></span>
-<span><span class="co">#&gt; [1] <span style="color: #0087D7;">GlcNAc</span>6Ac(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">Glc</span>3Me(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; # Unique structures: 1</span></span>
-<span></span>
-<span><span class="co"># Now remove the decorations (6Ac and 3Me)</span></span>
-<span><span class="fu"><a href="../reference/remove_substituents.html">remove_substituents</a></span><span class="op">(</span><span class="va">struc</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;glycan_structure[1]&gt;</span></span>
-<span><span class="co">#&gt; [1] <span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">Glc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; # Unique structures: 1</span></span></code></pre></div>
-<p><strong>Convert monosaccharides to generic:</strong></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;glycan_structure[5]&gt;</span></span>
-<span><span class="co">#&gt; [1] <span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
-<span><span class="co">#&gt; [2] <span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [3] <span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [4] <span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; [5] <span style="color: #000000;">HexNAc</span>6Ac(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #000000;">Hex</span>3Me(<span style="color: #B2B2B2;">a1-</span></span></span>
-<span><span class="co">#&gt; # Unique structures: 5</span></span></code></pre></div>
-<p><strong>Reduce structure resolution level:</strong></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/reduce_structure_level.html">reduce_structure_level</a></span><span class="op">(</span><span class="va">struc</span>, to_level <span class="op">=</span> <span class="st">"basic"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;glycan_structure[5]&gt;</span></span>
-<span><span class="co">#&gt; [1] <span style="color: #000000;">Hex</span>(??-?)[<span style="color: #000000;">Hex</span>(??-?)]<span style="color: #000000;">Hex</span>(??-?)<span style="color: #000000;">HexNAc</span>(??-?)<span style="color: #000000;">HexNAc</span>(??-</span></span>
-<span><span class="co">#&gt; [2] <span style="color: #000000;">Hex</span>(??-?)<span style="color: #000000;">HexNAc</span>(??-</span></span>
-<span><span class="co">#&gt; [3] <span style="color: #000000;">HexNAc</span>(??-?)[<span style="color: #000000;">Hex</span>(??-?)]<span style="color: #000000;">HexNAc</span>(??-</span></span>
-<span><span class="co">#&gt; [4] <span style="color: #000000;">Hex</span>(??-?)[<span style="color: #000000;">Hex</span>(??-?)]<span style="color: #000000;">Hex</span>(??-?)[<span style="color: #000000;">Hex</span>(??-?)]<span style="color: #000000;">Hex</span>(??-</span></span>
-<span><span class="co">#&gt; [5] <span style="color: #000000;">HexNAc</span>6Ac(??-?)<span style="color: #000000;">Hex</span>3Me(??-</span></span>
-<span><span class="co">#&gt; # Unique structures: 5</span></span>
-<span><span class="co"># Same as remove_linkages() then convert_to_generic()</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="part-3-conversions-and-integrations">Part 3: Conversions and Integrations<a class="anchor" aria-label="anchor" href="#part-3-conversions-and-integrations"></a>
-</h2>
-<div class="section level3">
-<h3 id="from-structure-to-composition">From Structure to Composition<a class="anchor" aria-label="anchor" href="#from-structure-to-composition"></a>
-</h3>
-<p>Ever wondered what’s actually in those complex structures? Easy:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
-<span><span class="va">comp</span></span>
-<span><span class="co">#&gt; &lt;glycan_composition[5]&gt;</span></span>
-<span><span class="co">#&gt; [1] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
-<span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span></span>
-<span><span class="co">#&gt; [3] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #0087D7;">GlcNAc</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span></span>
-<span><span class="co">#&gt; [4] <span style="color: #00AF5F;">Man</span>(5)</span></span>
-<span><span class="co">#&gt; [5] <span style="color: #0087D7;">Glc</span>(1)<span style="color: #0087D7;">GlcNAc</span>(1)<span style="color: #000000;">Me</span>(1)<span style="color: #000000;">Ac</span>(1)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="back-to-strings">Back to Strings<a class="anchor" aria-label="anchor" href="#back-to-strings"></a>
-</h3>
-<p>Need to export your data or use it elsewhere?</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get the original string representations</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span></span>
-<span><span class="co">#&gt; [2] "Gal(b1-3)GalNAc(a1-"                                </span></span>
-<span><span class="co">#&gt; [3] "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"                  </span></span>
-<span><span class="co">#&gt; [4] "Man(a1-3)[Man(a1-6)]Man(a1-3)[Man(a1-6)]Man(a1-"    </span></span>
-<span><span class="co">#&gt; [5] "GlcNAc6Ac(b1-4)Glc3Me(a1-"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">comp</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Man(3)GlcNAc(2)"           "Gal(1)GalNAc(1)"          </span></span>
-<span><span class="co">#&gt; [3] "Gal(1)GlcNAc(1)GalNAc(1)"  "Man(5)"                   </span></span>
-<span><span class="co">#&gt; [5] "Glc(1)GlcNAc(1)Me(1)Ac(1)"</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="playing-nice-with-the-tidyverse">Playing Nice with the Tidyverse<a class="anchor" aria-label="anchor" href="#playing-nice-with-the-tidyverse"></a>
-</h3>
-<p><code>glyrepr</code> objects are first-class citizens in the
-tidyverse:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>  id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">struc</span><span class="op">)</span>,</span>
-<span>  structures <span class="op">=</span> <span class="va">struc</span>,</span>
-<span>  names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"N-glycan core"</span>, <span class="st">"Core 1"</span>, <span class="st">"Core 2"</span>, <span class="st">"Branched Man"</span>, <span class="st">"Decorated"</span><span class="op">)</span></span>
+<p>Like glycan composition vectors, glycan structure vectors can also
+handle missing values.</p>
+<p>Different from glycan composition vectors, though, glycan structure
+vectors can have names. This is a very useful feature we introduced in
+version 0.10.0.</p>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">strings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  glycan1 <span class="op">=</span> <span class="st">"Gal(b1-3)GalNAc(a1-"</span>,</span>
+<span>  glycan2 <span class="op">=</span> <span class="st">"Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"</span></span>
 <span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>n_man <span class="op">=</span> <span class="fu"><a href="../reference/count_mono.html">count_mono</a></span><span class="op">(</span><span class="va">structures</span>, <span class="st">"Man"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">n_man</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
-<span><span class="co">#&gt;      id structures                                          names         n_man</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;struct&gt;</span>                                            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span> N-glycan core     3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     4 <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-</span>     Branched Man      5</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="va">strings</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] glycan1  <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
+<span><span class="co">#&gt; [2] glycan2  <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
+<span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
+<p>You will find the names useful when working with the
+<code>glymotif</code> package.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="whats-next">What’s Next?<a class="anchor" aria-label="anchor" href="#whats-next"></a>
 </h2>
-<p>Congratulations! You’ve just learned the fundamentals of glycan
-representation in R. Here’s what you can explore next:</p>
+<p>This vignette sets the foundation for working with glycan
+representations in <code>glycoverse</code>. From here, you can explore
+the packages that build on these representations:</p>
 <ul>
-<li>🔬 <strong>Advanced analysis</strong>: Check out the “Power User
-Guide: Efficient Glycan Manipulation” vignette for power-user
-features</li>
-<li>🧬 <strong>Motif searching</strong>: Try the <code>glymotif</code>
-package for finding patterns in glycan structures<br>
-</li>
-<li>📊 <strong>Visualization</strong>: Explore glycan visualization
-packages in the glycoverse</li>
+<li>
+<a href="https://github.com/glycoverse/glyparse" class="external-link">glyparse</a>:
+parsing text nomenclatures into glycan representations.</li>
+<li>
+<a href="https://github.com/glycoverse/glymotif" class="external-link">glymotif</a>:
+identifying and analyzing glycan motifs.</li>
+<li>
+<a href="https://github.com/glycoverse/glydet" class="external-link">glydet</a>:
+calculating derived traits and quantifying motifs.</li>
+<li>
+<a href="https://github.com/glycoverse/glydraw" class="external-link">glydraw</a>:
+visualizing glycan structures with SNFG notation.</li>
+<li>
+<a href="https://github.com/glycoverse/glyenzy" class="external-link">glyenzy</a>:
+inspecting and modeling glycan biosynthesis.</li>
 </ul>
-<p>The glycoverse is your oyster! 🦪</p>
-</div>
-<div class="section level2">
-<h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
-</h2>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
-<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Matrix products: default</span></span>
-<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; locale:</span></span>
-<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
-<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
-<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
-<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; time zone: UTC</span></span>
-<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attached base packages:</span></span>
-<span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] dplyr_1.2.0         tibble_3.3.1        tictoc_1.2.1       </span></span>
-<span><span class="co">#&gt; [4] glyrepr_0.10.1.9000</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] jsonlite_2.0.0    compiler_4.5.2    tidyselect_1.2.1  stringr_1.6.0    </span></span>
-<span><span class="co">#&gt;  [5] jquerylib_0.1.4   systemfonts_1.3.1 textshaping_1.0.4 yaml_2.3.12      </span></span>
-<span><span class="co">#&gt;  [9] fastmap_1.2.0     R6_2.6.1          generics_0.1.4    igraph_2.2.2     </span></span>
-<span><span class="co">#&gt; [13] knitr_1.51        backports_1.5.0   checkmate_2.3.4   rstackdeque_1.1.1</span></span>
-<span><span class="co">#&gt; [17] desc_1.4.3        bslib_0.10.0      pillar_1.11.1     rlang_1.1.7      </span></span>
-<span><span class="co">#&gt; [21] utf8_1.2.6        cachem_1.1.0      stringi_1.8.7     xfun_0.56        </span></span>
-<span><span class="co">#&gt; [25] fs_1.6.6          sass_0.4.10       cli_3.6.5         pkgdown_2.2.0    </span></span>
-<span><span class="co">#&gt; [29] magrittr_2.0.4    digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.1      </span></span>
-<span><span class="co">#&gt; [33] evaluate_1.0.5    glue_1.8.0        ragg_1.5.0        rmarkdown_2.30   </span></span>
-<span><span class="co">#&gt; [37] purrr_1.2.1       tools_4.5.2       pkgconfig_2.0.3   htmltools_0.5.9</span></span></code></pre></div>
+<p>Happy exploring.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
