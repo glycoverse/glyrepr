@@ -266,14 +266,14 @@ library(tictoc)
 tic("smap_int (optimized)")
 vertex_counts_optimized <- smap_int(huge_struc, igraph::vcount)
 toc()
-#> smap_int (optimized): 0.003 sec elapsed
+#> smap_int (optimized): 0.002 sec elapsed
 
 # Naive approach: extract all graphs and process each one
 tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.204 sec elapsed
+#> Naive approach (all graphs): 0.202 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -429,7 +429,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] tictoc_1.2.1        lobstr_1.2.1        glyrepr_0.11.0.9000
+#> [1] tictoc_1.2.1        lobstr_1.2.1        glyrepr_0.12.0.9000
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.0    tidyselect_1.2.1 

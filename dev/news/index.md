@@ -2,6 +2,10 @@
 
 ## glyrepr (development version)
 
+## glyrepr 0.12.0
+
+CRAN release: 2026-05-14
+
 ### New features
 
 - Add
