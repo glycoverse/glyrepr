@@ -72,10 +72,13 @@ get_structure_level <- function(x) {
 #' @noRd
 .warn_generic_linkage_structure_level <- function(has_linkages_lenient) {
   if (any(has_linkages_lenient)) {
-    cli::cli_warn(c(
-      "Generic glycan structures with linkage annotations are treated as {.val basic}.",
-      "i" = "Linkage information is ignored when residues are generic."
-    ), class = "glyrepr_warning_generic_structure_linkages")
+    cli::cli_warn(
+      c(
+        "Generic glycan structures with linkage annotations are treated as {.val basic}.",
+        "i" = "Linkage information is ignored when residues are generic."
+      ),
+      class = "glyrepr_warning_generic_structure_linkages"
+    )
   }
 }
 
