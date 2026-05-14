@@ -10,7 +10,7 @@
 |collate  |zh_CN.UTF-8                              |
 |ctype    |zh_CN.UTF-8                              |
 |tz       |Asia/Shanghai                            |
-|date     |2026-04-26                               |
+|date     |2026-05-14                               |
 |pandoc   |2.16.2 @ /usr/local/bin/ (via rmarkdown) |
 |quarto   |1.8.26 @ /usr/local/bin/quarto           |
 
@@ -18,7 +18,7 @@
 
 |package    |old    |new         |Δ |
 |:----------|:------|:-----------|:--|
-|glyrepr    |0.10.1 |0.10.1.9000 |*  |
+|glyrepr    |0.11.0 |0.11.0.9000 |*  |
 |glue       |NA     |1.8.1       |*  |
 |igraph     |NA     |2.3.0       |*  |
 |parallelly |NA     |1.47.0      |*  |
