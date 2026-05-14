@@ -1,5 +1,10 @@
 # glyrepr (development version)
 
+## New features
+
+* Add `get_anomer_pos()` helper to get the anomer position of a monosaccharide.
+* Add `fill_anomer_pos()` function to fill the anomer position of a glycan structure with missing anomer information.
+
 # glyrepr 0.11.0
 
 ## Breaking changes
