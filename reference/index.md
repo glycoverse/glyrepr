@@ -34,6 +34,8 @@
 
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/reference/convert_to_generic.md)
   : Convert Monosaccharides to Generic Type
+- [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/fill_anomer_pos.md)
+  : Fill Anomer Positions
 - [`remove_linkages()`](https://glycoverse.github.io/glyrepr/reference/remove_linkages.md)
   : Remove All Linkages from a Glycan
 - [`remove_substituents()`](https://glycoverse.github.io/glyrepr/reference/remove_substituents.md)
@@ -92,6 +94,8 @@
   : Get Available Monosaacharides
 - [`available_substituents()`](https://glycoverse.github.io/glyrepr/reference/available_substituents.md)
   : Available Substituents
+- [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/get_anomer_pos.md)
+  : Get Anomer Positions
 - [`is_known_monosaccharide()`](https://glycoverse.github.io/glyrepr/reference/is_known_monosaccharide.md)
   : Check if a Monosaccharide is Known
 - [`possible_linkages()`](https://glycoverse.github.io/glyrepr/reference/possible_linkages.md)

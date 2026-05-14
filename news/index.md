@@ -1,5 +1,19 @@
 # Changelog
 
+## glyrepr 0.12.0
+
+CRAN release: 2026-05-14
+
+### New features
+
+- Add
+  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/get_anomer_pos.md)
+  helper to get the anomer position of a monosaccharide.
+- Add
+  [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/fill_anomer_pos.md)
+  function to fill the anomer position of a glycan structure with
+  missing anomer information.
+
 ## glyrepr 0.11.0
 
 CRAN release: 2026-04-26

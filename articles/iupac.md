@@ -6,6 +6,7 @@ to show how a branched glycan structure can be written as a compact,
 readable string.
 
 ``` r
+
 library(glyrepr)
 ```
 
@@ -217,6 +218,7 @@ one by one.
 **Test your answer:**
 
 ``` r
+
 # Try your hand-written string here!
 my_attempt <- "Your_IUPAC_string_here"
 
@@ -256,6 +258,7 @@ Next steps:
 ## Session Information
 
 ``` r
+
 sessionInfo()
 #> R version 4.6.0 (2026-04-24)
 #> Platform: x86_64-pc-linux-gnu
@@ -278,7 +281,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] glyrepr_0.11.0
+#> [1] glyrepr_0.12.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] vctrs_0.7.3       cli_3.6.6         knitr_1.51        rlang_1.2.0      

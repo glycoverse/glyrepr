@@ -21,6 +21,7 @@ level, but the graph representation is useful when you need custom
 structure analysis.
 
 ``` r
+
 library(glyrepr)
 ```
 
@@ -53,12 +54,13 @@ underlying graph with
 [`get_structure_graphs()`](https://glycoverse.github.io/glyrepr/reference/get_structure_graphs.md):
 
 ``` r
+
 glycan <- n_glycan_core()
 graph <- get_structure_graphs(glycan)
 graph
-#> IGRAPH ca3554d DN-- 5 4 -- 
+#> IGRAPH eb0c767 DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from ca3554d (vertex names):
+#> + edges from eb0c767 (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 ```
 
@@ -90,6 +92,7 @@ structure operations easier.
 You can also plot the graph with `igraph`:
 
 ``` r
+
 plot(graph)
 ```
 
@@ -105,6 +108,7 @@ Each vertex represents a monosaccharide with three key properties:
 integers, but they could be anything as long as they’re unique:
 
 ``` r
+
 igraph::V(graph)$name
 #> [1] "1" "2" "3" "4" "5"
 ```
@@ -113,6 +117,7 @@ igraph::V(graph)$name
 “HexNAc”, “Glc”, “GlcNAc”.
 
 ``` r
+
 igraph::V(graph)$mono
 #> [1] "Man"    "Man"    "Man"    "GlcNAc" "GlcNAc"
 ```
@@ -126,6 +131,7 @@ notation](https://www.ncbi.nlm.nih.gov/glycans/snfg.html) or run
 position 3, “?S” = sulfate at unknown position:
 
 ``` r
+
 igraph::V(graph)$sub
 #> [1] "" "" "" "" ""
 ```
@@ -133,6 +139,7 @@ igraph::V(graph)$sub
 Multiple decorations are comma-separated and sorted by position:
 
 ``` r
+
 glycan2 <- as_glycan_structure("Glc3Me6S(a1-")
 graph2 <- get_structure_graphs(glycan2)
 igraph::V(graph2)$sub
@@ -149,6 +156,7 @@ Here is an example where “Gal” has an “a” anomeric configuration,
 linking from position 3 of “GalNAc” to position 1 of “Gal”:
 
 ``` r
+
 glycan3 <- as_glycan_structure("Gal(a1-3)GalNAc(b1-")
 graph3 <- get_structure_graphs(glycan3)
 igraph::E(graph3)$linkage
@@ -164,6 +172,7 @@ example “Neu5Ac with an a2-3 linkage”.
 **Anomer:** The anomeric configuration of the reducing end.
 
 ``` r
+
 graph$anomer
 #> [1] "b1"
 ```
@@ -179,6 +188,7 @@ for custom structure analysis.
 children):
 
 ``` r
+
 sum(igraph::degree(graph, mode = "out") > 1)
 #> [1] 1
 ```
@@ -186,9 +196,10 @@ sum(igraph::degree(graph, mode = "out") > 1)
 **Example 2:** Explore the structure with breadth-first search:
 
 ``` r
+
 bfs_result <- igraph::bfs(graph, root = 1, mode = "out")
 bfs_result$order
-#> + 5/5 vertices, named, from ca3554d:
+#> + 5/5 vertices, named, from eb0c767:
 #> [1] 1 2 3 4 5
 ```
 
@@ -197,6 +208,7 @@ bfs_result$order
 Working with multiple glycans? You could use `purrr`:
 
 ``` r
+
 library(purrr)
 
 glycans <- c(n_glycan_core(), o_glycan_core_1(), o_glycan_core_2())
@@ -209,6 +221,7 @@ For glycan structure vectors, `glyrepr`’s `smap` functions are usually a
 better fit:
 
 ``` r
+
 smap_int(glycans, ~ igraph::vcount(.x))  # Direct analysis, no intermediate step.
 #> [1] 5 2 3
 ```

@@ -30,6 +30,7 @@ higher-level packages in the ecosystem build on them, so it is worth
 taking a little time to get comfortable here.
 
 ``` r
+
 library(glyrepr)
 ```
 
@@ -49,6 +50,7 @@ is the direct constructor. It takes one or more named vectors, where the
 names are monosaccharides and the values are counts.
 
 ``` r
+
 comps <- glycan_composition(
   c(Man = 5, GlcNAc = 2),
   c(Man = 3, Gal = 2, GlcNAc = 4),
@@ -70,6 +72,7 @@ is more flexible and can convert several input types.
 From a list of named vectors:
 
 ``` r
+
 as_glycan_composition(list(
   c(Man = 5, GlcNAc = 2),
   c(Man = 3, Gal = 2, GlcNAc = 4),
@@ -87,6 +90,7 @@ but it is more convenient when your compositions are already stored in a
 list, for example after reading or generating them programmatically.
 
 ``` r
+
 comp_list <- list(
   c(Man = 5, GlcNAc = 2),
   c(Man = 3, Gal = 2, GlcNAc = 4),
@@ -102,6 +106,7 @@ as_glycan_composition(comp_list)
 From a character vector:
 
 ``` r
+
 as_glycan_composition(c("H5N2", "Hex(3)HexNAc(2)"))
 #> <glycan_composition[2]>
 #> [1] Hex(5)HexNAc(2)
@@ -114,6 +119,7 @@ Both compact notation (`"H5N2"`) and Byonic-style notation
 From a glycan structure vector, which we will discuss below:
 
 ``` r
+
 strucs <- c(o_glycan_core_1(), o_glycan_core_2())
 as_glycan_composition(strucs)
 #> <glycan_composition[2]>
@@ -139,6 +145,7 @@ and literature.
 same vector.
 
 ``` r
+
 # This raises an error because the monosaccharide names are mixed.
 try(as_glycan_composition(c("Hex(5)HexNAc(2)", "Man(5)GlcNAc(2)")), silent = TRUE)
 ```
@@ -152,6 +159,7 @@ The main function for inspecting glycan compositions is
 Let’s demonstrate it using the `comps` vector we created earlier.
 
 ``` r
+
 comps
 #> <glycan_composition[3]>
 #> [1] Man(5)GlcNAc(2)
@@ -163,11 +171,13 @@ The first argument is a glycan composition vector, and the second
 argument is the monosaccharide you want to count.
 
 ``` r
+
 count_mono(comps, "Man")
 #> [1] 5 3 3
 ```
 
 ``` r
+
 count_mono(comps, "Neu5Ac")
 #> [1] 0 0 1
 ```
@@ -178,6 +188,7 @@ understands the relationship between them, so it can count at the level
 you ask for.
 
 ``` r
+
 count_mono(comps, "Hex")
 #> [1] 5 5 5
 ```
@@ -188,6 +199,7 @@ You can also omit the second argument to get the total monosaccharide
 count for each composition.
 
 ``` r
+
 count_mono(comps)
 #> [1]  7  9 11
 ```
@@ -202,6 +214,7 @@ sorting.
 **Concatenation**:
 
 ``` r
+
 c(comps, comps)
 #> <glycan_composition[6]>
 #> [1] Man(5)GlcNAc(2)
@@ -215,6 +228,7 @@ c(comps, comps)
 **Subsetting**:
 
 ``` r
+
 comps[1:2]
 #> <glycan_composition[2]>
 #> [1] Man(5)GlcNAc(2)
@@ -222,6 +236,7 @@ comps[1:2]
 ```
 
 ``` r
+
 comps[integer()]
 #> <glycan_composition[0]>
 ```
@@ -229,6 +244,7 @@ comps[integer()]
 **Length**:
 
 ``` r
+
 length(comps)
 #> [1] 3
 ```
@@ -236,6 +252,7 @@ length(comps)
 **Unique**:
 
 ``` r
+
 dup_comps <- c(comps, comps)
 dup_comps
 #> <glycan_composition[6]>
@@ -248,6 +265,7 @@ dup_comps
 ```
 
 ``` r
+
 unique(dup_comps)
 #> <glycan_composition[3]>
 #> [1] Man(5)GlcNAc(2)
@@ -258,6 +276,7 @@ unique(dup_comps)
 **Repeated**:
 
 ``` r
+
 rep(comps, times = 2)
 #> <glycan_composition[6]>
 #> [1] Man(5)GlcNAc(2)
@@ -271,6 +290,7 @@ rep(comps, times = 2)
 **Sorting**:
 
 ``` r
+
 sort(comps)
 #> <glycan_composition[3]>
 #> [1] Man(5)GlcNAc(2)
@@ -279,6 +299,7 @@ sort(comps)
 ```
 
 ``` r
+
 sort(comps, decreasing = TRUE)
 #> <glycan_composition[3]>
 #> [1] Man(3)Gal(2)GlcNAc(4)Fuc(1)Neu5Ac(1)
@@ -292,6 +313,7 @@ One of the most useful features of glycan composition vectors is that
 they work smoothly with tibbles and data frames.
 
 ``` r
+
 library(tibble)
 
 tb <- tibble(
@@ -311,6 +333,7 @@ You can use `tidyverse` functions to perform operations on the glycan
 composition column.
 
 ``` r
+
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -335,6 +358,7 @@ tb |>
 Glycan composition vectors can also handle missing values.
 
 ``` r
+
 comps_with_na <- glycan_composition(c(Man = 5, GlcNAc = 2), NA)
 comps_with_na
 #> <glycan_composition[2]>
@@ -343,6 +367,7 @@ comps_with_na
 ```
 
 ``` r
+
 count_mono(comps_with_na, "Man")
 #> [1]  5 NA
 ```
@@ -393,6 +418,7 @@ Parsing IUPAC-condensed strings is straightforward with
 [glyparse](https://github.com/glycoverse/glyparse) package.)
 
 ``` r
+
 strucs <- as_glycan_structure(c(
   "Gal(b1-3)GalNAc(a1-",
   "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
@@ -412,17 +438,18 @@ access the underlying `igraph` objects using
 [`get_structure_graphs()`](https://glycoverse.github.io/glyrepr/reference/get_structure_graphs.md).
 
 ``` r
+
 get_structure_graphs(strucs)
 #> [[1]]
-#> IGRAPH 7b5b2c9 DN-- 2 1 -- 
+#> IGRAPH 9bfa31c DN-- 2 1 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 7b5b2c9 (vertex names):
+#> + edge from 9bfa31c (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 4a74f38 DN-- 3 2 -- 
+#> IGRAPH e78ca8a DN-- 3 2 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 4a74f38 (vertex names):
+#> + edges from e78ca8a (vertex names):
 #> [1] 3->1 3->2
 ```
 
@@ -437,6 +464,7 @@ The
 function also works with glycan structure vectors.
 
 ``` r
+
 count_mono(strucs, "Gal")
 #> [1] 1 1
 ```
@@ -449,17 +477,20 @@ and
 inspect specific aspects of the structures.
 
 ``` r
+
 # This function works element-wise
 has_linkages(strucs)
 #> [1] TRUE TRUE
 ```
 
 ``` r
+
 get_mono_type(strucs)
 #> [1] "concrete"
 ```
 
 ``` r
+
 get_structure_level(strucs)
 #> [1] "intact"
 ```
@@ -491,6 +522,7 @@ Let’s see some examples.
 **Intact structures**:
 
 ``` r
+
 as_glycan_structure(c(
   "Gal(b1-3)GalNAc(a1-",
   "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
@@ -501,6 +533,7 @@ as_glycan_structure(c(
 **Partial structures**:
 
 ``` r
+
 as_glycan_structure(c(
   "Gal(b1-?)GalNAc(a1-",
   "Gal(b1-?)[GlcNAc(b1-6)]GalNAc(a1-"
@@ -511,6 +544,7 @@ as_glycan_structure(c(
 **Topological structures**:
 
 ``` r
+
 as_glycan_structure(c(
   "Gal(??-?)GalNAc(??-",
   "Gal(??-?)[GlcNAc(??-?)]GalNAc(??-"
@@ -521,6 +555,7 @@ as_glycan_structure(c(
 **Basic structures**:
 
 ``` r
+
 as_glycan_structure(c(
   "Hex(??-?)HexNAc(??-",
   "Hex(??-?)[HexNAc(??-?)]HexNAc(??-"
@@ -537,6 +572,7 @@ If you create such a vector, `glyrepr` classifies it as `"basic"` and
 warns you.
 
 ``` r
+
 as_glycan_structure(c(
   "Hex(a1-3)HexNAc(a1-",
   "Hex(a1-3)[HexNAc(b1-6)]HexNAc(a1-"
@@ -553,6 +589,7 @@ subsetting and concatenation. They also have structure-specific helpers
 for reducing resolution, removing linkages, and removing substituents.
 
 ``` r
+
 strucs
 #> <glycan_structure[2]>
 #> [1] Gal(b1-3)GalNAc(a1-
@@ -561,6 +598,7 @@ strucs
 ```
 
 ``` r
+
 reduce_structure_level(strucs, to_level = "basic")
 #> <glycan_structure[2]>
 #> [1] Hex(??-?)HexNAc(??-
@@ -569,6 +607,7 @@ reduce_structure_level(strucs, to_level = "basic")
 ```
 
 ``` r
+
 remove_linkages(strucs)  # same as reduce_structure_level(strucs, to_level = "topological")
 #> <glycan_structure[2]>
 #> [1] Gal(??-?)GalNAc(??-
@@ -577,6 +616,7 @@ remove_linkages(strucs)  # same as reduce_structure_level(strucs, to_level = "to
 ```
 
 ``` r
+
 strucs_with_subs <- as_glycan_structure(c(
   "Gal6S(b1-3)GalNAc(a1-",
   "Gal6S(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
@@ -598,6 +638,7 @@ vectors can have names. This is a very useful feature we introduced in
 version 0.10.0.
 
 ``` r
+
 strings <- c(
   glycan1 = "Gal(b1-3)GalNAc(a1-",
   glycan2 = "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
