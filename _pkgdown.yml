@@ -26,6 +26,7 @@ reference:
 - title: "Glycan Composition and Structure Manipulation"
   contents:
   - convert_to_generic
+  - fill_anomer_pos
   - remove_linkages
   - remove_substituents
   - reduce_structure_level
