@@ -42,6 +42,7 @@ reference:
   contents:
   - available_monosaccharides
   - available_substituents
+  - get_anomer_pos
   - is_known_monosaccharide
   - possible_linkages
   - valid_linkages

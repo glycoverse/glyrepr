@@ -35,3 +35,25 @@ test_that("get all monosaccharides", {
   expect_contains(res, c("Hex", "Man"))
   expect_true(length(unique(res)) == length(res))
 })
+
+
+test_that("get_anomer_pos returns anomer positions for concrete monosaccharides", {
+  monos <- c("Gal", "GalNAc", "Neu5Ac", "Kdo", "Fru")
+
+  expect_equal(get_anomer_pos(monos), c(1L, 1L, 2L, 2L, 2L))
+})
+
+
+test_that("get_anomer_pos preserves names", {
+  monos <- c(a = "Gal", b = "Neu5Ac")
+
+  expect_equal(names(get_anomer_pos(monos)), names(monos))
+})
+
+
+test_that("get_anomer_pos rejects non-concrete monosaccharides", {
+  expect_error(
+    get_anomer_pos(c("Hex", "X")),
+    regexp = "concrete monosaccharide"
+  )
+})
