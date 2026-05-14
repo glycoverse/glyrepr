@@ -23,8 +23,10 @@
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/count_mono.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/dot-extract_base_mono.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/dot-parse_iupac_condensed_single.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/format_glycan_structure_subset.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_anomer.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_mono_color.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_structure_graphs.html</loc></url>

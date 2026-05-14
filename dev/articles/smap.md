@@ -11,6 +11,7 @@ familiarity with graph concepts. If you are just getting started, read
 the “Getting Started with glyrepr” vignette first.
 
 ``` r
+
 library(glyrepr)
 ```
 
@@ -35,6 +36,7 @@ belong to.
 Let’s see this in action:
 
 ``` r
+
 # Our test data: some common glycan structures
 iupacs <- c(
   "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",  # N-glycan core
@@ -70,6 +72,7 @@ Notice that the object reports only 5 unique structures. The vector has
 We can verify that directly:
 
 ``` r
+
 # Only 5 unique graphs are stored internally
 length(attr(large_struc, "structures"))
 #> [1] 0
@@ -82,6 +85,7 @@ length(large_struc)
 ### Memory Savings
 
 ``` r
+
 library(lobstr)
 obj_sizes(struc, large_struc)
 #> * 15.18 kB
@@ -101,6 +105,7 @@ functions do not operate directly on a glycan structure vector as if it
 were a list of graphs.
 
 ``` r
+
 # This will not work and will raise an error.
 tryCatch(
   purrr::map_int(large_struc, ~ igraph::vcount(.x)),
@@ -121,6 +126,7 @@ functions. They understand the unique structure optimization and work
 directly with the underlying graph objects.
 
 ``` r
+
 vertex_counts <- smap_int(large_struc, ~ igraph::vcount(.x))
 vertex_counts[1:10]
 #>  [1] 5 2 3 5 2 5 2 3 5 2
@@ -134,17 +140,17 @@ underlying `igraph` objects that represent glycan structures.
 The `smap` family provides glycan-aware equivalents for virtually all
 `purrr` functions:
 
-| purrr                                                         | smap                                                                                | purrr                                                           | smap                                                                         |
-|---------------------------------------------------------------|-------------------------------------------------------------------------------------|-----------------------------------------------------------------|------------------------------------------------------------------------------|
-| [`map()`](https://purrr.tidyverse.org/reference/map.html)     | [`smap()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)              | [`map2()`](https://purrr.tidyverse.org/reference/map2.html)     | [`smap2()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md)     |
-| [`map_lgl()`](https://purrr.tidyverse.org/reference/map.html) | [`smap_lgl()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)          | [`map2_lgl()`](https://purrr.tidyverse.org/reference/map2.html) | [`smap2_lgl()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md) |
-| [`map_int()`](https://purrr.tidyverse.org/reference/map.html) | [`smap_int()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)          | [`map2_int()`](https://purrr.tidyverse.org/reference/map2.html) | [`smap2_int()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md) |
-| [`map_dbl()`](https://purrr.tidyverse.org/reference/map.html) | [`smap_dbl()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)          | [`map2_dbl()`](https://purrr.tidyverse.org/reference/map2.html) | [`smap2_dbl()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md) |
-| [`map_chr()`](https://purrr.tidyverse.org/reference/map.html) | [`smap_chr()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)          | [`map2_chr()`](https://purrr.tidyverse.org/reference/map2.html) | [`smap2_chr()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md) |
-| [`some()`](https://purrr.tidyverse.org/reference/every.html)  | [`ssome()`](https://glycoverse.github.io/glyrepr/dev/reference/smap_predicates.md)  | [`pmap()`](https://purrr.tidyverse.org/reference/pmap.html)     | [`spmap()`](https://glycoverse.github.io/glyrepr/dev/reference/spmap.md)     |
-| [`every()`](https://purrr.tidyverse.org/reference/every.html) | [`severy()`](https://glycoverse.github.io/glyrepr/dev/reference/smap_predicates.md) | `pmap_*()`                                                      | `spmap_*()`                                                                  |
-| [`none()`](https://purrr.tidyverse.org/reference/every.html)  | [`snone()`](https://glycoverse.github.io/glyrepr/dev/reference/smap_predicates.md)  | [`imap()`](https://purrr.tidyverse.org/reference/imap.html)     | [`simap()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md)     |
-|                                                               |                                                                                     | `imap_*()`                                                      | `simap_*()`                                                                  |
+| purrr | smap | purrr | smap |
+|----|----|----|----|
+| [`map()`](https://purrr.tidyverse.org/reference/map.html) | [`smap()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md) | [`map2()`](https://purrr.tidyverse.org/reference/map2.html) | [`smap2()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md) |
+| [`map_lgl()`](https://purrr.tidyverse.org/reference/map.html) | [`smap_lgl()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md) | [`map2_lgl()`](https://purrr.tidyverse.org/reference/map2.html) | [`smap2_lgl()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md) |
+| [`map_int()`](https://purrr.tidyverse.org/reference/map.html) | [`smap_int()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md) | [`map2_int()`](https://purrr.tidyverse.org/reference/map2.html) | [`smap2_int()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md) |
+| [`map_dbl()`](https://purrr.tidyverse.org/reference/map.html) | [`smap_dbl()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md) | [`map2_dbl()`](https://purrr.tidyverse.org/reference/map2.html) | [`smap2_dbl()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md) |
+| [`map_chr()`](https://purrr.tidyverse.org/reference/map.html) | [`smap_chr()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md) | [`map2_chr()`](https://purrr.tidyverse.org/reference/map2.html) | [`smap2_chr()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md) |
+| [`some()`](https://purrr.tidyverse.org/reference/every.html) | [`ssome()`](https://glycoverse.github.io/glyrepr/dev/reference/smap_predicates.md) | [`pmap()`](https://purrr.tidyverse.org/reference/pmap.html) | [`spmap()`](https://glycoverse.github.io/glyrepr/dev/reference/spmap.md) |
+| [`every()`](https://purrr.tidyverse.org/reference/every.html) | [`severy()`](https://glycoverse.github.io/glyrepr/dev/reference/smap_predicates.md) | `pmap_*()` | `spmap_*()` |
+| [`none()`](https://purrr.tidyverse.org/reference/every.html) | [`snone()`](https://glycoverse.github.io/glyrepr/dev/reference/smap_predicates.md) | [`imap()`](https://purrr.tidyverse.org/reference/imap.html) | [`simap()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md) |
+|  |  | `imap_*()` | `simap_*()` |
 
 As a simple rule, replace `map` with `smap`, `pmap` with `spmap`, and
 `imap` with `simap`. The function signatures are designed to feel
@@ -155,6 +161,7 @@ familiar if you already use `purrr`.
 **Count vertices in each structure:**
 
 ``` r
+
 vertex_counts <- smap_int(large_struc, igraph::vcount)
 summary(vertex_counts)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
@@ -164,6 +171,7 @@ summary(vertex_counts)
 **Find structures with more than 4 vertices:**
 
 ``` r
+
 has_many_vertices <- smap_lgl(large_struc, ~ igraph::vcount(.x) > 4)
 sum(has_many_vertices)
 #> [1] 2000
@@ -172,6 +180,7 @@ sum(has_many_vertices)
 **Get the degree sequence of each structure:**
 
 ``` r
+
 degree_sequences <- smap(large_struc, ~ igraph::degree(.x))
 degree_sequences[1:3]
 #> [[1]]
@@ -190,6 +199,7 @@ degree_sequences[1:3]
 **Check if any structure has isolated vertices:**
 
 ``` r
+
 ssome(large_struc, ~ any(igraph::degree(.x) == 0))
 #> [1] FALSE
 ```
@@ -197,6 +207,7 @@ ssome(large_struc, ~ any(igraph::degree(.x) == 0))
 **Verify all structures are connected:**
 
 ``` r
+
 severy(large_struc, ~ igraph::is_connected(.x))
 #> [1] TRUE
 ```
@@ -206,6 +217,7 @@ severy(large_struc, ~ igraph::is_connected(.x))
 Quick examples of the extended family:
 
 ``` r
+
 # smap2: Apply function with additional parameters
 thresholds <- c(3, 4, 5)
 large_enough <- smap2_lgl(struc[1:3], thresholds, function(g, threshold) {
@@ -216,6 +228,7 @@ large_enough
 ```
 
 ``` r
+
 # simap: Include position information
 indexed_report <- simap_chr(large_struc[1:3], function(g, i) {
   paste0("#", i, ": ", igraph::vcount(g), " vertices")
@@ -236,6 +249,7 @@ The main performance benefit of `smap` functions comes from automatic
 deduplication:
 
 ``` r
+
 # Create a large dataset with high redundancy
 huge_struc <- rep(struc, 5000)  # 25,000 structures, only 5 unique
 
@@ -252,14 +266,14 @@ library(tictoc)
 tic("smap_int (optimized)")
 vertex_counts_optimized <- smap_int(huge_struc, igraph::vcount)
 toc()
-#> smap_int (optimized): 0.003 sec elapsed
+#> smap_int (optimized): 0.002 sec elapsed
 
 # Naive approach: extract all graphs and process each one
 tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.217 sec elapsed
+#> Naive approach (all graphs): 0.207 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -278,6 +292,7 @@ The function you pass to `smap` must accept an `igraph` object as its
 first argument. You can use purrr-style lambda notation:
 
 ``` r
+
 # Calculate clustering coefficient for each structure
 clustering_coeffs <- smap_dbl(large_struc, ~ igraph::transitivity(.x, type = "global"))
 summary(clustering_coeffs)
@@ -288,6 +303,7 @@ summary(clustering_coeffs)
 ### Combining Multiple Metrics
 
 ``` r
+
 # Create a compact structure summary.
 structure_analysis <- smap(large_struc, function(g) {
   list(
@@ -313,6 +329,7 @@ head(analysis_df)
 ### Memory-Efficient Filtering
 
 ``` r
+
 # Find only structures with exactly 5 vertices
 has_five_vertices <- smap_lgl(large_struc, ~ igraph::vcount(.x) == 5)
 five_vertex_structures <- large_struc[has_five_vertices]
@@ -349,6 +366,7 @@ Here’s how you might build a custom glycan analysis pipeline using
 `smap` functions:
 
 ``` r
+
 # Custom motif detector
 detect_branching <- function(g) {
   degrees <- igraph::degree(g)
@@ -388,6 +406,7 @@ Key takeaways:
 ## Session Information
 
 ``` r
+
 sessionInfo()
 #> R version 4.6.0 (2026-04-24)
 #> Platform: x86_64-pc-linux-gnu
@@ -416,7 +435,7 @@ sessionInfo()
 #>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.0    tidyselect_1.2.1 
 #>  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5
 #>  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   
-#> [13] igraph_2.3.0      knitr_1.51        backports_1.5.1   checkmate_2.3.4  
+#> [13] igraph_2.3.1      knitr_1.51        backports_1.5.1   checkmate_2.3.4  
 #> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.10.0     
 #> [21] pillar_1.11.1     rlang_1.2.0       cachem_1.1.0      stringi_1.8.7    
 #> [25] xfun_0.57         fs_2.1.0          sass_0.4.10       cli_3.6.6        

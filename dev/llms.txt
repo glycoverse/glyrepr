@@ -17,24 +17,28 @@ You can install the latest release of glyrepr from
 [CRAN](https://CRAN.R-project.org/package=glyrepr):
 
 ``` r
+
 install.packages("glyrepr")
 ```
 
 Or from [r-universe](https://glycoverse.r-universe.dev/glyrepr):
 
 ``` r
+
 install.packages('glyrepr', repos = c('https://glycoverse.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 Or from [GitHub](https://github.com/glycoverse/glyrepr):
 
 ``` r
+
 remotes::install_github("glycoverse/glyrepr@*release")
 ```
 
 Or install the development version:
 
 ``` r
+
 remotes::install_github("glycoverse/glyrepr")
 ```
 
@@ -66,6 +70,7 @@ advanced glycan analysis.
 ## Example
 
 ``` r
+
 library(glyrepr)
 
 # Create glycan compositions
@@ -132,6 +137,8 @@ count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
 
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md)
   : Convert Monosaccharides to Generic Type
+- [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md)
+  : Fill Anomer Positions
 - [`remove_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_linkages.md)
   : Remove All Linkages from a Glycan
 - [`remove_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_substituents.md)
@@ -190,6 +197,8 @@ count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
   : Get Available Monosaacharides
 - [`available_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/available_substituents.md)
   : Available Substituents
+- [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/get_anomer_pos.md)
+  : Get Anomer Positions
 - [`is_known_monosaccharide()`](https://glycoverse.github.io/glyrepr/dev/reference/is_known_monosaccharide.md)
   : Check if a Monosaccharide is Known
 - [`possible_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/possible_linkages.md)
