@@ -1,5 +1,12 @@
 # Changelog
 
+## glyrepr 0.12.1
+
+### Minor improvements and bug fixes
+
+- Performance optimization for glycan structure vector creation.
+  ([\#46](https://github.com/glycoverse/glyrepr/issues/46))
+
 ## glyrepr 0.12.0
 
 CRAN release: 2026-05-14
@@ -363,7 +370,6 @@ CRAN release: 2025-09-23
 - Glycan structures now support multiple substituents on a single
   monosaccharide. Substituents are stored as comma-separated strings
   internally and concatenated in IUPAC format for display.
-
 - Glycan compositions now support substituents. The `glycan_composition`
   class can now represent and count substituents alongside
   monosaccharides.
