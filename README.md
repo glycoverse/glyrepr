@@ -56,16 +56,16 @@ remotes::install_github("glycoverse/glyrepr")
 
 ## Documentation
 
--   🚀 Get started:
-    [Here](https://glycoverse.github.io/glyrepr/articles/glyrepr.html)
--   🔍 Underlying graph representation:
-    [Here](https://glycoverse.github.io/glyrepr/articles/glycan-graph.html)
--   🔧 Faster structure operations:
-    [Here](https://glycoverse.github.io/glyrepr/articles/smap.html)
--   ✏️ IUPAC-condensed glycan text representation:
-    [Here](https://glycoverse.github.io/glyrepr/articles/iupac.html)
--   📚 Reference:
-    [Here](https://glycoverse.github.io/glyrepr/reference/index.html)
+- 🚀 Get started:
+  [Here](https://glycoverse.github.io/glyrepr/articles/glyrepr.html)
+- 🔍 Underlying graph representation:
+  [Here](https://glycoverse.github.io/glyrepr/articles/glycan-graph.html)
+- 🔧 Faster structure operations:
+  [Here](https://glycoverse.github.io/glyrepr/articles/smap.html)
+- ✏️ IUPAC-condensed glycan text representation:
+  [Here](https://glycoverse.github.io/glyrepr/articles/iupac.html)
+- 📚 Reference:
+  [Here](https://glycoverse.github.io/glyrepr/reference/index.html)
 
 ## Role in `glycoverse`
 
