@@ -2,6 +2,8 @@
 
 ## glyrepr (development version)
 
+## glyrepr 0.12.1
+
 ### Minor improvements and bug fixes
 
 - Performance optimization for glycan structure vector creation.
