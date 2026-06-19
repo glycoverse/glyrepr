@@ -285,13 +285,13 @@ sessionInfo()
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] vctrs_0.7.3       cli_3.6.6         knitr_1.51        rlang_1.2.0      
-#>  [5] xfun_0.57         stringi_1.8.7     purrr_1.2.2       generics_0.1.4   
-#>  [9] textshaping_1.0.5 jsonlite_2.0.0    glue_1.8.1        htmltools_0.5.9  
-#> [13] ragg_1.5.2        sass_0.4.10       rmarkdown_2.31    tibble_3.3.1     
-#> [17] evaluate_1.0.5    jquerylib_0.1.4   fastmap_1.2.0     yaml_2.3.12      
-#> [21] lifecycle_1.0.5   stringr_1.6.0     compiler_4.6.0    dplyr_1.2.1      
-#> [25] fs_2.1.0          pkgconfig_2.0.3   systemfonts_1.3.2 digest_0.6.39    
-#> [29] R6_2.6.1          tidyselect_1.2.1  pillar_1.11.1     magrittr_2.0.5   
-#> [33] bslib_0.10.0      tools_4.6.0       pkgdown_2.2.0     cachem_1.1.0     
-#> [37] desc_1.4.3
+#>  [5] xfun_0.58         stringi_1.8.7     otel_0.2.0        purrr_1.2.2      
+#>  [9] generics_0.1.4    textshaping_1.0.5 jsonlite_2.0.0    glue_1.8.1       
+#> [13] htmltools_0.5.9   ragg_1.5.2        sass_0.4.10       rmarkdown_2.31   
+#> [17] tibble_3.3.1      evaluate_1.0.5    jquerylib_0.1.4   fastmap_1.2.0    
+#> [21] yaml_2.3.12       lifecycle_1.0.5   stringr_1.6.0     compiler_4.6.0   
+#> [25] dplyr_1.2.1       fs_2.1.0          pkgconfig_2.0.3   systemfonts_1.3.2
+#> [29] digest_0.6.39     R6_2.6.1          tidyselect_1.2.1  pillar_1.11.1    
+#> [33] magrittr_2.0.5    bslib_0.11.0      tools_4.6.0       pkgdown_2.2.0    
+#> [37] cachem_1.1.0      desc_1.4.3
 ```
