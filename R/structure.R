@@ -620,56 +620,64 @@ vec_cast.glyrepr_structure.character <- function(x, to, ...) {
     return(glycan_structure())
   }
 
-  # Handle NA values
+  input_names <- names(x)
+  result <- glycan_structure_from_iupac_character(x)
+  names(result) <- input_names
+  result
+}
+
+#' Create a glycan structure vector from IUPAC-condensed strings
+#'
+#' Parses each unique non-missing IUPAC-condensed string once, validates the
+#' resulting graphs, canonicalizes their IUPAC representation, and maps the
+#' canonical strings back to the original input positions.
+#'
+#' @param x A character vector of IUPAC-condensed strings.
+#' @returns A [glycan_structure()] vector.
+#' @noRd
+glycan_structure_from_iupac_character <- function(x) {
   na_mask <- is.na(x)
 
   if (all(na_mask)) {
-    # All NA - return vector of NAs with empty graphs
-    result <- new_na_glycan_structure(length(x))
-    names(result) <- names(x)
-    return(result)
+    return(new_na_glycan_structure(length(x)))
   }
+
+  non_na_x <- x[!na_mask]
+  unique_x <- unique(non_na_x)
+
+  graphs <- purrr::map(unique_x, .parse_iupac_condensed_single)
 
   if (any(na_mask)) {
-    # Mixed NA and non-NA
-    non_na_x <- x[!na_mask]
-
-    # Parse non-NA characters
-    graphs <- purrr::map(non_na_x, .parse_iupac_condensed_single)
-
-    # Create structure for non-NA elements
-    iupacs <- purrr::map_chr(graphs, .structure_to_iupac_single)
-
-    # Create unique graphs
-    unique_indices <- which(!duplicated(iupacs))
+    unique_iupacs <- purrr::map_chr(graphs, .structure_to_iupac_single)
+    unique_indices <- which(!duplicated(unique_iupacs))
     unique_graphs <- graphs[unique_indices]
-    unique_iupacs <- iupacs[unique_indices]
-    names(unique_graphs) <- unique_iupacs
+    names(unique_graphs) <- unique_iupacs[unique_indices]
 
-    # Build result preserving NA positions
-    result_iupacs <- character(length(x))
-    result_iupacs[na_mask] <- NA_character_
+    result_iupacs <- rep(NA_character_, length(x))
+    result_iupacs[!na_mask] <- unique_iupacs[match(non_na_x, unique_x)]
 
-    non_na_positions <- which(!na_mask)
-    for (i in seq_along(non_na_positions)) {
-      pos <- non_na_positions[i]
-      result_iupacs[pos] <- iupacs[i]
-    }
-
-    result <- new_glycan_structure(result_iupacs, unique_graphs)
-
-    # Restore names
-    names(result) <- names(x)
-
-    return(result)
+    return(new_glycan_structure(result_iupacs, unique_graphs))
   }
 
-  # Original logic for non-NA case
-  input_names <- names(x)
-  graphs <- purrr::map(x, .parse_iupac_condensed_single)
-  result <- do.call(glycan_structure, graphs)
-  names(result) <- input_names
-  result
+  graphs <- purrr::map(graphs, function(graph) {
+    graph %>%
+      validate_single_glycan_structure() %>%
+      ensure_name_vertex_attr()
+  })
+
+  reordered_result <- reorder_graphs_with_indices(graphs)
+  graphs <- reordered_result$graphs
+  validate_glycan_structure_vector(graphs)
+
+  unique_iupacs <- purrr::map_chr(graphs, .structure_to_iupac_single)
+  unique_indices <- which(!duplicated(unique_iupacs))
+  unique_graphs <- graphs[unique_indices]
+  names(unique_graphs) <- unique_iupacs[unique_indices]
+
+  result_iupacs <- rep(NA_character_, length(x))
+  result_iupacs[!na_mask] <- unique_iupacs[match(non_na_x, unique_x)]
+
+  new_glycan_structure(result_iupacs, unique_graphs)
 }
 
 #' @export
