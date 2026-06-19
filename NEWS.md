@@ -1,5 +1,9 @@
 # glyrepr (development version)
 
+## Minor improvements and bug fixes
+
+* Performance optimization for glycan structure vector creation. (#46)
+
 # glyrepr 0.12.0
 
 ## New features
@@ -138,7 +142,7 @@ We have redesigned the internal implementation of `glyrepr_composition` and `gly
 * `get_structure_graphs()` is redesigned.
   - The `i` parameter is removed, as indexing can be done manually on the input `glyrepr_structure` vector or on the returned list easily.
   - Add a `return_list` parameter to control the return type. This parameter makes this function "type-stable".
-* `glycan_structure()` and `as_glycan_structure()` now reorder the underlying graphs to be in line with the IUPAC-style sequence. For example, the vertex order of "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(b1-" is always 1. Gal, 2. GlcNAc, 3. GalNAc, and edges b1-3, b1-6, no matter what the original graphs are. Users can assign the indices of vertices and edges easily by printing the structure to console. This update makes `glymotif::match_motif()` more meaningful. 
+* `glycan_structure()` and `as_glycan_structure()` now reorder the underlying graphs to be in line with the IUPAC-style sequence. For example, the vertex order of "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(b1-" is always 1. Gal, 2. GlcNAc, 3. GalNAc, and edges b1-3, b1-6, no matter what the original graphs are. Users can assign the indices of vertices and edges easily by printing the structure to console. This update makes `glymotif::match_motif()` more meaningful.
 
 ## New features
 
@@ -181,6 +185,5 @@ We have redesigned the internal implementation of `glyrepr_composition` and `gly
 * Glycan structures now support multiple substituents on a single monosaccharide.
   Substituents are stored as comma-separated strings internally and concatenated
   in IUPAC format for display.
-
 * Glycan compositions now support substituents. The `glycan_composition` class
   can now represent and count substituents alongside monosaccharides.
