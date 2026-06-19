@@ -243,47 +243,54 @@ build_seq_cache <- function(glycan, root) {
   )
 }
 
-#' Generate glycan sequence recursively using pseudo-IUPAC format
+#' Generate vertex and edge order using IUPAC-condensed traversal
 #'
-#' @param node Current node
-#' @param cache Precomputed adjacency and edge metadata
-#' @returns Character string representing the pseudo-IUPAC sequence
+#' @param node Current node.
+#' @param cache Precomputed adjacency and edge metadata.
+#' @returns A list with integer vectors `vertices` and `edges`.
 #' @noRd
-seq_glycan <- function(node, cache) {
+seq_glycan_order <- function(node, cache) {
   children <- cache$children[[node]]
-  edge_ids <- cache$edge_ids[[node]]
 
-  # Base case: leaf node
-  if (is.null(children) || length(children) == 0) {
-    # Return vertex index with V prefix
-    return(paste0("V", as.character(node)))
+  if (length(children) == 0) {
+    return(list(vertices = node, edges = integer()))
   }
 
   if (length(children) > 1) {
     children_order <- order_branches(node, cache)
     backbone_child <- children[[children_order$backbone]]
-    backbone_edge_id <- edge_ids[[children_order$backbone]]
-    backbone_seq <- seq_glycan(backbone_child, cache)
-    branch_children <- children[children_order$branches]
-    branch_edge_ids <- edge_ids[children_order$branches]
-    branch_seqs <- purrr::map_chr(branch_children, ~ seq_glycan(.x, cache))
-    branch_seqs <- paste0("[", branch_seqs, "E", branch_edge_ids, "]")
+    backbone_edge_id <- cache$edge_ids[[node]][[children_order$backbone]]
+    backbone_order <- seq_glycan_order(backbone_child, cache)
+
+    branch_orders <- lapply(
+      children_order$branches,
+      function(branch_index) {
+        branch_child <- children[[branch_index]]
+        branch_order <- seq_glycan_order(branch_child, cache)
+        list(
+          vertices = branch_order$vertices,
+          edges = c(branch_order$edges, cache$edge_ids[[node]][[branch_index]])
+        )
+      }
+    )
   } else {
     backbone_child <- children[[1]]
-    backbone_edge_id <- edge_ids[[1]]
-    backbone_seq <- seq_glycan(backbone_child, cache)
-    branch_seqs <- ""
+    backbone_edge_id <- cache$edge_ids[[node]][[1]]
+    backbone_order <- seq_glycan_order(backbone_child, cache)
+    branch_orders <- list()
   }
 
-  # Combine: backbone + E<edge_index> + branches + V<node_index>
-  branches_str <- paste0(branch_seqs, collapse = "")
-  paste0(
-    backbone_seq,
-    "E",
-    backbone_edge_id,
-    branches_str,
-    "V",
-    as.character(node)
+  list(
+    vertices = c(
+      backbone_order$vertices,
+      unlist(lapply(branch_orders, `[[`, "vertices"), use.names = FALSE),
+      node
+    ),
+    edges = c(
+      backbone_order$edges,
+      backbone_edge_id,
+      unlist(lapply(branch_orders, `[[`, "edges"), use.names = FALSE)
+    )
   )
 }
 
@@ -364,59 +371,4 @@ order_branches <- function(node, cache) {
   } else {
     list(backbone = backbone_child_index, branches = integer(0))
   }
-}
-
-#' Replace vertex and edge indices with actual monosaccharides and linkages
-#'
-#' @param pseudo_seq Character string containing pseudo-IUPAC sequence with V and E prefixes
-#' @param glycan An igraph object representing a glycan structure
-#' @returns Character string with V<index> replaced by monosaccharides and E<index> replaced by linkages
-#' @noRd
-replace_mono_and_link <- function(pseudo_seq, glycan) {
-  # Replace vertex indices (V<index>) with monosaccharides and substituents
-  vertex_pattern <- "V(\\d+)"
-  vertex_matches <- stringr::str_match_all(pseudo_seq, vertex_pattern)[[1]]
-
-  if (nrow(vertex_matches) > 0) {
-    for (i in seq_len(nrow(vertex_matches))) {
-      vertex_index <- as.numeric(vertex_matches[i, 2])
-      mono <- igraph::vertex_attr(glycan, "mono", vertex_index)
-      sub <- igraph::vertex_attr(glycan, "sub", vertex_index)
-
-      # Combine monosaccharide with substituent if present
-      mono_with_sub <- if (sub == "") {
-        mono
-      } else {
-        # Remove commas to get IUPAC format
-        iupac_sub <- stringr::str_remove_all(sub, ",")
-        paste0(mono, iupac_sub)
-      }
-
-      # Replace V<index> with actual monosaccharide
-      pseudo_seq <- stringr::str_replace(
-        pseudo_seq,
-        paste0("V", vertex_index),
-        mono_with_sub
-      )
-    }
-  }
-
-  # Replace edge indices (E<index>) with linkages
-  edge_pattern <- "E(\\d+)"
-  edge_matches <- stringr::str_match_all(pseudo_seq, edge_pattern)[[1]]
-
-  if (nrow(edge_matches) > 0) {
-    for (i in seq_len(nrow(edge_matches))) {
-      edge_index <- as.numeric(edge_matches[i, 2])
-      linkage <- igraph::edge_attr(glycan, "linkage", edge_index)
-      # Replace E<index> with actual linkage wrapped in parentheses
-      pseudo_seq <- stringr::str_replace(
-        pseudo_seq,
-        paste0("E", edge_index),
-        paste0("(", linkage, ")")
-      )
-    }
-  }
-
-  pseudo_seq
 }

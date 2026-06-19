@@ -27,27 +27,17 @@ reorder_graphs_with_indices <- function(graphs) {
 .reorder_one_graph <- function(graph) {
   root <- which(igraph::degree(graph, mode = "in") == 0)
   seq_cache <- build_seq_cache(graph, root)
-  pseudo_seq <- seq_glycan(root, seq_cache)
-  .reorder_by_pseudo_seq(graph, pseudo_seq)
+  order <- seq_glycan_order(root, seq_cache)
+  .reorder_by_sequence_order(graph, order)
 }
 
-.reorder_by_pseudo_seq <- function(graph, pseudo_seq) {
-  # Reorder the vertices
-  vertices <- stringr::str_extract_all(pseudo_seq, "V(\\d+)")[[1]]
-  vertices <- stringr::str_sub(vertices, 2L, -1L)
-  # Fix: Use the correct permutation vector
-  # vertices contains the desired order, we need the inverse permutation
-  target_order <- as.numeric(vertices)
+.reorder_by_sequence_order <- function(graph, sequence_order) {
+  target_order <- as.numeric(sequence_order$vertices)
   permutation <- order(target_order)
   graph <- igraph::permute(graph, permutation)
   igraph::V(graph)$name <- as.character(1:igraph::vcount(graph))
 
-  # Reorder the edges
-  edges <- stringr::str_extract_all(pseudo_seq, "E(\\d+)")[[1]]
-  edges <- stringr::str_sub(edges, 2L, -1L)
-  graph <- .permute_edges(graph, as.numeric(edges))
-
-  graph
+  .permute_edges(graph, as.numeric(sequence_order$edges))
 }
 
 .permute_edges <- function(g, order) {
