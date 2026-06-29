@@ -47,6 +47,11 @@ test_that("get_structure_level works for a partial glycan vector with only one k
   expect_equal(get_structure_level(glycans), "partial")
 })
 
+test_that("get_structure_level treats ambiguous linkage positions as partial", {
+  glycan <- as_glycan_structure("Neu5Ac(a2-3/6)Gal(b1-4)GlcNAc(b1-")
+  expect_equal(get_structure_level(glycan), "partial")
+})
+
 test_that("get_structure_level works for a topological glycan vector", {
   glycans <- as_glycan_structure(c(
     "Gal(??-?)GalNAc(??-",

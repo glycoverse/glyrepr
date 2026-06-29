@@ -10,7 +10,7 @@
 #'   * If `FALSE` (default), a glycan is considered to have linkages if any
 #'     linkage is partially known (not "??-?").
 #'   * If `TRUE`, a glycan is considered to have linkages only if all linkages
-#'     are fully determined (no "?" in the linkage).
+#'     are fully determined (no "?" or multiple positions in the linkage).
 #'
 #' @returns A logical vector indicating if each glycan structure has linkages.
 #'
@@ -42,7 +42,8 @@ has_linkages <- function(glycan, strict = FALSE) {
   if (strict) {
     linkages <- igraph::E(glycan)$linkage
     anomer <- glycan$anomer
-    all(!stringr::str_detect(c(linkages, anomer), stringr::fixed("?")))
+    all(!stringr::str_detect(c(linkages, anomer), stringr::fixed("?"))) &&
+      all(!stringr::str_detect(linkages, stringr::fixed("/")))
   } else {
     any(igraph::E(glycan)$linkage != "??-?") | glycan$anomer != "??"
   }
