@@ -14,7 +14,7 @@ has_linkages(glycan, strict = FALSE)
 \item If \code{FALSE} (default), a glycan is considered to have linkages if any
 linkage is partially known (not "??-?").
 \item If \code{TRUE}, a glycan is considered to have linkages only if all linkages
-are fully determined (no "?" in the linkage).
+are fully determined (no "?" or multiple positions in the linkage).
 }}
 }
 \value{
