@@ -19,7 +19,7 @@ Glycan structures can have four possible levels of resolution:
 \item "intact": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
 and no linkage or anomer is unknown or ambiguous.
 \item "partial": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-at least one linkage or anomer contains "?",
+at least one linkage or anomer is unknown or ambiguous,
 and at least one linkage or anomer has a non-"?" annotation.
 \item "topological": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
 and all linkages and anomers are completely unknown ("??-?"/"??").
