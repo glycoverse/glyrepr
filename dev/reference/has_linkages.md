@@ -26,7 +26,8 @@ has_linkages(glycan, strict = FALSE)
     linkage is partially known (not "??-?").
 
   - If `TRUE`, a glycan is considered to have linkages only if all
-    linkages are fully determined (no "?" in the linkage).
+    linkages are fully determined (no "?" or multiple positions in the
+    linkage).
 
 ## Value
 

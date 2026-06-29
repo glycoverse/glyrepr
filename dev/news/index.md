@@ -4,6 +4,8 @@
 
 ## glyrepr 0.12.1
 
+CRAN release: 2026-06-19
+
 ### Minor improvements and bug fixes
 
 - Performance optimization for glycan structure vector creation.
