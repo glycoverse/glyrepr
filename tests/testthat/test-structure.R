@@ -639,6 +639,36 @@ test_that("get_structure_graphs validates return_list parameter", {
   )
 })
 
+test_that("as.list returns same-length graph list for structures", {
+  glycan <- o_glycan_core_1()
+  sv <- c(glycan, glycan)
+  iupacs <- structure_to_iupac(sv)
+
+  graph_list <- as.list(sv)
+
+  expect_type(graph_list, "list")
+  expect_length(graph_list, 2)
+  expect_null(names(graph_list))
+  expect_s3_class(graph_list[[1]], "igraph")
+  expect_s3_class(graph_list[[2]], "igraph")
+  expect_false(identical(graph_list[[1]], graph_list[[2]]))
+  expect_equal(
+    structure_to_iupac(glycan_structure(graph_list[[1]], graph_list[[2]])),
+    iupacs
+  )
+})
+
+test_that("as.list preserves structure vector names", {
+  glycan <- o_glycan_core_1()
+  sv <- c(first = glycan, second = glycan)
+
+  graph_list <- as.list(sv)
+
+  expect_equal(names(graph_list), c("first", "second"))
+  expect_s3_class(graph_list[[1]], "igraph")
+  expect_s3_class(graph_list[[2]], "igraph")
+})
+
 # Integration tests -----------------------------------------------------------
 test_that("glycan_structure preserves glycan structures correctly", {
   glycan1 <- o_glycan_core_1()
