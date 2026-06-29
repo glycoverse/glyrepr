@@ -2,9 +2,18 @@
 
 ## glyrepr (development version)
 
+### New features
+
 - Add [`as.list()`](https://rdrr.io/r/base/list.html) support for
   `glyrepr_composition` and `glyrepr_structure` vectors.
-  ([\#4](https://github.com/glycoverse/glyrepr/issues/4))
+  ([\#52](https://github.com/glycoverse/glyrepr/issues/52))
+
+### Minor improvements and bug fixes
+
+- Ambiguous linkages like `a2-3/6` are also regarded as unknown for
+  `has_linkage()` and
+  [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md).
+  ([\#51](https://github.com/glycoverse/glyrepr/issues/51))
 
 ## glyrepr 0.12.1
 
