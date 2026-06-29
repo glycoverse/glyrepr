@@ -447,7 +447,7 @@ as.list.glyrepr_structure <- function(x, ...) {
       copy_structure_graph(graphs[[iupac]])
     }
   })
-  names(out) <- iupacs
+  names(out) <- names(x)
   out
 }
 

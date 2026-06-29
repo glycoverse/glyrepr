@@ -145,8 +145,22 @@ test_that("as.list returns named integer vectors for compositions", {
 
   expect_type(comp_list, "list")
   expect_length(comp_list, 2)
+  expect_null(names(comp_list))
   expect_equal(comp_list[[1]], c(Hex = 5L, HexNAc = 2L))
   expect_equal(comp_list[[2]], c(Hex = 3L, HexNAc = 1L, dHex = 1L))
+})
+
+test_that("as.list preserves composition vector names", {
+  comp <- glycan_composition(
+    first = c(Hex = 5, HexNAc = 2),
+    second = c(Hex = 3, HexNAc = 1)
+  )
+
+  comp_list <- as.list(comp)
+
+  expect_equal(names(comp_list), c("first", "second"))
+  expect_equal(comp_list[[1]], c(Hex = 5L, HexNAc = 2L))
+  expect_equal(comp_list[[2]], c(Hex = 3L, HexNAc = 1L))
 })
 
 # Tests for formatting ----------------------------------------------
