@@ -2,6 +2,8 @@
 
 S3method("[",glyrepr_structure)
 S3method("[[<-",glyrepr_structure)
+S3method(as.list,glyrepr_composition)
+S3method(as.list,glyrepr_structure)
 S3method(convert_to_generic,character)
 S3method(convert_to_generic,glyrepr_composition)
 S3method(convert_to_generic,glyrepr_structure)

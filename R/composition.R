@@ -165,6 +165,18 @@ format.glyrepr_composition <- function(x, ...) {
 }
 
 #' @export
+as.list.glyrepr_composition <- function(x, ...) {
+  data <- vctrs::field(vctrs::vec_data(x), "data")
+  purrr::map(data, function(comp) {
+    if (.is_na_composition_elem(comp)) {
+      NULL
+    } else {
+      comp
+    }
+  })
+}
+
+#' @export
 vec_ptype2.glyrepr_composition.glyrepr_composition <- function(x, y, ...) {
   new_glycan_composition(list())
 }

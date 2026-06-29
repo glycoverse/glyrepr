@@ -435,6 +435,34 @@ format.glyrepr_structure <- function(x, ...) {
   formatted
 }
 
+#' @export
+as.list.glyrepr_structure <- function(x, ...) {
+  iupacs <- vctrs::vec_data(x)
+  graphs <- attr(x, "graphs")
+
+  out <- purrr::map(iupacs, function(iupac) {
+    if (is.na(iupac)) {
+      NULL
+    } else {
+      copy_structure_graph(graphs[[iupac]])
+    }
+  })
+  names(out) <- iupacs
+  out
+}
+
+#' Copy a glycan structure graph
+#'
+#' Use an identity permutation to materialize a separate igraph object while
+#' preserving vertices, edges, and attributes.
+#'
+#' @param graph An igraph object.
+#' @returns A copied igraph object.
+#' @noRd
+copy_structure_graph <- function(graph) {
+  igraph::permute(graph, seq_len(igraph::vcount(graph)))
+}
+
 #' Format a Subset of Glycan Structures with Optional Colors
 #'
 #' @param x A glyrepr_structure object

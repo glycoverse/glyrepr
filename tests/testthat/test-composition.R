@@ -135,6 +135,20 @@ test_that("as_glycan_composition works for a glycan structure with multiple subs
   expect_equal(comp, expected_comp)
 })
 
+test_that("as.list returns named integer vectors for compositions", {
+  comp <- glycan_composition(
+    c(Hex = 5, HexNAc = 2),
+    c(Hex = 3, HexNAc = 1, dHex = 1)
+  )
+
+  comp_list <- as.list(comp)
+
+  expect_type(comp_list, "list")
+  expect_length(comp_list, 2)
+  expect_equal(comp_list[[1]], c(Hex = 5L, HexNAc = 2L))
+  expect_equal(comp_list[[2]], c(Hex = 3L, HexNAc = 1L, dHex = 1L))
+})
+
 # Tests for formatting ----------------------------------------------
 
 test_that("format works correctly", {
