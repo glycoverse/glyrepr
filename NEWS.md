@@ -1,6 +1,6 @@
 # glyrepr (development version)
 
-* Add `as.list()` support for `glyrepr_composition` and `glyrepr_structure` vectors. (#49)
+* Add `as.list()` support for `glyrepr_composition` and `glyrepr_structure` vectors. (#4)
 
 # glyrepr 0.12.1
 
