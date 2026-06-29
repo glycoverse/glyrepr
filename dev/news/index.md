@@ -2,6 +2,10 @@
 
 ## glyrepr (development version)
 
+- Add [`as.list()`](https://rdrr.io/r/base/list.html) support for
+  `glyrepr_composition` and `glyrepr_structure` vectors.
+  ([\#4](https://github.com/glycoverse/glyrepr/issues/4))
+
 ## glyrepr 0.12.1
 
 CRAN release: 2026-06-19
