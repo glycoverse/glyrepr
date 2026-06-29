@@ -28,7 +28,7 @@ URL: https://glycoverse.github.io/glyrepr/, https://github.com/glycoverse/glyrep
 Imports: 
     checkmate,
     cli,
-    dplyr,
+    dplyr (>= 1.2.0),
     furrr,
     future,
     glue,
