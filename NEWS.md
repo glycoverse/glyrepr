@@ -1,6 +1,12 @@
 # glyrepr (development version)
 
-* Add `as.list()` support for `glyrepr_composition` and `glyrepr_structure` vectors. (#4)
+## New features
+
+* Add `as.list()` support for `glyrepr_composition` and `glyrepr_structure` vectors. (#52)
+
+## Minor improvements and bug fixes
+
+* Ambiguous linkages like `a2-3/6` are also regarded as unknown for `has_linkage()` and `get_structure_level()`. (#51)
 
 # glyrepr 0.12.1
 
