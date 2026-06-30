@@ -304,6 +304,18 @@ test_that("as_glycan_structure.character prefers longer substituent tokens", {
   expect_equal(structure_to_iupac(glycans), iupacs)
 })
 
+test_that("as_glycan_structure.character handles glycolyl substituents", {
+  iupacs <- c("Glc3NGc(a1-", "Glc3Gc(a1-")
+  expected_subs <- c("3NGc", "3Gc")
+
+  glycans <- as_glycan_structure(iupacs)
+  graphs <- get_structure_graphs(glycans)
+  subs <- purrr::map_chr(graphs, ~ igraph::V(.x)$sub)
+
+  expect_equal(subs, expected_subs)
+  expect_equal(structure_to_iupac(glycans), iupacs)
+})
+
 test_that("Neu monosaccharides with 5Ac are correctly parsed as Neu5Ac", {
   # Test cases where 5Ac should result in Neu5Ac base monosaccharide
   expect_equal(
@@ -331,6 +343,10 @@ test_that("Neu monosaccharides with 5Gc are correctly parsed as Neu5Gc", {
     .extract_substituent("Neu4Ac5Gc"),
     c(mono = "Neu5Gc", sub = "4Ac")
   )
+  expect_equal(
+    .extract_substituent("Neu3Gc5Gc"),
+    c(mono = "Neu5Gc", sub = "3Gc")
+  )
   expect_equal(.extract_substituent("Neu7S5Gc"), c(mono = "Neu5Gc", sub = "7S"))
 })
 
@@ -342,6 +358,7 @@ test_that("Neu monosaccharides without 5Ac or 5Gc remain as Neu", {
     .extract_substituent("Neu3Me7Ac"),
     c(mono = "Neu", sub = "3Me,7Ac")
   )
+  expect_equal(.extract_substituent("Neu3Gc"), c(mono = "Neu", sub = "3Gc"))
 })
 
 test_that("Neu5Ac and Neu5Gc exact matches work correctly", {

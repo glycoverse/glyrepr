@@ -2,6 +2,7 @@
 
 ## New features
 
+* Add `NGc` and `Gc` to the supported substituent list for N-glycolyl and glycolyl substituents. (#54)
 * Add `as.list()` support for `glyrepr_composition` and `glyrepr_structure` vectors. (#52)
 
 ## Minor improvements and bug fixes

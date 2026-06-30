@@ -192,6 +192,10 @@ colorize_iupac_string <- function(iupac_text, mono_names) {
     return("Neu5Ac")
   } else if (stringr::str_starts(mono, "Neu5Ac") && nchar(mono) > 6) {
     return("Neu5Ac")
+  } else if (mono == "Neu5Gc") {
+    return("Neu5Gc")
+  } else if (stringr::str_starts(mono, "Neu5Gc") && nchar(mono) > 6) {
+    return("Neu5Gc")
   } else if (mono == "Neu4Ac5Ac") {
     return("Neu5Ac")
   } else if (mono == "Neu4Ac5Gc") {
