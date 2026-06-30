@@ -292,6 +292,18 @@ test_that("as_glycan_structure.character handles multiple substituents", {
   expect_equal(igraph::V(graph)$sub, "3Me,6S")
 })
 
+test_that("as_glycan_structure.character prefers longer substituent tokens", {
+  iupacs <- c("Glc3Pyr(a1-", "Glc3PC(a1-", "Glc3PPEtn(a1-", "Glc3PEtn(a1-")
+  expected_subs <- c("3Pyr", "3PC", "3PPEtn", "3PEtn")
+
+  glycans <- as_glycan_structure(iupacs)
+  graphs <- get_structure_graphs(glycans)
+  subs <- purrr::map_chr(graphs, ~ igraph::V(.x)$sub)
+
+  expect_equal(subs, expected_subs)
+  expect_equal(structure_to_iupac(glycans), iupacs)
+})
+
 test_that("Neu monosaccharides with 5Ac are correctly parsed as Neu5Ac", {
   # Test cases where 5Ac should result in Neu5Ac base monosaccharide
   expect_equal(

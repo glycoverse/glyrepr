@@ -6,6 +6,7 @@
 
 ## Minor improvements and bug fixes
 
+* Fix `as_glycan_structure()` parsing for substituent names such as `Pyr`, `PC`, `PPEtn`, and `PEtn` that share the `P` prefix. (#53)
 * Ambiguous linkages like `a2-3/6` are also regarded as unknown for `has_linkage()` and `get_structure_level()`. (#51)
 
 # glyrepr 0.12.1

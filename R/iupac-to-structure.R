@@ -221,7 +221,7 @@
 
 # Extract substituent from monosaccharide name
 .extract_substituent <- function(mono) {
-  subs_pattern <- stringr::str_c(available_substituents(), collapse = "|")
+  subs_pattern <- substituent_name_pattern(longest_first = TRUE)
   single_sub_pattern <- stringr::str_glue("[1-9\\?]({subs_pattern})") # Pattern for a single substituent
 
   # Handle different types of monosaccharides
