@@ -12,6 +12,25 @@ available_substituents <- function() {
   c("Me", "Ac", "NAc", "P", "S", "Pyr", "PC", "PPEtn", "PEtn", "N")
 }
 
+#' Build a Substituent Name Regex Pattern
+#'
+#' @param longest_first Whether to sort longer substituent names before shorter
+#'   names in the regex alternation.
+#'
+#' @returns A regex alternation pattern for known substituent names.
+#'
+#' @noRd
+substituent_name_pattern <- function(longest_first = FALSE) {
+  checkmate::assert_flag(longest_first)
+
+  substituents <- available_substituents()
+  if (longest_first) {
+    substituents <- substituents[order(nchar(substituents), decreasing = TRUE)]
+  }
+
+  stringr::str_c(stringr::str_escape(substituents), collapse = "|")
+}
+
 #' Normalize Substituent String
 #'
 #' Takes a substituent string (potentially with multiple substituents) and

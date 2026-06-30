@@ -66,7 +66,7 @@ valid_substituent <- function(sub) {
     individual_subs <- stringr::str_split(single_sub, ",")[[1]]
 
     # Check if each individual substituent is valid
-    subs_pattern <- stringr::str_c(available_substituents(), collapse = "|")
+    subs_pattern <- substituent_name_pattern()
     pattern <- stringr::str_glue("^[\\d\\?]({subs_pattern})$")
 
     individual_valid <- purrr::map_lgl(
