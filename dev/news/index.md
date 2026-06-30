@@ -4,6 +4,9 @@
 
 ### New features
 
+- Add `NGc` and `Gc` to the supported substituent list for N-glycolyl
+  and glycolyl substituents.
+  ([\#54](https://github.com/glycoverse/glyrepr/issues/54))
 - Add [`as.list()`](https://rdrr.io/r/base/list.html) support for
   `glyrepr_composition` and `glyrepr_structure` vectors.
   ([\#52](https://github.com/glycoverse/glyrepr/issues/52))
