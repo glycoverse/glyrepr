@@ -343,6 +343,10 @@ test_that("Neu monosaccharides with 5Gc are correctly parsed as Neu5Gc", {
     .extract_substituent("Neu4Ac5Gc"),
     c(mono = "Neu5Gc", sub = "4Ac")
   )
+  expect_equal(
+    .extract_substituent("Neu3Gc5Gc"),
+    c(mono = "Neu5Gc", sub = "3Gc")
+  )
   expect_equal(.extract_substituent("Neu7S5Gc"), c(mono = "Neu5Gc", sub = "7S"))
 })
 
@@ -354,6 +358,7 @@ test_that("Neu monosaccharides without 5Ac or 5Gc remain as Neu", {
     .extract_substituent("Neu3Me7Ac"),
     c(mono = "Neu", sub = "3Me,7Ac")
   )
+  expect_equal(.extract_substituent("Neu3Gc"), c(mono = "Neu", sub = "3Gc"))
 })
 
 test_that("Neu5Ac and Neu5Gc exact matches work correctly", {
