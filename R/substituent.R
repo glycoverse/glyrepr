@@ -9,7 +9,7 @@
 #'
 #' @export
 available_substituents <- function() {
-  c("Me", "Ac", "NAc", "P", "S", "Pyr", "PC", "PPEtn", "PEtn", "N")
+  c("Me", "Ac", "NAc", "NGc", "P", "S", "Pyr", "PC", "PPEtn", "PEtn", "N", "Gc")
 }
 
 #' Build a Substituent Name Regex Pattern

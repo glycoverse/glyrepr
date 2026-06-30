@@ -6,6 +6,8 @@ test_that("available_substituents returns expected values", {
   expect_true(length(subs) > 0)
   expect_true("Me" %in% subs)
   expect_true("Ac" %in% subs)
+  expect_true("NGc" %in% subs)
+  expect_true("Gc" %in% subs)
   expect_true("S" %in% subs)
 })
 
