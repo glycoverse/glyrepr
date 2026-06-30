@@ -10,6 +10,11 @@
 
 ### Minor improvements and bug fixes
 
+- Fix
+  [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  parsing for substituent names such as `Pyr`, `PC`, `PPEtn`, and `PEtn`
+  that share the `P` prefix.
+  ([\#53](https://github.com/glycoverse/glyrepr/issues/53))
 - Ambiguous linkages like `a2-3/6` are also regarded as unknown for
   `has_linkage()` and
   [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md).
