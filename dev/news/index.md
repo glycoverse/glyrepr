@@ -15,6 +15,11 @@
 
 - Fix
   [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  parsing for monosaccharide names that start with digits, such as
+  `6dGul` and `4eLeg`.
+  ([\#55](https://github.com/glycoverse/glyrepr/issues/55))
+- Fix
+  [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   parsing for substituent names such as `Pyr`, `PC`, `PPEtn`, and `PEtn`
   that share the `P` prefix.
   ([\#53](https://github.com/glycoverse/glyrepr/issues/53))
