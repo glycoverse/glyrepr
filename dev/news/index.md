@@ -4,6 +4,9 @@
 
 ### New features
 
+- [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/get_anomer_pos.md)
+  now accepts generic monosaccharide names such as `"Hex"`.
+  ([\#57](https://github.com/glycoverse/glyrepr/issues/57))
 - Add `NGc` and `Gc` to the supported substituent list for N-glycolyl
   and glycolyl substituents.
   ([\#54](https://github.com/glycoverse/glyrepr/issues/54))

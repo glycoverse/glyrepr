@@ -1,7 +1,7 @@
 # Get Anomer Positions
 
-This function returns the anomer position for concrete monosaccharide
-names.
+This function returns the anomer position for concrete or generic
+monosaccharide names.
 
 ## Usage
 
@@ -13,7 +13,7 @@ get_anomer_pos(mono)
 
 - mono:
 
-  A character vector of concrete monosaccharide names.
+  A character vector of monosaccharide names.
 
 ## Value
 
@@ -22,6 +22,6 @@ An integer vector of anomer positions.
 ## Examples
 
 ``` r
-get_anomer_pos(c("Gal", "Neu5Ac"))
-#> [1] 1 2
+get_anomer_pos(c("Gal", "Hex", "Neu5Ac"))
+#> [1] 1 1 2
 ```
