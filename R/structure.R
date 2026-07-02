@@ -807,7 +807,9 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
     return(x)
   }
 
-  iupacs <- glycan_structure_iupac_data(x)[i]
+  iupacs_all <- glycan_structure_iupac_data(x)
+  names(iupacs_all) <- names(x)
+  iupacs <- iupacs_all[i]
   graphs <- filter_used_structure_graphs(iupacs, attr(x, "graphs"))
   out <- new_glycan_structure(iupacs, graphs)
 

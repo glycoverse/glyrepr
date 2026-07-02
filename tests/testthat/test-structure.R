@@ -1109,6 +1109,13 @@ test_that("converting to character", {
   expect_equal(as.character(sv), "Gal(b1-3)GalNAc(a1-")
 })
 
+test_that("[[ extracts named structure elements by name", {
+  glycans <- c(valid = o_glycan_core_1(), missing = glycan_structure(NA))
+
+  expect_false(is.na(glycans[["valid"]]))
+  expect_equal(as.character(glycans[["valid"]]), "Gal(b1-3)GalNAc(a1-")
+})
+
 # Tests for vertex and edge reordering -------------------------
 test_that("vertices and edges are reordered correctly", {
   graph1 <- igraph::make_graph(~ 1 - +2, 1 - +3)
