@@ -16,6 +16,11 @@
 
 ### Minor improvements and bug fixes
 
+- `glyrepr_structure` objects no longer return `TRUE` from
+  [`is.character()`](https://rdrr.io/r/base/character.html). Use
+  [`as.character()`](https://rdrr.io/r/base/character.html) for explicit
+  IUPAC-condensed string conversion.
+  ([\#59](https://github.com/glycoverse/glyrepr/issues/59))
 - Fix
   [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   so character vectors containing `NA` reject mixed concrete and generic

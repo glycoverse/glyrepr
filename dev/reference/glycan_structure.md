@@ -31,9 +31,8 @@ A `glyrepr_structure` class glycan structure vector object.
 
 ## Data Structure Overview
 
-A glycan structure vector is a vctrs record with an additional S3 class
-`glyrepr_structure`. Therefore, `sloop::s3_class()` returns the class
-hierarchy `c("glyrepr_structure", "vctrs_rcrd")`.
+A glycan structure vector is a vctrs vector with an additional S3 class
+`glyrepr_structure`.
 
 Each glycan structure must satisfy the following constraints:
 
@@ -111,19 +110,11 @@ Glycan structure vectors can have names, which are preserved during
 operations. This is particularly useful when working with the `glymotif`
 package.
 
-## As characters
+## Character conversion
 
-One side-effect of the current implementation is that you can treat a
-glycan structure vector as a pure character vector of IUPAC-condensed
-strings. In fact,
-[`is.character()`](https://rdrr.io/r/base/character.html) returns `TRUE`
-for a glycan structure vector, and all `stringr` functions work directly
-on the vector.
-
-However, we still recommend using
+A glycan structure vector is not a character vector. Use
 [`as.character()`](https://rdrr.io/r/base/character.html) to explicitly
-convert to character when needed, to avoid confusion and ensure that the
-intended behavior is clear.
+convert it to IUPAC-condensed strings when needed.
 
 ## Examples
 
