@@ -4,6 +4,13 @@
 
 ### New features
 
+- Add
+  [`structure_nodes()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md),
+  [`structure_edges()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md),
+  and
+  [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+  for converting glycan structures to and from graph-table tibbles.
+  ([\#60](https://github.com/glycoverse/glyrepr/issues/60))
 - [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/get_anomer_pos.md)
   now accepts generic monosaccharide names such as `"Hex"`.
   ([\#57](https://github.com/glycoverse/glyrepr/issues/57))
