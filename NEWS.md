@@ -2,7 +2,7 @@
 
 ## New features
 
-* `get_anomer_pos()` now accepts generic monosaccharide names such as `"Hex"`. (#56)
+* `get_anomer_pos()` now accepts generic monosaccharide names such as `"Hex"`. (#57)
 * Add `NGc` and `Gc` to the supported substituent list for N-glycolyl and glycolyl substituents. (#54)
 * Add `as.list()` support for `glyrepr_composition` and `glyrepr_structure` vectors. (#52)
 
