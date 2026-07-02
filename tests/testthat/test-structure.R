@@ -18,6 +18,13 @@ test_that("glycan_structure works", {
   expect_s3_class(glycan, c("glyrepr_structure"))
 })
 
+test_that("glycan_structure is not a character vector", {
+  glycan <- n_glycan_core()
+
+  expect_false(is.character(glycan))
+  expect_equal(vctrs::vec_data(glycan), structure_to_iupac(glycan))
+})
+
 
 test_that("glycan_structure fails for invalid graphs", {
   bad_graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 3 - +1)
@@ -1102,6 +1109,13 @@ test_that("converting to character", {
   expect_equal(as.character(sv), "Gal(b1-3)GalNAc(a1-")
 })
 
+test_that("[[ extracts named structure elements by name", {
+  glycans <- c(valid = o_glycan_core_1(), missing = glycan_structure(NA))
+
+  expect_false(is.na(glycans[["valid"]]))
+  expect_equal(as.character(glycans[["valid"]]), "Gal(b1-3)GalNAc(a1-")
+})
+
 # Tests for vertex and edge reordering -------------------------
 test_that("vertices and edges are reordered correctly", {
   graph1 <- igraph::make_graph(~ 1 - +2, 1 - +3)
@@ -1230,6 +1244,16 @@ test_that("names are preserved after subsetting with [", {
 
   subset_reverse <- glycans[c(2, 1)]
   expect_equal(names(subset_reverse), c("B", "A"))
+})
+
+test_that("names are preserved after character subsetting with [", {
+  glycans <- c(valid = o_glycan_core_1(), missing = glycan_structure(NA))
+
+  subset <- glycans["valid"]
+
+  expect_false(is.na(subset))
+  expect_equal(names(subset), "valid")
+  expect_equal(as.character(subset), c(valid = "Gal(b1-3)GalNAc(a1-"))
 })
 
 test_that("names are preserved after subsetting with logical index", {

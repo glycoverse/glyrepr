@@ -25,9 +25,8 @@ mechanisms, making it suitable for glycoproteomics, glycomics analysis, and glyc
 structure comparison studies.
 }
 \section{Data Structure Overview}{
-A glycan structure vector is a vctrs record with an additional S3 class
-\code{glyrepr_structure}. Therefore, \code{sloop::s3_class()} returns the class hierarchy
-\code{c("glyrepr_structure", "vctrs_rcrd")}.
+A glycan structure vector is a vctrs vector with an additional S3 class
+\code{glyrepr_structure}.
 
 Each glycan structure must satisfy the following constraints:
 \subsection{Graph Structure Requirements}{
@@ -99,14 +98,9 @@ Glycan structure vectors can have names, which are preserved during operations.
 This is particularly useful when working with the \code{glymotif} package.
 }
 
-\section{As characters}{
-One side-effect of the current implementation is that you can treat a glycan structure vector
-as a pure character vector of IUPAC-condensed strings.
-In fact, \code{is.character()} returns \code{TRUE} for a glycan structure vector,
-and all \code{stringr} functions work directly on the vector.
-
-However, we still recommend using \code{as.character()} to explicitly convert to character when needed,
-to avoid confusion and ensure that the intended behavior is clear.
+\section{Character conversion}{
+A glycan structure vector is not a character vector. Use \code{as.character()} to
+explicitly convert it to IUPAC-condensed strings when needed.
 }
 
 \examples{
