@@ -258,6 +258,14 @@ test_that("as_glycan_structure.character handles mixed valid/invalid in vectors"
   expect_error(as_glycan_structure(all_invalid), "Could not parse")
 })
 
+test_that("as_glycan_structure.character rejects mixed mono types with NA", {
+  mixed_vector <- c("Glc(a1-", NA, "Hex(a1-")
+
+  expect_error(
+    as_glycan_structure(mixed_vector),
+    "All structures must have the same monosaccharide type"
+  )
+})
 
 test_that("as_glycan_structure.character handles extreme linkage cases", {
   # Maximum valid positions
