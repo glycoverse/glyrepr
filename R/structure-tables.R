@@ -10,12 +10,15 @@
 #' vector. Duplicate structures are expanded to their original vector positions.
 #' Missing structures have no node or edge rows and are reconstructed from
 #' missing values in `anomers`.
+#' If `x` is named, the node and edge tibbles also contain a `glycan_name`
+#' column. `structure_from_tibbles()` uses `glycan_name` as output names when
+#' that column is present.
 #'
 #' @param x A glycan structure vector.
 #' @param nodes A data frame with columns `glycan_id`, `node_id`, `mono`, and
-#'   `sub`.
+#'   `sub`, and optionally `glycan_name`.
 #' @param edges A data frame with columns `glycan_id`, `edge_id`, `from_node`,
-#'   `to_node`, and `linkage`.
+#'   `to_node`, and `linkage`, and optionally `glycan_name`.
 #' @param anomers A character vector of reducing-end anomers, one per glycan.
 #'
 #' @returns
@@ -41,14 +44,23 @@ structure_nodes <- function(x) {
   checkmate::assert_class(x, "glyrepr_structure")
 
   graphs <- as.list(x)
+  glycan_names <- names(x)
+  has_glycan_names <- !is.null(glycan_names)
   if (length(graphs) == 0) {
-    return(empty_structure_nodes())
+    return(empty_structure_nodes(has_glycan_names))
   }
 
   node_tables <- purrr::map2(
     seq_along(graphs),
     graphs,
-    structure_nodes_one
+    function(glycan_id, graph) {
+      glycan_name <- if (has_glycan_names) {
+        glycan_names[[glycan_id]]
+      } else {
+        NULL
+      }
+      structure_nodes_one(glycan_id, graph, glycan_name)
+    }
   )
 
   dplyr::bind_rows(node_tables)
@@ -61,14 +73,23 @@ structure_edges <- function(x) {
   checkmate::assert_class(x, "glyrepr_structure")
 
   graphs <- as.list(x)
+  glycan_names <- names(x)
+  has_glycan_names <- !is.null(glycan_names)
   if (length(graphs) == 0) {
-    return(empty_structure_edges())
+    return(empty_structure_edges(has_glycan_names))
   }
 
   edge_tables <- purrr::map2(
     seq_along(graphs),
     graphs,
-    structure_edges_one
+    function(glycan_id, graph) {
+      glycan_name <- if (has_glycan_names) {
+        glycan_names[[glycan_id]]
+      } else {
+        NULL
+      }
+      structure_edges_one(glycan_id, graph, glycan_name)
+    }
   )
 
   dplyr::bind_rows(edge_tables)
@@ -92,6 +113,7 @@ structure_from_tibbles <- function(nodes, edges, anomers) {
     length(anomers),
     "edges"
   )
+  glycan_names <- structure_table_glycan_names(nodes, edges, anomers)
 
   if (length(anomers) == 0) {
     return(glycan_structure())
@@ -107,37 +129,59 @@ structure_from_tibbles <- function(nodes, edges, anomers) {
   })
 
   out <- do.call(glycan_structure, graphs)
-  names(out) <- names(anomers)
+  names(out) <- glycan_names
   out
 }
 
 
 #' Create an empty structure node tibble
 #'
+#' @param has_glycan_name Whether to include a `glycan_name` column.
 #' @returns A zero-row tibble with the `structure_nodes()` columns.
 #' @noRd
-empty_structure_nodes <- function() {
-  tibble::tibble(
+empty_structure_nodes <- function(has_glycan_name = FALSE) {
+  out <- tibble::tibble(
     glycan_id = integer(),
     node_id = integer(),
     mono = character(),
     sub = character()
   )
+
+  if (has_glycan_name) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = character(),
+      .after = "glycan_id"
+    )
+  }
+
+  out
 }
 
 
 #' Create an empty structure edge tibble
 #'
+#' @param has_glycan_name Whether to include a `glycan_name` column.
 #' @returns A zero-row tibble with the `structure_edges()` columns.
 #' @noRd
-empty_structure_edges <- function() {
-  tibble::tibble(
+empty_structure_edges <- function(has_glycan_name = FALSE) {
+  out <- tibble::tibble(
     glycan_id = integer(),
     edge_id = integer(),
     from_node = integer(),
     to_node = integer(),
     linkage = character()
   )
+
+  if (has_glycan_name) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = character(),
+      .after = "glycan_id"
+    )
+  }
+
+  out
 }
 
 
@@ -145,20 +189,31 @@ empty_structure_edges <- function() {
 #'
 #' @param glycan_id Integer position of the glycan.
 #' @param graph An igraph object or `NULL` for a missing structure.
+#' @param glycan_name Optional glycan name.
 #' @returns A tibble with node rows for one glycan.
 #' @noRd
-structure_nodes_one <- function(glycan_id, graph) {
+structure_nodes_one <- function(glycan_id, graph, glycan_name = NULL) {
   if (is.null(graph)) {
-    return(empty_structure_nodes())
+    return(empty_structure_nodes(!is.null(glycan_name)))
   }
 
   node_count <- igraph::vcount(graph)
-  tibble::tibble(
+  out <- tibble::tibble(
     glycan_id = rep(as.integer(glycan_id), node_count),
     node_id = seq_len(node_count),
     mono = igraph::vertex_attr(graph, "mono"),
     sub = igraph::vertex_attr(graph, "sub")
   )
+
+  if (!is.null(glycan_name)) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = rep(glycan_name, node_count),
+      .after = "glycan_id"
+    )
+  }
+
+  out
 }
 
 
@@ -166,22 +221,33 @@ structure_nodes_one <- function(glycan_id, graph) {
 #'
 #' @param glycan_id Integer position of the glycan.
 #' @param graph An igraph object or `NULL` for a missing structure.
+#' @param glycan_name Optional glycan name.
 #' @returns A tibble with edge rows for one glycan.
 #' @noRd
-structure_edges_one <- function(glycan_id, graph) {
+structure_edges_one <- function(glycan_id, graph, glycan_name = NULL) {
   if (is.null(graph) || igraph::ecount(graph) == 0) {
-    return(empty_structure_edges())
+    return(empty_structure_edges(!is.null(glycan_name)))
   }
 
   edge_count <- igraph::ecount(graph)
   edge_ends <- igraph::ends(graph, igraph::E(graph), names = FALSE)
-  tibble::tibble(
+  out <- tibble::tibble(
     glycan_id = rep(as.integer(glycan_id), edge_count),
     edge_id = seq_len(edge_count),
     from_node = as.integer(edge_ends[, 1]),
     to_node = as.integer(edge_ends[, 2]),
     linkage = igraph::edge_attr(graph, "linkage")
   )
+
+  if (!is.null(glycan_name)) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = rep(glycan_name, edge_count),
+      .after = "glycan_id"
+    )
+  }
+
+  out
 }
 
 
@@ -192,12 +258,25 @@ structure_edges_one <- function(glycan_id, graph) {
 #' @noRd
 validate_structure_nodes_table <- function(nodes) {
   required_cols <- c("glycan_id", "node_id", "mono", "sub")
-  nodes <- validate_structure_table(nodes, required_cols, "nodes")
+  nodes <- validate_structure_table(
+    nodes,
+    required_cols,
+    "nodes",
+    optional_cols = "glycan_name"
+  )
 
   validate_integerish_structure_column(nodes, "glycan_id", "nodes")
   validate_integerish_structure_column(nodes, "node_id", "nodes")
   validate_character_structure_column(nodes, "mono", "nodes")
   validate_character_structure_column(nodes, "sub", "nodes")
+  if ("glycan_name" %in% names(nodes)) {
+    validate_character_structure_column(
+      nodes,
+      "glycan_name",
+      "nodes",
+      any.missing = TRUE
+    )
+  }
 
   nodes$glycan_id <- as.integer(nodes$glycan_id)
   nodes$node_id <- as.integer(nodes$node_id)
@@ -212,13 +291,26 @@ validate_structure_nodes_table <- function(nodes) {
 #' @noRd
 validate_structure_edges_table <- function(edges) {
   required_cols <- c("glycan_id", "edge_id", "from_node", "to_node", "linkage")
-  edges <- validate_structure_table(edges, required_cols, "edges")
+  edges <- validate_structure_table(
+    edges,
+    required_cols,
+    "edges",
+    optional_cols = "glycan_name"
+  )
 
   validate_integerish_structure_column(edges, "glycan_id", "edges")
   validate_integerish_structure_column(edges, "edge_id", "edges")
   validate_integerish_structure_column(edges, "from_node", "edges")
   validate_integerish_structure_column(edges, "to_node", "edges")
   validate_character_structure_column(edges, "linkage", "edges")
+  if ("glycan_name" %in% names(edges)) {
+    validate_character_structure_column(
+      edges,
+      "glycan_name",
+      "edges",
+      any.missing = TRUE
+    )
+  }
 
   edges$glycan_id <- as.integer(edges$glycan_id)
   edges$edge_id <- as.integer(edges$edge_id)
@@ -233,9 +325,15 @@ validate_structure_edges_table <- function(edges) {
 #' @param table A candidate graph table.
 #' @param required_cols Required column names.
 #' @param arg_name User-facing argument name.
+#' @param optional_cols Optional column names to keep.
 #' @returns A tibble with required columns.
 #' @noRd
-validate_structure_table <- function(table, required_cols, arg_name) {
+validate_structure_table <- function(
+  table,
+  required_cols,
+  arg_name,
+  optional_cols = character()
+) {
   if (!is.data.frame(table)) {
     cli::cli_abort("{.arg {arg_name}} must be a data frame.")
   }
@@ -248,7 +346,13 @@ validate_structure_table <- function(table, required_cols, arg_name) {
     ))
   }
 
-  tibble::as_tibble(table[required_cols])
+  selected_cols <- c(
+    required_cols[[1]],
+    intersect(optional_cols, names(table)),
+    required_cols[-1]
+  )
+
+  tibble::as_tibble(table[selected_cols])
 }
 
 
@@ -281,16 +385,103 @@ validate_integerish_structure_column <- function(table, column, arg_name) {
 #' @param table A graph table.
 #' @param column Column name.
 #' @param arg_name User-facing argument name.
+#' @param any.missing Whether missing values are allowed.
 #' @returns Invisible `NULL`.
 #' @noRd
-validate_character_structure_column <- function(table, column, arg_name) {
-  if (!checkmate::test_character(table[[column]], any.missing = FALSE)) {
+validate_character_structure_column <- function(
+  table,
+  column,
+  arg_name,
+  any.missing = FALSE
+) {
+  if (!checkmate::test_character(table[[column]], any.missing = any.missing)) {
     cli::cli_abort(
       "{.arg {arg_name}} column {.field {column}} must contain character values."
     )
   }
 
   invisible(NULL)
+}
+
+
+#' Derive output names from graph tables or anomers
+#'
+#' @param nodes A validated node table.
+#' @param edges A validated edge table.
+#' @param anomers A validated anomer vector.
+#' @returns A character vector of names, or `NULL`.
+#' @noRd
+structure_table_glycan_names <- function(nodes, edges, anomers) {
+  table_names <- structure_table_glycan_names_from_rows(nodes, edges, anomers)
+  if (is.null(table_names)) {
+    return(names(anomers))
+  }
+
+  out_names <- names(anomers)
+  if (is.null(out_names)) {
+    out_names <- rep("", length(anomers))
+  }
+
+  has_table_name <- !is.na(table_names)
+  out_names[has_table_name] <- table_names[has_table_name]
+  out_names
+}
+
+
+#' Derive glycan names from node and edge rows
+#'
+#' @param nodes A validated node table.
+#' @param edges A validated edge table.
+#' @param anomers A validated anomer vector.
+#' @returns A character vector with `NA` where no table name is available, or
+#'   `NULL` when neither table contains `glycan_name`.
+#' @noRd
+structure_table_glycan_names_from_rows <- function(nodes, edges, anomers) {
+  name_rows <- dplyr::bind_rows(
+    structure_table_name_rows(nodes),
+    structure_table_name_rows(edges)
+  )
+
+  if (nrow(name_rows) == 0) {
+    return(NULL)
+  }
+
+  table_names <- rep(NA_character_, length(anomers))
+  for (glycan_id in unique(name_rows$glycan_id)) {
+    glycan_names <- unique(name_rows$glycan_name[
+      name_rows$glycan_id == glycan_id
+    ])
+    glycan_names <- glycan_names[!is.na(glycan_names)]
+
+    if (length(glycan_names) > 1) {
+      cli::cli_abort(
+        "Glycan {.val {glycan_id}} has multiple {.field glycan_name} values."
+      )
+    }
+
+    if (length(glycan_names) == 1) {
+      table_names[[glycan_id]] <- glycan_names[[1]]
+    }
+  }
+
+  table_names
+}
+
+
+#' Extract glycan-name rows from a graph table
+#'
+#' @param table A validated graph table.
+#' @returns A tibble with `glycan_id` and `glycan_name`.
+#' @noRd
+structure_table_name_rows <- function(table) {
+  if (!"glycan_name" %in% names(table)) {
+    return(tibble::tibble(
+      glycan_id = integer(),
+      glycan_name = character()
+    ))
+  }
+
+  unique(table[c("glycan_id", "glycan_name")])
 }
 
 

@@ -17,10 +17,10 @@ structure_from_tibbles(nodes, edges, anomers)
 \item{x}{A glycan structure vector.}
 
 \item{nodes}{A data frame with columns \code{glycan_id}, \code{node_id}, \code{mono}, and
-\code{sub}.}
+\code{sub}, and optionally \code{glycan_name}.}
 
 \item{edges}{A data frame with columns \code{glycan_id}, \code{edge_id}, \code{from_node},
-\code{to_node}, and \code{linkage}.}
+\code{to_node}, and \code{linkage}, and optionally \code{glycan_name}.}
 
 \item{anomers}{A character vector of reducing-end anomers, one per glycan.}
 }
@@ -43,6 +43,9 @@ The \code{glycan_id} column is the integer position of each glycan in the input
 vector. Duplicate structures are expanded to their original vector positions.
 Missing structures have no node or edge rows and are reconstructed from
 missing values in \code{anomers}.
+If \code{x} is named, the node and edge tibbles also contain a \code{glycan_name}
+column. \code{structure_from_tibbles()} uses \code{glycan_name} as output names when
+that column is present.
 }
 \examples{
 glycans <- c(o_glycan_core_1(), o_glycan_core_1())

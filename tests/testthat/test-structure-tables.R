@@ -34,6 +34,45 @@ test_that("structure_edges expands duplicated structures", {
   expect_equal(edges$linkage, c("b1-3", "b1-3"))
 })
 
+test_that("structure_nodes includes glycan_name for named structures", {
+  glycans <- c(
+    first = o_glycan_core_1(),
+    missing = NA,
+    second = o_glycan_core_1()
+  )
+
+  nodes <- structure_nodes(glycans)
+
+  expect_named(nodes, c("glycan_id", "glycan_name", "node_id", "mono", "sub"))
+  expect_equal(nodes$glycan_id, c(1L, 1L, 3L, 3L))
+  expect_equal(nodes$glycan_name, c("first", "first", "second", "second"))
+  expect_equal(nodes$node_id, c(1L, 2L, 1L, 2L))
+})
+
+test_that("structure_edges includes glycan_name for named structures", {
+  glycans <- c(
+    first = o_glycan_core_1(),
+    missing = NA,
+    second = o_glycan_core_1()
+  )
+
+  edges <- structure_edges(glycans)
+
+  expect_named(
+    edges,
+    c(
+      "glycan_id",
+      "glycan_name",
+      "edge_id",
+      "from_node",
+      "to_node",
+      "linkage"
+    )
+  )
+  expect_equal(edges$glycan_id, c(1L, 3L))
+  expect_equal(edges$glycan_name, c("first", "second"))
+})
+
 test_that("structure_from_tibbles recreates structure vectors", {
   glycans <- c(o_glycan_core_1(), n_glycan_core())
   nodes <- structure_nodes(glycans)
@@ -44,6 +83,37 @@ test_that("structure_from_tibbles recreates structure vectors", {
 
   expect_s3_class(rebuilt, "glyrepr_structure")
   expect_equal(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
+})
+
+test_that("structure_from_tibbles restores names from glycan_name", {
+  glycans <- c(first = o_glycan_core_1(), second = n_glycan_core())
+  nodes <- structure_nodes(glycans)
+  edges <- structure_edges(glycans)
+  anomers <- unname(get_anomer(glycans))
+
+  rebuilt <- structure_from_tibbles(nodes, edges, anomers)
+
+  expect_equal(names(rebuilt), c("first", "second"))
+  expect_equal(
+    unname(structure_to_iupac(rebuilt)),
+    unname(structure_to_iupac(glycans))
+  )
+})
+
+test_that("structure_from_tibbles preserves named missing positions", {
+  glycans <- c(
+    first = o_glycan_core_1(),
+    missing = NA,
+    second = o_glycan_core_1()
+  )
+  nodes <- structure_nodes(glycans)
+  edges <- structure_edges(glycans)
+  anomers <- get_anomer(glycans)
+
+  rebuilt <- structure_from_tibbles(nodes, edges, anomers)
+
+  expect_equal(names(rebuilt), names(glycans))
+  expect_equal(is.na(rebuilt), is.na(glycans))
 })
 
 test_that("structure_from_tibbles handles single-node and reordered rows", {
