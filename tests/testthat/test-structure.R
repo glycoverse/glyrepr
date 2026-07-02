@@ -1246,6 +1246,16 @@ test_that("names are preserved after subsetting with [", {
   expect_equal(names(subset_reverse), c("B", "A"))
 })
 
+test_that("names are preserved after character subsetting with [", {
+  glycans <- c(valid = o_glycan_core_1(), missing = glycan_structure(NA))
+
+  subset <- glycans["valid"]
+
+  expect_false(is.na(subset))
+  expect_equal(names(subset), "valid")
+  expect_equal(as.character(subset), c(valid = "Gal(b1-3)GalNAc(a1-"))
+})
+
 test_that("names are preserved after subsetting with logical index", {
   glycans <- c(o_glycan_core_1(), n_glycan_core(), o_glycan_core_1())
   names(glycans) <- c("A", "B", "C")

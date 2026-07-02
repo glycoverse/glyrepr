@@ -815,7 +815,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 
   nms <- names(x)
   if (!is.null(nms)) {
-    names(out) <- nms[i]
+    names(out) <- names(iupacs)
   }
 
   out
