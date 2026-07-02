@@ -16,7 +16,6 @@ License: MIT + file LICENSE
 Suggests: 
     testthat (>= 3.0.0),
     patrick,
-    tibble,
     knitr,
     rmarkdown,
     tictoc,
@@ -39,6 +38,7 @@ Imports:
     rlang,
     rstackdeque,
     stringr,
+    tibble,
     vctrs (>= 0.6.5)
 VignetteBuilder: knitr
 BugReports: https://github.com/glycoverse/glyrepr/issues

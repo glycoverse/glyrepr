@@ -14,6 +14,7 @@ reference:
   - glycan_structure
   - as_glycan_structure
   - is_glycan_structure
+  - structure_from_tibbles
 - title: "Glycan Composition and Structure Inspection"
   contents:
   - count_mono
@@ -21,6 +22,8 @@ reference:
   - get_mono_type
   - get_structure_graphs
   - has_linkages
+  - structure_nodes
+  - structure_edges
   - structure_to_iupac
   - get_structure_level
 - title: "Glycan Composition and Structure Manipulation"
