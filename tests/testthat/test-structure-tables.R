@@ -130,6 +130,24 @@ test_that("structure_from_tibbles handles single-node and reordered rows", {
   expect_equal(structure_to_iupac(rebuilt), structure_to_iupac(glycan))
 })
 
+test_that("structure_from_tibbles is insensitive to node and edge row order", {
+  glycans <- c(
+    first = n_glycan_core(),
+    second = o_glycan_core_1(),
+    third = n_glycan_core()
+  )
+  nodes <- structure_nodes(glycans)
+  edges <- structure_edges(glycans)
+
+  nodes <- nodes[order(nodes$node_id, nodes$glycan_id, decreasing = TRUE), ]
+  edges <- edges[order(edges$edge_id, edges$glycan_id, decreasing = TRUE), ]
+
+  rebuilt <- structure_from_tibbles(nodes, edges, get_anomer(glycans))
+
+  expect_equal(names(rebuilt), names(glycans))
+  expect_equal(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
+})
+
 test_that("structure table round trip preserves missing positions", {
   glycans <- c(o_glycan_core_1(), glycan_structure(NA), o_glycan_core_1())
   nodes <- structure_nodes(glycans)
