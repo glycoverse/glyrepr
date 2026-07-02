@@ -18,6 +18,13 @@ test_that("glycan_structure works", {
   expect_s3_class(glycan, c("glyrepr_structure"))
 })
 
+test_that("glycan_structure is not a character vector", {
+  glycan <- n_glycan_core()
+
+  expect_false(is.character(glycan))
+  expect_equal(vctrs::vec_data(glycan), structure_to_iupac(glycan))
+})
+
 
 test_that("glycan_structure fails for invalid graphs", {
   bad_graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 3 - +1)
