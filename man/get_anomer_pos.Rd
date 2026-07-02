@@ -7,15 +7,16 @@
 get_anomer_pos(mono)
 }
 \arguments{
-\item{mono}{A character vector of concrete monosaccharide names.}
+\item{mono}{A character vector of monosaccharide names.}
 }
 \value{
 An integer vector of anomer positions.
 }
 \description{
-This function returns the anomer position for concrete monosaccharide names.
+This function returns the anomer position for concrete or generic
+monosaccharide names.
 }
 \examples{
-get_anomer_pos(c("Gal", "Neu5Ac"))
+get_anomer_pos(c("Gal", "Hex", "Neu5Ac"))
 
 }

@@ -44,6 +44,20 @@ test_that("get_anomer_pos returns anomer positions for concrete monosaccharides"
 })
 
 
+test_that("get_anomer_pos returns anomer positions for generic monosaccharides", {
+  monos <- c("Hex", "HexNAc", "NeuAc", "gKdo")
+
+  expect_equal(get_anomer_pos(monos), c(1L, 1L, 2L, 2L))
+})
+
+
+test_that("get_anomer_pos supports mixed generic and concrete monosaccharides", {
+  monos <- c("Gal", "Hex", "Neu5Ac", "NeuAc")
+
+  expect_equal(get_anomer_pos(monos), c(1L, 1L, 2L, 2L))
+})
+
+
 test_that("get_anomer_pos preserves names", {
   monos <- c(a = "Gal", b = "Neu5Ac")
 
@@ -51,9 +65,9 @@ test_that("get_anomer_pos preserves names", {
 })
 
 
-test_that("get_anomer_pos rejects non-concrete monosaccharides", {
+test_that("get_anomer_pos rejects unknown monosaccharides", {
   expect_error(
-    get_anomer_pos(c("Hex", "X")),
-    regexp = "concrete monosaccharide"
+    get_anomer_pos("X"),
+    regexp = "known monosaccharide"
   )
 })
