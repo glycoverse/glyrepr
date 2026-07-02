@@ -141,25 +141,13 @@
 
 # Tokenize IUPAC condensed string
 .tokenize_iupac <- function(iupac) {
-  # anomer is either "a", "b", or "?".
-  anomer_p <- "[ab\\?]"
-
-  # pos1 is either "1", "2", or "?".
-  pos1_p <- "([12\\?])"
-
-  # pos2 is "1"-"9" (followed by any number of "/1-9"), or "?"
-  pos2_p <- "([1-9](/[1-9])*|\\?)"
-
-  # Linkage pattern
-  linkage_pattern <- stringr::str_glue("{anomer_p}{pos1_p}-{pos2_p}")
-
   # Monosaccharide name pattern (including potential substituents)
   # Allow known names that start with digits, e.g. "6dGul" and "4eLeg".
   # Allow letters, digits, and ? for substituents like "Man?S", "Glc3Me6S", etc.
   # Substituents are directly concatenated in IUPAC format, no commas
   mono_pattern <- "([A-Za-z]|[0-9][A-Za-z])[A-Za-z0-9\\?]*"
   mono_linkage_pattern <- stringr::str_glue(
-    "{mono_pattern}(\\({linkage_pattern}\\))?"
+    "{mono_pattern}(\\({linkage_pattern(anchored = FALSE)}\\))?"
   )
 
   # The pattern is either a monosaccharide name or a bracket
@@ -197,27 +185,11 @@
   linkage <- stringr::str_sub(token, left_bracket_pos + 1, -2)
 
   # Validate linkage format
-  if (!.validate_linkage(linkage)) {
+  if (!valid_linkages(linkage)) {
     cli::cli_abort(paste0("Invalid linkage format: ", linkage))
   }
 
   c(mono = mono, sub = sub, linkage = linkage)
-}
-
-# Validate linkage format
-.validate_linkage <- function(linkage) {
-  # Empty linkage
-  if (nchar(linkage) == 0) {
-    return(FALSE)
-  }
-
-  # Pattern for valid linkage: anomer + pos1 + - + pos2
-  # anomer: a, b, or ?
-  # pos1: 1, 2, or ?
-  # pos2: 1-9 (optionally followed by /1-9 patterns), or ?
-  valid_pattern <- "^[ab\\?][12\\?]-([1-9](/[1-9])*|\\?)$"
-
-  return(stringr::str_detect(linkage, valid_pattern))
 }
 
 # Extract substituent from monosaccharide name
@@ -280,32 +252,12 @@
       clean_mono <- stringr::str_remove(clean_mono, stringr::fixed(sub))
     }
 
-    # Sort substituents by position
-    sub_string <- .sort_substituents(all_subs)
+    sub_string <- collapse_substituent_tokens(all_subs)
 
     c(mono = clean_mono, sub = sub_string)
   } else {
     c(mono = mono, sub = "")
   }
-}
-
-# Helper function to sort substituents by position
-.sort_substituents <- function(subs) {
-  if (length(subs) == 0) {
-    return("")
-  }
-
-  # Extract positions for sorting
-  positions <- purrr::map_chr(subs, ~ stringr::str_extract(.x, "^[1-9\\?]"))
-  numeric_positions <- purrr::map_dbl(positions, function(pos) {
-    if (pos == "?") Inf else as.numeric(pos)
-  })
-
-  # Sort substituents by position
-  sorted_indices <- order(numeric_positions)
-  sorted_subs <- subs[sorted_indices]
-
-  stringr::str_c(sorted_subs, collapse = ",")
 }
 
 # Handle all Neu variants containing 5Ac
@@ -336,7 +288,7 @@
 
   # Sort substituents by position
   sub_string <- if (length(all_subs) > 0) {
-    .sort_substituents(all_subs)
+    collapse_substituent_tokens(all_subs)
   } else {
     ""
   }

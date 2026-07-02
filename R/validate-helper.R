@@ -79,21 +79,8 @@ valid_substituent <- function(sub) {
       return(FALSE)
     }
 
-    # Check if substituents are properly sorted by position
-    # Extract positions from individual substituents
-    positions <- purrr::map_chr(
-      individual_subs,
-      ~ stringr::str_extract(.x, "^[\\d\\?]")
-    )
-
-    # For sorting, convert ? to a high numeric value
-    numeric_positions <- purrr::map_dbl(positions, function(pos) {
-      if (pos == "?") {
-        return(Inf)
-      } else {
-        return(as.numeric(pos))
-      }
-    })
+    positions <- substituent_position_tokens(individual_subs)
+    numeric_positions <- substituent_position_values(individual_subs)
 
     # Check if positions are sorted in ascending order
     is_sorted <- all(numeric_positions == sort(numeric_positions))
@@ -109,6 +96,31 @@ valid_substituent <- function(sub) {
 # Is a valid anomer?
 valid_anomer <- function(anomer) {
   stringr::str_detect(anomer, "^[ab\\?][\\d\\?]$")
+}
+
+
+#' Build a Linkage Regex Pattern
+#'
+#' Creates the shared regex pattern for glycosidic linkages.
+#'
+#' @param anchored Whether to anchor the pattern at the start and end.
+#'
+#' @returns A regex pattern string.
+#'
+#' @noRd
+linkage_pattern <- function(anchored = TRUE) {
+  checkmate::assert_flag(anchored)
+
+  anomer_p <- "[ab\\?]"
+  pos1_p <- "([12]|\\?)"
+  pos2_p <- "([1-9](/[1-9])*|\\?)"
+  pattern <- stringr::str_glue("{anomer_p}{pos1_p}-{pos2_p}")
+
+  if (anchored) {
+    pattern <- stringr::str_glue("^{pattern}$")
+  }
+
+  pattern
 }
 
 
@@ -136,11 +148,7 @@ valid_anomer <- function(anomer) {
 #' @export
 valid_linkages <- function(linkages) {
   checkmate::assert_character(linkages)
-  anomer_p <- "[ab\\?]"
-  pos1_p <- "([12]|\\?)"
-  pos2_p <- "([1-9](/[1-9])*|\\?)"
-  linkage_pattern <- stringr::str_glue("^{anomer_p}{pos1_p}-{pos2_p}$")
-  stringr::str_detect(linkages, linkage_pattern)
+  stringr::str_detect(linkages, linkage_pattern())
 }
 
 

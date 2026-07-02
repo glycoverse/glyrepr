@@ -23,3 +23,17 @@ patrick::with_parameters_test_that(
   },
   char = c("1-4", "c1-4", "a3-1", "a1-10", "b1", "abc", "")
 )
+
+
+test_that("linkage pattern helper matches valid linkage grammar", {
+  pattern <- linkage_pattern()
+
+  expect_true(all(stringr::str_detect(
+    c("a1-2", "?1-4", "a?-?", "a2-3/6"),
+    pattern
+  )))
+  expect_false(any(stringr::str_detect(
+    c("1-4", "c1-4", "a3-1", "a1-10"),
+    pattern
+  )))
+})

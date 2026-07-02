@@ -43,6 +43,15 @@ test_that("normalize_substituents input validation", {
   expect_error(normalize_substituents(123))
 })
 
+test_that("substituent position helpers parse and sort positions consistently", {
+  subs <- c("6S", "?Ac", "3Me")
+
+  expect_equal(substituent_position_tokens(subs), c("6", "?", "3"))
+  expect_equal(substituent_position_values(subs), c(6, Inf, 3))
+  expect_equal(sort_substituent_tokens(subs), c("3Me", "6S", "?Ac"))
+  expect_equal(collapse_substituent_tokens(subs), "3Me,6S,?Ac")
+})
+
 test_that("remove_substituents works on glycan structures", {
   # Create a test glycan with substituents
   graph <- igraph::make_graph(~ 1 - +2)
