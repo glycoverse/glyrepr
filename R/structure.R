@@ -674,19 +674,24 @@ glycan_structure_from_iupac_character <- function(x) {
   unique_x <- unique(non_na_x)
 
   graphs <- purrr::map(unique_x, .parse_iupac_condensed_single)
+  canonical <- canonicalize_and_validate_iupac_graphs(graphs)
 
-  if (any(na_mask)) {
-    unique_iupacs <- purrr::map_chr(graphs, .structure_to_iupac_single)
-    unique_indices <- which(!duplicated(unique_iupacs))
-    unique_graphs <- graphs[unique_indices]
-    names(unique_graphs) <- unique_iupacs[unique_indices]
+  result_iupacs <- rep(NA_character_, length(x))
+  result_iupacs[!na_mask] <- canonical$iupacs[match(non_na_x, unique_x)]
 
-    result_iupacs <- rep(NA_character_, length(x))
-    result_iupacs[!na_mask] <- unique_iupacs[match(non_na_x, unique_x)]
+  new_glycan_structure(result_iupacs, canonical$graphs)
+}
 
-    return(new_glycan_structure(result_iupacs, unique_graphs))
-  }
-
+#' Canonicalize and validate parsed IUPAC-condensed graphs
+#'
+#' Validates each parsed graph, reorders vertices and edges to the canonical
+#' IUPAC-condensed order, validates vector-level monosaccharide-type
+#' consistency, and deduplicates graph storage by canonical IUPAC string.
+#'
+#' @param graphs A list of parsed igraph graph objects.
+#' @returns A list with canonical `iupacs` and unique named `graphs`.
+#' @noRd
+canonicalize_and_validate_iupac_graphs <- function(graphs) {
   graphs <- purrr::map(graphs, function(graph) {
     graph %>%
       validate_single_glycan_structure() %>%
@@ -697,15 +702,15 @@ glycan_structure_from_iupac_character <- function(x) {
   graphs <- reordered_result$graphs
   validate_glycan_structure_vector(graphs)
 
-  unique_iupacs <- purrr::map_chr(graphs, .structure_to_iupac_single)
-  unique_indices <- which(!duplicated(unique_iupacs))
+  iupacs <- purrr::map_chr(graphs, .structure_to_iupac_single)
+  unique_indices <- which(!duplicated(iupacs))
   unique_graphs <- graphs[unique_indices]
-  names(unique_graphs) <- unique_iupacs[unique_indices]
+  names(unique_graphs) <- iupacs[unique_indices]
 
-  result_iupacs <- rep(NA_character_, length(x))
-  result_iupacs[!na_mask] <- unique_iupacs[match(non_na_x, unique_x)]
-
-  new_glycan_structure(result_iupacs, unique_graphs)
+  list(
+    iupacs = iupacs,
+    graphs = unique_graphs
+  )
 }
 
 #' @export

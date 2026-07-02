@@ -8,6 +8,7 @@
 
 ## Minor improvements and bug fixes
 
+* Fix `as_glycan_structure()` so character vectors containing `NA` reject mixed concrete and generic structures consistently. (#58)
 * Fix `as_glycan_structure()` parsing for monosaccharide names that start with digits, such as `6dGul` and `4eLeg`. (#55)
 * Fix `as_glycan_structure()` parsing for substituent names such as `Pyr`, `PC`, `PPEtn`, and `PEtn` that share the `P` prefix. (#53)
 * Ambiguous linkages like `a2-3/6` are also regarded as unknown for `has_linkage()` and `get_structure_level()`. (#51)
