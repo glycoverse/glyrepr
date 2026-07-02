@@ -55,6 +55,26 @@ test_that("as_glycan_structure.character handles Neu5Ac correctly", {
   expect_equal(igraph::V(graph)$sub, "9Ac")
 })
 
+test_that("as_glycan_structure.character parses digit-leading monosaccharides", {
+  monos <- available_monosaccharides("concrete")
+  monos <- monos[stringr::str_detect(monos, "^[0-9]")]
+  iupacs <- paste0(monos, "(?", get_anomer_pos(monos), "-")
+
+  glycans <- as_glycan_structure(iupacs)
+  graphs <- get_structure_graphs(glycans)
+
+  expect_equal(purrr::map_chr(graphs, ~ igraph::V(.x)$mono), monos)
+  expect_equal(
+    purrr::map_chr(graphs, ~ igraph::V(.x)$sub),
+    rep("", length(monos))
+  )
+  expect_equal(structure_to_iupac(glycans), iupacs)
+  expect_equal(
+    structure_to_iupac(as_glycan_structure("6dGul(b1-")),
+    "6dGul(b1-"
+  )
+})
+
 
 test_that("as_glycan_structure.character handles unknown linkages", {
   # Unknown linkages

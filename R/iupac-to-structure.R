@@ -154,9 +154,10 @@
   linkage_pattern <- stringr::str_glue("{anomer_p}{pos1_p}-{pos2_p}")
 
   # Monosaccharide name pattern (including potential substituents)
+  # Allow known names that start with digits, e.g. "6dGul" and "4eLeg".
   # Allow letters, digits, and ? for substituents like "Man?S", "Glc3Me6S", etc.
   # Substituents are directly concatenated in IUPAC format, no commas
-  mono_pattern <- "[A-Za-z][A-Za-z0-9\\?]*"
+  mono_pattern <- "([A-Za-z]|[0-9][A-Za-z])[A-Za-z0-9\\?]*"
   mono_linkage_pattern <- stringr::str_glue(
     "{mono_pattern}(\\({linkage_pattern}\\))?"
   )
