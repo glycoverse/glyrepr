@@ -1,5 +1,9 @@
 # glyrepr (development version)
 
+## Breaking changes
+
+* Remove the `.parallel` argument from `smap()`, `smap2()`, `spmap()`, and their variants, and drop the unused `furrr` and `future` dependencies. (#62)
+
 ## New features
 
 * Add `structure_nodes()`, `structure_edges()`, and `structure_from_tibbles()` for converting glycan structures to and from graph-table tibbles. (#60)
@@ -10,7 +14,6 @@
 
 ## Minor improvements and bug fixes
 
-* Remove the `.parallel` argument from `smap()`, `smap2()`, `spmap()`, and their variants, and drop the unused `furrr` and `future` dependencies. (#62)
 * `glyrepr_structure` objects no longer return `TRUE` from `is.character()`. Use `as.character()` for explicit IUPAC-condensed string conversion. (#59)
 * Fix `as_glycan_structure()` so character vectors containing `NA` reject mixed concrete and generic structures consistently. (#58)
 * Fix `as_glycan_structure()` parsing for monosaccharide names that start with digits, such as `6dGul` and `4eLeg`. (#55)
