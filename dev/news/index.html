@@ -41,6 +41,10 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
 <div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>Remove the <code>.parallel</code> argument from <code><a href="../reference/smap.html">smap()</a></code>, <code><a href="../reference/smap2.html">smap2()</a></code>, <code><a href="../reference/spmap.html">spmap()</a></code>, and their variants, and drop the unused <code>furrr</code> and <code>future</code> dependencies. (<a href="https://github.com/glycoverse/glyrepr/issues/62" class="external-link">#62</a>)</li>
+</ul></div>
+<div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>Add <code><a href="../reference/structure_tables.html">structure_nodes()</a></code>, <code><a href="../reference/structure_tables.html">structure_edges()</a></code>, and <code><a href="../reference/structure_tables.html">structure_from_tibbles()</a></code> for converting glycan structures to and from graph-table tibbles. (<a href="https://github.com/glycoverse/glyrepr/issues/60" class="external-link">#60</a>)</li>
 <li>Rename <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> to <code><a href="../reference/infer_anomer_pos.html">infer_anomer_pos()</a></code> to better describe that the position is inferred from a monosaccharide name; <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> remains available as a backward-compatible alias. (<a href="https://github.com/glycoverse/glyrepr/issues/61" class="external-link">#61</a>)</li>

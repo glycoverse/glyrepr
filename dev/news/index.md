@@ -2,6 +2,16 @@
 
 ## glyrepr (development version)
 
+### Breaking changes
+
+- Remove the `.parallel` argument from
+  [`smap()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md),
+  [`smap2()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md),
+  [`spmap()`](https://glycoverse.github.io/glyrepr/dev/reference/spmap.md),
+  and their variants, and drop the unused `furrr` and `future`
+  dependencies.
+  ([\#62](https://github.com/glycoverse/glyrepr/issues/62))
+
 ### New features
 
 - Add

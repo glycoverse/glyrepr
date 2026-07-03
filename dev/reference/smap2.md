@@ -8,19 +8,19 @@ functions, but optimized for glycan structure vectors.
 ## Usage
 
 ``` r
-smap2(.x, .y, .f, ..., .parallel = FALSE)
+smap2(.x, .y, .f, ...)
 
-smap2_vec(.x, .y, .f, ..., .ptype = NULL, .parallel = FALSE)
+smap2_vec(.x, .y, .f, ..., .ptype = NULL)
 
-smap2_lgl(.x, .y, .f, ..., .parallel = FALSE)
+smap2_lgl(.x, .y, .f, ...)
 
-smap2_int(.x, .y, .f, ..., .parallel = FALSE)
+smap2_int(.x, .y, .f, ...)
 
-smap2_dbl(.x, .y, .f, ..., .parallel = FALSE)
+smap2_dbl(.x, .y, .f, ...)
 
-smap2_chr(.x, .y, .f, ..., .parallel = FALSE)
+smap2_chr(.x, .y, .f, ...)
 
-smap2_structure(.x, .y, .f, ..., .parallel = FALSE)
+smap2_structure(.x, .y, .f, ...)
 ```
 
 ## Arguments
@@ -42,14 +42,6 @@ smap2_structure(.x, .y, .f, ..., .parallel = FALSE)
 - ...:
 
   Additional arguments passed to `.f`.
-
-- .parallel:
-
-  Logical; whether to use parallel processing. If `FALSE` (default),
-  parallel processing is disabled. Set to `TRUE` to enable parallel
-  processing. See examples in
-  [`smap`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)
-  for how to set up and use parallel processing.
 
 - .ptype:
 

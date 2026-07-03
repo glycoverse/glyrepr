@@ -9,19 +9,19 @@ structure vectors.
 ## Usage
 
 ``` r
-spmap(.l, .f, ..., .parallel = FALSE)
+spmap(.l, .f, ...)
 
-spmap_vec(.l, .f, ..., .ptype = NULL, .parallel = FALSE)
+spmap_vec(.l, .f, ..., .ptype = NULL)
 
-spmap_lgl(.l, .f, ..., .parallel = FALSE)
+spmap_lgl(.l, .f, ...)
 
-spmap_int(.l, .f, ..., .parallel = FALSE)
+spmap_int(.l, .f, ...)
 
-spmap_dbl(.l, .f, ..., .parallel = FALSE)
+spmap_dbl(.l, .f, ...)
 
-spmap_chr(.l, .f, ..., .parallel = FALSE)
+spmap_chr(.l, .f, ...)
 
-spmap_structure(.l, .f, ..., .parallel = FALSE)
+spmap_structure(.l, .f, ...)
 ```
 
 ## Arguments
@@ -42,14 +42,6 @@ spmap_structure(.l, .f, ..., .parallel = FALSE)
 - ...:
 
   Additional arguments passed to `.f`.
-
-- .parallel:
-
-  Logical; whether to use parallel processing. If `FALSE` (default),
-  parallel processing is disabled. Set to `TRUE` to enable parallel
-  processing. See examples in
-  [`smap`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)
-  for how to set up and use parallel processing.
 
 - .ptype:
 
