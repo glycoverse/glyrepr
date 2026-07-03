@@ -1,5 +1,9 @@
 # glyrepr (development version)
 
+## Breaking changes
+
+* Remove the `.parallel` argument from `smap()`, `smap2()`, `spmap()`, and their variants, and drop the unused `furrr` and `future` dependencies. (#62)
+
 ## New features
 
 * Add `structure_nodes()`, `structure_edges()`, and `structure_from_tibbles()` for converting glycan structures to and from graph-table tibbles. (#60)

@@ -10,19 +10,19 @@
 \alias{smap_structure}
 \title{Map Functions Over Glycan Structure Vectors}
 \usage{
-smap(.x, .f, ..., .parallel = FALSE)
+smap(.x, .f, ...)
 
-smap_vec(.x, .f, ..., .ptype = NULL, .parallel = FALSE)
+smap_vec(.x, .f, ..., .ptype = NULL)
 
-smap_lgl(.x, .f, ..., .parallel = FALSE)
+smap_lgl(.x, .f, ...)
 
-smap_int(.x, .f, ..., .parallel = FALSE)
+smap_int(.x, .f, ...)
 
-smap_dbl(.x, .f, ..., .parallel = FALSE)
+smap_dbl(.x, .f, ...)
 
-smap_chr(.x, .f, ..., .parallel = FALSE)
+smap_chr(.x, .f, ...)
 
-smap_structure(.x, .f, ..., .parallel = FALSE)
+smap_structure(.x, .f, ...)
 }
 \arguments{
 \item{.x}{A glycan structure vector (glyrepr_structure).}
@@ -31,9 +31,6 @@ smap_structure(.x, .f, ..., .parallel = FALSE)
 Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string naming a function.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
-
-\item{.parallel}{Logical; whether to use parallel processing. If \code{FALSE} (default),
-parallel processing is disabled. Set to \code{TRUE} to enable parallel processing.}
 
 \item{.ptype}{A prototype for the return type (for \code{smap_vec}).}
 }
