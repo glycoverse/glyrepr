@@ -28,8 +28,6 @@ Imports:
     checkmate,
     cli,
     dplyr (>= 1.2.0),
-    furrr,
-    future,
     glue,
     igraph,
     magrittr,

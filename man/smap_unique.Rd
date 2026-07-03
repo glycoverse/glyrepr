@@ -4,7 +4,7 @@
 \alias{smap_unique}
 \title{Apply Function to Unique Structures Only}
 \usage{
-smap_unique(.x, .f, ..., .parallel = FALSE)
+smap_unique(.x, .f, ...)
 }
 \arguments{
 \item{.x}{A glycan structure vector (glyrepr_structure).}
@@ -13,10 +13,6 @@ smap_unique(.x, .f, ..., .parallel = FALSE)
 Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string naming a function.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
-
-\item{.parallel}{Logical; whether to use parallel processing. If \code{FALSE} (default),
-parallel processing is disabled. Set to \code{TRUE} to enable parallel processing.
-See examples in \code{\link{smap}} for how to set up and use parallel processing.}
 }
 \value{
 A list with results for each unique structure, named by their hash codes.
