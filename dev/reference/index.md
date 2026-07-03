@@ -102,8 +102,9 @@
   : Get Available Monosaacharides
 - [`available_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/available_substituents.md)
   : Available Substituents
-- [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/get_anomer_pos.md)
-  : Get Anomer Positions
+- [`infer_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/infer_anomer_pos.md)
+  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/infer_anomer_pos.md)
+  : Infer Anomer Positions
 - [`is_known_monosaccharide()`](https://glycoverse.github.io/glyrepr/dev/reference/is_known_monosaccharide.md)
   : Check if a Monosaccharide is Known
 - [`possible_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/possible_linkages.md)

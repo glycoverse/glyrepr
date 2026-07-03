@@ -11,7 +11,16 @@
   [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   for converting glycan structures to and from graph-table tibbles.
   ([\#60](https://github.com/glycoverse/glyrepr/issues/60))
-- [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/get_anomer_pos.md)
+- Rename
+  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/infer_anomer_pos.md)
+  to
+  [`infer_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/infer_anomer_pos.md)
+  to better describe that the position is inferred from a monosaccharide
+  name;
+  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/infer_anomer_pos.md)
+  remains available as a backward-compatible alias.
+  ([\#61](https://github.com/glycoverse/glyrepr/issues/61))
+- [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/infer_anomer_pos.md)
   now accepts generic monosaccharide names such as `"Hex"`.
   ([\#57](https://github.com/glycoverse/glyrepr/issues/57))
 - Add `NGc` and `Gc` to the supported substituent list for N-glycolyl
@@ -64,7 +73,7 @@ CRAN release: 2026-05-14
 ### New features
 
 - Add
-  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/get_anomer_pos.md)
+  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/infer_anomer_pos.md)
   helper to get the anomer position of a monosaccharide.
 - Add
   [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md)

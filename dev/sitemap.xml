@@ -26,7 +26,6 @@
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/format_glycan_structure_subset.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_anomer.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_mono_color.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_structure_graphs.html</loc></url>
@@ -37,6 +36,7 @@
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/glyrepr-vctrs.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/has_linkages.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/index.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/infer_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/is_known_monosaccharide.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/n_glycan_core.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/possible_linkages.html</loc></url>

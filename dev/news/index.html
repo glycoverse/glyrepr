@@ -43,8 +43,9 @@
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>Add <code><a href="../reference/structure_tables.html">structure_nodes()</a></code>, <code><a href="../reference/structure_tables.html">structure_edges()</a></code>, and <code><a href="../reference/structure_tables.html">structure_from_tibbles()</a></code> for converting glycan structures to and from graph-table tibbles. (<a href="https://github.com/glycoverse/glyrepr/issues/60" class="external-link">#60</a>)</li>
+<li>Rename <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> to <code><a href="../reference/infer_anomer_pos.html">infer_anomer_pos()</a></code> to better describe that the position is inferred from a monosaccharide name; <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> remains available as a backward-compatible alias. (<a href="https://github.com/glycoverse/glyrepr/issues/61" class="external-link">#61</a>)</li>
 <li>
-<code><a href="../reference/get_anomer_pos.html">get_anomer_pos()</a></code> now accepts generic monosaccharide names such as <code>"Hex"</code>. (<a href="https://github.com/glycoverse/glyrepr/issues/57" class="external-link">#57</a>)</li>
+<code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> now accepts generic monosaccharide names such as <code>"Hex"</code>. (<a href="https://github.com/glycoverse/glyrepr/issues/57" class="external-link">#57</a>)</li>
 <li>Add <code>NGc</code> and <code>Gc</code> to the supported substituent list for N-glycolyl and glycolyl substituents. (<a href="https://github.com/glycoverse/glyrepr/issues/54" class="external-link">#54</a>)</li>
 <li>Add <code><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list()</a></code> support for <code>glyrepr_composition</code> and <code>glyrepr_structure</code> vectors. (<a href="https://github.com/glycoverse/glyrepr/issues/52" class="external-link">#52</a>)</li>
 </ul></div>
@@ -69,7 +70,7 @@
 <h2 class="pkg-version" data-toc-text="0.12.0" id="glyrepr-0120">glyrepr 0.12.0<a class="anchor" aria-label="anchor" href="#glyrepr-0120"></a></h2><p class="text-muted">CRAN release: 2026-05-14</p>
 <div class="section level3">
 <h3 id="new-features-0-12-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-12-0"></a></h3>
-<ul><li>Add <code><a href="../reference/get_anomer_pos.html">get_anomer_pos()</a></code> helper to get the anomer position of a monosaccharide.</li>
+<ul><li>Add <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> helper to get the anomer position of a monosaccharide.</li>
 <li>Add <code><a href="../reference/fill_anomer_pos.html">fill_anomer_pos()</a></code> function to fill the anomer position of a glycan structure with missing anomer information.</li>
 </ul></div>
 </div>
