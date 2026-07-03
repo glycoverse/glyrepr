@@ -58,7 +58,7 @@ test_that("as_glycan_structure.character handles Neu5Ac correctly", {
 test_that("as_glycan_structure.character parses digit-leading monosaccharides", {
   monos <- available_monosaccharides("concrete")
   monos <- monos[stringr::str_detect(monos, "^[0-9]")]
-  iupacs <- paste0(monos, "(?", get_anomer_pos(monos), "-")
+  iupacs <- paste0(monos, "(?", infer_anomer_pos(monos), "-")
 
   glycans <- as_glycan_structure(iupacs)
   graphs <- get_structure_graphs(glycans)

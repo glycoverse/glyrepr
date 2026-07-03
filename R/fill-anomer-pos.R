@@ -91,7 +91,7 @@ fill_anomer_pos <- function(strucs) {
 
   stringr::str_c(
     stringr::str_sub(anomer, 1, 1),
-    get_anomer_pos(mono),
+    infer_anomer_pos(mono),
     stringr::str_sub(anomer, 3)
   )
 }

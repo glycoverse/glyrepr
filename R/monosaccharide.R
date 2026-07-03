@@ -115,20 +115,22 @@ available_monosaccharides <- function(mono_type = "all") {
 }
 
 
-#' Get Anomer Positions
+#' Infer Anomer Positions
 #'
-#' This function returns the anomer position for concrete or generic
+#' This function infers the anomer position for concrete or generic
 #' monosaccharide names.
 #'
 #' @param mono A character vector of monosaccharide names.
 #'
 #' @returns An integer vector of anomer positions.
 #'
+#' @aliases get_anomer_pos
+#'
 #' @examples
-#' get_anomer_pos(c("Gal", "Hex", "Neu5Ac"))
+#' infer_anomer_pos(c("Gal", "Hex", "Neu5Ac"))
 #'
 #' @export
-get_anomer_pos <- function(mono) {
+infer_anomer_pos <- function(mono) {
   checkmate::assert_character(mono, any.missing = FALSE)
 
   mono_names <- c(monosaccharides$concrete, monosaccharides$generic)
@@ -146,6 +148,13 @@ get_anomer_pos <- function(mono) {
 
   names(anomer_pos) <- names(mono)
   anomer_pos
+}
+
+
+#' @rdname infer_anomer_pos
+#' @export
+get_anomer_pos <- function(mono) {
+  infer_anomer_pos(mono)
 }
 
 
