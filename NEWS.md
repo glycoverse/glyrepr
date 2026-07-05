@@ -1,4 +1,4 @@
-# glyrepr (development version)
+# glyrepr 0.13.0
 
 ## Breaking changes
 
