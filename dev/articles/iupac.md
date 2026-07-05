@@ -284,7 +284,7 @@ sessionInfo()
 #> [1] glyrepr_0.12.1.9000
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] vctrs_0.7.3       cli_3.6.6         knitr_1.51        rlang_1.2.0      
+#>  [1] vctrs_0.7.3       cli_3.6.6         knitr_1.51        rlang_1.3.0      
 #>  [5] xfun_0.59         stringi_1.8.7     otel_0.2.0        purrr_1.2.2      
 #>  [9] generics_0.1.4    textshaping_1.0.5 jsonlite_2.0.0    glue_1.8.1       
 #> [13] htmltools_0.5.9   ragg_1.5.2        sass_0.4.10       rmarkdown_2.31   

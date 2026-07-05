@@ -266,14 +266,14 @@ library(tictoc)
 tic("smap_int (optimized)")
 vertex_counts_optimized <- smap_int(huge_struc, igraph::vcount)
 toc()
-#> smap_int (optimized): 0.033 sec elapsed
+#> smap_int (optimized): 0.03 sec elapsed
 
 # Naive approach: extract all graphs and process each one
 tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.252 sec elapsed
+#> Naive approach (all graphs): 0.239 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -437,7 +437,7 @@ sessionInfo()
 #>  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   
 #> [13] igraph_2.3.3      knitr_1.51        backports_1.5.1   checkmate_2.3.4  
 #> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.11.0     
-#> [21] pillar_1.11.1     rlang_1.2.0       cachem_1.1.0      stringi_1.8.7    
+#> [21] pillar_1.11.1     rlang_1.3.0       cachem_1.1.0      stringi_1.8.7    
 #> [25] xfun_0.59         fs_2.1.0          sass_0.4.10       otel_0.2.0       
 #> [29] cli_3.6.6         pkgdown_2.2.0     magrittr_2.0.5    digest_0.6.39    
 #> [33] lifecycle_1.0.5   prettyunits_1.2.0 vctrs_0.7.3       evaluate_1.0.5   
