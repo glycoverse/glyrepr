@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.12.1.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.13.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,12 +40,15 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.13.0" id="glyrepr-0130">glyrepr 0.13.0<a class="anchor" aria-label="anchor" href="#glyrepr-0130"></a></h2><p class="text-muted">CRAN release: 2026-07-05</p>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-0-13-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-13-0"></a></h3>
 <ul><li>Remove the <code>.parallel</code> argument from <code><a href="../reference/smap.html">smap()</a></code>, <code><a href="../reference/smap2.html">smap2()</a></code>, <code><a href="../reference/spmap.html">spmap()</a></code>, and their variants, and drop the unused <code>furrr</code> and <code>future</code> dependencies. (<a href="https://github.com/glycoverse/glyrepr/issues/62" class="external-link">#62</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-13-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-13-0"></a></h3>
 <ul><li>Add <code><a href="../reference/structure_tables.html">structure_nodes()</a></code>, <code><a href="../reference/structure_tables.html">structure_edges()</a></code>, and <code><a href="../reference/structure_tables.html">structure_from_tibbles()</a></code> for converting glycan structures to and from graph-table tibbles. (<a href="https://github.com/glycoverse/glyrepr/issues/60" class="external-link">#60</a>)</li>
 <li>Rename <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> to <code><a href="../reference/infer_anomer_pos.html">infer_anomer_pos()</a></code> to better describe that the position is inferred from a monosaccharide name; <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> remains available as a backward-compatible alias. (<a href="https://github.com/glycoverse/glyrepr/issues/61" class="external-link">#61</a>)</li>
 <li>
@@ -54,7 +57,7 @@
 <li>Add <code><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list()</a></code> support for <code>glyrepr_composition</code> and <code>glyrepr_structure</code> vectors. (<a href="https://github.com/glycoverse/glyrepr/issues/52" class="external-link">#52</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-0-13-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-13-0"></a></h3>
 <ul><li>
 <code>glyrepr_structure</code> objects no longer return <code>TRUE</code> from <code><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character()</a></code>. Use <code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> for explicit IUPAC-condensed string conversion. (<a href="https://github.com/glycoverse/glyrepr/issues/59" class="external-link">#59</a>)</li>
 <li>Fix <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> so character vectors containing <code>NA</code> reject mixed concrete and generic structures consistently. (<a href="https://github.com/glycoverse/glyrepr/issues/58" class="external-link">#58</a>)</li>

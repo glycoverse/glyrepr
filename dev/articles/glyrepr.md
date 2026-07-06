@@ -441,15 +441,15 @@ access the underlying `igraph` objects using
 
 get_structure_graphs(strucs)
 #> [[1]]
-#> IGRAPH 88d87db DN-- 2 1 -- 
+#> IGRAPH d78d683 DN-- 2 1 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 88d87db (vertex names):
+#> + edge from d78d683 (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH f6f7bac DN-- 3 2 -- 
+#> IGRAPH 63e8b66 DN-- 3 2 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from f6f7bac (vertex names):
+#> + edges from 63e8b66 (vertex names):
 #> [1] 3->1 3->2
 ```
 

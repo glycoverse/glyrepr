@@ -2,6 +2,10 @@
 
 ## glyrepr (development version)
 
+## glyrepr 0.13.0
+
+CRAN release: 2026-07-05
+
 ### Breaking changes
 
 - Remove the `.parallel` argument from
