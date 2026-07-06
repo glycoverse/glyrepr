@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.12.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,32 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.12.1" id="glyrepr-0121">glyrepr 0.12.1<a class="anchor" aria-label="anchor" href="#glyrepr-0121"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.13.0" id="glyrepr-0130">glyrepr 0.13.0<a class="anchor" aria-label="anchor" href="#glyrepr-0130"></a></h2><p class="text-muted">CRAN release: 2026-07-05</p>
+<div class="section level3">
+<h3 id="breaking-changes-0-13-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-13-0"></a></h3>
+<ul><li>Remove the <code>.parallel</code> argument from <code><a href="../reference/smap.html">smap()</a></code>, <code><a href="../reference/smap2.html">smap2()</a></code>, <code><a href="../reference/spmap.html">spmap()</a></code>, and their variants, and drop the unused <code>furrr</code> and <code>future</code> dependencies. (<a href="https://github.com/glycoverse/glyrepr/issues/62" class="external-link">#62</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-13-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-13-0"></a></h3>
+<ul><li>Add <code><a href="../reference/structure_tables.html">structure_nodes()</a></code>, <code><a href="../reference/structure_tables.html">structure_edges()</a></code>, and <code><a href="../reference/structure_tables.html">structure_from_tibbles()</a></code> for converting glycan structures to and from graph-table tibbles. (<a href="https://github.com/glycoverse/glyrepr/issues/60" class="external-link">#60</a>)</li>
+<li>Rename <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> to <code><a href="../reference/infer_anomer_pos.html">infer_anomer_pos()</a></code> to better describe that the position is inferred from a monosaccharide name; <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> remains available as a backward-compatible alias. (<a href="https://github.com/glycoverse/glyrepr/issues/61" class="external-link">#61</a>)</li>
+<li>
+<code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> now accepts generic monosaccharide names such as <code>"Hex"</code>. (<a href="https://github.com/glycoverse/glyrepr/issues/57" class="external-link">#57</a>)</li>
+<li>Add <code>NGc</code> and <code>Gc</code> to the supported substituent list for N-glycolyl and glycolyl substituents. (<a href="https://github.com/glycoverse/glyrepr/issues/54" class="external-link">#54</a>)</li>
+<li>Add <code><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list()</a></code> support for <code>glyrepr_composition</code> and <code>glyrepr_structure</code> vectors. (<a href="https://github.com/glycoverse/glyrepr/issues/52" class="external-link">#52</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-0-13-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-13-0"></a></h3>
+<ul><li>
+<code>glyrepr_structure</code> objects no longer return <code>TRUE</code> from <code><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character()</a></code>. Use <code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> for explicit IUPAC-condensed string conversion. (<a href="https://github.com/glycoverse/glyrepr/issues/59" class="external-link">#59</a>)</li>
+<li>Fix <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> so character vectors containing <code>NA</code> reject mixed concrete and generic structures consistently. (<a href="https://github.com/glycoverse/glyrepr/issues/58" class="external-link">#58</a>)</li>
+<li>Fix <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> parsing for monosaccharide names that start with digits, such as <code>6dGul</code> and <code>4eLeg</code>. (<a href="https://github.com/glycoverse/glyrepr/issues/55" class="external-link">#55</a>)</li>
+<li>Fix <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> parsing for substituent names such as <code>Pyr</code>, <code>PC</code>, <code>PPEtn</code>, and <code>PEtn</code> that share the <code>P</code> prefix. (<a href="https://github.com/glycoverse/glyrepr/issues/53" class="external-link">#53</a>)</li>
+<li>Ambiguous linkages like <code>a2-3/6</code> are also regarded as unknown for <code>has_linkage()</code> and <code><a href="../reference/get_structure_level.html">get_structure_level()</a></code>. (<a href="https://github.com/glycoverse/glyrepr/issues/51" class="external-link">#51</a>)</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.12.1" id="glyrepr-0121">glyrepr 0.12.1<a class="anchor" aria-label="anchor" href="#glyrepr-0121"></a></h2><p class="text-muted">CRAN release: 2026-06-19</p>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-0-12-1">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-12-1"></a></h3>
 <ul><li>Performance optimization for glycan structure vector creation. (<a href="https://github.com/glycoverse/glyrepr/issues/46" class="external-link">#46</a>)</li>
@@ -49,7 +74,7 @@
 <h2 class="pkg-version" data-toc-text="0.12.0" id="glyrepr-0120">glyrepr 0.12.0<a class="anchor" aria-label="anchor" href="#glyrepr-0120"></a></h2><p class="text-muted">CRAN release: 2026-05-14</p>
 <div class="section level3">
 <h3 id="new-features-0-12-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-12-0"></a></h3>
-<ul><li>Add <code><a href="../reference/get_anomer_pos.html">get_anomer_pos()</a></code> helper to get the anomer position of a monosaccharide.</li>
+<ul><li>Add <code><a href="../reference/infer_anomer_pos.html">get_anomer_pos()</a></code> helper to get the anomer position of a monosaccharide.</li>
 <li>Add <code><a href="../reference/fill_anomer_pos.html">fill_anomer_pos()</a></code> function to fill the anomer position of a glycan structure with missing anomer information.</li>
 </ul></div>
 </div>

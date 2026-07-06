@@ -1,6 +1,77 @@
 # Changelog
 
+## glyrepr 0.13.0
+
+CRAN release: 2026-07-05
+
+### Breaking changes
+
+- Remove the `.parallel` argument from
+  [`smap()`](https://glycoverse.github.io/glyrepr/reference/smap.md),
+  [`smap2()`](https://glycoverse.github.io/glyrepr/reference/smap2.md),
+  [`spmap()`](https://glycoverse.github.io/glyrepr/reference/spmap.md),
+  and their variants, and drop the unused `furrr` and `future`
+  dependencies.
+  ([\#62](https://github.com/glycoverse/glyrepr/issues/62))
+
+### New features
+
+- Add
+  [`structure_nodes()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md),
+  [`structure_edges()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md),
+  and
+  [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md)
+  for converting glycan structures to and from graph-table tibbles.
+  ([\#60](https://github.com/glycoverse/glyrepr/issues/60))
+- Rename
+  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/infer_anomer_pos.md)
+  to
+  [`infer_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/infer_anomer_pos.md)
+  to better describe that the position is inferred from a monosaccharide
+  name;
+  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/infer_anomer_pos.md)
+  remains available as a backward-compatible alias.
+  ([\#61](https://github.com/glycoverse/glyrepr/issues/61))
+- [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/infer_anomer_pos.md)
+  now accepts generic monosaccharide names such as `"Hex"`.
+  ([\#57](https://github.com/glycoverse/glyrepr/issues/57))
+- Add `NGc` and `Gc` to the supported substituent list for N-glycolyl
+  and glycolyl substituents.
+  ([\#54](https://github.com/glycoverse/glyrepr/issues/54))
+- Add [`as.list()`](https://rdrr.io/r/base/list.html) support for
+  `glyrepr_composition` and `glyrepr_structure` vectors.
+  ([\#52](https://github.com/glycoverse/glyrepr/issues/52))
+
+### Minor improvements and bug fixes
+
+- `glyrepr_structure` objects no longer return `TRUE` from
+  [`is.character()`](https://rdrr.io/r/base/character.html). Use
+  [`as.character()`](https://rdrr.io/r/base/character.html) for explicit
+  IUPAC-condensed string conversion.
+  ([\#59](https://github.com/glycoverse/glyrepr/issues/59))
+- Fix
+  [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md)
+  so character vectors containing `NA` reject mixed concrete and generic
+  structures consistently.
+  ([\#58](https://github.com/glycoverse/glyrepr/issues/58))
+- Fix
+  [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md)
+  parsing for monosaccharide names that start with digits, such as
+  `6dGul` and `4eLeg`.
+  ([\#55](https://github.com/glycoverse/glyrepr/issues/55))
+- Fix
+  [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md)
+  parsing for substituent names such as `Pyr`, `PC`, `PPEtn`, and `PEtn`
+  that share the `P` prefix.
+  ([\#53](https://github.com/glycoverse/glyrepr/issues/53))
+- Ambiguous linkages like `a2-3/6` are also regarded as unknown for
+  `has_linkage()` and
+  [`get_structure_level()`](https://glycoverse.github.io/glyrepr/reference/get_structure_level.md).
+  ([\#51](https://github.com/glycoverse/glyrepr/issues/51))
+
 ## glyrepr 0.12.1
+
+CRAN release: 2026-06-19
 
 ### Minor improvements and bug fixes
 
@@ -14,7 +85,7 @@ CRAN release: 2026-05-14
 ### New features
 
 - Add
-  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/get_anomer_pos.md)
+  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/infer_anomer_pos.md)
   helper to get the anomer position of a monosaccharide.
 - Add
   [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/fill_anomer_pos.md)

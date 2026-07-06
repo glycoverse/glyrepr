@@ -12,6 +12,10 @@
   : Create a Glycan Structure Vector
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md)
   : Convert to Glycan Structure Vector
+- [`structure_nodes()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md)
+  [`structure_edges()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md)
+  [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md)
+  : Convert Glycan Structures to Graph Tables
 
 ## Glycan Composition and Structure Inspection
 
@@ -25,6 +29,10 @@
   : Access Individual Glycan Structures
 - [`has_linkages()`](https://glycoverse.github.io/glyrepr/reference/has_linkages.md)
   : Determine if a Glycan Structure has Linkages
+- [`structure_nodes()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md)
+  [`structure_edges()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md)
+  [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md)
+  : Convert Glycan Structures to Graph Tables
 - [`structure_to_iupac()`](https://glycoverse.github.io/glyrepr/reference/structure_to_iupac.md)
   : Convert Glycan Structure to IUPAC-like Sequence
 - [`get_structure_level()`](https://glycoverse.github.io/glyrepr/reference/get_structure_level.md)
@@ -94,8 +102,9 @@
   : Get Available Monosaacharides
 - [`available_substituents()`](https://glycoverse.github.io/glyrepr/reference/available_substituents.md)
   : Available Substituents
-- [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/get_anomer_pos.md)
-  : Get Anomer Positions
+- [`infer_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/infer_anomer_pos.md)
+  [`get_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/infer_anomer_pos.md)
+  : Infer Anomer Positions
 - [`is_known_monosaccharide()`](https://glycoverse.github.io/glyrepr/reference/is_known_monosaccharide.md)
   : Check if a Monosaccharide is Known
 - [`possible_linkages()`](https://glycoverse.github.io/glyrepr/reference/possible_linkages.md)

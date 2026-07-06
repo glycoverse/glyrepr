@@ -16,6 +16,6 @@ A character vector.
 
 ``` r
 available_substituents()
-#>  [1] "Me"    "Ac"    "NAc"   "P"     "S"     "Pyr"   "PC"    "PPEtn" "PEtn" 
-#> [10] "N"    
+#>  [1] "Me"    "Ac"    "NAc"   "NGc"   "P"     "S"     "Pyr"   "PC"    "PPEtn"
+#> [10] "PEtn"  "N"     "Gc"   
 ```

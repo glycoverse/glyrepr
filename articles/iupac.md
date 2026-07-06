@@ -260,7 +260,7 @@ Next steps:
 ``` r
 
 sessionInfo()
-#> R version 4.6.0 (2026-04-24)
+#> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.4 LTS
 #> 
@@ -281,17 +281,17 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] glyrepr_0.12.1
+#> [1] glyrepr_0.13.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] vctrs_0.7.3       cli_3.6.6         knitr_1.51        rlang_1.2.0      
+#>  [1] vctrs_0.7.3       cli_3.6.6         knitr_1.51        rlang_1.3.0      
 #>  [5] xfun_0.59         stringi_1.8.7     otel_0.2.0        purrr_1.2.2      
 #>  [9] generics_0.1.4    textshaping_1.0.5 jsonlite_2.0.0    glue_1.8.1       
 #> [13] htmltools_0.5.9   ragg_1.5.2        sass_0.4.10       rmarkdown_2.31   
 #> [17] tibble_3.3.1      evaluate_1.0.5    jquerylib_0.1.4   fastmap_1.2.0    
-#> [21] yaml_2.3.12       lifecycle_1.0.5   stringr_1.6.0     compiler_4.6.0   
+#> [21] yaml_2.3.12       lifecycle_1.0.5   stringr_1.6.0     compiler_4.6.1   
 #> [25] dplyr_1.2.1       fs_2.1.0          pkgconfig_2.0.3   systemfonts_1.3.2
 #> [29] digest_0.6.39     R6_2.6.1          tidyselect_1.2.1  pillar_1.11.1    
-#> [33] magrittr_2.0.5    bslib_0.11.0      tools_4.6.0       pkgdown_2.2.0    
+#> [33] magrittr_2.0.5    bslib_0.11.0      tools_4.6.1       pkgdown_2.2.0    
 #> [37] cachem_1.1.0      desc_1.4.3
 ```

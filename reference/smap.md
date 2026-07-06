@@ -8,19 +8,19 @@ for glycan structure vectors.
 ## Usage
 
 ``` r
-smap(.x, .f, ..., .parallel = FALSE)
+smap(.x, .f, ...)
 
-smap_vec(.x, .f, ..., .ptype = NULL, .parallel = FALSE)
+smap_vec(.x, .f, ..., .ptype = NULL)
 
-smap_lgl(.x, .f, ..., .parallel = FALSE)
+smap_lgl(.x, .f, ...)
 
-smap_int(.x, .f, ..., .parallel = FALSE)
+smap_int(.x, .f, ...)
 
-smap_dbl(.x, .f, ..., .parallel = FALSE)
+smap_dbl(.x, .f, ...)
 
-smap_chr(.x, .f, ..., .parallel = FALSE)
+smap_chr(.x, .f, ...)
 
-smap_structure(.x, .f, ..., .parallel = FALSE)
+smap_structure(.x, .f, ...)
 ```
 
 ## Arguments
@@ -38,12 +38,6 @@ smap_structure(.x, .f, ..., .parallel = FALSE)
 - ...:
 
   Additional arguments passed to `.f`.
-
-- .parallel:
-
-  Logical; whether to use parallel processing. If `FALSE` (default),
-  parallel processing is disabled. Set to `TRUE` to enable parallel
-  processing.
 
 - .ptype:
 

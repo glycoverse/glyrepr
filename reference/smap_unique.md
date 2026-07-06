@@ -8,7 +8,7 @@ but only care about unique results.
 ## Usage
 
 ``` r
-smap_unique(.x, .f, ..., .parallel = FALSE)
+smap_unique(.x, .f, ...)
 ```
 
 ## Arguments
@@ -26,14 +26,6 @@ smap_unique(.x, .f, ..., .parallel = FALSE)
 - ...:
 
   Additional arguments passed to `.f`.
-
-- .parallel:
-
-  Logical; whether to use parallel processing. If `FALSE` (default),
-  parallel processing is disabled. Set to `TRUE` to enable parallel
-  processing. See examples in
-  [`smap`](https://glycoverse.github.io/glyrepr/reference/smap.md) for
-  how to set up and use parallel processing.
 
 ## Value
 

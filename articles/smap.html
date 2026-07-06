@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.12.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -133,8 +133,8 @@ has 5,000 elements, but only 5 unique graphs are stored internally.</p>
 <p>We can verify that directly:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Only 5 unique graphs are stored internally</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">large_struc</span>, <span class="st">"structures"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">large_struc</span>, <span class="st">"graphs"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 5</span></span>
 <span></span>
 <span><span class="co"># But we have 5,000 total elements</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">large_struc</span><span class="op">)</span></span>
@@ -146,8 +146,8 @@ has 5,000 elements, but only 5 unique graphs are stored internally.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lobstr.r-lib.org/" class="external-link">lobstr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://lobstr.r-lib.org/reference/obj_size.html" class="external-link">obj_sizes</a></span><span class="op">(</span><span class="va">struc</span>, <span class="va">large_struc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; * 15.18 kB</span></span>
-<span><span class="co">#&gt; * 40.69 kB</span></span></code></pre></div>
+<span><span class="co">#&gt; *  15.54 kB</span></span>
+<span><span class="co">#&gt; * 320.69 kB</span></span></code></pre></div>
 <p>The memory difference can be substantial. For repeated structures,
 the optimized representation can be much smaller than storing every
 graph independently.</p>
@@ -348,14 +348,14 @@ from automatic deduplication:</p>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"smap_int (optimized)"</span><span class="op">)</span></span>
 <span><span class="va">vertex_counts_optimized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smap.html">smap_int</a></span><span class="op">(</span><span class="va">huge_struc</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; smap_int (optimized): 0.003 sec elapsed</span></span>
+<span><span class="co">#&gt; smap_int (optimized): 0.029 sec elapsed</span></span>
 <span></span>
 <span><span class="co"># Naive approach: extract all graphs and process each one</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="st">"Naive approach (all graphs)"</span><span class="op">)</span></span>
 <span><span class="va">all_graphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">huge_struc</span><span class="op">)</span>  <span class="co"># Extracts all 25,000 graphs</span></span>
 <span><span class="va">vertex_counts_naive</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">all_graphs</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Naive approach (all graphs): 0.214 sec elapsed</span></span>
+<span><span class="co">#&gt; Naive approach (all graphs): 0.238 sec elapsed</span></span>
 <span></span>
 <span><span class="co"># Verify results are equivalent (though data types may differ)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">vertex_counts_optimized</span>, <span class="va">vertex_counts_naive</span><span class="op">)</span></span>
@@ -491,7 +491,7 @@ structures.</li>
 </h2>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.6.0 (2026-04-24)</span></span>
+<span><span class="co">#&gt; R version 4.6.1 (2026-06-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
 <span><span class="co">#&gt; Running under: Ubuntu 24.04.4 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -512,20 +512,20 @@ structures.</li>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] tictoc_1.2.1   lobstr_1.2.1   glyrepr_0.12.1</span></span>
+<span><span class="co">#&gt; [1] tictoc_1.2.1   lobstr_1.2.1   glyrepr_0.13.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.0    tidyselect_1.2.1 </span></span>
+<span><span class="co">#&gt;  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.1    tidyselect_1.2.1 </span></span>
 <span><span class="co">#&gt;  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5</span></span>
 <span><span class="co">#&gt;  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   </span></span>
-<span><span class="co">#&gt; [13] igraph_2.3.2      knitr_1.51        backports_1.5.1   checkmate_2.3.4  </span></span>
+<span><span class="co">#&gt; [13] igraph_2.3.3      knitr_1.51        backports_1.5.1   checkmate_2.3.4  </span></span>
 <span><span class="co">#&gt; [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.11.0     </span></span>
-<span><span class="co">#&gt; [21] pillar_1.11.1     rlang_1.2.0       cachem_1.1.0      stringi_1.8.7    </span></span>
+<span><span class="co">#&gt; [21] pillar_1.11.1     rlang_1.3.0       cachem_1.1.0      stringi_1.8.7    </span></span>
 <span><span class="co">#&gt; [25] xfun_0.59         fs_2.1.0          sass_0.4.10       otel_0.2.0       </span></span>
 <span><span class="co">#&gt; [29] cli_3.6.6         pkgdown_2.2.0     magrittr_2.0.5    digest_0.6.39    </span></span>
 <span><span class="co">#&gt; [33] lifecycle_1.0.5   prettyunits_1.2.0 vctrs_0.7.3       evaluate_1.0.5   </span></span>
 <span><span class="co">#&gt; [37] glue_1.8.1        ragg_1.5.2        rmarkdown_2.31    purrr_1.2.2      </span></span>
-<span><span class="co">#&gt; [41] tools_4.6.0       pkgconfig_2.0.3   htmltools_0.5.9</span></span></code></pre></div>
+<span><span class="co">#&gt; [41] tools_4.6.1       pkgconfig_2.0.3   htmltools_0.5.9</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

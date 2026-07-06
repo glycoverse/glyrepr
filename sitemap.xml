@@ -27,7 +27,6 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/fill_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/format_glycan_structure_subset.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/get_anomer.html</loc></url>
-<url><loc>https://glycoverse.github.io/glyrepr/reference/get_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/get_mono_color.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/get_mono_type.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/get_structure_graphs.html</loc></url>
@@ -38,6 +37,7 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/glyrepr-vctrs.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/has_linkages.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/index.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/infer_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/is_known_monosaccharide.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/n_glycan_core.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/possible_linkages.html</loc></url>
@@ -51,6 +51,7 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/smap_predicates.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/smap_unique.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/spmap.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/structure_tables.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/structure_to_iupac.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/valid_linkages.html</loc></url>
 </urlset>

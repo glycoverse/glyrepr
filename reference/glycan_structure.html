@@ -13,7 +13,7 @@ structure comparison studies."><meta property="og:image" content="https://glycov
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.12.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,9 +78,8 @@ glycan structure vectors. Supports mixed input of multiple objects.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="data-structure-overview">Data Structure Overview<a class="anchor" aria-label="anchor" href="#data-structure-overview"></a></h2>
-    <p>A glycan structure vector is a vctrs record with an additional S3 class
-<code>glyrepr_structure</code>. Therefore, <code>sloop::s3_class()</code> returns the class hierarchy
-<code>c("glyrepr_structure", "vctrs_rcrd")</code>.</p>
+    <p>A glycan structure vector is a vctrs vector with an additional S3 class
+<code>glyrepr_structure</code>.</p>
 <p>Each glycan structure must satisfy the following constraints:</p><div class="section">
 <h3 id="graph-structure-requirements">Graph Structure Requirements<a class="anchor" aria-label="anchor" href="#graph-structure-requirements"></a></h3>
 
@@ -140,13 +139,9 @@ unknown structures:</p><ul><li><p>Create with <code>glycan_structure(NA)</code> 
 This is particularly useful when working with the <code>glymotif</code> package.</p>
     </div>
     <div class="section level2">
-    <h2 id="as-characters">As characters<a class="anchor" aria-label="anchor" href="#as-characters"></a></h2>
-    <p>One side-effect of the current implementation is that you can treat a glycan structure vector
-as a pure character vector of IUPAC-condensed strings.
-In fact, <code><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character()</a></code> returns <code>TRUE</code> for a glycan structure vector,
-and all <code>stringr</code> functions work directly on the vector.</p>
-<p>However, we still recommend using <code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> to explicitly convert to character when needed,
-to avoid confusion and ensure that the intended behavior is clear.</p>
+    <h2 id="character-conversion">Character conversion<a class="anchor" aria-label="anchor" href="#character-conversion"></a></h2>
+    <p>A glycan structure vector is not a character vector. Use <code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> to
+explicitly convert it to IUPAC-condensed strings when needed.</p>
     </div>
 
     <div class="section level2">
