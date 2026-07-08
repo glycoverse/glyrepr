@@ -49,11 +49,14 @@ test_that("fill_anomer_pos preserves NA values and names", {
 })
 
 
-test_that("fill_anomer_pos rejects non-concrete monosaccharides", {
+test_that("fill_anomer_pos accepts generic monosaccharides", {
   strucs <- n_glycan_core(linkage = FALSE, mono_type = "generic")
 
-  expect_error(
-    fill_anomer_pos(strucs),
-    regexp = "concrete monosaccharides"
+  result <- fill_anomer_pos(strucs)
+
+  expect_s3_class(result, "glyrepr_structure")
+  expect_equal(
+    as.character(result),
+    "Hex(?1-?)[Hex(?1-?)]Hex(?1-?)HexNAc(?1-?)HexNAc(?1-"
   )
 })

@@ -7,7 +7,8 @@
 #' For anomer positions that are already specified in the input structures,
 #' this function does not modify them.
 #'
-#' @param strucs A [glycan_structure()] vector with concrete monosaccharides.
+#' @param strucs A [glycan_structure()] vector with concrete or generic
+#'   monosaccharides.
 #'
 #' @returns A [glycan_structure()] vector with anomer positions added where
 #'   missing.
@@ -22,29 +23,7 @@
 #' @export
 fill_anomer_pos <- function(strucs) {
   checkmate::assert_class(strucs, "glyrepr_structure")
-  .assert_concrete_structure(strucs)
   smap_structure(strucs, .fill_anomer_pos_single)
-}
-
-
-#' Assert That a Glycan Structure Has Concrete Monosaccharides
-#'
-#' @param strucs A [glycan_structure()] vector.
-#'
-#' @returns `strucs`, invisibly. Throws an error if non-missing structures are
-#'   not concrete.
-#' @noRd
-.assert_concrete_structure <- function(strucs) {
-  mono_type <- get_mono_type(strucs)
-  if (length(mono_type) == 0 || is.na(mono_type)) {
-    return(invisible(strucs))
-  }
-
-  if (mono_type != "concrete") {
-    cli::cli_abort("{.arg strucs} must have concrete monosaccharides.")
-  }
-
-  invisible(strucs)
 }
 
 
@@ -80,7 +59,7 @@ fill_anomer_pos <- function(strucs) {
 #'
 #' @param anomer A linkage string like `"??-?"` or reducing-end anomer like
 #'   `"??"`.
-#' @param mono A concrete monosaccharide name.
+#' @param mono A concrete or generic monosaccharide name.
 #'
 #' @returns `anomer` with the second character filled when missing.
 #' @noRd
