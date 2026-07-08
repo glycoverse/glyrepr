@@ -2,7 +2,7 @@
 
 ## Minor improvements and bug fixes
 
-* `fill_anomer_pos()` now accepts glycan structures with generic monosaccharides. (#69)
+* `fill_anomer_pos()` now accepts glycan structures with generic monosaccharides. (#70)
 * `convert_to_generic()` now converts concrete monosaccharides in mixed concrete/generic character vectors. (#68)
 * Allow multiple substituents with unknown positions in glycan structures. (#67)
 
