@@ -50,13 +50,13 @@ convert_to_generic.character <- function(x) {
 
   from <- get_mono_type(x)
 
-  # Check if conversion is valid (no backward conversion)
-  if (any(from == "generic")) {
-    # Already generic, return as-is
+  if (!any(from == "concrete")) {
     return(x)
   }
 
-  convert_mono_type_impl(x)
+  result <- x
+  result[from == "concrete"] <- convert_mono_type_impl(x[from == "concrete"])
+  result
 }
 
 #' @export

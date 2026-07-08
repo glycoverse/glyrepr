@@ -2,6 +2,7 @@
 
 ## Minor improvements and bug fixes
 
+* `convert_to_generic()` now converts concrete monosaccharides in mixed concrete/generic character vectors. (#64)
 * Allow multiple substituents with unknown positions in glycan structures. (#67)
 
 # glyrepr 0.13.0
