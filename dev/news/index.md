@@ -4,6 +4,9 @@
 
 ### Minor improvements and bug fixes
 
+- [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md)
+  now accepts glycan structures with generic monosaccharides.
+  ([\#70](https://github.com/glycoverse/glyrepr/issues/70))
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md)
   now converts concrete monosaccharides in mixed concrete/generic
   character vectors.
