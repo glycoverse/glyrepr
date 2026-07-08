@@ -60,6 +60,11 @@ test_that("convert_to_generic works with character vectors", {
   expect_equal(result, c("Hex", "HexNAc"))
 })
 
+test_that("convert_to_generic converts concrete elements in mixed character vectors", {
+  result <- convert_to_generic(c("Gal", "GalNAc", "Hex", "HexNAc"))
+  expect_equal(result, c("Hex", "HexNAc", "Hex", "HexNAc"))
+})
+
 test_that("convert_to_generic with already generic characters returns same", {
   input <- c("Hex", "HexNAc")
   result <- convert_to_generic(input)
