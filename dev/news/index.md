@@ -4,6 +4,10 @@
 
 ### Minor improvements and bug fixes
 
+- [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md)
+  now converts concrete monosaccharides in mixed concrete/generic
+  character vectors.
+  ([\#68](https://github.com/glycoverse/glyrepr/issues/68))
 - Allow multiple substituents with unknown positions in glycan
   structures. ([\#67](https://github.com/glycoverse/glyrepr/issues/67))
 
