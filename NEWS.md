@@ -1,5 +1,9 @@
 # glyrepr (development version)
 
+## Minor improvements and bug fixes
+
+* Allow multiple substituents with unknown positions in glycan structures. (#66)
+
 # glyrepr 0.13.0
 
 ## Breaking changes

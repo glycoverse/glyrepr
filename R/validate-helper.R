@@ -85,8 +85,9 @@ valid_substituent <- function(sub) {
     # Check if positions are sorted in ascending order
     is_sorted <- all(numeric_positions == sort(numeric_positions))
 
-    # Check for duplicate positions (not allowed)
-    has_duplicates <- any(duplicated(positions))
+    # Check for duplicate known positions (not allowed)
+    known_positions <- positions[positions != "?"]
+    has_duplicates <- any(duplicated(known_positions))
 
     return(is_sorted && !has_duplicates)
   })

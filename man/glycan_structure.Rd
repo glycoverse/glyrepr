@@ -54,6 +54,7 @@ Each glycan structure must satisfy the following constraints:
 e.g., "2Ac", "3S"
 \item Multiple substituents separated by commas and ordered by position,
 e.g., "3Me,4Ac", "2S,6P"
+\item Unknown substituent positions can be repeated, e.g., "?Me,?S"
 \item No substituents represented by empty string ""
 }
 }
