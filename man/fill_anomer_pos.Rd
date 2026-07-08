@@ -7,7 +7,8 @@
 fill_anomer_pos(strucs)
 }
 \arguments{
-\item{strucs}{A \code{\link[=glycan_structure]{glycan_structure()}} vector with concrete monosaccharides.}
+\item{strucs}{A \code{\link[=glycan_structure]{glycan_structure()}} vector with concrete or generic
+monosaccharides.}
 }
 \value{
 A \code{\link[=glycan_structure]{glycan_structure()}} vector with anomer positions added where
