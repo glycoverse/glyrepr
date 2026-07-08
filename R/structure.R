@@ -30,6 +30,7 @@
 #'     e.g., "2Ac", "3S"
 #'   - Multiple substituents separated by commas and ordered by position,
 #'     e.g., "3Me,4Ac", "2S,6P"
+#'   - Unknown substituent positions can be repeated, e.g., "?Me,?S"
 #'   - No substituents represented by empty string ""
 #'
 #' ## Edge Attributes

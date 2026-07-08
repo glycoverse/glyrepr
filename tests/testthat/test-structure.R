@@ -209,6 +209,17 @@ test_that("duplicate positions in substituents are not allowed", {
 })
 
 
+test_that("duplicate unknown substituent positions are allowed", {
+  skip_on_old_win()
+  graph <- igraph::make_empty_graph(n = 1)
+  igraph::V(graph)$mono <- "Glc"
+  igraph::V(graph)$sub <- "?Me,?Me"
+  igraph::E(graph)$linkage <- character(0)
+  graph$anomer <- "a1"
+  expect_no_error(glycan_structure(graph))
+})
+
+
 test_that("normalize_substituents works correctly", {
   expect_equal(normalize_substituents(""), "")
   expect_equal(normalize_substituents("6S"), "6S")
