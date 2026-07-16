@@ -4,13 +4,20 @@
 \alias{as_glycan_structure}
 \title{Convert to Glycan Structure Vector}
 \usage{
-as_glycan_structure(x)
+as_glycan_structure(x, on_failure = c("error", "na"))
 }
 \arguments{
 \item{x}{An object to convert to a glycan structure vector.
 Can be an igraph object, a list of igraph objects,
 a character vector of IUPAC-condensed strings,
 or an existing glyrepr_structure object.}
+
+\item{on_failure}{The failure policy for element-local parsing, validation,
+and canonicalization errors. \code{"error"} preserves the default strict
+behavior. \code{"na"} replaces failed elements with \code{NA} and emits one warning
+that reports their positions and failure reasons. Existing missing elements
+remain missing without a warning. Vector-level incompatibilities still
+produce an error.}
 }
 \value{
 A glyrepr_structure object.
@@ -36,5 +43,11 @@ as_glycan_structure(list(graph, o_glycan_graph))
 
 # Convert a character vector of IUPAC-condensed strings
 as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
+
+# Preserve valid elements while replacing an invalid element with NA
+as_glycan_structure(
+  c(valid = "Glc(?1-", invalid = "not-a-structure"),
+  on_failure = "na"
+)
 
 }

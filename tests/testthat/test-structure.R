@@ -492,6 +492,100 @@ test_that("as_glycan_structure works with empty inputs", {
   expect_equal(length(result), 0)
 })
 
+test_that("as_glycan_structure can replace invalid graphs with NA", {
+  valid <- create_simple_glycan_graph("Glc", character())
+  invalid <- create_simple_glycan_graph("NotAMonosaccharide", character())
+  graphs <- list(valid = valid, missing = NA, invalid = invalid)
+
+  expect_snapshot(
+    result <- as_glycan_structure(graphs, on_failure = "na")
+  )
+
+  expect_s3_class(result, "glyrepr_structure")
+  expect_equal(names(result), names(graphs))
+  expect_equal(
+    is.na(result),
+    c(valid = FALSE, missing = TRUE, invalid = TRUE)
+  )
+  expect_equal(as.character(result[1]), c(valid = "Glc(?1-"))
+  expect_length(attr(result, "graphs"), 1)
+})
+
+test_that("as_glycan_structure can replace invalid character input with NA", {
+  iupacs <- c(
+    valid = "Glc(?1-",
+    invalid = "not-a-structure",
+    missing = NA
+  )
+
+  expect_snapshot(
+    result <- as_glycan_structure(iupacs, on_failure = "na")
+  )
+
+  expect_equal(names(result), names(iupacs))
+  expect_equal(
+    is.na(result),
+    c(valid = FALSE, invalid = TRUE, missing = TRUE)
+  )
+  expect_equal(as.character(result[1]), c(valid = "Glc(?1-"))
+})
+
+test_that("as_glycan_structure keeps existing missing elements silently", {
+  valid <- create_simple_glycan_graph("Glc", character())
+  graphs <- list(valid = valid, missing = NA)
+
+  expect_no_warning(
+    result <- as_glycan_structure(graphs, on_failure = "na")
+  )
+
+  expect_equal(is.na(result), c(valid = FALSE, missing = TRUE))
+})
+
+test_that("as_glycan_structure validates graph elements only once", {
+  original_validator <- validate_single_glycan_structure
+  validation_count <- 0
+  testthat::local_mocked_bindings(
+    validate_single_glycan_structure = function(glycan) {
+      validation_count <<- validation_count + 1
+      original_validator(glycan)
+    }
+  )
+  valid <- create_simple_glycan_graph("Glc", character())
+  invalid <- create_simple_glycan_graph("NotAMonosaccharide", character())
+
+  suppressWarnings(
+    as_glycan_structure(list(valid, invalid), on_failure = "na")
+  )
+
+  expect_equal(validation_count, 2)
+})
+
+test_that("as_glycan_structure keeps strict failures as the default", {
+  valid <- create_simple_glycan_graph("Glc", character())
+  invalid <- create_simple_glycan_graph("NotAMonosaccharide", character())
+
+  expect_snapshot(
+    error = TRUE,
+    as_glycan_structure(list(valid, invalid))
+  )
+})
+
+test_that("as_glycan_structure keeps vector-level failures strict", {
+  iupacs <- c(concrete = "Glc(?1-", generic = "Hex(??-")
+
+  expect_snapshot(
+    error = TRUE,
+    as_glycan_structure(iupacs, on_failure = "na")
+  )
+})
+
+test_that("as_glycan_structure validates on_failure", {
+  expect_snapshot(
+    error = TRUE,
+    as_glycan_structure("Glc(?1-", on_failure = "skip")
+  )
+})
+
 # Tests for is_glycan_structure --------------------------------------------------
 
 test_that("is_glycan_structure correctly identifies glycan_structure objects", {
