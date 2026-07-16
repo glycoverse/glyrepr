@@ -2,7 +2,7 @@
 
 ## Minor improvements and bug fixes
 
-* `as_glycan_structure()` gains `on_failure = "na"` to preserve valid elements while replacing element-local parsing or validation failures with `NA` and reporting one aggregated warning. (#72)
+* `as_glycan_structure()` gains `on_failure = "na"` to preserve valid elements while replacing element-local parsing or validation failures with `NA` and reporting one aggregated warning. (#73)
 * `fill_anomer_pos()` now accepts glycan structures with generic monosaccharides. (#70)
 * `convert_to_generic()` now converts concrete monosaccharides in mixed concrete/generic character vectors. (#68)
 * Allow multiple substituents with unknown positions in glycan structures. (#67)
