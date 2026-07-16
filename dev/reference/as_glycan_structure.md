@@ -5,7 +5,7 @@ Convert an object to a glycan structure vector.
 ## Usage
 
 ``` r
-as_glycan_structure(x)
+as_glycan_structure(x, on_failure = c("error", "na"))
 ```
 
 ## Arguments
@@ -15,6 +15,15 @@ as_glycan_structure(x)
   An object to convert to a glycan structure vector. Can be an igraph
   object, a list of igraph objects, a character vector of
   IUPAC-condensed strings, or an existing glyrepr_structure object.
+
+- on_failure:
+
+  The failure policy for element-local parsing, validation, and
+  canonicalization errors. `"error"` preserves the default strict
+  behavior. `"na"` replaces failed elements with `NA` and emits one
+  warning that reports their positions and failure reasons. Existing
+  missing elements remain missing without a warning. Vector-level
+  incompatibilities still produce an error.
 
 ## Value
 
@@ -59,4 +68,19 @@ as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
 #> [1] GlcNAc(b1-4)GlcNAc(b1-
 #> [2] Man(a1-2)GlcNAc(b1-
 #> # Unique structures: 2
+
+# Preserve valid elements while replacing an invalid element with NA
+as_glycan_structure(
+  c(valid = "Glc(?1-", invalid = "not-a-structure"),
+  on_failure = "na"
+)
+#> Warning: 1 structure failed validation and was replaced with `NA`.
+#> ✖ Position 2 (`invalid`): Could not parse IUPAC-condensed string:
+#>   "not-a-structure" ℹ Can't extract anomer information. ℹ Anomer information is
+#>   required for the reducing-end monosaccharide. ℹ For example, use 'Man(a1-'
+#>   instead of 'Man'.
+#> <glycan_structure[2]>
+#> [1] valid    Glc(?1-
+#> [2] invalid  NA
+#> # Unique structures: 1
 ```

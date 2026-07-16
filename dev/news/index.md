@@ -4,6 +4,11 @@
 
 ### Minor improvements and bug fixes
 
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  gains `on_failure = "na"` to preserve valid elements while replacing
+  element-local parsing or validation failures with `NA` and reporting
+  one aggregated warning.
+  ([\#73](https://github.com/glycoverse/glyrepr/issues/73))
 - [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md)
   now accepts glycan structures with generic monosaccharides.
   ([\#70](https://github.com/glycoverse/glyrepr/issues/70))
