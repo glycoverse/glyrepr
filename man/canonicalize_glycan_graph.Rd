@@ -20,6 +20,15 @@ of one glycan graph to match its IUPAC-condensed sequence.
 This function assumes that \code{graph} has already passed
 \code{\link[=validate_glycan_graph]{validate_glycan_graph()}}. It performs no semantic validation.
 }
+\section{Low-level API warning}{
+
+These functions are low-level, developer-facing APIs. Calling them directly
+is usually not a good idea unless you understand and can guarantee all glycan
+graph and \code{glyrepr_structure} invariants. Prefer \code{\link[=as_glycan_structure]{as_glycan_structure()}} for
+ordinary construction. Incorrect use of these functions can create invalid
+structure vectors that fail in later operations.
+}
+
 \section{Name-preserving manual construction}{
 
 The five low-level functions can reproduce strict graph-based construction
