@@ -65,13 +65,6 @@ structure_to_iupac <- function(glycan) {
   vctrs::vec_data(glycan)
 }
 
-# Internal function to convert a single igraph to IUPAC
-.structure_to_iupac_single <- function(glycan) {
-  root <- which(igraph::degree(glycan, mode = "in") == 0)
-  seq_cache <- build_seq_cache(glycan, root)
-  paste0(seq_glycan_iupac(root, seq_cache), "(", glycan$anomer, "-")
-}
-
 #' Calculate linkage rank used for ordering linkages
 #'
 #' This is the reciprocal of the second position of the linkage.

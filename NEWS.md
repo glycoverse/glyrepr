@@ -1,5 +1,9 @@
 # glyrepr (development version)
 
+## New features
+
+* New `validate_glycan_graph()`, `canonicalize_glycan_graph()`, `validate_glycan_graph_vector()`, `graph_to_iupac()`, and `new_glycan_structure()` provide a low-level, name-preserving construction pipeline for downstream packages working with trusted glycan graphs. (#75)
+
 ## Minor improvements and bug fixes
 
 * `as_glycan_structure()` gains `on_failure = "na"` to preserve valid elements while replacing element-local parsing or validation failures with `NA` and reporting one aggregated warning. (#73)
