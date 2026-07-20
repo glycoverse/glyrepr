@@ -2,6 +2,19 @@
 
 ## glyrepr (development version)
 
+### New features
+
+- New
+  [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph.md),
+  [`canonicalize_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graph.md),
+  [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph_vector.md),
+  [`graph_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/graph_to_iupac.md),
+  and
+  [`new_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/new_glycan_structure.md)
+  provide a low-level, name-preserving construction pipeline for
+  downstream packages working with trusted glycan graphs.
+  ([\#75](https://github.com/glycoverse/glyrepr/issues/75))
+
 ### Minor improvements and bug fixes
 
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
