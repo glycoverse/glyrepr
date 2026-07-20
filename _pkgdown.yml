@@ -26,6 +26,16 @@ reference:
   - structure_edges
   - structure_to_iupac
   - get_structure_level
+- title: "Low-Level Glycan Graph Infrastructure"
+  desc: >
+    Developer-facing functions for validating and canonicalizing glycan graphs,
+    generating IUPAC-condensed keys, and assembling trusted structure vectors.
+  contents:
+  - validate_glycan_graph
+  - canonicalize_glycan_graph
+  - validate_glycan_graph_vector
+  - graph_to_iupac
+  - new_glycan_structure
 - title: "Glycan Composition and Structure Manipulation"
   contents:
   - convert_to_generic

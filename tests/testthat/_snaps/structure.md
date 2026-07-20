@@ -23,7 +23,7 @@
     Condition
       Error in `purrr::map()`:
       i In index: 2.
-      Caused by error in `validate_single_glycan_structure()`:
+      Caused by error in `validate_glycan_graph()`:
       ! Unknown monosaccharide: NotAMonosaccharide
 
 # as_glycan_structure keeps vector-level failures strict
@@ -31,7 +31,7 @@
     Code
       as_glycan_structure(iupacs, on_failure = "na")
     Condition
-      Error in `validate_glycan_structure_vector()`:
+      Error in `validate_glycan_graph_vector()`:
       ! All structures must have the same monosaccharide type.
       x Found 1 concrete and 1 generic structure(s) in the same vector.
       i Use `convert_to_generic()` to convert concrete structures to generic type.

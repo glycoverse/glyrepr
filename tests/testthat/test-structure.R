@@ -542,10 +542,10 @@ test_that("as_glycan_structure keeps existing missing elements silently", {
 })
 
 test_that("as_glycan_structure validates graph elements only once", {
-  original_validator <- validate_single_glycan_structure
+  original_validator <- validate_glycan_graph
   validation_count <- 0
   testthat::local_mocked_bindings(
-    validate_single_glycan_structure = function(glycan) {
+    validate_glycan_graph = function(glycan) {
       validation_count <<- validation_count + 1
       original_validator(glycan)
     }

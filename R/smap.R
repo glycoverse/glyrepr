@@ -67,7 +67,7 @@ NULL
   # Get new IUPACs for all modified graphs
   new_unique_iupacs <- purrr::map_chr(
     modified_graphs,
-    .structure_to_iupac_single
+    graph_to_iupac
   )
   new_iupacs <- new_unique_iupacs[idx_mapping]
 
