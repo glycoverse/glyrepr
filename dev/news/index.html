@@ -42,18 +42,17 @@
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li>New <code><a href="../reference/validate_glycan_graph.html">validate_glycan_graph()</a></code>, <code><a href="../reference/canonicalize_glycan_graph.html">canonicalize_glycan_graph()</a></code>, <code><a href="../reference/validate_glycan_graph_vector.html">validate_glycan_graph_vector()</a></code>, <code><a href="../reference/graph_to_iupac.html">graph_to_iupac()</a></code>, and <code><a href="../reference/new_glycan_structure.html">new_glycan_structure()</a></code> provide a low-level, name-preserving construction pipeline for downstream packages working with trusted glycan graphs. (<a href="https://github.com/glycoverse/glyrepr/issues/75" class="external-link">#75</a>)</li>
+<ul><li>The low-level <code><a href="../reference/validate_glycan_graph.html">validate_glycan_graph()</a></code>, <code><a href="../reference/canonicalize_glycan_graph.html">canonicalize_glycan_graph()</a></code>, <code><a href="../reference/validate_glycan_graph_vector.html">validate_glycan_graph_vector()</a></code>, <code><a href="../reference/graph_to_iupac.html">graph_to_iupac()</a></code>, and <code><a href="../reference/new_glycan_structure.html">new_glycan_structure()</a></code> APIs support name-preserving construction from trusted glycan graphs. (<a href="https://github.com/glycoverse/glyrepr/issues/75" class="external-link">#75</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
-<ul><li>Restore compatibility for downstream packages that used the former internal scalar graph validator.</li>
+<ul><li>Glycan structures now allow multiple substituents with unknown positions. (<a href="https://github.com/glycoverse/glyrepr/issues/67" class="external-link">#67</a>)</li>
 <li>
-<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> gains <code>on_failure = "na"</code> to preserve valid elements while replacing element-local parsing or validation failures with <code>NA</code> and reporting one aggregated warning. (<a href="https://github.com/glycoverse/glyrepr/issues/73" class="external-link">#73</a>)</li>
-<li>
-<code><a href="../reference/fill_anomer_pos.html">fill_anomer_pos()</a></code> now accepts glycan structures with generic monosaccharides. (<a href="https://github.com/glycoverse/glyrepr/issues/70" class="external-link">#70</a>)</li>
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> gains <code>on_failure = "na"</code> to preserve valid elements, replace element-local failures with <code>NA</code>, and report one aggregated warning. (<a href="https://github.com/glycoverse/glyrepr/issues/73" class="external-link">#73</a>)</li>
 <li>
 <code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code> now converts concrete monosaccharides in mixed concrete/generic character vectors. (<a href="https://github.com/glycoverse/glyrepr/issues/68" class="external-link">#68</a>)</li>
-<li>Allow multiple substituents with unknown positions in glycan structures. (<a href="https://github.com/glycoverse/glyrepr/issues/67" class="external-link">#67</a>)</li>
+<li>
+<code><a href="../reference/fill_anomer_pos.html">fill_anomer_pos()</a></code> now accepts glycan structures with generic monosaccharides. (<a href="https://github.com/glycoverse/glyrepr/issues/70" class="external-link">#70</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">

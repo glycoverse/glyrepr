@@ -4,35 +4,31 @@
 
 ### New features
 
-- New
+- The low-level
   [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph.md),
   [`canonicalize_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graph.md),
   [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph_vector.md),
   [`graph_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/graph_to_iupac.md),
   and
   [`new_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/new_glycan_structure.md)
-  provide a low-level, name-preserving construction pipeline for
-  downstream packages working with trusted glycan graphs.
+  APIs support name-preserving construction from trusted glycan graphs.
   ([\#75](https://github.com/glycoverse/glyrepr/issues/75))
 
 ### Minor improvements and bug fixes
 
-- Restore compatibility for downstream packages that used the former
-  internal scalar graph validator.
+- Glycan structures now allow multiple substituents with unknown
+  positions. ([\#67](https://github.com/glycoverse/glyrepr/issues/67))
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
-  gains `on_failure = "na"` to preserve valid elements while replacing
-  element-local parsing or validation failures with `NA` and reporting
-  one aggregated warning.
+  gains `on_failure = "na"` to preserve valid elements, replace
+  element-local failures with `NA`, and report one aggregated warning.
   ([\#73](https://github.com/glycoverse/glyrepr/issues/73))
-- [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md)
-  now accepts glycan structures with generic monosaccharides.
-  ([\#70](https://github.com/glycoverse/glyrepr/issues/70))
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md)
   now converts concrete monosaccharides in mixed concrete/generic
   character vectors.
   ([\#68](https://github.com/glycoverse/glyrepr/issues/68))
-- Allow multiple substituents with unknown positions in glycan
-  structures. ([\#67](https://github.com/glycoverse/glyrepr/issues/67))
+- [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md)
+  now accepts glycan structures with generic monosaccharides.
+  ([\#70](https://github.com/glycoverse/glyrepr/issues/70))
 
 ## glyrepr 0.13.0
 
