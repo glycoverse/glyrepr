@@ -58,9 +58,9 @@ underlying graph with
 glycan <- n_glycan_core()
 graph <- get_structure_graphs(glycan)
 graph
-#> IGRAPH f5e3137 DN-- 5 4 -- 
+#> IGRAPH 1655e74 DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from f5e3137 (vertex names):
+#> + edges from 1655e74 (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 ```
 
@@ -199,7 +199,7 @@ sum(igraph::degree(graph, mode = "out") > 1)
 
 bfs_result <- igraph::bfs(graph, root = 1, mode = "out")
 bfs_result$order
-#> + 5/5 vertices, named, from f5e3137:
+#> + 5/5 vertices, named, from 1655e74:
 #> [1] 1 2 3 4 5
 ```
 

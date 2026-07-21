@@ -17,6 +17,8 @@
 
 ### Minor improvements and bug fixes
 
+- Restore compatibility for downstream packages that used the former
+  internal scalar graph validator.
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   gains `on_failure = "na"` to preserve valid elements while replacing
   element-local parsing or validation failures with `NA` and reporting
