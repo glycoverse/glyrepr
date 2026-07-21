@@ -2,15 +2,15 @@
 
 |field    |value                                                                                               |
 |:--------|:---------------------------------------------------------------------------------------------------|
-|version  |R version 4.6.0 (2026-04-24)                                                                        |
-|os       |macOS Tahoe 26.5.1                                                                                  |
+|version  |R version 4.6.1 (2026-06-24)                                                                        |
+|os       |macOS Tahoe 26.5.2                                                                                  |
 |system   |aarch64, darwin23                                                                                   |
 |ui       |Positron                                                                                            |
 |language |(EN)                                                                                                |
 |collate  |en_US.UTF-8                                                                                         |
 |ctype    |en_US.UTF-8                                                                                         |
 |tz       |Asia/Shanghai                                                                                       |
-|date     |2026-07-03                                                                                          |
+|date     |2026-07-21                                                                                          |
 |pandoc   |3.8.3 @ /Applications/Positron.app/Contents/Resources/app/quarto/bin/tools/aarch64/ (via rmarkdown) |
 |quarto   |1.8.26 @ /Applications/quarto/bin/quarto                                                            |
 
@@ -18,7 +18,7 @@
 
 |package |old    |new         |Δ  |
 |:-------|:------|:-----------|:--|
-|glyrepr |0.12.1 |0.12.1.9000 |*  |
+|glyrepr |0.13.0 |0.13.0.9000 |*  |
 
 # Revdeps
 
