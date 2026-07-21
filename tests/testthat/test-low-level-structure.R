@@ -30,6 +30,13 @@ test_that("validate_glycan_graph returns valid input unchanged", {
 })
 
 
+test_that("legacy scalar graph validation remains available", {
+  graph <- get_structure_graphs(o_glycan_core_1(), return_list = FALSE)
+
+  expect_identical(validate_single_glycan_structure(graph), graph)
+})
+
+
 test_that("validate_glycan_graph reports invalid input", {
   graph <- igraph::as_undirected(
     get_structure_graphs(o_glycan_core_1(), return_list = FALSE)

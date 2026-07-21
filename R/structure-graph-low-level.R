@@ -107,6 +107,13 @@ validate_glycan_graph <- function(graph) {
 }
 
 
+# Compatibility alias retained for downstream packages that used the former
+# internal scalar validator.
+validate_single_glycan_structure <- function(glycan) {
+  validate_glycan_graph(glycan)
+}
+
+
 #' Canonicalize a Glycan Graph
 #'
 #' Add a vertex `name` attribute when needed and reorder the vertices and edges
