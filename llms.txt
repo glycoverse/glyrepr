@@ -141,6 +141,23 @@ count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
 - [`get_structure_level()`](https://glycoverse.github.io/glyrepr/reference/get_structure_level.md)
   : Get the Structure Resolution Levels
 
+## Low-Level Glycan Graph Infrastructure
+
+Developer-facing functions for validating and canonicalizing glycan
+graphs, generating IUPAC-condensed keys, and assembling trusted
+structure vectors.
+
+- [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/reference/validate_glycan_graph.md)
+  : Validate a Glycan Graph
+- [`canonicalize_glycan_graph()`](https://glycoverse.github.io/glyrepr/reference/canonicalize_glycan_graph.md)
+  : Canonicalize a Glycan Graph
+- [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/reference/validate_glycan_graph_vector.md)
+  : Validate Compatibility Across Glycan Graphs
+- [`graph_to_iupac()`](https://glycoverse.github.io/glyrepr/reference/graph_to_iupac.md)
+  : Generate IUPAC-Condensed from a Glycan Graph
+- [`new_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/new_glycan_structure.md)
+  : Construct a Glycan Structure Vector from Trusted Data
+
 ## Glycan Composition and Structure Manipulation
 
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/reference/convert_to_generic.md)

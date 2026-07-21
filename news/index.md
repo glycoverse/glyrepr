@@ -1,5 +1,35 @@
 # Changelog
 
+## glyrepr 0.14.0
+
+### New features
+
+- The low-level
+  [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/reference/validate_glycan_graph.md),
+  [`canonicalize_glycan_graph()`](https://glycoverse.github.io/glyrepr/reference/canonicalize_glycan_graph.md),
+  [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/reference/validate_glycan_graph_vector.md),
+  [`graph_to_iupac()`](https://glycoverse.github.io/glyrepr/reference/graph_to_iupac.md),
+  and
+  [`new_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/new_glycan_structure.md)
+  APIs support name-preserving construction from trusted glycan graphs.
+  ([\#75](https://github.com/glycoverse/glyrepr/issues/75))
+
+### Minor improvements and bug fixes
+
+- Glycan structures now allow multiple substituents with unknown
+  positions. ([\#67](https://github.com/glycoverse/glyrepr/issues/67))
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md)
+  gains `on_failure = "na"` to preserve valid elements, replace
+  element-local failures with `NA`, and report one aggregated warning.
+  ([\#73](https://github.com/glycoverse/glyrepr/issues/73))
+- [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/reference/convert_to_generic.md)
+  now converts concrete monosaccharides in mixed concrete/generic
+  character vectors.
+  ([\#68](https://github.com/glycoverse/glyrepr/issues/68))
+- [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/reference/fill_anomer_pos.md)
+  now accepts glycan structures with generic monosaccharides.
+  ([\#70](https://github.com/glycoverse/glyrepr/issues/70))
+
 ## glyrepr 0.13.0
 
 CRAN release: 2026-07-05

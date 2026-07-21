@@ -16,7 +16,7 @@ fill_anomer_pos(strucs)
 
   A
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.md)
-  vector with concrete monosaccharides.
+  vector with concrete or generic monosaccharides.
 
 ## Value
 

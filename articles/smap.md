@@ -266,14 +266,14 @@ library(tictoc)
 tic("smap_int (optimized)")
 vertex_counts_optimized <- smap_int(huge_struc, igraph::vcount)
 toc()
-#> smap_int (optimized): 0.029 sec elapsed
+#> smap_int (optimized): 0.032 sec elapsed
 
 # Naive approach: extract all graphs and process each one
 tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.238 sec elapsed
+#> Naive approach (all graphs): 0.243 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -429,7 +429,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] tictoc_1.2.1   lobstr_1.2.1   glyrepr_0.13.0
+#> [1] tictoc_1.2.1   lobstr_1.2.1   glyrepr_0.14.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.1    tidyselect_1.2.1 
@@ -438,8 +438,8 @@ sessionInfo()
 #> [13] igraph_2.3.3      knitr_1.51        backports_1.5.1   checkmate_2.3.4  
 #> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.11.0     
 #> [21] pillar_1.11.1     rlang_1.3.0       cachem_1.1.0      stringi_1.8.7    
-#> [25] xfun_0.59         fs_2.1.0          sass_0.4.10       otel_0.2.0       
-#> [29] cli_3.6.6         pkgdown_2.2.0     magrittr_2.0.5    digest_0.6.39    
+#> [25] xfun_0.60         fs_2.1.0          sass_0.4.10       otel_0.2.0       
+#> [29] cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5    digest_0.6.39    
 #> [33] lifecycle_1.0.5   prettyunits_1.2.0 vctrs_0.7.3       evaluate_1.0.5   
 #> [37] glue_1.8.1        ragg_1.5.2        rmarkdown_2.31    purrr_1.2.2      
 #> [41] tools_4.6.1       pkgconfig_2.0.3   htmltools_0.5.9

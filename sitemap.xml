@@ -19,6 +19,7 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/available_monosaccharides.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/available_substituents.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/canonicalize_glycan_graph.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/colorize_iupac_string.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/convert_to_generic.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/count_mono.html</loc></url>
@@ -35,11 +36,13 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/glycan_structure.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/glyrepr-package.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/glyrepr-vctrs.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/graph_to_iupac.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/has_linkages.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/index.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/infer_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/is_known_monosaccharide.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/n_glycan_core.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/new_glycan_structure.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/possible_linkages.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/reduce_structure_level.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/remove_linkages.html</loc></url>
@@ -54,5 +57,7 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/structure_tables.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/structure_to_iupac.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/valid_linkages.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/validate_glycan_graph.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/validate_glycan_graph_vector.html</loc></url>
 </urlset>
 

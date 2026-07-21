@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.13.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.14.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,23 @@
       <small>Source: <a href="https://github.com/glycoverse/glyrepr/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.14.0" id="glyrepr-0140">glyrepr 0.14.0<a class="anchor" aria-label="anchor" href="#glyrepr-0140"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-14-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-14-0"></a></h3>
+<ul><li>The low-level <code><a href="../reference/validate_glycan_graph.html">validate_glycan_graph()</a></code>, <code><a href="../reference/canonicalize_glycan_graph.html">canonicalize_glycan_graph()</a></code>, <code><a href="../reference/validate_glycan_graph_vector.html">validate_glycan_graph_vector()</a></code>, <code><a href="../reference/graph_to_iupac.html">graph_to_iupac()</a></code>, and <code><a href="../reference/new_glycan_structure.html">new_glycan_structure()</a></code> APIs support name-preserving construction from trusted glycan graphs. (<a href="https://github.com/glycoverse/glyrepr/issues/75" class="external-link">#75</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-0-14-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-14-0"></a></h3>
+<ul><li>Glycan structures now allow multiple substituents with unknown positions. (<a href="https://github.com/glycoverse/glyrepr/issues/67" class="external-link">#67</a>)</li>
+<li>
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> gains <code>on_failure = "na"</code> to preserve valid elements, replace element-local failures with <code>NA</code>, and report one aggregated warning. (<a href="https://github.com/glycoverse/glyrepr/issues/73" class="external-link">#73</a>)</li>
+<li>
+<code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code> now converts concrete monosaccharides in mixed concrete/generic character vectors. (<a href="https://github.com/glycoverse/glyrepr/issues/68" class="external-link">#68</a>)</li>
+<li>
+<code><a href="../reference/fill_anomer_pos.html">fill_anomer_pos()</a></code> now accepts glycan structures with generic monosaccharides. (<a href="https://github.com/glycoverse/glyrepr/issues/70" class="external-link">#70</a>)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.13.0" id="glyrepr-0130">glyrepr 0.13.0<a class="anchor" aria-label="anchor" href="#glyrepr-0130"></a></h2><p class="text-muted">CRAN release: 2026-07-05</p>
 <div class="section level3">
@@ -306,7 +323,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>
