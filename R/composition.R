@@ -403,6 +403,12 @@ is.na.glyrepr_composition <- function(x, ...) {
 }
 
 #' @export
+print.glyrepr_composition <- function(x, ..., n = 10) {
+  vctrs::obj_print(x, ..., max_n = n)
+  invisible(x)
+}
+
+#' @export
 obj_print_data.glyrepr_composition <- function(
   x,
   ...,

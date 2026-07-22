@@ -19,3 +19,33 @@
       Simple composition codes "E" and/or "L" are parsed as "NeuAc".
       i Linkage-specific Neu5Ac information is discarded in glycan compositions.
 
+# print.glyrepr_composition supports n
+
+    <glycan_composition[11]>
+    [1] Hex(5)
+    [2] Hex(5)
+    [3] Hex(5)
+    [4] Hex(5)
+    [5] Hex(5)
+    [6] Hex(5)
+    [7] Hex(5)
+    [8] Hex(5)
+    [9] Hex(5)
+    [10] Hex(5)
+    ... (1 more not shown)
+
+---
+
+    <glycan_composition[11]>
+    [1] Hex(5)
+    [2] Hex(5)
+    [3] Hex(5)
+    [4] Hex(5)
+    [5] Hex(5)
+    [6] Hex(5)
+    [7] Hex(5)
+    [8] Hex(5)
+    [9] Hex(5)
+    [10] Hex(5)
+    [11] Hex(5)
+

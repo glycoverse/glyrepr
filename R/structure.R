@@ -364,6 +364,12 @@ format_glycan_structure_subset <- function(x, indices, colored = TRUE) {
 
 
 #' @export
+print.glyrepr_structure <- function(x, ..., n = 10) {
+  vctrs::obj_print(x, ..., max_n = n)
+  invisible(x)
+}
+
+#' @export
 obj_print_footer.glyrepr_structure <- function(x, ...) {
   cat(
     "# Unique structures: ",
