@@ -2,7 +2,13 @@
 
 ## glyrepr (development version)
 
+- [`print()`](https://rdrr.io/r/base/print.html) gains an `n` argument
+  for `glyrepr_structure` and `glyrepr_composition` vectors.
+  ([\#77](https://github.com/glycoverse/glyrepr/issues/77))
+
 ## glyrepr 0.14.0
+
+CRAN release: 2026-07-21
 
 ### New features
 
