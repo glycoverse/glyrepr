@@ -507,6 +507,13 @@ test_that("print handles NA compositions", {
   expect_true(any(grepl("<NA>", output)))
 })
 
+test_that("print.glyrepr_composition supports n", {
+  compositions <- rep(glycan_composition(c(Hex = 5)), 11)
+
+  expect_snapshot_output(print(compositions))
+  expect_snapshot_output(print(compositions, n = Inf))
+})
+
 test_that("tibble printing handles NA compositions", {
   comp <- c(glycan_composition(c(Hex = 5)), NA)
   tibble <- tibble::tibble(comp = comp, a = 1:2)

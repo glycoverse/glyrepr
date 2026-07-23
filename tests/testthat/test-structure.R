@@ -695,6 +695,13 @@ test_that("obj_print_footer.glyrepr_structure handles empty vector", {
   expect_match(output, "# Unique structures: 0")
 })
 
+test_that("print.glyrepr_structure supports n", {
+  structures <- rep(n_glycan_core(), 11)
+
+  expect_snapshot_output(print(structures))
+  expect_snapshot_output(print(structures, n = Inf))
+})
+
 # Tests for get_structure_graphs ----------------------------------------------
 
 test_that("get_structure_graphs extracts individual structures correctly", {
