@@ -1,6 +1,6 @@
 # glyrepr (development version)
 
-* `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#71)
+* `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)
 
 # glyrepr 0.14.0
 
