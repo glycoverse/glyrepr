@@ -5,6 +5,9 @@
 - [`print()`](https://rdrr.io/r/base/print.html) gains an `n` argument
   for `glyrepr_structure` and `glyrepr_composition` vectors.
   ([\#77](https://github.com/glycoverse/glyrepr/issues/77))
+- IUPAC-condensed sequence generation from glycan graphs is faster by
+  reducing repeated `igraph` extraction.
+  ([\#78](https://github.com/glycoverse/glyrepr/issues/78))
 
 ## glyrepr 0.14.0
 
