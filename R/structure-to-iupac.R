@@ -148,12 +148,13 @@ calculate_depths <- function(glycan, root, children = NULL) {
 #'   The signature of a node is a string used for branch ordering in ties breaking.
 #'
 #' @param glycan An igraph object representing a glycan structure
-#' @param root Root vertex index used for depth calculation
 #' @returns List containing child vertices, edge ids, linkages per parent, and node depths
 #' @noRd
-build_seq_cache <- function(glycan, root) {
+build_seq_cache <- function(glycan) {
   vcount <- igraph::vcount(glycan)
-  edge_ids <- seq_len(igraph::ecount(glycan))
+  edge_vertices <- igraph::as_edgelist(glycan, names = FALSE)
+  edge_ids <- seq_len(nrow(edge_vertices))
+  root <- setdiff(seq_len(vcount), edge_vertices[, 2])
 
   children <- vector("list", vcount)
   parent_edge_ids <- vector("list", vcount)
@@ -165,8 +166,7 @@ build_seq_cache <- function(glycan, root) {
   }
 
   if (length(edge_ids) > 0) {
-    edge_vertices <- igraph::ends(glycan, igraph::E(glycan), names = FALSE)
-    edge_linkages <- igraph::edge_attr(glycan, "linkage")
+    edge_linkages <- igraph::edge_attr(glycan)$linkage
     edge_ids_by_parent <- split(edge_ids, edge_vertices[, 1])
 
     for (parent in names(edge_ids_by_parent)) {
@@ -179,8 +179,9 @@ build_seq_cache <- function(glycan, root) {
   }
 
   # ===== Calculate node signatures =====
-  mono_vec <- igraph::vertex_attr(glycan, "mono")
-  sub_vec <- igraph::vertex_attr(glycan, "sub")
+  vertex_attributes <- igraph::vertex_attr(glycan)
+  mono_vec <- vertex_attributes$mono
+  sub_vec <- vertex_attributes$sub
   mono_sub <- ifelse(
     is.na(sub_vec) | sub_vec == "",
     mono_vec,
@@ -226,6 +227,7 @@ build_seq_cache <- function(glycan, root) {
   # ===== End of calculating node signatures =====
 
   list(
+    root = root,
     children = children,
     edge_ids = parent_edge_ids,
     linkages = parent_linkages,
