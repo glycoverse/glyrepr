@@ -213,8 +213,8 @@ validate_glycan_graph_vector <- function(graphs, label = NULL) {
 #' @export
 graph_to_iupac <- function(graph) {
   checkmate::assert_class(graph, "igraph")
-  root <- which(igraph::degree(graph, mode = "in") == 0)
-  seq_cache <- build_seq_cache(graph, root)
+  seq_cache <- build_seq_cache(graph)
+  root <- seq_cache$root
   paste0(seq_glycan_iupac(root, seq_cache), "(", graph$anomer, "-")
 }
 

@@ -25,8 +25,8 @@ reorder_graphs_with_indices <- function(graphs) {
 }
 
 .reorder_one_graph <- function(graph) {
-  root <- which(igraph::degree(graph, mode = "in") == 0)
-  seq_cache <- build_seq_cache(graph, root)
+  seq_cache <- build_seq_cache(graph)
+  root <- seq_cache$root
   order <- seq_glycan_order(root, seq_cache)
   .reorder_by_sequence_order(graph, order)
 }

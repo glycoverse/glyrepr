@@ -1,6 +1,7 @@
 # glyrepr (development version)
 
 * `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)
+* IUPAC-condensed sequence generation from glycan graphs is faster by reducing repeated `igraph` extraction. (#78)
 
 # glyrepr 0.14.0
 
