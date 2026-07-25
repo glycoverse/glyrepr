@@ -335,6 +335,17 @@ test_that("validating duplicated linkage positions", {
 })
 
 
+test_that("the same linkage position on different residues is valid", {
+  graph <- igraph::make_graph(~ 1 - +2, 1 - +3, 2 - +4)
+  igraph::V(graph)$mono <- c("GalNAc", "Gal", "Neu5Ac", "GlcNAc")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- c("b1-4", "a2-3", "b1-3")
+  graph$anomer <- "a1"
+
+  expect_no_error(glycan_structure(graph))
+})
+
+
 test_that("duplicated ? linkages are OK", {
   graph <- igraph::make_graph(~ 1 - +2, 1 - +3)
   igraph::V(graph)$mono <- c("GalNAc", "Gal", "Neu5Ac")

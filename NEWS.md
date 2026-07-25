@@ -1,5 +1,6 @@
 # glyrepr (development version)
 
+* `validate_glycan_graph()` and structure parsing are faster by checking linkage positions in bulk. (#79)
 * `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)
 * IUPAC-condensed sequence generation from glycan graphs is faster by reducing repeated `igraph` extraction. (#78)
 
