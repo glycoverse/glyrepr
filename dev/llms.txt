@@ -18,28 +18,30 @@ You can install the latest release of glyrepr from
 
 ``` r
 
-install.packages("glyrepr")
+pak::pkg_install("glyrepr")
 ```
 
 Or from [r-universe](https://glycoverse.r-universe.dev/glyrepr):
 
 ``` r
 
-install.packages('glyrepr', repos = c('https://glycoverse.r-universe.dev', 'https://cloud.r-project.org'))
+pak::repo_add(glycoverse = "https://glycoverse.r-universe.dev")
+pak::pkg_install("glyrepr")
 ```
 
-Or from [GitHub](https://github.com/glycoverse/glyrepr):
+Or install the latest GitHub release:
 
 ``` r
 
-remotes::install_github("glycoverse/glyrepr@*release")
+pak::pkg_install("glycoverse/glyrepr@*release")
 ```
 
-Or install the development version:
+Or install the development version from
+[GitHub](https://github.com/glycoverse/glyrepr):
 
 ``` r
 
-remotes::install_github("glycoverse/glyrepr")
+pak::pkg_install("glycoverse/glyrepr")
 ```
 
 ## Documentation
