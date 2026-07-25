@@ -154,16 +154,25 @@ valid_linkages <- function(linkages) {
 
 
 # Check if any duplicated linkage positions exist.
-# This means the same position of one residue can not be connected to multiple other residues.
-any_dup_linkage_pos <- function(glycan) {
-  for (v in igraph::V(glycan)) {
-    links <- igraph::incident(glycan, v, mode = "out")$linkage
-    pos2 <- stringr::str_split_i(links, stringr::fixed("-"), 2)
-    pos2 <- pos2[pos2 != "?"]
-    pos2 <- pos2[!stringr::str_detect(pos2, stringr::fixed("/"))]
-    if (any(duplicated(pos2))) {
-      return(TRUE)
-    }
+# The same position of one residue cannot connect to multiple other residues.
+any_dup_linkage_pos <- function(
+  glycan,
+  linkages = igraph::edge_attr(glycan, "linkage")
+) {
+  if (length(linkages) < 2L) {
+    return(FALSE)
   }
-  return(FALSE)
+
+  endpoints <- igraph::as_edgelist(glycan, names = FALSE)
+  dash <- regexpr("-", linkages, fixed = TRUE)
+  positions <- substring(linkages, dash + 1L)
+  check <- positions != "?" & !grepl("/", positions, fixed = TRUE)
+  positions <- positions[check]
+
+  if (length(positions) < 2L) {
+    return(FALSE)
+  }
+
+  parents <- endpoints[check, 1L]
+  anyDuplicated(paste(parents, positions, sep = "\r")) > 0L
 }

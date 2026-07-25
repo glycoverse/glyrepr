@@ -91,7 +91,7 @@ validate_glycan_graph <- function(graph) {
     cli::cli_abort(msg, linkages = invalid_linkages)
   }
 
-  if (any_dup_linkage_pos(graph)) {
+  if (any_dup_linkage_pos(graph, linkages)) {
     cli::cli_abort("Duplicated linkage positions.")
   }
 
