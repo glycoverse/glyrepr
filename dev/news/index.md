@@ -2,6 +2,9 @@
 
 ## glyrepr (development version)
 
+- [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph.md)
+  and structure parsing are faster by checking linkage positions in
+  bulk. ([\#79](https://github.com/glycoverse/glyrepr/issues/79))
 - [`print()`](https://rdrr.io/r/base/print.html) gains an `n` argument
   for `glyrepr_structure` and `glyrepr_composition` vectors.
   ([\#77](https://github.com/glycoverse/glyrepr/issues/77))
