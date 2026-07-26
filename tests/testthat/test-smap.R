@@ -999,6 +999,47 @@ test_that("structure mappers validate floating metadata returned by callbacks", 
   )
 })
 
+test_that("structure mappers reuse unchanged validated graphs", {
+  glycan <- c(
+    first = o_glycan_core_1(),
+    duplicate = o_glycan_core_1(),
+    missing = glycan_structure(NA)
+  )
+  original_validator <- validate_glycan_graph
+  validation_count <- 0
+  testthat::local_mocked_bindings(
+    validate_glycan_graph = function(graph) {
+      validation_count <<- validation_count + 1
+      original_validator(graph)
+    }
+  )
+
+  unchanged <- list(
+    smap = smap_structure(glycan, identity),
+    smap2 = smap2_structure(glycan, 1, function(graph, ...) graph),
+    spmap = spmap_structure(
+      list(glycan, 1),
+      function(graph, ...) graph
+    ),
+    simap = simap_structure(glycan, function(graph, ...) graph)
+  )
+  purrr::walk(unchanged, function(result) {
+    expect_identical(as.character(result), as.character(glycan))
+    expect_identical(names(result), names(glycan))
+    expect_identical(is.na(result), is.na(glycan))
+    expect_length(attr(result, "graphs"), 1)
+  })
+  expect_equal(validation_count, 0)
+
+  smap_structure(
+    glycan[1],
+    function(graph) {
+      igraph::set_graph_attr(graph, "mapped", value = TRUE)
+    }
+  )
+  expect_equal(validation_count, 1)
+})
+
 # Additional regression tests for the smap2 nested list fix
 test_that("smap2 handles real glycan structures with nested match results correctly", {
   # Create a realistic glycan structure (simulating glyenzy use case)

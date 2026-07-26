@@ -56,9 +56,10 @@ Similar to purrr pmap functions, but optimized for glycan structure vectors.
 These functions only compute \code{.f} once for each unique combination of structure and corresponding
 values from other vectors, then map the results back to the original vector positions.
 
-\code{spmap_structure()} validates and canonicalizes every graph returned by
-\code{.f}. A callback that changes vertex identities or components of a floating
-structure must also update its \code{floating_parts} metadata.
+\code{spmap_structure()} reuses unchanged graphs and validates and canonicalizes
+changed graphs returned by \code{.f}. A callback that changes vertex identities
+or components of a floating structure must also update its \code{floating_parts}
+metadata.
 
 \strong{NA Handling:}
 NA elements in the first argument (glycan structure vector) are preserved in the output.

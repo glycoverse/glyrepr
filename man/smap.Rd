@@ -54,9 +54,10 @@ These functions only compute \code{.f} once for each unique structure, then map
 the results back to the original vector positions. This is much more efficient
 than applying \code{.f} to each element individually when there are duplicate structures.
 
-Structure-returning variants validate and canonicalize every graph returned
-by \code{.f}. A callback that changes vertex identities or components of a
-floating structure must also update its \code{floating_parts} metadata.
+Structure-returning variants reuse unchanged graphs and validate and
+canonicalize changed graphs returned by \code{.f}. A callback that changes vertex
+identities or components of a floating structure must also update its
+\code{floating_parts} metadata.
 
 \strong{Return Types:}
 \itemize{

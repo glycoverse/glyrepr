@@ -56,9 +56,10 @@ These functions only compute \code{.f} once for each unique combination of struc
 \code{.y} value, then map the results back to the original vector positions. This is much more efficient
 than applying \code{.f} to each element pair individually when there are duplicate structure-value combinations.
 
-\code{smap2_structure()} validates and canonicalizes every graph returned by
-\code{.f}. A callback that changes vertex identities or components of a floating
-structure must also update its \code{floating_parts} metadata.
+\code{smap2_structure()} reuses unchanged graphs and validates and canonicalizes
+changed graphs returned by \code{.f}. A callback that changes vertex identities
+or components of a floating structure must also update its \code{floating_parts}
+metadata.
 
 \strong{NA Handling:}
 NA elements in \code{.x} are preserved in the output - the function is not applied to NA positions,
