@@ -102,3 +102,25 @@
       Caused by error in `floating_graph_info()`:
       ! A floating glycan structure must contain exactly one main tree.
 
+# floating parent indices reject integer overflow
+
+    Code
+      as_glycan_structure("{Neu5Ac(a2-3)|2147483648}Gal(a1-")
+    Condition
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `split_floating_iupac_part()`:
+      ! Floating part parent indices exceed the supported integer range.
+
+---
+
+    Code
+      glycan_structure(graph)
+    Condition
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `.f()`:
+      ! Floating part parents must contain valid vertex indices.
+

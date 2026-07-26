@@ -261,6 +261,26 @@ test_that("invalid floating-part graph annotations are rejected", {
 })
 
 
+test_that("floating parent indices reject integer overflow", {
+  expect_snapshot(
+    as_glycan_structure(
+      "{Neu5Ac(a2-3)|2147483648}Gal(a1-"
+    ),
+    error = TRUE
+  )
+
+  graph <- get_structure_graphs(
+    as_glycan_structure("{Neu5Ac(a2-3)|1}Gal(a1-"),
+    return_list = FALSE
+  )
+  graph$floating_parts[[1]]$parents <- 2147483648
+  expect_snapshot(
+    glycan_structure(graph),
+    error = TRUE
+  )
+})
+
+
 test_that("floating-part identity supports equality and vctrs operations", {
   main <- "Gal(b1-3)GalNAc(a1-"
   unrestricted <- as_glycan_structure(

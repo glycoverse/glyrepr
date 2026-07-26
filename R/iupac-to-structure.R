@@ -114,7 +114,17 @@ split_floating_iupac_part <- function(content) {
         "Floating part parents must be comma-separated positive node indices."
       )
     }
-    parents <- as.integer(stringr::str_split(parent_text, ",")[[1]])
+    parent_tokens <- stringr::str_split(parent_text, ",")[[1]]
+    parent_values <- suppressWarnings(as.double(parent_tokens))
+    if (
+      any(!is.finite(parent_values)) ||
+        any(parent_values > .Machine$integer.max)
+    ) {
+      cli::cli_abort(
+        "Floating part parent indices exceed the supported integer range."
+      )
+    }
+    parents <- as.integer(parent_values)
     if (anyDuplicated(parents) > 0) {
       cli::cli_abort("Floating part parent indices must be unique.")
     }

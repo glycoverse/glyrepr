@@ -93,6 +93,8 @@ normalize_floating_part <- function(part, graph_size) {
     length(root) != 1 ||
       is.na(root) ||
       !is.numeric(root) ||
+      !is.finite(root) ||
+      root > .Machine$integer.max ||
       root != as.integer(root) ||
       root < 1 ||
       root > graph_size
@@ -118,6 +120,8 @@ normalize_floating_part <- function(part, graph_size) {
   if (
     !is.numeric(parents) ||
       anyNA(parents) ||
+      any(!is.finite(parents)) ||
+      any(parents > .Machine$integer.max) ||
       any(parents != as.integer(parents)) ||
       any(parents < 1) ||
       any(parents > graph_size)
