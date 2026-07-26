@@ -264,6 +264,57 @@ structure_component_membership <- function(x) {
 }
 
 
+#' List Potential Virtual Edges for Floating Parts
+#'
+#' @description
+#' `structure_candidate_edges()` represents every potential floating-part
+#' attachment as an explicit virtual edge. `from_node` is a candidate parent in
+#' the main tree and `to_node` is the root of the floating part.
+#'
+#' The rows correspond one-to-one with [structure_floating_candidates()]. For
+#' unrestricted `{<floating>}` parts, every original main-tree node is returned
+#' and `scope` is `"all"`. For explicitly restricted parts, only the declared
+#' parent nodes are returned and `scope` is `"explicit"`.
+#'
+#' Node indices refer to `structure_nodes()$node_id` for the same glycan.
+#' Missing structures and structures without floating parts contribute no
+#' rows. Duplicate structures are expanded to their original vector positions.
+#' If `x` is named, the result also contains a `glycan_name` column.
+#'
+#' @param x A glycan structure vector.
+#'
+#' @returns A tibble with columns `glycan_id`, `part_id`, `from_node`,
+#'   `to_node`, `linkage`, and `scope`, plus `glycan_name` when `x` is named.
+#'
+#' @examples
+#' glycan <- as_glycan_structure(
+#'   "{Neu5Ac(a2-3)|1,2}Gal(b1-3)GalNAc(a1-"
+#' )
+#' structure_candidate_edges(glycan)
+#'
+#' @export
+structure_candidate_edges <- function(x) {
+  candidates <- structure_floating_candidates(x)
+
+  candidates <- dplyr::rename(
+    candidates,
+    from_node = "parent_node",
+    to_node = "root_node"
+  )
+  columns <- c(
+    "glycan_id",
+    if ("glycan_name" %in% names(candidates)) "glycan_name",
+    "part_id",
+    "from_node",
+    "to_node",
+    "linkage",
+    "scope"
+  )
+
+  candidates[, columns]
+}
+
+
 #' @rdname structure_tables
 #' @export
 structure_from_tibbles <- function(
