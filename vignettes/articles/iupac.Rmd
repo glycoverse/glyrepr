@@ -247,6 +247,12 @@ This means that the virtual `a2-3` attachment can use node 1 or node 4.
 The indices follow the left-to-right residue order of the main
 IUPAC-condensed sequence; residues inside floating blocks are not counted.
 The `|1,4` suffix is a `glyrepr` extension to curly-brace IUPAC notation.
+An explicit candidate set needs at least two nodes to remain floating.
+Singleton syntax is still accepted, but it fully localizes the attachment and
+is serialized as an ordinary linkage. For example,
+`{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-` becomes
+`Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`. The same normalization occurs when the
+parent list is omitted and the main glycan has only one node.
 
 Here is the complete bi-antennary example:
 

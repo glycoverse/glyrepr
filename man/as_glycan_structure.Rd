@@ -32,7 +32,11 @@ main-tree node as a candidate parent, while
 \verb{\{Neu5Ac(a2-3)|1,4\}<main>} restricts the candidates to main-tree nodes 1 and
 4. Parent indices follow residue order in the supplied main sequence and are
 remapped to canonical IUPAC order in the result. The \verb{|<parents>} suffix is a
-\code{glyrepr} extension to curly-brace IUPAC notation.
+\code{glyrepr} extension to curly-brace IUPAC notation. A singleton candidate set
+is accepted as input but fully localizes the attachment, so
+\verb{\{Neu5Ac(a2-3)|1\}Gal(b1-4)GlcNAc(b1-} canonicalizes to the ordinary structure
+\verb{Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-}. An omitted parent list behaves the same way
+when the main tree contains only one node.
 }
 \examples{
 library(igraph)

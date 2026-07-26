@@ -18,7 +18,10 @@
 #' refer to `structure_nodes()$node_id` for the same glycan. An empty `parents`
 #' vector means all feasible main-tree nodes are candidates. The `linkage`
 #' column describes the virtual attachment to the main tree; this attachment is
-#' intentionally absent from `structure_edges()`.
+#' intentionally absent from `structure_edges()`. During reconstruction, a row
+#' with exactly one effective candidate parent is normalized to an ordinary
+#' edge and is therefore absent from the resulting
+#' `structure_floating_parts()` table.
 #'
 #' @param x A glycan structure vector.
 #' @param nodes A data frame with columns `glycan_id`, `node_id`, `mono`, and
@@ -45,7 +48,7 @@
 #' structure_from_tibbles(nodes, edges, get_anomer(glycans))
 #'
 #' floating <- as_glycan_structure(
-#'   "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+#'   "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
 #' )
 #' floating_parts <- structure_floating_parts(floating)
 #' structure_from_tibbles(

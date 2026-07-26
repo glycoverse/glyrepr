@@ -54,8 +54,11 @@
 #' - `parents`: integer vertex indices in the main tree. An empty integer vector
 #'   means that all feasible main-tree nodes are candidates.
 #'
-#' The virtual attachment is metadata, not an edge. Floating metadata is
-#' validated and contributes to the canonical structure key.
+#' During canonicalization, a floating part with exactly one candidate parent
+#' is attached to that parent as an ordinary graph edge. This includes an empty
+#' `parents` vector when the main tree has only one node. Only unresolved
+#' attachments retain floating metadata, where the virtual attachment is
+#' metadata rather than an edge and contributes to the canonical structure key.
 #'
 #' # Node and Edge Order
 #'
@@ -127,7 +130,7 @@
 #'
 #' # Example 4: Parse a floating part with explicit candidate parents
 #' floating <- as_glycan_structure(
-#'   "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+#'   "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
 #' )
 #' structure_floating_parts(floating)
 #'
@@ -696,7 +699,11 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #' `{Neu5Ac(a2-3)|1,4}<main>` restricts the candidates to main-tree nodes 1 and
 #' 4. Parent indices follow residue order in the supplied main sequence and are
 #' remapped to canonical IUPAC order in the result. The `|<parents>` suffix is a
-#' `glyrepr` extension to curly-brace IUPAC notation.
+#' `glyrepr` extension to curly-brace IUPAC notation. A singleton candidate set
+#' is accepted as input but fully localizes the attachment, so
+#' `{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-` canonicalizes to the ordinary structure
+#' `Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`. An omitted parent list behaves the same way
+#' when the main tree contains only one node.
 #'
 #' @param x An object to convert to a glycan structure vector.
 #'   Can be an igraph object, a list of igraph objects,
