@@ -11,6 +11,8 @@
 #'     linkage is partially known (not "??-?").
 #'   * If `TRUE`, a glycan is considered to have linkages only if all linkages
 #'     are fully determined (no "?" or multiple positions in the linkage).
+#'   Linkages include both graph edges and the virtual attachment linkage of
+#'   each floating part.
 #'
 #' @returns A logical vector indicating if each glycan structure has linkages.
 #'
@@ -39,13 +41,18 @@ has_linkages <- function(glycan, strict = FALSE) {
 
 # Internal function to check linkages in a single igraph
 .has_linkages_single <- function(glycan, strict) {
+  floating_linkages <- purrr::map_chr(
+    floating_parts_attr(glycan),
+    "linkage"
+  )
+  linkages <- c(igraph::E(glycan)$linkage, floating_linkages)
+
   if (strict) {
-    linkages <- igraph::E(glycan)$linkage
     anomer <- glycan$anomer
     all(!stringr::str_detect(c(linkages, anomer), stringr::fixed("?"))) &&
       all(!stringr::str_detect(linkages, stringr::fixed("/")))
   } else {
-    any(igraph::E(glycan)$linkage != "??-?") | glycan$anomer != "??"
+    any(linkages != "??-?") | glycan$anomer != "??"
   }
 }
 
@@ -132,8 +139,9 @@ possible_linkages <- function(
 
 #' Remove All Linkages from a Glycan
 #'
-#' This function replaces all linkages in a glycan structure with "??-?",
-#' as well as the reducing end anomer with "??-".
+#' This function replaces all graph-edge and floating-part attachment
+#' linkages in a glycan structure with "??-?", as well as the reducing end
+#' anomer with "??-".
 #'
 #' @param glycan A glyrepr_structure vector.
 #'
@@ -160,5 +168,10 @@ remove_linkages <- function(glycan) {
 .remove_linkages_single <- function(glycan) {
   res <- igraph::set_edge_attr(glycan, "linkage", value = "??-?")
   res <- igraph::set_graph_attr(res, "anomer", value = "??")
-  res
+  parts <- normalize_floating_parts(res)
+  parts <- purrr::map(parts, function(part) {
+    part$linkage <- "??-?"
+    part
+  })
+  set_floating_parts_attr(res, parts)
 }

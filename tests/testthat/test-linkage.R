@@ -37,6 +37,19 @@ test_that("has_linkages() considers anomers", {
   expect_true(has_linkages(glycan))
 })
 
+test_that("has_linkages() considers floating attachment linkages", {
+  known <- as_glycan_structure("{Neu5Ac(a2-3)}Gal(a1-")
+  unknown <- as_glycan_structure("{Neu5Ac(??-?)}Gal(??-")
+  partial <- as_glycan_structure("{Neu5Ac(a2-?)}Gal(a1-")
+
+  expect_true(has_linkages(known))
+  expect_true(has_linkages(known, strict = TRUE))
+  expect_false(has_linkages(unknown))
+  expect_false(has_linkages(unknown, strict = TRUE))
+  expect_true(has_linkages(partial))
+  expect_false(has_linkages(partial, strict = TRUE))
+})
+
 # ========= possible_linkages() =========
 # Tests for possible_linkages() function
 test_that("possible_linkages() works for a?-2", {
@@ -123,4 +136,20 @@ test_that("remove_linkages() works", {
   graph <- get_structure_graphs(glycan, return_list = FALSE)
   expect_equal(igraph::E(graph)$linkage, c("??-?", "??-?"))
   expect_equal(igraph::graph_attr(graph, "anomer"), "??")
+})
+
+test_that("remove_linkages() removes floating attachment linkages", {
+  glycan <- as_glycan_structure(
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  )
+
+  result <- remove_linkages(glycan)
+
+  expect_identical(
+    as.character(result),
+    "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-"
+  )
+  parts <- structure_floating_parts(result)
+  expect_identical(parts$linkage, "??-?")
+  expect_identical(parts$parents[[1]], c(1L, 2L))
 })
