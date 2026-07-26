@@ -962,7 +962,7 @@ test_that("spmap_structure correctly updates unique structures count when modifi
 
 test_that("structure mappers recanonicalize floating candidate indices", {
   glycan <- as_glycan_structure(
-    "{Neu5Ac(a2-3)|2}Fuc(a1-2)[Gal(a1-3)]Man(a1-"
+    "{Neu5Ac(a2-4)|2,3}Fuc(a1-2)[Gal(a1-3)]Man(a1-"
   )
   strip_tree_linkages <- function(graph, ...) {
     graph <- igraph::set_edge_attr(graph, "linkage", value = "??-?")
@@ -979,18 +979,18 @@ test_that("structure mappers recanonicalize floating candidate indices", {
   purrr::walk(results, function(result) {
     expect_identical(
       as.character(result),
-      "{Neu5Ac(a2-3)|1}Gal(??-?)[Fuc(??-?)]Man(??-"
+      "{Neu5Ac(a2-4)|1,3}Gal(??-?)[Fuc(??-?)]Man(??-"
     )
     expect_identical(
       structure_floating_parts(result)$parents[[1]],
-      1L
+      c(1L, 3L)
     )
   })
 })
 
 test_that("structure mappers validate floating metadata returned by callbacks", {
   glycan <- as_glycan_structure(
-    "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
   )
 
   expect_snapshot(

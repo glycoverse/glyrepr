@@ -397,7 +397,58 @@ component_sequence_order <- function(graph, vertices) {
   )
 }
 
+resolve_single_parent_floating_parts <- function(graph) {
+  parts <- normalize_floating_parts(graph)
+  if (length(parts) == 0) {
+    return(graph)
+  }
+
+  info <- floating_graph_info(graph, parts)
+  candidate_parents <- purrr::map(parts, function(part) {
+    if (length(part$parents) > 0) {
+      part$parents
+    } else {
+      info$main_vertices
+    }
+  })
+  resolved <- lengths(candidate_parents) == 1
+  if (!any(resolved)) {
+    return(graph)
+  }
+
+  for (part_id in which(resolved)) {
+    part <- parts[[part_id]]
+    graph <- igraph::add_edges(
+      graph,
+      c(candidate_parents[[part_id]][[1]], part$root),
+      linkage = part$linkage
+    )
+  }
+
+  remaining <- parts[!resolved]
+  if (length(remaining) == 0) {
+    return(delete_floating_parts_attr(graph))
+  }
+
+  # An unrestricted part refers to every node in the original main tree.
+  # Materialize that domain before resolved components enlarge the main tree.
+  remaining <- purrr::map(remaining, function(part) {
+    if (length(part$parents) == 0) {
+      part$parents <- as.integer(info$main_vertices)
+    }
+    part
+  })
+  set_floating_parts_attr(graph, remaining)
+}
+
 canonicalize_floating_graph <- function(graph) {
+  graph <- resolve_single_parent_floating_parts(graph)
+  if (!has_floating_parts_graph(graph)) {
+    seq_cache <- build_seq_cache(graph)
+    order <- seq_glycan_order(seq_cache$root, seq_cache)
+    return(.reorder_by_sequence_order(graph, order))
+  }
+
   parts <- normalize_floating_parts(graph)
   info <- floating_graph_info(graph, parts)
   original_names <- igraph::V(graph)$name

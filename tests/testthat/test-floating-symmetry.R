@@ -1,6 +1,6 @@
 .make_symmetric_floating_graph <- function(
   edge_order = c(1, 2, 1, 3),
-  parent = 2L
+  parents = c(1L, 2L)
 ) {
   graph <- igraph::make_empty_graph(4, directed = TRUE)
   graph <- igraph::add_edges(graph, edge_order)
@@ -10,7 +10,7 @@
   igraph::E(graph)$linkage <- c("a1-?", "a1-?")
   graph$anomer <- "a1"
   graph$floating_parts <- list(
-    list(root = 4L, linkage = "a2-3", parents = parent)
+    list(root = 4L, linkage = "a2-3", parents = parents)
   )
   graph
 }
@@ -41,16 +41,16 @@ test_that("symmetric edge permutations normalize explicit parents", {
 
   expect_equal(
     .floating_symmetry_parent_positions(graph_a),
-    list(1L)
+    list(c(1L, 3L))
   )
   expect_equal(
     .floating_symmetry_parent_positions(graph_b),
-    list(1L)
+    list(c(1L, 3L))
   )
 
   glycan_a <- glycan_structure(graph_a)
   glycan_b <- glycan_structure(graph_b)
-  expected <- "{Neu5Ac(a2-3)|1}Gal(a1-?)[Gal(a1-?)]Glc(a1-"
+  expected <- "{Neu5Ac(a2-3)|1,3}Gal(a1-?)[Gal(a1-?)]Glc(a1-"
 
   expect_identical(structure_to_iupac(glycan_a), expected)
   expect_identical(structure_to_iupac(glycan_b), expected)
@@ -69,7 +69,7 @@ test_that("symmetric vertex permutations normalize explicit parents", {
   igraph::E(graph_b)$linkage <- c("a1-?", "a1-?")
   graph_b$anomer <- "a1"
   graph_b$floating_parts <- list(
-    list(root = 2L, linkage = "a2-3", parents = 1L)
+    list(root = 2L, linkage = "a2-3", parents = c(1L, 3L))
   )
 
   expect_equal(
@@ -93,7 +93,7 @@ test_that("floating canonicalization does not depend on input vertex names", {
 
   expect_identical(
     structure_to_iupac(glycan),
-    "{Neu5Ac(a2-3)|1}Gal(a1-?)[Gal(a1-?)]Glc(a1-"
+    "{Neu5Ac(a2-3)|1,3}Gal(a1-?)[Gal(a1-?)]Glc(a1-"
   )
 })
 
@@ -115,7 +115,7 @@ test_that("nested symmetric branches use descendant parent constraints", {
     igraph::E(graph)$linkage <- c("b1-?", "b1-4", "b1-?", "b1-4")
     graph$anomer <- "a1"
     graph$floating_parts <- list(
-      list(root = 6L, linkage = "a2-3", parents = 4L)
+      list(root = 6L, linkage = "a2-3", parents = c(1L, 4L))
     )
     graph
   }
@@ -125,11 +125,11 @@ test_that("nested symmetric branches use descendant parent constraints", {
 
   expect_equal(
     .floating_symmetry_parent_positions(graph_a),
-    list(1L)
+    list(c(1L, 5L))
   )
   expect_equal(
     .floating_symmetry_parent_positions(graph_b),
-    list(1L)
+    list(c(1L, 5L))
   )
 
   glycan_a <- glycan_structure(graph_a)
@@ -150,11 +150,11 @@ test_that("multiple parent sets are canonicalized jointly", {
     igraph::E(graph)$linkage <- c("a1-?", "a1-?")
     graph$anomer <- "a1"
     graph$floating_parts <- list(
-      list(root = 4L, linkage = "a1-6", parents = 2L),
+      list(root = 4L, linkage = "a1-6", parents = c(1L, 2L)),
       list(
         root = 5L,
         linkage = "a2-3",
-        parents = if (same_arm) 2L else 3L
+        parents = if (same_arm) c(1L, 2L) else c(1L, 3L)
       )
     )
     graph
@@ -167,11 +167,11 @@ test_that("multiple parent sets are canonicalized jointly", {
 
   expect_equal(
     .floating_symmetry_parent_positions(same_a),
-    list(1L, 1L)
+    list(c(1L, 3L), c(1L, 3L))
   )
   expect_equal(
     .floating_symmetry_parent_positions(same_b),
-    list(1L, 1L)
+    list(c(1L, 3L), c(1L, 3L))
   )
   expect_equal(
     .floating_symmetry_parent_positions(split_a),

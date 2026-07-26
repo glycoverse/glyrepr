@@ -38,9 +38,15 @@ test_that("has_linkages() considers anomers", {
 })
 
 test_that("has_linkages() considers floating attachment linkages", {
-  known <- as_glycan_structure("{Neu5Ac(a2-3)}Gal(a1-")
-  unknown <- as_glycan_structure("{Neu5Ac(??-?)}Gal(??-")
-  partial <- as_glycan_structure("{Neu5Ac(a2-?)}Gal(a1-")
+  known <- as_glycan_structure(
+    "{Neu5Ac(a2-6)}Gal(b1-3)GalNAc(a1-"
+  )
+  unknown <- as_glycan_structure(
+    "{Neu5Ac(??-?)}Gal(??-?)GalNAc(??-"
+  )
+  partial <- as_glycan_structure(
+    "{Neu5Ac(a2-?)}Gal(a1-?)GalNAc(a1-"
+  )
 
   expect_true(has_linkages(known))
   expect_true(has_linkages(known, strict = TRUE))
