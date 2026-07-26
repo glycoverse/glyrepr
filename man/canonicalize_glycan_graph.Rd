@@ -29,6 +29,16 @@ ordinary construction. Incorrect use of these functions can create invalid
 structure vectors that fail in later operations.
 }
 
+\section{Floating graph schema}{
+
+A floating structure is one weakly disconnected graph with exactly one main
+outward tree and one outward tree per floating part. Its \code{floating_parts}
+graph attribute is a list of entries with integer \code{root}, character
+\code{linkage}, and integer \code{parents} fields. \code{parents = integer()} means all
+feasible main-tree nodes. The virtual attachment linkage is not a graph edge.
+See \code{\link[=glycan_structure]{glycan_structure()}} for the complete contract.
+}
+
 \section{Name-preserving manual construction}{
 
 The five low-level functions can reproduce strict graph-based construction

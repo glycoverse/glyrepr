@@ -25,6 +25,15 @@ A glyrepr_structure object.
 \description{
 Convert an object to a glycan structure vector.
 }
+\details{
+Character input supports floating-part blocks before the main
+IUPAC-condensed structure. \verb{\{Neu5Ac(a2-3)\}<main>} allows every feasible
+main-tree node as a candidate parent, while
+\verb{\{Neu5Ac(a2-3)|1,4\}<main>} restricts the candidates to main-tree nodes 1 and
+4. Parent indices follow residue order in the supplied main sequence and are
+remapped to canonical IUPAC order in the result. The \verb{|<parents>} suffix is a
+\code{glyrepr} extension to curly-brace IUPAC notation.
+}
 \examples{
 library(igraph)
 
@@ -43,6 +52,11 @@ as_glycan_structure(list(graph, o_glycan_graph))
 
 # Convert a character vector of IUPAC-condensed strings
 as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
+
+# Parse a floating residue with two candidate parents
+as_glycan_structure(
+  "{Neu5Ac(a2-3)|1,4}Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+)
 
 # Preserve valid elements while replacing an invalid element with NA
 as_glycan_structure(

@@ -54,6 +54,12 @@ missing values in \code{anomers}.
 If \code{x} is named, all three tibbles also contain a \code{glycan_name} column.
 \code{structure_from_tibbles()} uses \code{glycan_name} as output names when that
 column is present.
+
+In \code{structure_floating_parts()}, \code{root_node} and every integer in \code{parents}
+refer to \code{structure_nodes()$node_id} for the same glycan. An empty \code{parents}
+vector means all feasible main-tree nodes are candidates. The \code{linkage}
+column describes the virtual attachment to the main tree; this attachment is
+intentionally absent from \code{structure_edges()}.
 }
 \examples{
 glycans <- c(o_glycan_core_1(), o_glycan_core_1())
@@ -64,6 +70,12 @@ structure_from_tibbles(nodes, edges, get_anomer(glycans))
 floating <- as_glycan_structure(
   "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
 )
-structure_floating_parts(floating)
+floating_parts <- structure_floating_parts(floating)
+structure_from_tibbles(
+  structure_nodes(floating),
+  structure_edges(floating),
+  get_anomer(floating),
+  floating_parts
+)
 
 }

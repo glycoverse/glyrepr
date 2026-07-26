@@ -31,7 +31,10 @@ A glycan structure vector is a vctrs vector with an additional S3 class
 Each glycan structure must satisfy the following constraints:
 \subsection{Graph Structure Requirements}{
 \itemize{
-\item Must be a directed graph with an outward tree structure (reducing end as root)
+\item An ordinary structure must be a directed outward tree (reducing end as
+root).
+\item A structure with floating parts must be one annotated forest containing
+exactly one main outward tree and one outward tree per floating part.
 \item Must have a graph attribute \code{anomer} in the format "a1" or "b1"
 \itemize{
 \item Unknown parts can be represented with "?", e.g., "?1", "a?", "??"
@@ -70,6 +73,22 @@ e.g., "3Me,4Ac", "2S,6P"
 \item NA values are not allowed
 }
 }
+}
+
+\subsection{Floating Parts}{
+
+Floating parts are disconnected substructures whose attachment to the main
+tree is not fully localized. They are declared by the \code{floating_parts} graph
+attribute, a list with one entry per floating component. Each entry contains:
+\itemize{
+\item \code{root}: the integer vertex index of the floating component root.
+\item \code{linkage}: the virtual linkage from that root to the main tree.
+\item \code{parents}: integer vertex indices in the main tree. An empty integer vector
+means that all feasible main-tree nodes are candidates.
+}
+
+The virtual attachment is metadata, not an edge. Floating metadata is
+validated and contributes to the canonical structure key.
 }
 }
 
@@ -132,7 +151,13 @@ complex_graph$anomer <- "b1"
 complex_struct <- glycan_structure(complex_graph)
 print(complex_struct)
 
-# Example 4: Check if object is a glycan structure
+# Example 4: Parse a floating part with explicit candidate parents
+floating <- as_glycan_structure(
+  "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+)
+structure_floating_parts(floating)
+
+# Example 5: Check if object is a glycan structure
 is_glycan_structure(simple_struct)  # TRUE
 is_glycan_structure(graph)          # FALSE
 

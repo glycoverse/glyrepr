@@ -15,7 +15,10 @@
 #' Each glycan structure must satisfy the following constraints:
 #'
 #' ## Graph Structure Requirements
-#' - Must be a directed graph with an outward tree structure (reducing end as root)
+#' - An ordinary structure must be a directed outward tree (reducing end as
+#'   root).
+#' - A structure with floating parts must be one annotated forest containing
+#'   exactly one main outward tree and one outward tree per floating part.
 #' - Must have a graph attribute `anomer` in the format "a1" or "b1"
 #'   - Unknown parts can be represented with "?", e.g., "?1", "a?", "??"
 #'
@@ -39,6 +42,20 @@
 #'   - Unknown positions allowed: "a1-?", "b?-3", "??-?"
 #'   - Partially unknown positions: "a1-3/6", "a1-3/6/9"
 #'   - NA values are not allowed
+#'
+#' ## Floating Parts
+#'
+#' Floating parts are disconnected substructures whose attachment to the main
+#' tree is not fully localized. They are declared by the `floating_parts` graph
+#' attribute, a list with one entry per floating component. Each entry contains:
+#'
+#' - `root`: the integer vertex index of the floating component root.
+#' - `linkage`: the virtual linkage from that root to the main tree.
+#' - `parents`: integer vertex indices in the main tree. An empty integer vector
+#'   means that all feasible main-tree nodes are candidates.
+#'
+#' The virtual attachment is metadata, not an edge. Floating metadata is
+#' validated and contributes to the canonical structure key.
 #'
 #' # Node and Edge Order
 #'
@@ -104,7 +121,13 @@
 #' complex_struct <- glycan_structure(complex_graph)
 #' print(complex_struct)
 #'
-#' # Example 4: Check if object is a glycan structure
+#' # Example 4: Parse a floating part with explicit candidate parents
+#' floating <- as_glycan_structure(
+#'   "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+#' )
+#' structure_floating_parts(floating)
+#'
+#' # Example 5: Check if object is a glycan structure
 #' is_glycan_structure(simple_struct)  # TRUE
 #' is_glycan_structure(graph)          # FALSE
 #'
@@ -663,6 +686,14 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #'
 #' Convert an object to a glycan structure vector.
 #'
+#' Character input supports floating-part blocks before the main
+#' IUPAC-condensed structure. `{Neu5Ac(a2-3)}<main>` allows every feasible
+#' main-tree node as a candidate parent, while
+#' `{Neu5Ac(a2-3)|1,4}<main>` restricts the candidates to main-tree nodes 1 and
+#' 4. Parent indices follow residue order in the supplied main sequence and are
+#' remapped to canonical IUPAC order in the result. The `|<parents>` suffix is a
+#' `glyrepr` extension to curly-brace IUPAC notation.
+#'
 #' @param x An object to convert to a glycan structure vector.
 #'   Can be an igraph object, a list of igraph objects,
 #'   a character vector of IUPAC-condensed strings,
@@ -694,6 +725,11 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #'
 #' # Convert a character vector of IUPAC-condensed strings
 #' as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
+#'
+#' # Parse a floating residue with two candidate parents
+#' as_glycan_structure(
+#'   "{Neu5Ac(a2-3)|1,4}Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+#' )
 #'
 #' # Preserve valid elements while replacing an invalid element with NA
 #' as_glycan_structure(
@@ -927,6 +963,10 @@ warn_structure_failures <- function(positions, reasons, input_names = NULL) {
 #' Access Individual Glycan Structures
 #'
 #' Extract individual glycan structure graphs from a glycan structure vector.
+#' A structure with floating parts is returned as one annotated, weakly
+#' disconnected `igraph`: its main tree and floating components share the graph,
+#' and the `floating_parts` graph attribute records virtual attachments and
+#' candidate parents. See [glycan_structure()] for the metadata schema.
 #'
 #' @param x A glycan structure vector.
 #' @param return_list If `TRUE`, always returns a list.

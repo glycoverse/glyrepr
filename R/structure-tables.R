@@ -14,6 +14,12 @@
 #' `structure_from_tibbles()` uses `glycan_name` as output names when that
 #' column is present.
 #'
+#' In `structure_floating_parts()`, `root_node` and every integer in `parents`
+#' refer to `structure_nodes()$node_id` for the same glycan. An empty `parents`
+#' vector means all feasible main-tree nodes are candidates. The `linkage`
+#' column describes the virtual attachment to the main tree; this attachment is
+#' intentionally absent from `structure_edges()`.
+#'
 #' @param x A glycan structure vector.
 #' @param nodes A data frame with columns `glycan_id`, `node_id`, `mono`, and
 #'   `sub`, and optionally `glycan_name`.
@@ -41,7 +47,13 @@
 #' floating <- as_glycan_structure(
 #'   "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
 #' )
-#' structure_floating_parts(floating)
+#' floating_parts <- structure_floating_parts(floating)
+#' structure_from_tibbles(
+#'   structure_nodes(floating),
+#'   structure_edges(floating),
+#'   get_anomer(floating),
+#'   floating_parts
+#' )
 #'
 #' @name structure_tables
 NULL

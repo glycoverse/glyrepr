@@ -9,10 +9,10 @@
 #'
 #' @param graph A validated glycan forest with vertex names.
 #' @param info Floating-graph component information from
-#'   [floating_graph_info()].
+#'   `floating_graph_info()`.
 #'
 #' @returns A sequence-order list in the same form as
-#'   [component_sequence_order()].
+#'   `component_sequence_order()`.
 #' @noRd
 floating_symmetry_main_order <- function(graph, info) {
   has_explicit_parents <- purrr::some(
