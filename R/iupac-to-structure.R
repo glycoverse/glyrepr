@@ -21,6 +21,15 @@
     igraph::V(main)$source_index
   )
   floating$parts <- purrr::map(floating$parts, function(part) {
+    if (
+      length(part$parents) > 0 &&
+        any(part$parents > length(source_to_canonical))
+    ) {
+      cli::cli_abort(c(
+        "Floating part parent index is outside the main glycan.",
+        "i" = "The main glycan has {length(source_to_canonical)} node{?s}."
+      ))
+    }
     part$parents <- source_to_canonical[part$parents]
     part
   })
