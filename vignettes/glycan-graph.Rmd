@@ -22,8 +22,10 @@ the [igraph documentation](https://r.igraph.org) is a useful companion reference
 ## Glycans as Graphs
 
 Glycans are naturally represented as directed graphs.
-In `glyrepr`, a glycan structure is stored as an outward-directed tree,
-where each vertex represents a monosaccharide and each edge represents a glycosidic linkage.
+In `glyrepr`, an ordinary glycan structure is stored as an outward-directed
+tree, where each vertex represents a monosaccharide and each edge represents a
+glycosidic linkage. A structure with floating parts is stored as an annotated
+forest: one main tree plus one disconnected tree for each floating part.
 
 Behind the scenes,
 each `glycan_structure()` object is backed by an `igraph` object.
@@ -77,6 +79,8 @@ The printed graph contains several pieces of information.
 **Graph-level attributes:**
 
 - `anomer`: the anomeric configuration of the reducing end.
+- `floating_parts`, when present: virtual attachment metadata for disconnected
+  floating components.
 
 **Vertex attributes:**
 
@@ -175,12 +179,43 @@ for example "Neu5Ac with an a2-3 linkage".
 graph$anomer
 ```
 
+### Floating Parts
+
+A floating structure remains one `igraph`, but it is weakly disconnected.
+The main-tree vertices come first in canonical IUPAC order, followed by the
+floating components.
+
+```{r}
+floating <- as_glycan_structure(
+  "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+)
+floating_graph <- get_structure_graphs(floating)
+
+igraph::components(floating_graph, mode = "weak")$no
+igraph::graph_attr(floating_graph, "floating_parts")
+structure_floating_parts(floating)
+```
+
+Each `floating_parts` entry has three fields:
+
+- `root`: the vertex index at the root of the floating component.
+- `linkage`: the virtual linkage from that root to the main tree.
+- `parents`: candidate vertex indices in the main tree. `integer()` means all
+  feasible main-tree nodes.
+
+The virtual attachment is not stored in `igraph::E(floating_graph)`, because
+its endpoint is unresolved. Use `structure_floating_parts()` when a tabular
+representation must round-trip this metadata.
+
 ## Working with the Graph
 
 ### Using `igraph`
 
 Once you understand the graph structure, 
 you can use `igraph` functions for custom structure analysis.
+Remember that tree-specific functions need special handling for a structure
+with floating parts: `get_structure_graphs()` and `smap()` pass the complete
+annotated forest, not only the main tree.
 
 **Example 1:** Count branched structures (sugars with multiple children):
 

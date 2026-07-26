@@ -242,6 +242,14 @@ clustering_coeffs <- smap_dbl(large_struc, ~ igraph::transitivity(.x, type = "gl
 summary(clustering_coeffs)
 ```
 
+For a structure with floating parts, the callback receives one annotated,
+weakly disconnected graph containing the main tree and every floating
+component. Use `has_floating_parts()` before applying code that assumes a
+single tree. Structure-returning variants such as `smap_structure()` validate
+and canonicalize every returned graph; a callback that changes vertex
+identities or components must also update the graph's `floating_parts`
+metadata.
+
 ### Combining Multiple Metrics
 
 ```{r}
