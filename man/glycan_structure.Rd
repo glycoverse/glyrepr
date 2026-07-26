@@ -93,12 +93,16 @@ validated and contributes to the canonical structure key.
 }
 
 \section{Node and Edge Order}{
-The indices of vertices and linkages in a glycan correspond directly to their
-order in the IUPAC-condensed string, which is printed when you print a
-\code{\link[=glycan_structure]{glycan_structure()}}.
+For an ordinary tree, the indices of vertices and linkages correspond
+directly to their order in the printed IUPAC-condensed string.
 For example, for the glycan \verb{Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-},
 the vertices are "Man", "Man", "Man", "GlcNAc", "GlcNAc",
 and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".
+
+For a floating structure, all main-tree vertices and edges come first in
+their main IUPAC order. Floating components follow in canonical block order.
+Candidate-parent indices refer only to the main-tree portion. A virtual
+floating attachment is not an edge.
 }
 
 \section{NA Support}{

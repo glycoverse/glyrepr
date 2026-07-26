@@ -89,6 +89,12 @@ test_that("convert_to_generic with already generic structure returns same", {
   expect_identical(result, glycan)
 })
 
+test_that("convert_to_generic preserves empty structure vectors", {
+  glycan <- as_glycan_structure(character())
+
+  expect_identical(convert_to_generic(glycan), glycan)
+})
+
 test_that("convert_to_generic works with glycan compositions", {
   comp_concrete <- glycan_composition(c(Gal = 2, GlcNAc = 1))
   comp_generic <- convert_to_generic(comp_concrete)

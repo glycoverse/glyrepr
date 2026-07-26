@@ -755,6 +755,10 @@ test_that("get_structure_graphs return_list parameter works correctly", {
   # Test explicit return_list = FALSE
   result_list_false <- get_structure_graphs(sv[1], return_list = FALSE)
   expect_s3_class(result_list_false, "igraph")
+
+  empty <- as_glycan_structure(character())
+  expect_identical(get_structure_graphs(empty), list())
+  expect_identical(get_structure_graphs(empty, return_list = TRUE), list())
 })
 
 test_that("get_structure_graphs validates return_list parameter", {
@@ -762,10 +766,16 @@ test_that("get_structure_graphs validates return_list parameter", {
   glycan2 <- n_glycan_core()
   sv <- c(glycan1, glycan2)
 
-  # Should error when return_list = FALSE but length > 1
-  expect_error(
+  expect_snapshot(
     get_structure_graphs(sv, return_list = FALSE),
-    "return_list.*must be.*TRUE.*NULL.*length greater than 1"
+    error = TRUE
+  )
+  expect_snapshot(
+    get_structure_graphs(
+      as_glycan_structure(character()),
+      return_list = FALSE
+    ),
+    error = TRUE
   )
 })
 

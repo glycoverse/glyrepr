@@ -11,7 +11,8 @@ get_structure_graphs(x, return_list = NULL)
 
 \item{return_list}{If \code{TRUE}, always returns a list.
 If \code{FALSE} and \code{x} has a length of 1, return the igraph object directly.
-If not provided (default), \code{FALSE} when \code{x} has a length of 1 and \code{TRUE} otherwise.}
+If not provided (default), \code{FALSE} when \code{x} has a length of 1 and \code{TRUE}
+otherwise, including for an empty vector.}
 }
 \value{
 A list of igraph objects or an igraph object directly (see \code{return_list} parameter).

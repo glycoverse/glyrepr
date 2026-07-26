@@ -69,6 +69,10 @@ convert_to_generic.glyrepr_structure <- function(x) {
     ))
   }
 
+  if (length(x) == 0) {
+    return(x)
+  }
+
   # Get current mono types
   from <- get_mono_type(x)
   if (is.na(from) || from == "generic") {

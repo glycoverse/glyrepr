@@ -59,12 +59,16 @@
 #'
 #' # Node and Edge Order
 #'
-#' The indices of vertices and linkages in a glycan correspond directly to their
-#' order in the IUPAC-condensed string, which is printed when you print a
-#' [glyrepr::glycan_structure()].
+#' For an ordinary tree, the indices of vertices and linkages correspond
+#' directly to their order in the printed IUPAC-condensed string.
 #' For example, for the glycan `Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-`,
 #' the vertices are "Man", "Man", "Man", "GlcNAc", "GlcNAc",
 #' and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".
+#'
+#' For a floating structure, all main-tree vertices and edges come first in
+#' their main IUPAC order. Floating components follow in canonical block order.
+#' Candidate-parent indices refer only to the main-tree portion. A virtual
+#' floating attachment is not an edge.
 #'
 #' # NA Support
 #'
@@ -975,7 +979,8 @@ warn_structure_failures <- function(positions, reasons, input_names = NULL) {
 #' @param x A glycan structure vector.
 #' @param return_list If `TRUE`, always returns a list.
 #'   If `FALSE` and `x` has a length of 1, return the igraph object directly.
-#'   If not provided (default), `FALSE` when `x` has a length of 1 and `TRUE` otherwise.
+#'   If not provided (default), `FALSE` when `x` has a length of 1 and `TRUE`
+#'   otherwise, including for an empty vector.
 #'
 #' @returns A list of igraph objects or an igraph object directly (see `return_list` parameter).
 #'
@@ -990,11 +995,11 @@ get_structure_graphs <- function(x, return_list = NULL) {
   checkmate::assert_flag(return_list, null.ok = TRUE)
 
   if (is.null(return_list)) {
-    return_list <- length(x) > 1
+    return_list <- length(x) != 1
   } else {
-    if (!return_list && length(x) > 1) {
+    if (!return_list && length(x) != 1) {
       cli::cli_abort(c(
-        "{.arg return_list} must be `TRUE` or `NULL` if {.arg x} has a length greater than 1.",
+        "{.arg return_list} must be `TRUE` or `NULL` unless {.arg x} has length 1.",
         "i" = "Length of {.arg x}: {.val {length(x)}}"
       ))
     }

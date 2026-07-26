@@ -104,3 +104,21 @@
     [11] Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
     # Unique structures: 1
 
+# get_structure_graphs validates return_list parameter
+
+    Code
+      get_structure_graphs(sv, return_list = FALSE)
+    Condition
+      Error in `get_structure_graphs()`:
+      ! `return_list` must be `TRUE` or `NULL` unless `x` has length 1.
+      i Length of `x`: 2
+
+---
+
+    Code
+      get_structure_graphs(as_glycan_structure(character()), return_list = FALSE)
+    Condition
+      Error in `get_structure_graphs()`:
+      ! `return_list` must be `TRUE` or `NULL` unless `x` has length 1.
+      i Length of `x`: 0
+
