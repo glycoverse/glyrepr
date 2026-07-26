@@ -71,6 +71,9 @@ convert_to_generic.glyrepr_structure <- function(x) {
 
   # Get current mono types
   from <- get_mono_type(x)
+  if (is.na(from) || from == "generic") {
+    return(x)
+  }
 
   # Use spmap_structure with optimized implementation
   spmap_structure(list(x, from), function(graph, from) {
