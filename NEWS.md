@@ -2,6 +2,7 @@
 
 * `glycan_structure()` now supports floating glycan substructures with optional candidate-parent indices through `{<floating>}` and `{<floating>|<parents>}` syntax, together with floating-aware graph validation, canonicalization, transformations, and graph-table conversion. Singleton parent sets are normalized to ordinary graph edges.
 * Floating structure nodes now follow the complete IUPAC-condensed sequence, including brace-prefixed components; tabular parent IDs are global node IDs while serialized parent indices remain local to the main tree.
+* Canonical `floating_parts` graph metadata now stores a `nodes` vector containing every node in each floating component; legacy graph inputs without this field remain supported.
 * `structure_floating_candidates()` returns one row per potential floating-part attachment and expands unrestricted parent domains to every original main-tree node.
 * `structure_component_membership()` identifies main-tree and floating-part nodes without requiring callers to inspect private graph attributes.
 * `structure_candidate_edges()` exposes every potential floating-part attachment as a virtual edge for drawing and constraint-aware graph operations.

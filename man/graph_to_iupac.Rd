@@ -32,9 +32,11 @@ structure vectors that fail in later operations.
 
 A floating structure is one weakly disconnected graph with exactly one main
 outward tree and one outward tree per floating part. Its \code{floating_parts}
-graph attribute is a list of entries with integer \code{root}, character
-\code{linkage}, and integer \code{parents} fields. \code{parents = integer()} means all
-feasible main-tree nodes. During canonicalization, a part with exactly one
+graph attribute is a list of entries with integer \code{root}, integer \code{nodes},
+character \code{linkage}, and integer \code{parents} fields. \code{nodes} contains every
+vertex in that floating component. \code{parents = integer()} means all feasible
+main-tree nodes. Legacy input graphs may omit \code{nodes}; canonical output
+graphs always contain it. During canonicalization, a part with exactly one
 effective candidate parent is converted to an ordinary graph edge and its
 floating metadata is removed. Otherwise, the virtual attachment linkage is
 not a graph edge. See \code{\link[=glycan_structure]{glycan_structure()}} for the complete contract.

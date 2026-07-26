@@ -82,10 +82,16 @@ tree is not fully localized. They are declared by the \code{floating_parts} grap
 attribute, a list with one entry per floating component. Each entry contains:
 \itemize{
 \item \code{root}: the integer vertex index of the floating component root.
+\item \code{nodes}: all integer vertex indices in the floating component, ordered as
+the component appears in the complete IUPAC-condensed sequence.
 \item \code{linkage}: the virtual linkage from that root to the main tree.
 \item \code{parents}: integer vertex indices in the main tree. An empty integer vector
 means that all feasible main-tree nodes are candidates.
 }
+
+Canonical graphs always contain \code{nodes}. For backward compatibility, input
+graphs may omit it; \code{\link[=glycan_structure]{glycan_structure()}} derives the component membership
+before validation and stores \code{nodes} in the canonical result.
 
 During canonicalization, a floating part with exactly one candidate parent
 is attached to that parent as an ordinary graph edge. This includes an empty
@@ -102,10 +108,12 @@ For example, for the glycan \verb{Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNA
 the vertices are "Man", "Man", "Man", "GlcNAc", "GlcNAc",
 and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".
 
-For a floating structure, all main-tree vertices and edges come first in
-their main IUPAC order. Floating components follow in canonical block order.
-Candidate-parent indices refer only to the main-tree portion. A virtual
-floating attachment is not an edge.
+For a floating structure, floating-component vertices and edges precede the
+main tree, exactly as their brace-enclosed components precede the main glycan
+in the complete IUPAC-condensed string. Parent indices written inside braces
+are local to the main tree, while \code{floating_parts$parents} stores the
+corresponding global graph vertex indices. A virtual floating attachment is
+not an edge.
 }
 
 \section{NA Support}{

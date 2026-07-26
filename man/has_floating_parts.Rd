@@ -41,8 +41,12 @@ attachment linkage may be fully known, partially known, or unknown.
 
 Internally, an unresolved structure is an annotated forest containing one
 main tree and one disconnected tree per floating part. The virtual linkage
-and candidate parents are stored as graph metadata rather than as an edge;
-\code{\link[=structure_floating_parts]{structure_floating_parts()}} exposes this metadata in tabular form.
+and candidate parents are stored as graph metadata rather than as an edge.
+Each floating-part metadata entry also stores \code{nodes}, the complete vector of
+vertex indices in that floating component, so downstream graph operations do
+not need to rediscover its membership by traversal.
+\code{\link[=structure_floating_parts]{structure_floating_parts()}} exposes attachment metadata in tabular form, and
+\code{\link[=structure_component_membership]{structure_component_membership()}} exposes component membership.
 
 An explicit singleton parent list fully localizes the attachment, as does an
 omitted parent list when the main tree has only one node. Such a part is

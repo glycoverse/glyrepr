@@ -62,7 +62,7 @@ test_that("floating metadata rejects duplicated fields", {
   )
 })
 
-test_that("floating metadata requires every supported field", {
+test_that("floating metadata requires every core field", {
   graph <- make_floating_validation_graph(
     main_count = 1,
     floating_linkages = "a2-3",
@@ -73,6 +73,35 @@ test_that("floating metadata requires every supported field", {
   expect_snapshot(
     error = TRUE,
     glycan_structure(graph)
+  )
+})
+
+test_that("floating node metadata must describe exactly one component", {
+  graph <- make_floating_validation_graph(
+    main_count = 1,
+    floating_linkages = "a2-3",
+    floating_parents = list(integer())
+  )
+
+  duplicate_nodes <- graph
+  duplicate_nodes$floating_parts[[1]]$nodes <- c(2L, 2L)
+  expect_snapshot(
+    error = TRUE,
+    glycan_structure(duplicate_nodes)
+  )
+
+  missing_root <- graph
+  missing_root$floating_parts[[1]]$nodes <- 1L
+  expect_snapshot(
+    error = TRUE,
+    glycan_structure(missing_root)
+  )
+
+  wrong_component <- graph
+  wrong_component$floating_parts[[1]]$nodes <- c(1L, 2L)
+  expect_snapshot(
+    error = TRUE,
+    glycan_structure(wrong_component)
   )
 })
 

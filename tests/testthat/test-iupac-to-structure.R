@@ -49,6 +49,10 @@ test_that("as_glycan_structure.character parses floating parts", {
     c(1L, 1L, 1L, 2L)
   )
   expect_equal(
+    purrr::map(graphs, ~ .x$floating_parts[[1]]$nodes),
+    list(1L, 1L, 1L, c(1L, 2L))
+  )
+  expect_equal(
     igraph::V(graphs[[4]])$mono,
     c("Neu5Ac", "Gal", "Glc", "GalNAc")
   )

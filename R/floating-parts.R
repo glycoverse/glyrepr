@@ -29,8 +29,12 @@
 #'
 #' Internally, an unresolved structure is an annotated forest containing one
 #' main tree and one disconnected tree per floating part. The virtual linkage
-#' and candidate parents are stored as graph metadata rather than as an edge;
-#' [structure_floating_parts()] exposes this metadata in tabular form.
+#' and candidate parents are stored as graph metadata rather than as an edge.
+#' Each floating-part metadata entry also stores `nodes`, the complete vector of
+#' vertex indices in that floating component, so downstream graph operations do
+#' not need to rediscover its membership by traversal.
+#' [structure_floating_parts()] exposes attachment metadata in tabular form, and
+#' [structure_component_membership()] exposes component membership.
 #'
 #' An explicit singleton parent list fully localizes the attachment, as does an
 #' omitted parent list when the main tree has only one node. Such a part is
@@ -99,7 +103,7 @@ normalize_floating_part <- function(part, graph_size) {
     cli::cli_abort("Each floating part must be a list.")
   }
 
-  allowed <- c("root", "linkage", "parents")
+  allowed <- c("root", "nodes", "linkage", "parents")
   fields <- names(part)
   if (is.null(fields)) {
     fields <- rep("", length(part))
@@ -147,6 +151,34 @@ normalize_floating_part <- function(part, graph_size) {
       "Floating part {.field root} must be one valid vertex index."
     )
   }
+  root <- as.integer(root)
+
+  nodes <- part$nodes
+  if (!is.null(nodes)) {
+    if (
+      !is.numeric(nodes) ||
+        length(nodes) == 0 ||
+        anyNA(nodes) ||
+        any(!is.finite(nodes)) ||
+        any(nodes > .Machine$integer.max) ||
+        any(nodes != as.integer(nodes)) ||
+        any(nodes < 1) ||
+        any(nodes > graph_size)
+    ) {
+      cli::cli_abort(
+        "Floating part {.field nodes} must contain valid vertex indices."
+      )
+    }
+    nodes <- as.integer(nodes)
+    if (anyDuplicated(nodes) > 0) {
+      cli::cli_abort("Floating part node indices must be unique.")
+    }
+    if (!root %in% nodes) {
+      cli::cli_abort(
+        "Floating part {.field nodes} must contain its {.field root}."
+      )
+    }
+  }
 
   linkage <- part$linkage
   if (
@@ -180,7 +212,8 @@ normalize_floating_part <- function(part, graph_size) {
   }
 
   list(
-    root = as.integer(root),
+    root = root,
+    nodes = nodes,
     linkage = linkage,
     parents = parents
   )
@@ -194,7 +227,25 @@ normalize_floating_parts <- function(graph) {
     )
   }
 
-  purrr::map(parts, normalize_floating_part, graph_size = igraph::vcount(graph))
+  parts <- purrr::map(
+    parts,
+    normalize_floating_part,
+    graph_size = igraph::vcount(graph)
+  )
+  missing_nodes <- purrr::map_lgl(parts, ~ is.null(.x$nodes))
+  if (any(missing_nodes)) {
+    membership <- igraph::components(graph, mode = "weak")$membership
+    parts[missing_nodes] <- purrr::map(
+      parts[missing_nodes],
+      function(part) {
+        component <- membership[[part$root]]
+        part$nodes <- as.integer(which(membership == component))
+        part
+      }
+    )
+  }
+
+  parts
 }
 
 floating_graph_info <- function(
@@ -255,6 +306,18 @@ validate_floating_graph_shape <- function(graph) {
       cli::cli_abort(
         "The main glycan and every floating part must be an out tree."
       )
+    }
+  }
+
+  for (part_id in seq_along(parts)) {
+    component_nodes <- which(
+      info$membership == info$floating_components[[part_id]]
+    )
+    if (!setequal(parts[[part_id]]$nodes, component_nodes)) {
+      cli::cli_abort(c(
+        "Floating part node metadata does not match its graph component.",
+        "x" = "Floating part {part_id} must contain exactly node{?s} {.val {component_nodes}}."
+      ))
     }
   }
 
@@ -567,6 +630,7 @@ canonicalize_floating_graph <- function(graph) {
     )
     canonical_parts[[i]] <- list(
       root = as.integer(offset + root_position),
+      nodes = as.integer(offset + seq_len(component_size)),
       linkage = floating$linkage,
       parents = as.integer(floating_size + floating$parents)
     )
@@ -579,12 +643,9 @@ canonicalize_floating_graph <- function(graph) {
 floating_part_iupac <- function(
   graph,
   part,
-  membership,
   main_vertices
 ) {
-  component <- membership[[part$root]]
-  vertices <- which(membership == component)
-  subgraph <- igraph::induced_subgraph(graph, vertices)
+  subgraph <- igraph::induced_subgraph(graph, part$nodes)
   subgraph <- delete_floating_parts_attr(subgraph)
   cache <- build_seq_cache(subgraph)
   parents <- if (length(part$parents) == 0) {

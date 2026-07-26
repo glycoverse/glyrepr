@@ -135,7 +135,6 @@ floating_augmented_main_labels <- function(graph, main, info) {
         floating_part_iupac(
           graph,
           part,
-          info$membership,
           info$main_vertices
         ),
         sep = "\r"

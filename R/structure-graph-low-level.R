@@ -235,7 +235,6 @@ graph_to_iupac <- function(graph) {
     parts,
     floating_part_iupac,
     graph = graph,
-    membership = info$membership,
     main_vertices = info$main_vertices
   )
 

@@ -209,6 +209,7 @@ combine_floating_iupac_graphs <- function(main, parts) {
       cache <- build_seq_cache(part$graph)
       list(
         root = as.integer(offset + cache$root),
+        nodes = as.integer(offset + seq_len(igraph::vcount(part$graph))),
         linkage = part$linkage,
         parents = part$parents
       )

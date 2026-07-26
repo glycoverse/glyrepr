@@ -24,7 +24,7 @@
       ! Floating part metadata contains duplicated fields.
       x Duplicated field: root.
 
-# floating metadata requires every supported field
+# floating metadata requires every core field
 
     Code
       glycan_structure(graph)
@@ -36,6 +36,41 @@
       Caused by error in `.f()`:
       ! Floating part metadata is incomplete.
       x Missing field: parents.
+
+# floating node metadata must describe exactly one component
+
+    Code
+      glycan_structure(duplicate_nodes)
+    Condition
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `.f()`:
+      ! Floating part node indices must be unique.
+
+---
+
+    Code
+      glycan_structure(missing_root)
+    Condition
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `.f()`:
+      ! Floating part nodes must contain its root.
+
+---
+
+    Code
+      glycan_structure(wrong_component)
+    Condition
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `validate_floating_graph_shape()`:
+      ! Floating part node metadata does not match its graph component.
+      x Floating part 1 must contain exactly node 2.
 
 # explicit parents reject definitely occupied acceptor slots
 

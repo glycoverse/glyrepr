@@ -110,7 +110,12 @@ test_that("low-level graph pipeline supports annotated floating parts", {
   expect_equal(igraph::V(result)$mono, c("Neu5Ac", "Gal", "GalNAc"))
   expect_equal(
     result$floating_parts,
-    list(list(root = 1L, linkage = "a2-6", parents = c(2L, 3L)))
+    list(list(
+      root = 1L,
+      nodes = 1L,
+      linkage = "a2-6",
+      parents = c(2L, 3L)
+    ))
   )
   expect_identical(
     graph_to_iupac(result),
