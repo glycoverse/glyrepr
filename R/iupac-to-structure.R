@@ -7,6 +7,198 @@
 #' @return An igraph object representing the glycan structure
 #' @keywords internal
 .parse_iupac_condensed_single <- function(x) {
+  floating <- split_floating_iupac(x)
+  if (length(floating$parts) == 0) {
+    return(.parse_iupac_tree_single(x))
+  }
+
+  main <- .parse_iupac_tree_single(floating$main)
+  igraph::V(main)$source_index <- rev(seq_len(igraph::vcount(main)))
+  main <- validate_glycan_graph(main)
+  main <- canonicalize_glycan_graph(main)
+  source_to_canonical <- match(
+    seq_len(igraph::vcount(main)),
+    igraph::V(main)$source_index
+  )
+  floating$parts <- purrr::map(floating$parts, function(part) {
+    part$parents <- source_to_canonical[part$parents]
+    part
+  })
+  main <- igraph::delete_vertex_attr(main, "source_index")
+
+  parsed_parts <- purrr::map(
+    floating$parts,
+    parse_floating_iupac_part,
+    main_size = igraph::vcount(main)
+  )
+  combine_floating_iupac_graphs(main, parsed_parts)
+}
+
+split_floating_iupac <- function(x) {
+  if (is.na(x) || nchar(x) == 0 || stringr::str_detect(x, "^\\s*$")) {
+    cli::cli_abort("Cannot parse empty or NA IUPAC-condensed string.")
+  }
+  if (!stringr::str_starts(x, stringr::fixed("{"))) {
+    return(list(parts = list(), main = x))
+  }
+  if (stringr::str_detect(x, "^\\s+|\\s+$")) {
+    cli::cli_abort(
+      "IUPAC-condensed string cannot have leading or trailing whitespace"
+    )
+  }
+  if (stringr::str_detect(x, "\\s")) {
+    cli::cli_abort("IUPAC-condensed string cannot contain whitespace")
+  }
+
+  parts <- list()
+  remainder <- x
+  while (stringr::str_starts(remainder, stringr::fixed("{"))) {
+    chars <- stringr::str_split(remainder, "")[[1]]
+    closing_positions <- which(chars == "}")
+    if (length(closing_positions) == 0) {
+      cli::cli_abort("Malformed floating part in IUPAC-condensed string.")
+    }
+    closing <- closing_positions[[1]]
+    if (closing == 1) {
+      cli::cli_abort("Malformed floating part in IUPAC-condensed string.")
+    }
+    if (any(chars[seq_len(closing)] == "{" & seq_len(closing) != 1)) {
+      cli::cli_abort("Floating parts cannot be nested.")
+    }
+
+    content <- stringr::str_sub(remainder, 2, closing - 1)
+    parts[[length(parts) + 1]] <- split_floating_iupac_part(content)
+    remainder <- stringr::str_sub(remainder, closing + 1)
+  }
+
+  if (!nzchar(remainder)) {
+    cli::cli_abort("A floating glycan structure must have a main glycan.")
+  }
+  if (stringr::str_detect(remainder, "[{}]")) {
+    cli::cli_abort(
+      "Floating parts must precede the main IUPAC-condensed structure."
+    )
+  }
+
+  list(parts = parts, main = remainder)
+}
+
+split_floating_iupac_part <- function(content) {
+  pipe_count <- stringr::str_count(content, stringr::fixed("|"))
+  if (pipe_count > 1) {
+    cli::cli_abort(
+      "A floating part can contain at most one parent-index separator."
+    )
+  }
+
+  fields <- stringr::str_split(content, stringr::fixed("|"))[[1]]
+  sequence <- fields[[1]]
+  if (!nzchar(sequence)) {
+    cli::cli_abort("A floating part cannot be empty.")
+  }
+
+  parents <- integer()
+  if (length(fields) == 2) {
+    parent_text <- fields[[2]]
+    if (!stringr::str_detect(parent_text, "^[1-9][0-9]*(,[1-9][0-9]*)*$")) {
+      cli::cli_abort(
+        "Floating part parents must be comma-separated positive node indices."
+      )
+    }
+    parents <- as.integer(stringr::str_split(parent_text, ",")[[1]])
+    if (anyDuplicated(parents) > 0) {
+      cli::cli_abort("Floating part parent indices must be unique.")
+    }
+  }
+
+  list(sequence = sequence, parents = parents)
+}
+
+parse_floating_iupac_part <- function(part, main_size) {
+  linkage_match <- stringr::str_match(
+    part$sequence,
+    paste0("\\((", linkage_pattern(anchored = FALSE), ")\\)$")
+  )
+  linkage <- linkage_match[[1, 2]]
+  if (is.na(linkage)) {
+    cli::cli_abort(
+      "A floating part must end with its linkage to the main glycan."
+    )
+  }
+  if (length(part$parents) > 0 && any(part$parents > main_size)) {
+    cli::cli_abort(c(
+      "Floating part parent index is outside the main glycan.",
+      "i" = "The main glycan has {main_size} node{?s}."
+    ))
+  }
+
+  sequence <- stringr::str_remove(
+    part$sequence,
+    paste0("\\(", linkage_pattern(anchored = FALSE), "\\)$")
+  )
+  donor <- stringr::str_sub(linkage, 1, 2)
+  graph <- .parse_iupac_tree_single(paste0(sequence, "(", donor, "-"))
+
+  list(
+    graph = graph,
+    linkage = linkage,
+    parents = sort(part$parents)
+  )
+}
+
+combine_floating_iupac_graphs <- function(main, parts) {
+  graphs <- c(list(main), purrr::map(parts, "graph"))
+  sizes <- purrr::map_int(graphs, igraph::vcount)
+  offsets <- cumsum(c(0L, sizes[-length(sizes)]))
+
+  graph <- igraph::make_empty_graph(sum(sizes), directed = TRUE)
+  igraph::V(graph)$name <- as.character(seq_len(igraph::vcount(graph)))
+  igraph::V(graph)$mono <- unlist(
+    purrr::map(graphs, ~ igraph::V(.x)$mono),
+    use.names = FALSE
+  )
+  igraph::V(graph)$sub <- unlist(
+    purrr::map(graphs, ~ igraph::V(.x)$sub),
+    use.names = FALSE
+  )
+
+  edge_vectors <- purrr::map2(
+    graphs,
+    offsets,
+    function(component, offset) {
+      edges <- igraph::as_edgelist(component, names = FALSE)
+      if (length(edges) == 0) {
+        return(integer())
+      }
+      as.integer(t(edges + offset))
+    }
+  )
+  edge_vector <- unlist(edge_vectors, use.names = FALSE)
+  if (length(edge_vector) > 0) {
+    graph <- igraph::add_edges(graph, edge_vector)
+  }
+  igraph::E(graph)$linkage <- unlist(
+    purrr::map(graphs, ~ igraph::E(.x)$linkage),
+    use.names = FALSE
+  )
+  graph$anomer <- main$anomer
+
+  metadata <- purrr::map2(
+    parts,
+    offsets[-1],
+    function(part, offset) {
+      cache <- build_seq_cache(part$graph)
+      list(
+        root = as.integer(offset + cache$root),
+        linkage = part$linkage,
+        parents = part$parents
+      )
+    }
+  )
+  set_floating_parts_attr(graph, metadata)
+}
+
+.parse_iupac_tree_single <- function(x) {
   if (is.na(x) || nchar(x) == 0 || stringr::str_detect(x, "^\\s*$")) {
     cli::cli_abort("Cannot parse empty or NA IUPAC-condensed string.")
   }
