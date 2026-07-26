@@ -14,6 +14,10 @@
 #' `structure_from_tibbles()` uses `glycan_name` as output names when that
 #' column is present.
 #'
+#' `structure_nodes()$node_id` follows residue order in the complete canonical
+#' IUPAC-condensed string. For a floating structure, nodes from each
+#' brace-enclosed floating part therefore precede nodes from the main tree.
+#'
 #' In `structure_floating_parts()`, `root_node` and every integer in `parents`
 #' refer to `structure_nodes()$node_id` for the same glycan. An empty `parents`
 #' vector means all feasible main-tree nodes are candidates. The `linkage`
@@ -22,6 +26,12 @@
 #' with exactly one effective candidate parent is normalized to an ordinary
 #' edge and is therefore absent from the resulting
 #' `structure_floating_parts()` table.
+#'
+#' Parent indices written after `|` in an IUPAC-condensed floating part are
+#' local to the main tree. `structure_floating_parts()` translates those values
+#' to global `structure_nodes()$node_id` values, so they can differ when
+#' floating nodes precede the main tree. `structure_from_tibbles()` expects
+#' these global node IDs and translates them back during serialization.
 #'
 #' @param x A glycan structure vector.
 #' @param nodes A data frame with columns `glycan_id`, `node_id`, `mono`, and

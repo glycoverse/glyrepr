@@ -11,7 +11,7 @@ test_that("localize_floating_parts attaches selected parts", {
   assignments <- tibble::tibble(
     glycan_id = 1L,
     part_id = 2L,
-    parent_node = 1L
+    parent_node = 3L
   )
 
   localized <- localize_floating_parts(glycans, assignments)
@@ -40,7 +40,7 @@ test_that("localize_floating_parts localizes unrestricted parts", {
     tibble::tibble(
       glycan_id = 1L,
       part_id = 1L,
-      parent_node = 1L
+      parent_node = 2L
     )
   )
 
@@ -65,7 +65,7 @@ test_that("localize_floating_parts remaps remaining parent indices", {
     tibble::tibble(
       glycan_id = 1L,
       part_id = 2L,
-      parent_node = 1L
+      parent_node = 3L
     )
   )
 
@@ -75,7 +75,7 @@ test_that("localize_floating_parts remaps remaining parent indices", {
   )
   expect_identical(
     structure_floating_parts(localized)$parents,
-    list(c(2L, 3L))
+    list(c(3L, 4L))
   )
 })
 
@@ -141,7 +141,7 @@ test_that("localize_floating_parts rejects invalid targets", {
       tibble::tibble(
         glycan_id = 1L,
         part_id = 1L,
-        parent_node = 3L
+        parent_node = 1L
       )
     ),
     error = TRUE
@@ -185,7 +185,7 @@ test_that("localize_floating_parts validates simultaneous slot conflicts", {
       tibble::tibble(
         glycan_id = c(1L, 1L),
         part_id = c(1L, 2L),
-        parent_node = c(1L, 1L)
+        parent_node = c(3L, 3L)
       )
     ),
     error = TRUE
@@ -203,7 +203,7 @@ test_that("localize_floating_parts checks occupied main-tree slots", {
       tibble::tibble(
         glycan_id = 1L,
         part_id = 1L,
-        parent_node = 2L
+        parent_node = 3L
       )
     ),
     error = TRUE
@@ -270,7 +270,7 @@ test_that("enumerate_floating_localizations filters occupied slots", {
     as.character(variants$structure),
     "Neu5Ac(a2-3)Gal(b1-3)GalNAc(a1-"
   )
-  expect_identical(variants$assignments[[1]]$parent_node, 1L)
+  expect_identical(variants$assignments[[1]]$parent_node, 2L)
 })
 
 test_that("enumerate_floating_localizations deduplicates canonical variants", {
@@ -285,7 +285,7 @@ test_that("enumerate_floating_localizations deduplicates canonical variants", {
 
   expect_equal(nrow(variants), 1)
   expect_identical(variants$variant_id, 1L)
-  expect_identical(variants$assignments[[1]]$parent_node, 1L)
+  expect_identical(variants$assignments[[1]]$parent_node, 2L)
 })
 
 test_that("enumerate_floating_localizations retains every input position", {

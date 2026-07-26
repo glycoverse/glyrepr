@@ -34,7 +34,8 @@ parent.
 comma-separated main-tree node indices in \verb{<parents>}.
 }
 
-Main-tree indices follow residue order in the IUPAC-condensed sequence. A
+Main-tree indices follow residue order within the main IUPAC-condensed tree
+and are numbered from 1 independently of preceding floating parts. A
 floating part may contain one residue or an entire subtree, and its virtual
 attachment linkage may be fully known, partially known, or unknown.
 

@@ -100,7 +100,7 @@ test_that("structure_floating_parts returns normalized attachment metadata", {
   expect_equal(parts$linkage, c("a2-3", "a1-2", "a2-6"))
   expect_equal(
     parts$parents,
-    list(integer(), c(1L, 2L), c(1L, 2L))
+    list(integer(), c(3L, 4L), c(3L, 4L))
   )
 })
 
@@ -132,8 +132,8 @@ test_that("structure_floating_candidates expands every attachment candidate", {
     c("unrestricted", "unrestricted", "restricted", "restricted")
   )
   expect_equal(candidates$part_id, rep(1L, 4))
-  expect_equal(candidates$root_node, rep(3L, 4))
-  expect_equal(candidates$parent_node, c(1L, 2L, 1L, 2L))
+  expect_equal(candidates$root_node, rep(1L, 4))
+  expect_equal(candidates$parent_node, c(2L, 3L, 2L, 3L))
   expect_equal(candidates$linkage, c("a2-3", "a2-3", "a2-6", "a2-6"))
   expect_equal(candidates$scope, c("all", "all", "explicit", "explicit"))
 })
@@ -202,9 +202,9 @@ test_that("structure_component_membership identifies every graph component", {
   expect_equal(membership$node_id, c(1L, 2L, 3L, 4L, 1L))
   expect_equal(
     membership$component_type,
-    c("main", "main", "floating", "floating", "main")
+    c("floating", "floating", "main", "main", "main")
   )
-  expect_equal(membership$part_id, c(NA, NA, 1L, 2L, NA))
+  expect_equal(membership$part_id, c(1L, 2L, NA, NA, NA))
 })
 
 test_that("structure_component_membership returns typed empty tables", {
@@ -255,8 +255,8 @@ test_that("structure_candidate_edges exposes potential virtual edges", {
   )
   expect_equal(edges$glycan_id, c(1L, 1L, 2L, 2L))
   expect_equal(edges$part_id, rep(1L, 4))
-  expect_equal(edges$from_node, c(1L, 2L, 1L, 2L))
-  expect_equal(edges$to_node, rep(3L, 4))
+  expect_equal(edges$from_node, c(2L, 3L, 2L, 3L))
+  expect_equal(edges$to_node, rep(1L, 4))
   expect_equal(edges$linkage, c("a2-3", "a2-3", "a2-6", "a2-6"))
   expect_equal(edges$scope, c("all", "all", "explicit", "explicit"))
 })

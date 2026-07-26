@@ -40,7 +40,7 @@ glycan <- as_glycan_structure(
 assignments <- tibble::tibble(
   glycan_id = 1L,
   part_id = 1L,
-  parent_node = 1L
+  parent_node = 2L
 )
 localize_floating_parts(glycan, assignments)
 

@@ -22,7 +22,8 @@
 #' - `{<floating>|<parents>}<main>` restricts the candidates to the
 #'   comma-separated main-tree node indices in `<parents>`.
 #'
-#' Main-tree indices follow residue order in the IUPAC-condensed sequence. A
+#' Main-tree indices follow residue order within the main IUPAC-condensed tree
+#' and are numbered from 1 independently of preceding floating parts. A
 #' floating part may contain one residue or an entire subtree, and its virtual
 #' attachment linkage may be fully known, partially known, or unknown.
 #'
@@ -537,20 +538,16 @@ canonicalize_floating_graph <- function(graph) {
   floating_order <- order(purrr::map_chr(floating_orders, "key"))
   floating_orders <- floating_orders[floating_order]
 
-  vertex_order <- c(
-    main_order$vertices,
-    unlist(
-      purrr::map(floating_orders, c("order", "vertices")),
-      use.names = FALSE
-    )
+  floating_vertices <- unlist(
+    purrr::map(floating_orders, c("order", "vertices")),
+    use.names = FALSE
   )
-  edge_order <- c(
-    main_order$edges,
-    unlist(
-      purrr::map(floating_orders, c("order", "edges")),
-      use.names = FALSE
-    )
+  floating_edges <- unlist(
+    purrr::map(floating_orders, c("order", "edges")),
+    use.names = FALSE
   )
+  vertex_order <- c(floating_vertices, main_order$vertices)
+  edge_order <- c(floating_edges, main_order$edges)
 
   graph <- delete_floating_parts_attr(graph)
   graph <- .reorder_by_sequence_order(
@@ -558,8 +555,8 @@ canonicalize_floating_graph <- function(graph) {
     list(vertices = vertex_order, edges = edge_order)
   )
 
-  main_size <- length(main_order$vertices)
-  offset <- main_size
+  floating_size <- length(floating_vertices)
+  offset <- 0L
   canonical_parts <- vector("list", length(floating_orders))
   for (i in seq_along(floating_orders)) {
     floating <- floating_orders[[i]]
@@ -571,7 +568,7 @@ canonicalize_floating_graph <- function(graph) {
     canonical_parts[[i]] <- list(
       root = as.integer(offset + root_position),
       linkage = floating$linkage,
-      parents = floating$parents
+      parents = as.integer(floating_size + floating$parents)
     )
     offset <- offset + component_size
   }
@@ -579,7 +576,12 @@ canonicalize_floating_graph <- function(graph) {
   set_floating_parts_attr(graph, canonical_parts)
 }
 
-floating_part_iupac <- function(graph, part, membership) {
+floating_part_iupac <- function(
+  graph,
+  part,
+  membership,
+  main_vertices
+) {
   component <- membership[[part$root]]
   vertices <- which(membership == component)
   subgraph <- igraph::induced_subgraph(graph, vertices)
@@ -588,7 +590,8 @@ floating_part_iupac <- function(graph, part, membership) {
   parents <- if (length(part$parents) == 0) {
     ""
   } else {
-    paste0("|", paste(part$parents, collapse = ","))
+    main_parent_indices <- match(part$parents, main_vertices)
+    paste0("|", paste(main_parent_indices, collapse = ","))
   }
 
   paste0(

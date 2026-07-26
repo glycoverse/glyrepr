@@ -235,7 +235,8 @@ graph_to_iupac <- function(graph) {
     parts,
     floating_part_iupac,
     graph = graph,
-    membership = info$membership
+    membership = info$membership,
+    main_vertices = info$main_vertices
   )
 
   paste0(paste0(floating_iupac, collapse = ""), main_iupac)

@@ -983,7 +983,7 @@ test_that("structure mappers recanonicalize floating candidate indices", {
     )
     expect_identical(
       structure_floating_parts(result)$parents[[1]],
-      c(1L, 3L)
+      c(2L, 4L)
     )
   })
 })

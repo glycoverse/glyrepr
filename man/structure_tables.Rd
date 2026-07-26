@@ -55,6 +55,10 @@ If \code{x} is named, all three tibbles also contain a \code{glycan_name} column
 \code{structure_from_tibbles()} uses \code{glycan_name} as output names when that
 column is present.
 
+\code{structure_nodes()$node_id} follows residue order in the complete canonical
+IUPAC-condensed string. For a floating structure, nodes from each
+brace-enclosed floating part therefore precede nodes from the main tree.
+
 In \code{structure_floating_parts()}, \code{root_node} and every integer in \code{parents}
 refer to \code{structure_nodes()$node_id} for the same glycan. An empty \code{parents}
 vector means all feasible main-tree nodes are candidates. The \code{linkage}
@@ -63,6 +67,12 @@ intentionally absent from \code{structure_edges()}. During reconstruction, a row
 with exactly one effective candidate parent is normalized to an ordinary
 edge and is therefore absent from the resulting
 \code{structure_floating_parts()} table.
+
+Parent indices written after \code{|} in an IUPAC-condensed floating part are
+local to the main tree. \code{structure_floating_parts()} translates those values
+to global \code{structure_nodes()$node_id} values, so they can differ when
+floating nodes precede the main tree. \code{structure_from_tibbles()} expects
+these global node IDs and translates them back during serialization.
 }
 \examples{
 glycans <- c(o_glycan_core_1(), o_glycan_core_1())

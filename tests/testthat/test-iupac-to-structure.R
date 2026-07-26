@@ -42,15 +42,15 @@ test_that("as_glycan_structure.character parses floating parts", {
   expect_identical(unname(structure_to_iupac(glycans)), iupacs)
   expect_equal(
     purrr::map(graphs, ~ .x$floating_parts[[1]]$parents),
-    list(integer(), c(1L, 2L), c(1L, 4L), c(1L, 2L))
+    list(integer(), c(2L, 3L), c(2L, 5L), c(3L, 4L))
   )
   expect_equal(
     purrr::map_int(graphs, ~ .x$floating_parts[[1]]$root),
-    c(3L, 3L, 6L, 4L)
+    c(1L, 1L, 1L, 2L)
   )
   expect_equal(
     igraph::V(graphs[[4]])$mono,
-    c("Glc", "GalNAc", "Neu5Ac", "Gal")
+    c("Neu5Ac", "Gal", "Glc", "GalNAc")
   )
 })
 
