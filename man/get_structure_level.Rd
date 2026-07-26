@@ -29,6 +29,10 @@ and all linkages and anomers are completely unknown ("??-?"/"??").
 Floating parts do not by themselves affect the structure level. Their
 attachment linkage is evaluated like an ordinary linkage, while
 candidate-parent ambiguity is independent of linkage resolution.
+Consequently, a glycan with floating parts is regarded as "intact" when its
+residues are concrete and every graph-edge and floating-attachment linkage,
+as well as the reducing-end anomer, is fully specified, even though a
+floating part's parent remains unlocalized.
 
 Note that in theory you can have a glycan with generic monosaccharides with all linkages determined.
 For example, "Hex(b1-3)HexNAc(a1-" is a valid glycan structure.
@@ -39,6 +43,11 @@ This kind of glycan structure is also assigned to "basic" level.
 \examples{
 glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
 get_structure_level(glycan)
+
+floating <- as_glycan_structure(
+  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+)
+get_structure_level(floating)
 
 }
 \seealso{
