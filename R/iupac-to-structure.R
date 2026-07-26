@@ -7,10 +7,11 @@
 #' @return An igraph object representing the glycan structure
 #' @keywords internal
 .parse_iupac_condensed_single <- function(x) {
-  floating <- split_floating_iupac(x)
-  if (length(floating$parts) == 0) {
+  if (!isTRUE(startsWith(x, "{"))) {
     return(.parse_iupac_tree_single(x))
   }
+
+  floating <- split_floating_iupac(x)
 
   main <- .parse_iupac_tree_single(floating$main)
   igraph::V(main)$source_index <- rev(seq_len(igraph::vcount(main)))
