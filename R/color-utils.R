@@ -141,15 +141,19 @@ add_gray_linkages <- function(iupac_text) {
 
   result <- iupac_text
 
-  # Pattern 1: Complete linkages like (b1-3), (a1-6)
-  complete_pattern <- "\\(([ab?]\\d*-\\d*)\\)"
+  # Pattern 1: Complete linkages like (b1-3), (??-?), (a2-3/6)
+  complete_pattern <- paste0(
+    "\\((",
+    linkage_pattern(anchored = FALSE),
+    ")\\)"
+  )
   result <- stringr::str_replace_all(result, complete_pattern, function(match) {
     linkage <- stringr::str_sub(match, 2, -2) # Remove parentheses
     paste0("(", gray_style(linkage), ")")
   })
 
-  # Pattern 2: Incomplete linkages at end like (a1-, (?1-
-  incomplete_pattern <- "\\(([ab?]\\d*-)$"
+  # Pattern 2: Incomplete reducing-end annotations like (a1-, (?1-, (??-
+  incomplete_pattern <- "\\(([ab?][12?]-)$"
   result <- stringr::str_replace_all(
     result,
     incomplete_pattern,

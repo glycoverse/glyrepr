@@ -12,3 +12,19 @@ test_that("special sialic acid cases are handled correctly", {
   expect_equal(get_mono_color("Neu4Ac5Ac"), "#A54399") # Purple for Neu5Ac
   expect_equal(get_mono_color("Neu4Ac5Gc"), "#8FCCE9") # Light blue for Neu5Gc
 })
+
+test_that("all valid linkage forms can be colored", {
+  withr::local_options(cli.num_colors = 256)
+  annotations <- c("a1-3", "??-?", "a2-3/6", "a?-?", "?1-4")
+
+  purrr::walk(annotations, function(annotation) {
+    text <- paste0("(", annotation, ")")
+    colored <- add_gray_linkages(text)
+    expect_true(cli::ansi_has_any(colored))
+    expect_identical(cli::ansi_strip(colored), text)
+  })
+
+  incomplete <- add_gray_linkages("(??-")
+  expect_true(cli::ansi_has_any(incomplete))
+  expect_identical(cli::ansi_strip(incomplete), "(??-")
+})
