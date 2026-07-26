@@ -149,6 +149,65 @@ structure_floating_parts <- function(x) {
 }
 
 
+#' List Candidate Attachments for Floating Parts
+#'
+#' @description
+#' `structure_floating_candidates()` expands floating-part attachment metadata
+#' to one row per candidate parent. This provides a uniform representation for
+#' both explicitly restricted floating parts and unrestricted `{<floating>}`
+#' parts.
+#'
+#' For an unrestricted floating part, every node in the original main tree is
+#' returned as a candidate and `scope` is `"all"`. For a floating part written
+#' with `{<floating>|<parents>}`, only the declared parent nodes are returned and
+#' `scope` is `"explicit"`.
+#'
+#' Node indices refer to `structure_nodes()$node_id` for the same glycan. Missing
+#' structures and structures without floating parts contribute no rows.
+#' Duplicate structures are expanded to their original vector positions. If
+#' `x` is named, the result also contains a `glycan_name` column.
+#'
+#' @param x A glycan structure vector.
+#'
+#' @returns A tibble with columns `glycan_id`, `part_id`, `root_node`,
+#'   `parent_node`, `linkage`, and `scope`, plus `glycan_name` when `x` is
+#'   named.
+#'
+#' @examples
+#' glycans <- as_glycan_structure(c(
+#'   unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
+#'   restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#' ))
+#' structure_floating_candidates(glycans)
+#'
+#' @export
+structure_floating_candidates <- function(x) {
+  checkmate::assert_class(x, "glyrepr_structure")
+
+  graphs <- as.list(x)
+  glycan_names <- names(x)
+  has_glycan_names <- !is.null(glycan_names)
+  if (length(graphs) == 0) {
+    return(empty_structure_floating_candidates(has_glycan_names))
+  }
+
+  candidate_tables <- purrr::map2(
+    seq_along(graphs),
+    graphs,
+    function(glycan_id, graph) {
+      glycan_name <- if (has_glycan_names) {
+        glycan_names[[glycan_id]]
+      } else {
+        NULL
+      }
+      structure_floating_candidates_one(glycan_id, graph, glycan_name)
+    }
+  )
+
+  dplyr::bind_rows(candidate_tables)
+}
+
+
 #' @rdname structure_tables
 #' @export
 structure_from_tibbles <- function(
@@ -285,6 +344,36 @@ empty_structure_floating_parts <- function(has_glycan_name = FALSE) {
 }
 
 
+#' Create an empty floating-candidate tibble
+#'
+#' @param has_glycan_name Whether to include a `glycan_name` column.
+#' @returns A zero-row tibble with the
+#'   `structure_floating_candidates()` columns.
+#' @noRd
+empty_structure_floating_candidates <- function(
+  has_glycan_name = FALSE
+) {
+  out <- tibble::tibble(
+    glycan_id = integer(),
+    part_id = integer(),
+    root_node = integer(),
+    parent_node = integer(),
+    linkage = character(),
+    scope = character()
+  )
+
+  if (has_glycan_name) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = character(),
+      .after = "glycan_id"
+    )
+  }
+
+  out
+}
+
+
 #' Convert one graph to a structure node tibble
 #'
 #' @param glycan_id Integer position of the glycan.
@@ -384,6 +473,65 @@ structure_floating_parts_one <- function(
     out <- tibble::add_column(
       out,
       glycan_name = rep(glycan_name, length(parts)),
+      .after = "glycan_id"
+    )
+  }
+
+  out
+}
+
+
+#' Convert one graph to a floating-candidate tibble
+#'
+#' @param glycan_id Integer position of the glycan.
+#' @param graph An igraph object or `NULL` for a missing structure.
+#' @param glycan_name Optional glycan name.
+#' @returns A tibble with candidate attachment rows for one glycan.
+#' @noRd
+structure_floating_candidates_one <- function(
+  glycan_id,
+  graph,
+  glycan_name = NULL
+) {
+  if (is.null(graph)) {
+    return(empty_structure_floating_candidates(!is.null(glycan_name)))
+  }
+
+  parts <- normalize_floating_parts(graph)
+  if (length(parts) == 0) {
+    return(empty_structure_floating_candidates(!is.null(glycan_name)))
+  }
+
+  info <- floating_graph_info(graph, parts)
+  out <- purrr::map2_dfr(
+    parts,
+    seq_along(parts),
+    function(part, part_id) {
+      unrestricted <- length(part$parents) == 0
+      parent_nodes <- if (unrestricted) {
+        info$main_vertices
+      } else {
+        part$parents
+      }
+
+      tibble::tibble(
+        glycan_id = rep(as.integer(glycan_id), length(parent_nodes)),
+        part_id = rep(as.integer(part_id), length(parent_nodes)),
+        root_node = rep(as.integer(part$root), length(parent_nodes)),
+        parent_node = as.integer(parent_nodes),
+        linkage = rep(part$linkage, length(parent_nodes)),
+        scope = rep(
+          if (unrestricted) "all" else "explicit",
+          length(parent_nodes)
+        )
+      )
+    }
+  )
+
+  if (!is.null(glycan_name)) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = rep(glycan_name, nrow(out)),
       .after = "glycan_id"
     )
   }
