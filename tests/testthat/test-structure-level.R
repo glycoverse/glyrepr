@@ -52,13 +52,20 @@ test_that("get_structure_level treats ambiguous linkage positions as partial", {
   expect_equal(get_structure_level(glycan), "partial")
 })
 
-test_that("get_structure_level treats floating concrete parts as partial", {
-  glycans <- as_glycan_structure(c(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+test_that("get_structure_level is independent of floating topology", {
+  intact <- as_glycan_structure(
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  )
+  topological <- as_glycan_structure(
     "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-"
-  ))
+  )
+  partial <- as_glycan_structure(
+    "{Neu5Ac(a2-?)|1,2}Gal(??-?)GalNAc(??-"
+  )
 
-  expect_identical(get_structure_level(glycans), "partial")
+  expect_identical(get_structure_level(intact), "intact")
+  expect_identical(get_structure_level(topological), "topological")
+  expect_identical(get_structure_level(partial), "partial")
 })
 
 test_that("get_structure_level treats floating generic parts as basic", {
@@ -186,15 +193,21 @@ test_that("reduce_structure_level works for multiple glycans", {
   )
 })
 
-test_that("reduce_structure_level handles floating structures explicitly", {
+test_that("reduce_structure_level preserves floating topology", {
   glycan <- as_glycan_structure(
     "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
   )
 
-  expect_snapshot(
-    reduce_structure_level(glycan, to_level = "topological"),
-    error = TRUE
+  topological <- reduce_structure_level(glycan, to_level = "topological")
+  expect_identical(
+    as.character(topological),
+    "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-"
   )
+  expect_identical(
+    structure_floating_parts(topological)$parents[[1]],
+    c(1L, 2L)
+  )
+  expect_identical(get_structure_level(topological), "topological")
 
   basic <- reduce_structure_level(glycan, to_level = "basic")
   expect_identical(
