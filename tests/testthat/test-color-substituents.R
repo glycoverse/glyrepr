@@ -14,7 +14,8 @@ test_that("special sialic acid cases are handled correctly", {
 })
 
 test_that("all valid linkage forms can be colored", {
-  withr::local_options(cli.num_colors = 256)
+  old_options <- options(cli.num_colors = 256)
+  on.exit(options(old_options), add = TRUE)
   annotations <- c("a1-3", "??-?", "a2-3/6", "a?-?", "?1-4")
 
   purrr::walk(annotations, function(annotation) {

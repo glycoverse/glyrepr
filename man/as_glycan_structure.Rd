@@ -54,9 +54,13 @@ as_glycan_structure(list(graph, o_glycan_graph))
 as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
 
 # Parse a floating residue with two candidate parents
-as_glycan_structure(
-  "{Neu5Ac(a2-3)|1,4}Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+floating_iupac <- paste0(
+  "{Neu5Ac(a2-3)|1,4}",
+  "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)",
+  "[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]",
+  "Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 )
+as_glycan_structure(floating_iupac)
 
 # Preserve valid elements while replacing an invalid element with NA
 as_glycan_structure(
