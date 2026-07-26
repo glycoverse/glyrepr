@@ -3,12 +3,15 @@
 #' @description
 #' Glycan structures can have four possible levels of resolution:
 #' - "intact": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-#'   and no linkage or anomer is unknown or ambiguous.
+#'   no linkage or anomer is unknown or ambiguous, and there are no floating
+#'   parts.
 #' - "partial": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
 #'   at least one linkage or anomer is unknown or ambiguous,
-#'   and at least one linkage or anomer has a non-"?" annotation.
+#'   at least one linkage or anomer has a non-"?" annotation, or the structure
+#'   contains a floating part whose parent is not localized.
 #' - "topological": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-#'   and all linkages and anomers are completely unknown ("??-?"/"??").
+#'   all linkages and anomers are completely unknown ("??-?"/"??"), and there
+#'   are no floating parts.
 #' - "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc").
 #'
 #' Note that in theory you can have a glycan with generic monosaccharides with all linkages determined.
@@ -26,7 +29,7 @@
 #' glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
 #' get_structure_level(glycan)
 #'
-#' @seealso [has_linkages()], [get_mono_type()]
+#' @seealso [has_linkages()], [has_floating_parts()], [get_mono_type()]
 #' @export
 get_structure_level <- function(x) {
   checkmate::assert_class(x, "glyrepr_structure")
@@ -48,6 +51,10 @@ get_structure_level <- function(x) {
   if (mono_type == "generic") {
     .warn_generic_linkage_structure_level(has_linkages_lenient)
     return("basic")
+  }
+
+  if (any(has_floating_parts(x_valid))) {
+    return("partial")
   }
 
   if (all(has_linkages_strict)) {
@@ -96,6 +103,10 @@ get_structure_level <- function(x) {
 #' - If `to_level` is "topological", this function calls [remove_linkages()] to remove all linkages.
 #' - If `to_level` is "basic", this function calls [remove_linkages()] to remove all linkages,
 #'   and [convert_to_generic()] to convert all monosaccharides to generic.
+#' - A structure with floating parts cannot be reduced to "topological",
+#'   because removing linkage annotations does not localize the floating
+#'   attachment. It can be reduced to "basic" while retaining its floating
+#'   metadata.
 #'
 #' @param x A [glycan_structure()] vector.
 #' @param to_level The resolution level to reduce to. Can be "basic" or "topological".
@@ -124,6 +135,17 @@ reduce_structure_level <- function(x, to_level) {
     #. 2. All structures in x are NA.
     # In both cases, we can just return x without any modification.
     return(x)
+  }
+
+  if (
+    to_level == "topological" &&
+      any(has_floating_parts(x), na.rm = TRUE)
+  ) {
+    cli::cli_abort(c(
+      "Cannot reduce a structure with floating parts to {.val topological}.",
+      "i" = "Removing linkage annotations does not localize floating attachments.",
+      "i" = "Use {.val basic} to reduce monosaccharide resolution while retaining floating metadata."
+    ))
   }
 
   level_ranks <- c("basic" = 1, "topological" = 2, "partial" = 3, "intact" = 4)

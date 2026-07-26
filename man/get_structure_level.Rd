@@ -17,12 +17,15 @@ If \code{x} is empty or all structures in \code{x} are NA, returns NA_character_
 Glycan structures can have four possible levels of resolution:
 \itemize{
 \item "intact": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-and no linkage or anomer is unknown or ambiguous.
+no linkage or anomer is unknown or ambiguous, and there are no floating
+parts.
 \item "partial": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
 at least one linkage or anomer is unknown or ambiguous,
-and at least one linkage or anomer has a non-"?" annotation.
+at least one linkage or anomer has a non-"?" annotation, or the structure
+contains a floating part whose parent is not localized.
 \item "topological": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
-and all linkages and anomers are completely unknown ("??-?"/"??").
+all linkages and anomers are completely unknown ("??-?"/"??"), and there
+are no floating parts.
 \item "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc").
 }
 
@@ -38,5 +41,5 @@ get_structure_level(glycan)
 
 }
 \seealso{
-\code{\link[=has_linkages]{has_linkages()}}, \code{\link[=get_mono_type]{get_mono_type()}}
+\code{\link[=has_linkages]{has_linkages()}}, \code{\link[=has_floating_parts]{has_floating_parts()}}, \code{\link[=get_mono_type]{get_mono_type()}}
 }

@@ -33,6 +33,10 @@ The logic is as follows:
 \item If \code{to_level} is "topological", this function calls \code{\link[=remove_linkages]{remove_linkages()}} to remove all linkages.
 \item If \code{to_level} is "basic", this function calls \code{\link[=remove_linkages]{remove_linkages()}} to remove all linkages,
 and \code{\link[=convert_to_generic]{convert_to_generic()}} to convert all monosaccharides to generic.
+\item A structure with floating parts cannot be reduced to "topological",
+because removing linkage annotations does not localize the floating
+attachment. It can be reduced to "basic" while retaining its floating
+metadata.
 }
 }
 \examples{
