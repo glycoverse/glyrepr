@@ -14,7 +14,12 @@ test_that("floating parts parse and serialize for a bi-antennary N-glycan", {
   expect_equal(igraph::components(graph, mode = "weak")$no, 2)
   expect_equal(
     graph$floating_parts,
-    list(list(root = 1L, linkage = "a2-3", parents = integer()))
+    list(list(
+      root = 1L,
+      nodes = 1L,
+      linkage = "a2-3",
+      parents = integer()
+    ))
   )
 
   ordinary <- as_glycan_structure(main)
@@ -173,7 +178,12 @@ test_that("explicit candidate parents use canonical main-tree node indices", {
   )
   expect_equal(
     canonical_graph$floating_parts,
-    list(list(root = 1L, linkage = "a2-6", parents = c(2L, 3L)))
+    list(list(
+      root = 1L,
+      nodes = 1L,
+      linkage = "a2-6",
+      parents = c(2L, 3L)
+    ))
   )
 })
 
@@ -223,7 +233,34 @@ test_that("multi-residue floating substructures round-trip", {
   )
   expect_equal(
     graph$floating_parts,
-    list(list(root = 2L, linkage = "b1-6", parents = c(3L, 4L)))
+    list(list(
+      root = 2L,
+      nodes = c(1L, 2L),
+      linkage = "b1-6",
+      parents = c(3L, 4L)
+    ))
+  )
+})
+
+test_that("each floating part stores its complete canonical node block", {
+  iupac <- paste0(
+    "{Fuc(a1-2)Gal(b1-4)|1,2}",
+    "{Neu5Ac(a2-6)|1,2}",
+    "Gal(b1-3)GalNAc(a1-"
+  )
+
+  graph <- get_structure_graphs(
+    as_glycan_structure(iupac),
+    return_list = FALSE
+  )
+
+  expect_identical(
+    purrr::map(graph$floating_parts, "nodes"),
+    list(c(1L, 2L), 3L)
+  )
+  expect_identical(
+    purrr::map_int(graph$floating_parts, "root"),
+    c(2L, 3L)
   )
 })
 
@@ -234,10 +271,15 @@ test_that("floating nodes follow their full IUPAC sequence order", {
   )
 
   glycan <- as_glycan_structure(iupac)
+  graph <- get_structure_graphs(glycan, return_list = FALSE)
 
   expect_identical(
     structure_nodes(glycan)$mono,
     c("Neu5Ac", "Neu5Ac", "Gal", "Gal", "Glc")
+  )
+  expect_identical(
+    graph$floating_parts[[1]]$nodes,
+    c(1L, 2L)
   )
   expect_identical(
     structure_edges(glycan)[1, c("from_node", "to_node", "linkage")],

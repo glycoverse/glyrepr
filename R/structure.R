@@ -50,9 +50,15 @@
 #' attribute, a list with one entry per floating component. Each entry contains:
 #'
 #' - `root`: the integer vertex index of the floating component root.
+#' - `nodes`: all integer vertex indices in the floating component, ordered as
+#'   the component appears in the complete IUPAC-condensed sequence.
 #' - `linkage`: the virtual linkage from that root to the main tree.
 #' - `parents`: integer vertex indices in the main tree. An empty integer vector
 #'   means that all feasible main-tree nodes are candidates.
+#'
+#' Canonical graphs always contain `nodes`. For backward compatibility, input
+#' graphs may omit it; [glycan_structure()] derives the component membership
+#' before validation and stores `nodes` in the canonical result.
 #'
 #' During canonicalization, a floating part with exactly one candidate parent
 #' is attached to that parent as an ordinary graph edge. This includes an empty
@@ -68,10 +74,12 @@
 #' the vertices are "Man", "Man", "Man", "GlcNAc", "GlcNAc",
 #' and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".
 #'
-#' For a floating structure, all main-tree vertices and edges come first in
-#' their main IUPAC order. Floating components follow in canonical block order.
-#' Candidate-parent indices refer only to the main-tree portion. A virtual
-#' floating attachment is not an edge.
+#' For a floating structure, floating-component vertices and edges precede the
+#' main tree, exactly as their brace-enclosed components precede the main glycan
+#' in the complete IUPAC-condensed string. Parent indices written inside braces
+#' are local to the main tree, while `floating_parts$parents` stores the
+#' corresponding global graph vertex indices. A virtual floating attachment is
+#' not an edge.
 #'
 #' # NA Support
 #'
@@ -980,8 +988,9 @@ warn_structure_failures <- function(positions, reasons, input_names = NULL) {
 #' Extract individual glycan structure graphs from a glycan structure vector.
 #' A structure with floating parts is returned as one annotated, weakly
 #' disconnected `igraph`: its main tree and floating components share the graph,
-#' and the `floating_parts` graph attribute records virtual attachments and
-#' candidate parents. See [glycan_structure()] for the metadata schema.
+#' and the `floating_parts` graph attribute records each component's node
+#' indices, virtual attachment, and candidate parents. See [glycan_structure()]
+#' for the metadata schema.
 #'
 #' @param x A glycan structure vector.
 #' @param return_list If `TRUE`, always returns a list.

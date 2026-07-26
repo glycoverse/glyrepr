@@ -21,8 +21,9 @@ A list of igraph objects or an igraph object directly (see \code{return_list} pa
 Extract individual glycan structure graphs from a glycan structure vector.
 A structure with floating parts is returned as one annotated, weakly
 disconnected \code{igraph}: its main tree and floating components share the graph,
-and the \code{floating_parts} graph attribute records virtual attachments and
-candidate parents. See \code{\link[=glycan_structure]{glycan_structure()}} for the metadata schema.
+and the \code{floating_parts} graph attribute records each component's node
+indices, virtual attachment, and candidate parents. See \code{\link[=glycan_structure]{glycan_structure()}}
+for the metadata schema.
 }
 \examples{
 structures <- c(o_glycan_core_1(), n_glycan_core())

@@ -8,9 +8,11 @@
 #' @section Floating graph schema:
 #' A floating structure is one weakly disconnected graph with exactly one main
 #' outward tree and one outward tree per floating part. Its `floating_parts`
-#' graph attribute is a list of entries with integer `root`, character
-#' `linkage`, and integer `parents` fields. `parents = integer()` means all
-#' feasible main-tree nodes. During canonicalization, a part with exactly one
+#' graph attribute is a list of entries with integer `root`, integer `nodes`,
+#' character `linkage`, and integer `parents` fields. `nodes` contains every
+#' vertex in that floating component. `parents = integer()` means all feasible
+#' main-tree nodes. Legacy input graphs may omit `nodes`; canonical output
+#' graphs always contain it. During canonicalization, a part with exactly one
 #' effective candidate parent is converted to an ordinary graph edge and its
 #' floating metadata is removed. Otherwise, the virtual attachment linkage is
 #' not a graph edge. See [glycan_structure()] for the complete contract.

@@ -707,8 +707,10 @@ structure_component_membership_one <- function(
     component_type <- rep("main", node_count)
     part_id <- rep(NA_integer_, node_count)
   } else {
-    info <- floating_graph_info(graph, parts)
-    part_id <- match(info$membership, info$floating_components)
+    part_id <- rep(NA_integer_, node_count)
+    for (floating_id in seq_along(parts)) {
+      part_id[parts[[floating_id]]$nodes] <- floating_id
+    }
     component_type <- ifelse(is.na(part_id), "main", "floating")
   }
 
