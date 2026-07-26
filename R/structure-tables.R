@@ -1,18 +1,18 @@
 #' Convert Glycan Structures to Graph Tables
 #'
 #' @description
-#' `structure_nodes()` and `structure_edges()` convert a glycan structure vector
-#' to node and edge tibbles. `structure_from_tibbles()` rebuilds a
-#' `glyrepr_structure` vector from those tibbles and a vector of reducing-end
-#' anomers.
+#' `structure_nodes()`, `structure_edges()`, and
+#' `structure_floating_parts()` convert a glycan structure vector to normalized
+#' graph tables. `structure_from_tibbles()` rebuilds a `glyrepr_structure`
+#' vector from those tables and a vector of reducing-end anomers.
 #'
 #' The `glycan_id` column is the integer position of each glycan in the input
 #' vector. Duplicate structures are expanded to their original vector positions.
 #' Missing structures have no node or edge rows and are reconstructed from
 #' missing values in `anomers`.
-#' If `x` is named, the node and edge tibbles also contain a `glycan_name`
-#' column. `structure_from_tibbles()` uses `glycan_name` as output names when
-#' that column is present.
+#' If `x` is named, all three tibbles also contain a `glycan_name` column.
+#' `structure_from_tibbles()` uses `glycan_name` as output names when that
+#' column is present.
 #'
 #' @param x A glycan structure vector.
 #' @param nodes A data frame with columns `glycan_id`, `node_id`, `mono`, and
@@ -20,12 +20,16 @@
 #' @param edges A data frame with columns `glycan_id`, `edge_id`, `from_node`,
 #'   `to_node`, and `linkage`, and optionally `glycan_name`.
 #' @param anomers A character vector of reducing-end anomers, one per glycan.
+#' @param floating_parts A data frame returned by
+#'   `structure_floating_parts()`, or `NULL` when no floating parts are present.
 #'
 #' @returns
 #' - `structure_nodes()` returns a tibble with columns `glycan_id`, `node_id`,
 #'   `mono`, and `sub`.
 #' - `structure_edges()` returns a tibble with columns `glycan_id`, `edge_id`,
 #'   `from_node`, `to_node`, and `linkage`.
+#' - `structure_floating_parts()` returns a tibble with columns `glycan_id`,
+#'   `part_id`, `root_node`, `linkage`, and the list-column `parents`.
 #' - `structure_from_tibbles()` returns a `glyrepr_structure` vector.
 #'
 #' @examples
@@ -33,6 +37,11 @@
 #' nodes <- structure_nodes(glycans)
 #' edges <- structure_edges(glycans)
 #' structure_from_tibbles(nodes, edges, get_anomer(glycans))
+#'
+#' floating <- as_glycan_structure(
+#'   "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+#' )
+#' structure_floating_parts(floating)
 #'
 #' @name structure_tables
 NULL
@@ -98,10 +107,45 @@ structure_edges <- function(x) {
 
 #' @rdname structure_tables
 #' @export
-structure_from_tibbles <- function(nodes, edges, anomers) {
+structure_floating_parts <- function(x) {
+  checkmate::assert_class(x, "glyrepr_structure")
+
+  graphs <- as.list(x)
+  glycan_names <- names(x)
+  has_glycan_names <- !is.null(glycan_names)
+  if (length(graphs) == 0) {
+    return(empty_structure_floating_parts(has_glycan_names))
+  }
+
+  part_tables <- purrr::map2(
+    seq_along(graphs),
+    graphs,
+    function(glycan_id, graph) {
+      glycan_name <- if (has_glycan_names) {
+        glycan_names[[glycan_id]]
+      } else {
+        NULL
+      }
+      structure_floating_parts_one(glycan_id, graph, glycan_name)
+    }
+  )
+
+  dplyr::bind_rows(part_tables)
+}
+
+
+#' @rdname structure_tables
+#' @export
+structure_from_tibbles <- function(
+  nodes,
+  edges,
+  anomers,
+  floating_parts = NULL
+) {
   nodes <- validate_structure_nodes_table(nodes)
   edges <- validate_structure_edges_table(edges)
   anomers <- validate_structure_anomers(anomers)
+  floating_parts <- validate_structure_floating_parts_table(floating_parts)
 
   validate_structure_table_glycan_ids(
     nodes$glycan_id,
@@ -113,7 +157,17 @@ structure_from_tibbles <- function(nodes, edges, anomers) {
     length(anomers),
     "edges"
   )
-  glycan_names <- structure_table_glycan_names(nodes, edges, anomers)
+  validate_structure_table_glycan_ids(
+    floating_parts$glycan_id,
+    length(anomers),
+    "floating_parts"
+  )
+  glycan_names <- structure_table_glycan_names(
+    nodes,
+    edges,
+    floating_parts,
+    anomers
+  )
 
   if (length(anomers) == 0) {
     return(glycan_structure())
@@ -123,6 +177,11 @@ structure_from_tibbles <- function(nodes, edges, anomers) {
     build_structure_graph_from_table_rows(
       nodes[nodes$glycan_id == glycan_id, , drop = FALSE],
       edges[edges$glycan_id == glycan_id, , drop = FALSE],
+      floating_parts[
+        floating_parts$glycan_id == glycan_id,
+        ,
+        drop = FALSE
+      ],
       anomers[[glycan_id]],
       glycan_id
     )
@@ -171,6 +230,32 @@ empty_structure_edges <- function(has_glycan_name = FALSE) {
     from_node = integer(),
     to_node = integer(),
     linkage = character()
+  )
+
+  if (has_glycan_name) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = character(),
+      .after = "glycan_id"
+    )
+  }
+
+  out
+}
+
+
+#' Create an empty floating-part tibble
+#'
+#' @param has_glycan_name Whether to include a `glycan_name` column.
+#' @returns A zero-row tibble with the `structure_floating_parts()` columns.
+#' @noRd
+empty_structure_floating_parts <- function(has_glycan_name = FALSE) {
+  out <- tibble::tibble(
+    glycan_id = integer(),
+    part_id = integer(),
+    root_node = integer(),
+    linkage = character(),
+    parents = list()
   )
 
   if (has_glycan_name) {
@@ -251,6 +336,47 @@ structure_edges_one <- function(glycan_id, graph, glycan_name = NULL) {
 }
 
 
+#' Convert one graph to a floating-part tibble
+#'
+#' @param glycan_id Integer position of the glycan.
+#' @param graph An igraph object or `NULL` for a missing structure.
+#' @param glycan_name Optional glycan name.
+#' @returns A tibble with floating-part rows for one glycan.
+#' @noRd
+structure_floating_parts_one <- function(
+  glycan_id,
+  graph,
+  glycan_name = NULL
+) {
+  if (is.null(graph)) {
+    return(empty_structure_floating_parts(!is.null(glycan_name)))
+  }
+
+  parts <- normalize_floating_parts(graph)
+  if (length(parts) == 0) {
+    return(empty_structure_floating_parts(!is.null(glycan_name)))
+  }
+
+  out <- tibble::tibble(
+    glycan_id = rep(as.integer(glycan_id), length(parts)),
+    part_id = seq_along(parts),
+    root_node = purrr::map_int(parts, "root"),
+    linkage = purrr::map_chr(parts, "linkage"),
+    parents = purrr::map(parts, "parents")
+  )
+
+  if (!is.null(glycan_name)) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = rep(glycan_name, length(parts)),
+      .after = "glycan_id"
+    )
+  }
+
+  out
+}
+
+
 #' Validate a structure node table
 #'
 #' @param nodes A candidate node table.
@@ -317,6 +443,88 @@ validate_structure_edges_table <- function(edges) {
   edges$from_node <- as.integer(edges$from_node)
   edges$to_node <- as.integer(edges$to_node)
   edges
+}
+
+
+#' Validate a floating-part table
+#'
+#' @param floating_parts A candidate floating-part table or `NULL`.
+#' @returns A tibble with the required floating-part columns.
+#' @noRd
+validate_structure_floating_parts_table <- function(floating_parts) {
+  if (is.null(floating_parts)) {
+    return(empty_structure_floating_parts())
+  }
+
+  required_cols <- c(
+    "glycan_id",
+    "part_id",
+    "root_node",
+    "linkage",
+    "parents"
+  )
+  floating_parts <- validate_structure_table(
+    floating_parts,
+    required_cols,
+    "floating_parts",
+    optional_cols = "glycan_name"
+  )
+
+  validate_integerish_structure_column(
+    floating_parts,
+    "glycan_id",
+    "floating_parts"
+  )
+  validate_integerish_structure_column(
+    floating_parts,
+    "part_id",
+    "floating_parts"
+  )
+  validate_integerish_structure_column(
+    floating_parts,
+    "root_node",
+    "floating_parts"
+  )
+  validate_character_structure_column(
+    floating_parts,
+    "linkage",
+    "floating_parts"
+  )
+  if (!is.list(floating_parts$parents)) {
+    cli::cli_abort(
+      "{.arg floating_parts} column {.field parents} must be a list-column."
+    )
+  }
+  valid_parents <- purrr::map_lgl(
+    floating_parts$parents,
+    ~ checkmate::test_integerish(
+      .x,
+      lower = 1,
+      any.missing = FALSE
+    )
+  )
+  if (!all(valid_parents)) {
+    cli::cli_abort(
+      "{.arg floating_parts} column {.field parents} must contain positive integer vectors."
+    )
+  }
+  if ("glycan_name" %in% names(floating_parts)) {
+    validate_character_structure_column(
+      floating_parts,
+      "glycan_name",
+      "floating_parts",
+      any.missing = TRUE
+    )
+  }
+
+  floating_parts$glycan_id <- as.integer(floating_parts$glycan_id)
+  floating_parts$part_id <- as.integer(floating_parts$part_id)
+  floating_parts$root_node <- as.integer(floating_parts$root_node)
+  floating_parts$parents <- purrr::map(
+    floating_parts$parents,
+    as.integer
+  )
+  floating_parts
 }
 
 
@@ -408,11 +616,22 @@ validate_character_structure_column <- function(
 #'
 #' @param nodes A validated node table.
 #' @param edges A validated edge table.
+#' @param floating_parts A validated floating-part table.
 #' @param anomers A validated anomer vector.
 #' @returns A character vector of names, or `NULL`.
 #' @noRd
-structure_table_glycan_names <- function(nodes, edges, anomers) {
-  table_names <- structure_table_glycan_names_from_rows(nodes, edges, anomers)
+structure_table_glycan_names <- function(
+  nodes,
+  edges,
+  floating_parts,
+  anomers
+) {
+  table_names <- structure_table_glycan_names_from_rows(
+    nodes,
+    edges,
+    floating_parts,
+    anomers
+  )
   if (is.null(table_names)) {
     return(names(anomers))
   }
@@ -432,14 +651,21 @@ structure_table_glycan_names <- function(nodes, edges, anomers) {
 #'
 #' @param nodes A validated node table.
 #' @param edges A validated edge table.
+#' @param floating_parts A validated floating-part table.
 #' @param anomers A validated anomer vector.
 #' @returns A character vector with `NA` where no table name is available, or
 #'   `NULL` when neither table contains `glycan_name`.
 #' @noRd
-structure_table_glycan_names_from_rows <- function(nodes, edges, anomers) {
+structure_table_glycan_names_from_rows <- function(
+  nodes,
+  edges,
+  floating_parts,
+  anomers
+) {
   name_rows <- dplyr::bind_rows(
     structure_table_name_rows(nodes),
-    structure_table_name_rows(edges)
+    structure_table_name_rows(edges),
+    structure_table_name_rows(floating_parts)
   )
 
   if (nrow(name_rows) == 0) {
@@ -535,6 +761,7 @@ validate_structure_table_glycan_ids <- function(
 #'
 #' @param node_rows Node rows for one glycan.
 #' @param edge_rows Edge rows for one glycan.
+#' @param floating_rows Floating-part rows for one glycan.
 #' @param anomer Reducing-end anomer for the glycan.
 #' @param glycan_id Integer glycan ID used in error messages.
 #' @returns An igraph object, or `NA` for a missing glycan.
@@ -542,6 +769,7 @@ validate_structure_table_glycan_ids <- function(
 build_structure_graph_from_table_rows <- function(
   node_rows,
   edge_rows,
+  floating_rows,
   anomer,
   glycan_id
 ) {
@@ -549,6 +777,11 @@ build_structure_graph_from_table_rows <- function(
     if (nrow(edge_rows) > 0) {
       cli::cli_abort(
         "Glycan {.val {glycan_id}} has edges without nodes."
+      )
+    }
+    if (nrow(floating_rows) > 0) {
+      cli::cli_abort(
+        "Glycan {.val {glycan_id}} has floating parts without nodes."
       )
     }
     if (!is.na(anomer)) {
@@ -568,6 +801,11 @@ build_structure_graph_from_table_rows <- function(
 
   node_rows <- node_rows[order(node_rows$node_id), , drop = FALSE]
   edge_rows <- edge_rows[order(edge_rows$edge_id), , drop = FALSE]
+  floating_rows <- floating_rows[
+    order(floating_rows$part_id),
+    ,
+    drop = FALSE
+  ]
 
   validate_consecutive_structure_ids(
     node_rows$node_id,
@@ -577,6 +815,11 @@ build_structure_graph_from_table_rows <- function(
   validate_consecutive_structure_ids(
     edge_rows$edge_id,
     "edge_id",
+    glycan_id
+  )
+  validate_consecutive_structure_ids(
+    floating_rows$part_id,
+    "part_id",
     glycan_id
   )
   validate_structure_edge_nodes(edge_rows, nrow(node_rows), glycan_id)
@@ -594,6 +837,17 @@ build_structure_graph_from_table_rows <- function(
   igraph::V(graph)$sub <- node_rows$sub
   igraph::E(graph)$linkage <- edge_rows$linkage
   graph$anomer <- anomer
+  parts <- purrr::pmap(
+    floating_rows[c("root_node", "linkage", "parents")],
+    function(root_node, linkage, parents) {
+      list(
+        root = root_node,
+        linkage = linkage,
+        parents = parents
+      )
+    }
+  )
+  graph <- set_floating_parts_attr(graph, parts)
 
   graph
 }

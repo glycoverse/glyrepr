@@ -73,6 +73,34 @@ test_that("structure_edges includes glycan_name for named structures", {
   expect_equal(edges$glycan_name, c("first", "second"))
 })
 
+test_that("structure_floating_parts returns normalized attachment metadata", {
+  glycans <- as_glycan_structure(c(
+    unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Fuc(a1-2)|1}{Neu5Ac(a2-3)|1,2}Gal(b1-3)GalNAc(a1-",
+    ordinary = "Gal(a1-",
+    missing = NA
+  ))
+
+  parts <- structure_floating_parts(glycans)
+
+  expect_named(
+    parts,
+    c(
+      "glycan_id",
+      "glycan_name",
+      "part_id",
+      "root_node",
+      "linkage",
+      "parents"
+    )
+  )
+  expect_equal(parts$glycan_id, c(1L, 2L, 2L))
+  expect_equal(parts$glycan_name, c("unrestricted", "restricted", "restricted"))
+  expect_equal(parts$part_id, c(1L, 1L, 2L))
+  expect_equal(parts$linkage, c("a2-3", "a1-2", "a2-3"))
+  expect_equal(parts$parents, list(integer(), 1L, c(1L, 2L)))
+})
+
 test_that("structure_from_tibbles recreates structure vectors", {
   glycans <- c(o_glycan_core_1(), n_glycan_core())
   nodes <- structure_nodes(glycans)
@@ -83,6 +111,26 @@ test_that("structure_from_tibbles recreates structure vectors", {
 
   expect_s3_class(rebuilt, "glyrepr_structure")
   expect_equal(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
+})
+
+test_that("structure tables round-trip floating parts", {
+  glycans <- as_glycan_structure(c(
+    unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
+    missing = NA,
+    restricted = "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-",
+    duplicate = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-"
+  ))
+
+  rebuilt <- structure_from_tibbles(
+    structure_nodes(glycans),
+    structure_edges(glycans),
+    get_anomer(glycans),
+    structure_floating_parts(glycans)
+  )
+
+  expect_identical(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
+  expect_identical(names(rebuilt), names(glycans))
+  expect_identical(is.na(rebuilt), is.na(glycans))
 })
 
 test_that("structure_from_tibbles restores names from glycan_name", {
