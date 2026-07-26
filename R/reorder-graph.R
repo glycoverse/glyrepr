@@ -25,15 +25,59 @@ reorder_graphs_with_indices <- function(graphs) {
 }
 
 .reorder_one_graph <- function(graph) {
-  if (has_floating_parts_graph(graph)) {
-    return(canonicalize_floating_graph(graph))
+  has_parts_attr <- "floating_parts" %in% igraph::graph_attr_names(graph)
+  if (has_parts_attr) {
+    parts <- igraph::graph_attr(graph, "floating_parts")
+    if (length(parts) > 0) {
+      return(canonicalize_floating_graph(graph))
+    }
+    graph <- delete_floating_parts_attr(graph)
   }
 
-  graph <- delete_floating_parts_attr(graph)
   seq_cache <- build_seq_cache(graph)
   root <- seq_cache$root
   order <- seq_glycan_order(root, seq_cache)
+  if (is_canonical_sequence_order(order)) {
+    return(graph)
+  }
+
   .reorder_by_sequence_order(graph, order)
+}
+
+is_canonical_sequence_order <- function(sequence_order) {
+  vertex_order <- as.numeric(sequence_order$vertices)
+  edge_order <- as.numeric(sequence_order$edges)
+
+  identical(base::order(vertex_order), seq_along(vertex_order)) &&
+    identical(edge_order, as.numeric(seq_along(edge_order)))
+}
+
+canonicalize_graph_with_iupac <- function(graph) {
+  if ("floating_parts" %in% igraph::graph_attr_names(graph)) {
+    graph <- canonicalize_glycan_graph(graph)
+    return(list(graph = graph, iupac = graph_to_iupac(graph)))
+  }
+
+  graph <- ensure_name_vertex_attr(graph)
+  canonical_names <- as.character(seq_len(igraph::vcount(graph)))
+  if (!identical(igraph::V(graph)$name, canonical_names)) {
+    igraph::V(graph)$name <- canonical_names
+  }
+
+  seq_cache <- build_seq_cache(graph)
+  root <- seq_cache$root
+  sequence <- seq_glycan_order_iupac(root, seq_cache)
+  iupac <- paste0(
+    sequence$iupac,
+    "(",
+    graph$anomer,
+    "-"
+  )
+  if (!is_canonical_sequence_order(sequence)) {
+    graph <- .reorder_by_sequence_order(graph, sequence)
+  }
+
+  list(graph = graph, iupac = iupac)
 }
 
 .reorder_by_sequence_order <- function(graph, sequence_order) {

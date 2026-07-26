@@ -1,3 +1,11 @@
+# empty floating metadata preserves the validation contract
+
+    Code
+      validate_glycan_graph(graph)
+    Condition
+      Error in `normalize_floating_parts()`:
+      ! Graph attribute floating_parts must be a list.
+
 # validate_glycan_graph reports invalid input
 
     Code
