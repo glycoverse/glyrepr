@@ -17,6 +17,21 @@ test_that("as_glycan_structure.character parses simple IUPAC-condensed strings",
   expect_equal(structure_to_iupac(glycan3), "Gal(b1-3)GalNAc(a1-")
 })
 
+test_that("ordinary IUPAC parsing bypasses floating-part splitting", {
+  testthat::local_mocked_bindings(
+    split_floating_iupac = function(...) {
+      stop("floating parser should not run")
+    }
+  )
+
+  glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
+
+  expect_identical(
+    unname(structure_to_iupac(glycan)),
+    "Gal(b1-3)GalNAc(a1-"
+  )
+})
+
 test_that("as_glycan_structure.character parses branched structures", {
   # Simple branched structure
   iupac <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-"
