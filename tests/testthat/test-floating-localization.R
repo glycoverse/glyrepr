@@ -209,3 +209,136 @@ test_that("localize_floating_parts checks occupied main-tree slots", {
     error = TRUE
   )
 })
+
+test_that("enumerate_floating_localizations returns every valid variant", {
+  glycan <- as_glycan_structure(
+    paste0(
+      "{Fuc(a1-3)|1,2}",
+      "{Neu5Ac(a2-3)|1,2}",
+      "Gal(b1-4)GalNAc(a1-"
+    )
+  )
+
+  variants <- enumerate_floating_localizations(glycan)
+
+  expect_s3_class(variants, "tbl_df")
+  expect_named(
+    variants,
+    c("input_id", "variant_id", "structure", "assignments")
+  )
+  expect_identical(variants$input_id, c(1L, 1L))
+  expect_identical(variants$variant_id, c(1L, 2L))
+  expect_s3_class(variants$structure, "glyrepr_structure")
+  expect_false(any(has_floating_parts(variants$structure)))
+  expect_identical(
+    purrr::map(variants$assignments, "glycan_id"),
+    list(c(1L, 1L), c(1L, 1L))
+  )
+  expect_true(all(
+    purrr::map_lgl(
+      variants$assignments,
+      ~ length(unique(.x$parent_node)) == 2
+    )
+  ))
+})
+
+test_that("enumerate_floating_localizations handles ambiguous linkages", {
+  glycan <- as_glycan_structure(
+    "{Neu5Ac(a2-3/6)|1,2}Gal(b1-4)GalNAc(a1-"
+  )
+
+  variants <- enumerate_floating_localizations(glycan)
+
+  expect_equal(nrow(variants), 2)
+  expect_true(all(
+    purrr::map_lgl(
+      as.list(variants$structure),
+      ~ "a2-3/6" %in% igraph::edge_attr(.x, "linkage")
+    )
+  ))
+})
+
+test_that("enumerate_floating_localizations filters occupied slots", {
+  glycan <- as_glycan_structure(
+    "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-"
+  )
+
+  variants <- enumerate_floating_localizations(glycan)
+
+  expect_equal(nrow(variants), 1)
+  expect_identical(
+    as.character(variants$structure),
+    "Neu5Ac(a2-3)Gal(b1-3)GalNAc(a1-"
+  )
+  expect_identical(variants$assignments[[1]]$parent_node, 1L)
+})
+
+test_that("enumerate_floating_localizations deduplicates canonical variants", {
+  glycan <- as_glycan_structure(
+    paste0(
+      "{Neu5Ac(a2-3)|1,2}",
+      "Gal(??-?)[Gal(??-?)]GlcNAc(??-"
+    )
+  )
+
+  variants <- enumerate_floating_localizations(glycan)
+
+  expect_equal(nrow(variants), 1)
+  expect_identical(variants$variant_id, 1L)
+  expect_identical(variants$assignments[[1]]$parent_node, 1L)
+})
+
+test_that("enumerate_floating_localizations retains every input position", {
+  glycans <- as_glycan_structure(c(
+    missing = NA,
+    ordinary = "Gal(a1-",
+    floating = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  ))
+
+  variants <- enumerate_floating_localizations(glycans)
+
+  expect_identical(variants$input_id, c(1L, 2L, 3L, 3L))
+  expect_identical(variants$variant_id, c(1L, 1L, 1L, 2L))
+  expect_identical(
+    unname(is.na(variants$structure)),
+    c(TRUE, FALSE, FALSE, FALSE)
+  )
+  expect_identical(
+    purrr::map_int(variants$assignments, nrow),
+    c(0L, 0L, 1L, 1L)
+  )
+  expect_identical(
+    names(variants$structure),
+    c("missing", "ordinary", "floating", "floating")
+  )
+})
+
+test_that("enumerate_floating_localizations handles empty vectors", {
+  variants <- enumerate_floating_localizations(glycan_structure())
+
+  expect_named(
+    variants,
+    c("input_id", "variant_id", "structure", "assignments")
+  )
+  expect_equal(nrow(variants), 0)
+  expect_s3_class(variants$structure, "glyrepr_structure")
+})
+
+test_that("enumerate_floating_localizations enforces a conservative bound", {
+  glycan <- as_glycan_structure(
+    paste0(
+      "{Fuc(a1-3)|1,2}",
+      "{Neu5Ac(a2-3)|1,2}",
+      "Gal(b1-4)GalNAc(a1-"
+    )
+  )
+
+  expect_snapshot(
+    enumerate_floating_localizations(glycan, max_variants = 3),
+    error = TRUE
+  )
+  expect_error(
+    enumerate_floating_localizations(glycan, max_variants = 0),
+    class = "error"
+  )
+})

@@ -44,6 +44,7 @@ reference:
 - title: "Glycan Composition and Structure Manipulation"
   contents:
   - convert_to_generic
+  - enumerate_floating_localizations
   - fill_anomer_pos
   - localize_floating_parts
   - remove_linkages
