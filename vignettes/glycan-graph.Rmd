@@ -182,8 +182,8 @@ graph$anomer
 ### Floating Parts
 
 A floating structure remains one `igraph`, but it is weakly disconnected.
-The main-tree vertices come first in canonical IUPAC order, followed by the
-floating components.
+The floating-component vertices come first in complete IUPAC-condensed order,
+followed by the main-tree vertices in their canonical order.
 
 ```{r}
 floating <- as_glycan_structure(
@@ -196,9 +196,10 @@ igraph::graph_attr(floating_graph, "floating_parts")
 structure_floating_parts(floating)
 ```
 
-Each `floating_parts` entry has three fields:
+Each `floating_parts` entry has four fields:
 
 - `root`: the vertex index at the root of the floating component.
+- `nodes`: every vertex index in the floating component.
 - `linkage`: the virtual linkage from that root to the main tree.
 - `parents`: candidate vertex indices in the main tree. `integer()` means all
   feasible main-tree nodes. In a canonical structure, an explicit vector has at
