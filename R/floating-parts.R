@@ -401,7 +401,7 @@ canonicalize_floating_graph <- function(graph) {
   info <- floating_graph_info(graph, parts)
   original_names <- igraph::V(graph)$name
 
-  main_order <- component_sequence_order(graph, info$main_vertices)
+  main_order <- floating_symmetry_main_order(graph, info)
   main_names <- original_names[main_order$vertices]
   main_index <- stats::setNames(seq_along(main_names), main_names)
 
