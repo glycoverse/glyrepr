@@ -960,6 +960,45 @@ test_that("spmap_structure correctly updates unique structures count when modifi
   expect_equal(as.character(result)[1], "Gal(??-?)GalNAc(??-")
 })
 
+test_that("structure mappers recanonicalize floating candidate indices", {
+  glycan <- as_glycan_structure(
+    "{Neu5Ac(a2-3)|2}Fuc(a1-2)[Gal(a1-3)]Man(a1-"
+  )
+  strip_tree_linkages <- function(graph, ...) {
+    graph <- igraph::set_edge_attr(graph, "linkage", value = "??-?")
+    igraph::set_graph_attr(graph, "anomer", value = "??")
+  }
+
+  results <- list(
+    smap = smap_structure(glycan, strip_tree_linkages),
+    smap2 = smap2_structure(glycan, 1, strip_tree_linkages),
+    spmap = spmap_structure(list(glycan, 1), strip_tree_linkages),
+    simap = simap_structure(glycan, strip_tree_linkages)
+  )
+
+  purrr::walk(results, function(result) {
+    expect_identical(
+      as.character(result),
+      "{Neu5Ac(a2-3)|1}Gal(??-?)[Fuc(??-?)]Man(??-"
+    )
+    expect_identical(
+      structure_floating_parts(result)$parents[[1]],
+      1L
+    )
+  })
+})
+
+test_that("structure mappers validate floating metadata returned by callbacks", {
+  glycan <- as_glycan_structure(
+    "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+  )
+
+  expect_snapshot(
+    smap_structure(glycan, delete_floating_parts_attr),
+    error = TRUE
+  )
+})
+
 # Additional regression tests for the smap2 nested list fix
 test_that("smap2 handles real glycan structures with nested match results correctly", {
   # Create a realistic glycan structure (simulating glyenzy use case)

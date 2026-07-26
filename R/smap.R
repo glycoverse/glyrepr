@@ -8,6 +8,8 @@
 #' @param .x A glycan structure vector (glyrepr_structure).
 #' @param .f A function that takes an igraph object and returns a result.
 #'   Can be a function, purrr-style lambda (`~ .x$attr`), or a character string naming a function.
+#'   A structure with floating parts is passed as one annotated, weakly
+#'   disconnected graph, including its `floating_parts` graph attribute.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `smap_vec`).
 #'
@@ -15,6 +17,10 @@
 #' These functions only compute `.f` once for each unique structure, then map
 #' the results back to the original vector positions. This is much more efficient
 #' than applying `.f` to each element individually when there are duplicate structures.
+#'
+#' Structure-returning variants validate and canonicalize every graph returned
+#' by `.f`. A callback that changes vertex identities or components of a
+#' floating structure must also update its `floating_parts` metadata.
 #'
 #'
 #' **Return Types:**
@@ -64,6 +70,12 @@ NULL
 # Helper function to rebuild glycan_structure with proper deduplication
 # after modifications that may create identical graphs
 .rebuild_structure_with_dedup <- function(modified_graphs, idx_mapping) {
+  modified_graphs <- purrr::map(modified_graphs, function(graph) {
+    graph <- validate_glycan_graph(graph)
+    canonicalize_glycan_graph(graph)
+  })
+  validate_glycan_graph_vector(modified_graphs)
+
   # Get new IUPACs for all modified graphs
   new_unique_iupacs <- purrr::map_chr(
     modified_graphs,
@@ -478,6 +490,8 @@ smap_structure <- function(.x, .f, ...) {
 #' @param .x A glycan structure vector (glyrepr_structure).
 #' @param .f A function that takes an igraph object and returns a result.
 #'   Can be a function, purrr-style lambda (`~ .x$attr`), or a character string naming a function.
+#'   A structure with floating parts is passed as one annotated, weakly
+#'   disconnected graph.
 #' @param ... Additional arguments passed to `.f`.
 #' @return A list with results for each unique structure, named by their hash codes.
 #'
@@ -619,6 +633,8 @@ snone <- function(.x, .p, ...) {
 #' @param .y A vector of the same length as `.x`, or length 1 (will be recycled).
 #' @param .f A function that takes an igraph object (from `.x`) and a value (from `.y`) and returns a result.
 #'   Can be a function, purrr-style lambda (`~ .x + .y`), or a character string naming a function.
+#'   A structure with floating parts is passed as one annotated, weakly
+#'   disconnected graph.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `smap2_vec`).
 #'
@@ -626,6 +642,10 @@ snone <- function(.x, .p, ...) {
 #' These functions only compute `.f` once for each unique combination of structure and corresponding
 #' `.y` value, then map the results back to the original vector positions. This is much more efficient
 #' than applying `.f` to each element pair individually when there are duplicate structure-value combinations.
+#'
+#' `smap2_structure()` validates and canonicalizes every graph returned by
+#' `.f`. A callback that changes vertex identities or components of a floating
+#' structure must also update its `floating_parts` metadata.
 #'
 #' **NA Handling:**
 #' NA elements in `.x` are preserved in the output - the function is not applied to NA positions,
@@ -770,12 +790,18 @@ smap2_structure <- function(.x, .y, .f, ...) {
 #' @param .f A function that takes an igraph object (from first element of `.l`) and
 #'   values from other elements, returning a result.
 #'   Can be a function, purrr-style lambda (`~ .x + .y + .z`), or a character string naming a function.
+#'   A structure with floating parts is passed as one annotated, weakly
+#'   disconnected graph.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `spmap_vec`).
 #'
 #' @details
 #' These functions only compute `.f` once for each unique combination of structure and corresponding
 #' values from other vectors, then map the results back to the original vector positions.
+#'
+#' `spmap_structure()` validates and canonicalizes every graph returned by
+#' `.f`. A callback that changes vertex identities or components of a floating
+#' structure must also update its `floating_parts` metadata.
 #'
 #' **NA Handling:**
 #' NA elements in the first argument (glycan structure vector) are preserved in the output.
@@ -927,6 +953,8 @@ spmap_structure <- function(.l, .f, ...) {
 #' @param .f A function that takes an igraph object (from `.x`) and an index/name,
 #'   returning a result.
 #'   Can be a function, purrr-style lambda (`~ paste(.x, .y)`), or a character string naming a function.
+#'   A structure with floating parts is passed as one annotated, weakly
+#'   disconnected graph.
 #' @param ... Additional arguments passed to `.f`.
 #' @param .ptype A prototype for the return type (for `simap_vec`).
 #'
@@ -934,6 +962,10 @@ spmap_structure <- function(.l, .f, ...) {
 #' These functions only compute `.f` once for each unique combination of structure and corresponding
 #' index/name, then map the results back to the original vector positions. This is much more efficient
 #' than applying `.f` to each element individually when there are duplicate structures.
+#'
+#' `simap_structure()` validates and canonicalizes every graph returned by
+#' `.f`. A callback that changes vertex identities or components of a floating
+#' structure must also update its `floating_parts` metadata.
 #'
 #' **IMPORTANT PERFORMANCE NOTE:**
 #' Due to the inclusion of position indices, `simap` functions have **O(total_structures)**
