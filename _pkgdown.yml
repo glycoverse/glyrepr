@@ -26,6 +26,7 @@ reference:
   - structure_nodes
   - structure_edges
   - structure_floating_parts
+  - structure_floating_candidates
   - structure_to_iupac
   - get_structure_level
 - title: "Low-Level Glycan Graph Infrastructure"

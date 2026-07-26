@@ -104,6 +104,73 @@ test_that("structure_floating_parts returns normalized attachment metadata", {
   )
 })
 
+test_that("structure_floating_candidates expands every attachment candidate", {
+  glycans <- as_glycan_structure(c(
+    unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+    ordinary = "Gal(a1-",
+    missing = NA
+  ))
+
+  candidates <- structure_floating_candidates(glycans)
+
+  expect_named(
+    candidates,
+    c(
+      "glycan_id",
+      "glycan_name",
+      "part_id",
+      "root_node",
+      "parent_node",
+      "linkage",
+      "scope"
+    )
+  )
+  expect_equal(candidates$glycan_id, c(1L, 1L, 2L, 2L))
+  expect_equal(
+    candidates$glycan_name,
+    c("unrestricted", "unrestricted", "restricted", "restricted")
+  )
+  expect_equal(candidates$part_id, rep(1L, 4))
+  expect_equal(candidates$root_node, rep(3L, 4))
+  expect_equal(candidates$parent_node, c(1L, 2L, 1L, 2L))
+  expect_equal(candidates$linkage, c("a2-3", "a2-3", "a2-6", "a2-6"))
+  expect_equal(candidates$scope, c("all", "all", "explicit", "explicit"))
+})
+
+test_that("structure_floating_candidates returns typed empty tables", {
+  unnamed <- structure_floating_candidates(glycan_structure())
+  named <- structure_floating_candidates(
+    c(ordinary = as_glycan_structure("Gal(a1-"), missing = NA)
+  )
+
+  expect_named(
+    unnamed,
+    c(
+      "glycan_id",
+      "part_id",
+      "root_node",
+      "parent_node",
+      "linkage",
+      "scope"
+    )
+  )
+  expect_equal(nrow(unnamed), 0)
+  expect_named(
+    named,
+    c(
+      "glycan_id",
+      "glycan_name",
+      "part_id",
+      "root_node",
+      "parent_node",
+      "linkage",
+      "scope"
+    )
+  )
+  expect_equal(nrow(named), 0)
+})
+
 test_that("structure_from_tibbles recreates structure vectors", {
   glycans <- c(o_glycan_core_1(), n_glycan_core())
   nodes <- structure_nodes(glycans)

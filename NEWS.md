@@ -1,6 +1,7 @@
 # glyrepr (development version)
 
 * `glycan_structure()` now supports floating glycan substructures with optional candidate-parent indices through `{<floating>}` and `{<floating>|<parents>}` syntax, together with floating-aware graph validation, canonicalization, transformations, and graph-table conversion. Singleton parent sets are normalized to ordinary graph edges.
+* `structure_floating_candidates()` returns one row per potential floating-part attachment and expands unrestricted parent domains to every original main-tree node.
 * Structure-level classification now depends only on residue specificity and linkage completeness: floating candidate-parent metadata does not itself make a structure partial, and floating structures can be reduced to topological resolution.
 * `validate_glycan_graph()` and structure parsing are faster by checking linkage positions in bulk. (#79)
 * `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)
