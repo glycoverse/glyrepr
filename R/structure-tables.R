@@ -18,13 +18,14 @@
 #' IUPAC-condensed string. For a floating structure, nodes from each
 #' brace-enclosed floating part therefore precede nodes from the main tree.
 #'
-#' In `structure_floating_parts()`, `root_node` and every integer in `parents`
-#' refer to `structure_nodes()$node_id` for the same glycan. An empty `parents`
-#' vector means all feasible main-tree nodes are candidates. The `linkage`
-#' column describes the virtual attachment to the main tree; this attachment is
-#' intentionally absent from `structure_edges()`. During reconstruction, a row
-#' with exactly one effective candidate parent is normalized to an ordinary
-#' edge and is therefore absent from the resulting
+#' In `structure_floating_parts()`, `root_node` and every integer in the `nodes`
+#' and `parents` list-columns refer to `structure_nodes()$node_id` for the same
+#' glycan. `nodes` contains every node in the floating component. An empty
+#' `parents` vector means all feasible main-tree nodes are candidates. The
+#' `linkage` column describes the virtual attachment to the main tree; this
+#' attachment is intentionally absent from `structure_edges()`. During
+#' reconstruction, a row with exactly one effective candidate parent is
+#' normalized to an ordinary edge and is therefore absent from the resulting
 #' `structure_floating_parts()` table.
 #'
 #' Parent indices written after `|` in an IUPAC-condensed floating part are
@@ -48,7 +49,8 @@
 #' - `structure_edges()` returns a tibble with columns `glycan_id`, `edge_id`,
 #'   `from_node`, `to_node`, and `linkage`.
 #' - `structure_floating_parts()` returns a tibble with columns `glycan_id`,
-#'   `part_id`, `root_node`, `linkage`, and the list-column `parents`.
+#'   `part_id`, `root_node`, the list-column `nodes`, `linkage`, and the
+#'   list-column `parents`.
 #' - `structure_from_tibbles()` returns a `glyrepr_structure` vector.
 #'
 #' @examples
@@ -445,6 +447,7 @@ empty_structure_floating_parts <- function(has_glycan_name = FALSE) {
     glycan_id = integer(),
     part_id = integer(),
     root_node = integer(),
+    nodes = list(),
     linkage = character(),
     parents = list()
   )
@@ -610,6 +613,7 @@ structure_floating_parts_one <- function(
     glycan_id = rep(as.integer(glycan_id), length(parts)),
     part_id = seq_along(parts),
     root_node = purrr::map_int(parts, "root"),
+    nodes = purrr::map(parts, "nodes"),
     linkage = purrr::map_chr(parts, "linkage"),
     parents = purrr::map(parts, "parents")
   )
@@ -823,7 +827,7 @@ validate_structure_floating_parts_table <- function(floating_parts) {
     floating_parts,
     required_cols,
     "floating_parts",
-    optional_cols = "glycan_name"
+    optional_cols = c("glycan_name", "nodes")
   )
 
   validate_integerish_structure_column(
@@ -846,6 +850,29 @@ validate_structure_floating_parts_table <- function(floating_parts) {
     "linkage",
     "floating_parts"
   )
+  if ("nodes" %in% names(floating_parts)) {
+    if (!is.list(floating_parts$nodes)) {
+      cli::cli_abort(
+        "{.arg floating_parts} column {.field nodes} must be a list-column."
+      )
+    }
+    valid_nodes <- purrr::map_lgl(
+      floating_parts$nodes,
+      function(nodes) {
+        length(nodes) > 0 &&
+          checkmate::test_integerish(
+            nodes,
+            lower = 1,
+            any.missing = FALSE
+          )
+      }
+    )
+    if (!all(valid_nodes)) {
+      cli::cli_abort(
+        "{.arg floating_parts} column {.field nodes} must contain non-empty positive integer vectors."
+      )
+    }
+  }
   if (!is.list(floating_parts$parents)) {
     cli::cli_abort(
       "{.arg floating_parts} column {.field parents} must be a list-column."
@@ -876,6 +903,12 @@ validate_structure_floating_parts_table <- function(floating_parts) {
   floating_parts$glycan_id <- as.integer(floating_parts$glycan_id)
   floating_parts$part_id <- as.integer(floating_parts$part_id)
   floating_parts$root_node <- as.integer(floating_parts$root_node)
+  if ("nodes" %in% names(floating_parts)) {
+    floating_parts$nodes <- purrr::map(
+      floating_parts$nodes,
+      as.integer
+    )
+  }
   floating_parts$parents <- purrr::map(
     floating_parts$parents,
     as.integer
@@ -1193,16 +1226,17 @@ build_structure_graph_from_table_rows <- function(
   igraph::V(graph)$sub <- node_rows$sub
   igraph::E(graph)$linkage <- edge_rows$linkage
   graph$anomer <- anomer
-  parts <- purrr::pmap(
-    floating_rows[c("root_node", "linkage", "parents")],
-    function(root_node, linkage, parents) {
-      list(
-        root = root_node,
-        linkage = linkage,
-        parents = parents
-      )
+  parts <- lapply(seq_len(nrow(floating_rows)), function(row_id) {
+    part <- list(
+      root = floating_rows$root_node[[row_id]],
+      linkage = floating_rows$linkage[[row_id]],
+      parents = floating_rows$parents[[row_id]]
+    )
+    if ("nodes" %in% names(floating_rows)) {
+      part$nodes <- floating_rows$nodes[[row_id]]
     }
-  )
+    part
+  })
   graph <- set_floating_parts_attr(graph, parts)
 
   graph

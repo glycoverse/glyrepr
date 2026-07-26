@@ -90,6 +90,7 @@ test_that("structure_floating_parts returns normalized attachment metadata", {
       "glycan_name",
       "part_id",
       "root_node",
+      "nodes",
       "linkage",
       "parents"
     )
@@ -97,11 +98,26 @@ test_that("structure_floating_parts returns normalized attachment metadata", {
   expect_equal(parts$glycan_id, c(1L, 2L, 2L))
   expect_equal(parts$glycan_name, c("unrestricted", "restricted", "restricted"))
   expect_equal(parts$part_id, c(1L, 1L, 2L))
+  expect_equal(parts$nodes, list(1L, 1L, 2L))
   expect_equal(parts$linkage, c("a2-3", "a1-2", "a2-6"))
   expect_equal(
     parts$parents,
     list(integer(), c(3L, 4L), c(3L, 4L))
   )
+
+  empty <- structure_floating_parts(glycan_structure())
+  expect_named(
+    empty,
+    c(
+      "glycan_id",
+      "part_id",
+      "root_node",
+      "nodes",
+      "linkage",
+      "parents"
+    )
+  )
+  expect_identical(empty$nodes, list())
 })
 
 test_that("structure_floating_candidates expands every attachment candidate", {
@@ -308,6 +324,10 @@ test_that("structure tables round-trip floating parts", {
   expect_identical(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
   expect_identical(names(rebuilt), names(glycans))
   expect_identical(is.na(rebuilt), is.na(glycans))
+  expect_identical(
+    structure_floating_parts(rebuilt)$nodes,
+    structure_floating_parts(glycans)$nodes
+  )
 })
 
 test_that("structure tables resolve a single candidate parent", {
