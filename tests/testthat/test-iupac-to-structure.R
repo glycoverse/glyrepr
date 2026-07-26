@@ -28,6 +28,49 @@ test_that("as_glycan_structure.character parses branched structures", {
   )
 })
 
+test_that("as_glycan_structure.character parses floating parts", {
+  iupacs <- c(
+    "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
+    "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-",
+    "{Neu5Ac(a2-3)|1,4}Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
+    "{Neu5Ac(a2-3)Gal(b1-4)|1}GalNAc(a1-"
+  )
+
+  glycans <- as_glycan_structure(iupacs)
+  graphs <- as.list(glycans)
+
+  expect_identical(unname(structure_to_iupac(glycans)), iupacs)
+  expect_equal(
+    purrr::map(graphs, ~ .x$floating_parts[[1]]$parents),
+    list(integer(), 1L, c(1L, 4L), 1L)
+  )
+  expect_equal(
+    purrr::map_int(graphs, ~ .x$floating_parts[[1]]$root),
+    c(3L, 3L, 6L, 3L)
+  )
+  expect_equal(
+    igraph::V(graphs[[4]])$mono,
+    c("GalNAc", "Neu5Ac", "Gal")
+  )
+})
+
+test_that("floating parent indices follow canonicalized main-tree order", {
+  glycan <- as_glycan_structure(
+    paste0(
+      "{Neu5Ac(a2-3)|1}",
+      "Man(a1-6)[Man(a1-3)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+    )
+  )
+
+  expect_identical(
+    unname(structure_to_iupac(glycan)),
+    paste0(
+      "{Neu5Ac(a2-3)|2}",
+      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+    )
+  )
+})
+
 test_that("as_glycan_structure.character handles substituents", {
   # With substituents
   iupac <- "Man3S(a1-2)Gal6Ac(?1-"
