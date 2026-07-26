@@ -131,6 +131,7 @@ validate_single_glycan_structure <- function(glycan) {
 canonicalize_glycan_graph <- function(graph) {
   checkmate::assert_class(graph, "igraph")
   graph <- ensure_name_vertex_attr(graph)
+  igraph::V(graph)$name <- as.character(seq_len(igraph::vcount(graph)))
   .reorder_one_graph(graph)
 }
 
