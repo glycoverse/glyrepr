@@ -248,6 +248,20 @@ normalize_floating_parts <- function(graph) {
   parts
 }
 
+floating_main_vertices <- function(
+  graph,
+  parts = normalize_floating_parts(graph)
+) {
+  floating_nodes <- unlist(
+    purrr::map(parts, "nodes"),
+    use.names = FALSE
+  )
+  as.integer(setdiff(
+    seq_len(igraph::vcount(graph)),
+    floating_nodes
+  ))
+}
+
 floating_graph_info <- function(
   graph,
   parts = normalize_floating_parts(graph)
@@ -510,12 +524,12 @@ resolve_single_parent_floating_parts <- function(graph) {
     return(graph)
   }
 
-  info <- floating_graph_info(graph, parts)
+  main_vertices <- floating_main_vertices(graph, parts)
   candidate_parents <- purrr::map(parts, function(part) {
     if (length(part$parents) > 0) {
       part$parents
     } else {
-      info$main_vertices
+      main_vertices
     }
   })
   resolved <- lengths(candidate_parents) == 1
@@ -541,7 +555,7 @@ resolve_single_parent_floating_parts <- function(graph) {
   # Materialize that domain before resolved components enlarge the main tree.
   remaining <- purrr::map(remaining, function(part) {
     if (length(part$parents) == 0) {
-      part$parents <- as.integer(info$main_vertices)
+      part$parents <- main_vertices
     }
     part
   })
@@ -557,20 +571,22 @@ canonicalize_floating_graph <- function(graph) {
   }
 
   parts <- normalize_floating_parts(graph)
-  info <- floating_graph_info(graph, parts)
+  info <- list(
+    main_vertices = floating_main_vertices(graph, parts),
+    parts = parts
+  )
   original_names <- igraph::V(graph)$name
 
   main_order <- floating_symmetry_main_order(graph, info)
   main_names <- original_names[main_order$vertices]
   main_index <- stats::setNames(seq_along(main_names), main_names)
 
-  floating_orders <- purrr::map2(
+  floating_orders <- purrr::map(
     parts,
-    info$floating_components,
-    function(part, component) {
+    function(part) {
       order <- component_sequence_order(
         graph,
-        which(info$membership == component)
+        part$nodes
       )
       parent_names <- original_names[part$parents]
       parents <- unname(main_index[parent_names])

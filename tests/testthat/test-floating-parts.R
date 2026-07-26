@@ -262,6 +262,10 @@ test_that("each floating part stores its complete canonical node block", {
     purrr::map_int(graph$floating_parts, "root"),
     c(2L, 3L)
   )
+  expect_identical(
+    floating_main_vertices(graph, graph$floating_parts),
+    c(4L, 5L)
+  )
 })
 
 test_that("floating nodes follow their full IUPAC sequence order", {

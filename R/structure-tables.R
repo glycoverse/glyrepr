@@ -647,14 +647,14 @@ structure_floating_candidates_one <- function(
     return(empty_structure_floating_candidates(!is.null(glycan_name)))
   }
 
-  info <- floating_graph_info(graph, parts)
+  main_vertices <- floating_main_vertices(graph, parts)
   out <- purrr::map2_dfr(
     parts,
     seq_along(parts),
     function(part, part_id) {
       unrestricted <- length(part$parents) == 0
       parent_nodes <- if (unrestricted) {
-        info$main_vertices
+        main_vertices
       } else {
         part$parents
       }

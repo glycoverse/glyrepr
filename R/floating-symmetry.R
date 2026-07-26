@@ -8,8 +8,7 @@
 #' multiple floating parts.
 #'
 #' @param graph A validated glycan forest with vertex names.
-#' @param info Floating-graph component information from
-#'   `floating_graph_info()`.
+#' @param info Floating-part metadata and main-tree vertex indices.
 #'
 #' @returns A sequence-order list in the same form as
 #'   `component_sequence_order()`.
