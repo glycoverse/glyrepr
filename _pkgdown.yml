@@ -45,6 +45,7 @@ reference:
   contents:
   - convert_to_generic
   - fill_anomer_pos
+  - localize_floating_parts
   - remove_linkages
   - remove_substituents
   - reduce_structure_level
