@@ -208,6 +208,62 @@ structure_floating_candidates <- function(x) {
 }
 
 
+#' Identify Main and Floating Structure Components
+#'
+#' @description
+#' `structure_component_membership()` identifies whether each glycan node
+#' belongs to the main tree or to a floating part. It provides a public,
+#' normalized alternative to reading the private floating-part graph
+#' attribute.
+#'
+#' Main-tree nodes have `component_type = "main"` and a missing `part_id`.
+#' Nodes in a floating subtree have `component_type = "floating"` and the
+#' corresponding `part_id` from [structure_floating_parts()].
+#'
+#' Node indices refer to `structure_nodes()$node_id` for the same glycan.
+#' Missing structures contribute no rows. Duplicate structures are expanded to
+#' their original vector positions. If `x` is named, the result also contains a
+#' `glycan_name` column.
+#'
+#' @param x A glycan structure vector.
+#'
+#' @returns A tibble with columns `glycan_id`, `node_id`, `component_type`,
+#'   and `part_id`, plus `glycan_name` when `x` is named.
+#'
+#' @examples
+#' glycan <- as_glycan_structure(
+#'   "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#' )
+#' structure_component_membership(glycan)
+#'
+#' @export
+structure_component_membership <- function(x) {
+  checkmate::assert_class(x, "glyrepr_structure")
+
+  graphs <- as.list(x)
+  glycan_names <- names(x)
+  has_glycan_names <- !is.null(glycan_names)
+  if (length(graphs) == 0) {
+    return(empty_structure_component_membership(has_glycan_names))
+  }
+
+  membership_tables <- purrr::map2(
+    seq_along(graphs),
+    graphs,
+    function(glycan_id, graph) {
+      glycan_name <- if (has_glycan_names) {
+        glycan_names[[glycan_id]]
+      } else {
+        NULL
+      }
+      structure_component_membership_one(glycan_id, graph, glycan_name)
+    }
+  )
+
+  dplyr::bind_rows(membership_tables)
+}
+
+
 #' @rdname structure_tables
 #' @export
 structure_from_tibbles <- function(
@@ -360,6 +416,34 @@ empty_structure_floating_candidates <- function(
     parent_node = integer(),
     linkage = character(),
     scope = character()
+  )
+
+  if (has_glycan_name) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = character(),
+      .after = "glycan_id"
+    )
+  }
+
+  out
+}
+
+
+#' Create an empty component-membership tibble
+#'
+#' @param has_glycan_name Whether to include a `glycan_name` column.
+#' @returns A zero-row tibble with the
+#'   `structure_component_membership()` columns.
+#' @noRd
+empty_structure_component_membership <- function(
+  has_glycan_name = FALSE
+) {
+  out <- tibble::tibble(
+    glycan_id = integer(),
+    node_id = integer(),
+    component_type = character(),
+    part_id = integer()
   )
 
   if (has_glycan_name) {
@@ -532,6 +616,52 @@ structure_floating_candidates_one <- function(
     out <- tibble::add_column(
       out,
       glycan_name = rep(glycan_name, nrow(out)),
+      .after = "glycan_id"
+    )
+  }
+
+  out
+}
+
+
+#' Convert one graph to a component-membership tibble
+#'
+#' @param glycan_id Integer position of the glycan.
+#' @param graph An igraph object or `NULL` for a missing structure.
+#' @param glycan_name Optional glycan name.
+#' @returns A tibble with component-membership rows for one glycan.
+#' @noRd
+structure_component_membership_one <- function(
+  glycan_id,
+  graph,
+  glycan_name = NULL
+) {
+  if (is.null(graph)) {
+    return(empty_structure_component_membership(!is.null(glycan_name)))
+  }
+
+  node_count <- igraph::vcount(graph)
+  parts <- normalize_floating_parts(graph)
+  if (length(parts) == 0) {
+    component_type <- rep("main", node_count)
+    part_id <- rep(NA_integer_, node_count)
+  } else {
+    info <- floating_graph_info(graph, parts)
+    part_id <- match(info$membership, info$floating_components)
+    component_type <- ifelse(is.na(part_id), "main", "floating")
+  }
+
+  out <- tibble::tibble(
+    glycan_id = rep(as.integer(glycan_id), node_count),
+    node_id = seq_len(node_count),
+    component_type = component_type,
+    part_id = as.integer(part_id)
+  )
+
+  if (!is.null(glycan_name)) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = rep(glycan_name, node_count),
       .after = "glycan_id"
     )
   }
