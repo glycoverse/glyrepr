@@ -30,7 +30,7 @@ If \code{x} is named, the result also contains a \code{glycan_name} column.
 }
 \examples{
 glycan <- as_glycan_structure(
-  "{Neu5Ac(a2-3)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
 )
 structure_candidate_edges(glycan)
 
