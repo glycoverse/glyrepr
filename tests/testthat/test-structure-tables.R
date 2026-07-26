@@ -171,6 +171,66 @@ test_that("structure_floating_candidates returns typed empty tables", {
   expect_equal(nrow(named), 0)
 })
 
+test_that("structure_component_membership identifies every graph component", {
+  glycans <- as_glycan_structure(c(
+    floating = paste0(
+      "{Fuc(a1-2)|1,2}",
+      "{Neu5Ac(a2-6)|1,2}",
+      "Gal(b1-3)GalNAc(a1-"
+    ),
+    ordinary = "Gal(a1-",
+    missing = NA
+  ))
+
+  membership <- structure_component_membership(glycans)
+
+  expect_named(
+    membership,
+    c(
+      "glycan_id",
+      "glycan_name",
+      "node_id",
+      "component_type",
+      "part_id"
+    )
+  )
+  expect_equal(membership$glycan_id, c(1L, 1L, 1L, 1L, 2L))
+  expect_equal(
+    membership$glycan_name,
+    c(rep("floating", 4), "ordinary")
+  )
+  expect_equal(membership$node_id, c(1L, 2L, 3L, 4L, 1L))
+  expect_equal(
+    membership$component_type,
+    c("main", "main", "floating", "floating", "main")
+  )
+  expect_equal(membership$part_id, c(NA, NA, 1L, 2L, NA))
+})
+
+test_that("structure_component_membership returns typed empty tables", {
+  unnamed <- structure_component_membership(glycan_structure())
+  named <- structure_component_membership(
+    c(missing = glycan_structure(NA))
+  )
+
+  expect_named(
+    unnamed,
+    c("glycan_id", "node_id", "component_type", "part_id")
+  )
+  expect_equal(nrow(unnamed), 0)
+  expect_named(
+    named,
+    c(
+      "glycan_id",
+      "glycan_name",
+      "node_id",
+      "component_type",
+      "part_id"
+    )
+  )
+  expect_equal(nrow(named), 0)
+})
+
 test_that("structure_from_tibbles recreates structure vectors", {
   glycans <- c(o_glycan_core_1(), n_glycan_core())
   nodes <- structure_nodes(glycans)
