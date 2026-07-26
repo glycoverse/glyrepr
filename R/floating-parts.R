@@ -376,9 +376,9 @@ floating_linkage_acceptor_positions <- function(linkage) {
   unique(as.integer(strsplit(acceptor, "/", fixed = TRUE)[[1]]))
 }
 
-definitely_occupied_main_slots <- function(graph, main_vertices) {
+main_attachment_domains <- function(graph, main_vertices) {
   if (igraph::ecount(graph) == 0) {
-    return(character())
+    return(list())
   }
 
   endpoints <- igraph::as_edgelist(graph, names = FALSE)
@@ -387,18 +387,18 @@ definitely_occupied_main_slots <- function(graph, main_vertices) {
     main_vertices &
     endpoints[, 2] %in% main_vertices
 
-  slots <- character()
-  for (edge_id in which(is_main_edge)) {
+  lapply(which(is_main_edge), function(edge_id) {
     positions <- floating_linkage_acceptor_positions(linkages[[edge_id]])
-    if (length(positions) == 1) {
-      slots <- c(
-        slots,
-        paste(endpoints[edge_id, 1], positions, sep = "\r")
-      )
-    }
-  }
+    list(
+      known = length(positions) > 0,
+      slots = paste(endpoints[edge_id, 1], positions, sep = "\r")
+    )
+  })
+}
 
-  unique(slots)
+definitely_occupied_main_slots <- function(domains) {
+  slot_sets <- lapply(domains, `[[`, "slots")
+  unique(unlist(slot_sets[lengths(slot_sets) == 1], use.names = FALSE))
 }
 
 floating_attachment_domain <- function(
@@ -481,11 +481,12 @@ validate_floating_attachment_slots <- function(graph, info) {
     return(invisible(NULL))
   }
 
-  occupied_slots <- definitely_occupied_main_slots(
+  main_domains <- main_attachment_domains(
     graph,
     info$main_vertices
   )
-  domains <- lapply(seq_along(info$parts), function(part_id) {
+  occupied_slots <- definitely_occupied_main_slots(main_domains)
+  floating_domains <- lapply(seq_along(info$parts), function(part_id) {
     floating_attachment_domain(
       info$parts[[part_id]],
       part_id,
@@ -493,6 +494,7 @@ validate_floating_attachment_slots <- function(graph, info) {
       occupied_slots
     )
   })
+  domains <- c(main_domains, floating_domains)
 
   if (!has_conflict_free_attachment_assignment(domains)) {
     cli::cli_abort(c(

@@ -94,6 +94,17 @@
       ! Floating parts cannot be attached simultaneously.
       x No conflict-free assignment exists for the declared parent and acceptor positions.
 
+# ambiguous main edges participate in slot matching
+
+    Code
+      glycan_structure(conflict)
+    Condition
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `validate_floating_attachment_slots()`:
+      ! Floating parts cannot be attached simultaneously.
+      x No conflict-free assignment exists for the declared parent and acceptor positions.
+
 # unrestricted parents use all available main-tree slots
 
     Code
