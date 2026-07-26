@@ -72,13 +72,13 @@ test_that("has_floating_parts is vectorized and preserves missing values", {
 test_that("explicit candidate parents use canonical main-tree node indices", {
   main <- "Gal(b1-3)GalNAc(a1-"
   parsed <- as_glycan_structure(
-    paste0("{Neu5Ac(a2-3)|2,1}", main)
+    paste0("{Neu5Ac(a2-6)|2,1}", main)
   )
   parsed_graph <- get_structure_graphs(parsed, return_list = FALSE)
 
   expect_identical(
     structure_to_iupac(parsed),
-    paste0("{Neu5Ac(a2-3)|1,2}", main)
+    paste0("{Neu5Ac(a2-6)|1,2}", main)
   )
   expect_identical(parsed_graph$floating_parts[[1]]$parents, c(1L, 2L))
   expect_identical(igraph::V(parsed_graph)$name, c("1", "2", "3"))
@@ -314,15 +314,15 @@ test_that("floating-part vectors preserve duplicates, missing values, and names"
 
 test_that("floating components preserve multiplicity and canonical order", {
   input <- paste0(
-    "{Neu5Ac(a2-3)}",
-    "{Fuc(a1-3)}",
-    "{Neu5Ac(a2-3)}",
+    "{Neu5Ac(a2-?)}",
+    "{Fuc(a1-?)}",
+    "{Neu5Ac(a2-?)}",
     "Gal(a1-"
   )
   expected <- paste0(
-    "{Fuc(a1-3)}",
-    "{Neu5Ac(a2-3)}",
-    "{Neu5Ac(a2-3)}",
+    "{Fuc(a1-?)}",
+    "{Neu5Ac(a2-?)}",
+    "{Neu5Ac(a2-?)}",
     "Gal(a1-"
   )
 

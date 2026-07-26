@@ -55,6 +55,30 @@ normalize_floating_part <- function(part, graph_size) {
     cli::cli_abort("Each floating part must be a list.")
   }
 
+  allowed <- c("root", "linkage", "parents")
+  fields <- names(part)
+  if (is.null(fields)) {
+    fields <- rep("", length(part))
+  }
+  unsupported <- unique(fields[
+    is.na(fields) | fields == "" | !fields %in% allowed
+  ])
+  unsupported[is.na(unsupported) | unsupported == ""] <- "<unnamed>"
+  if (length(unsupported) > 0) {
+    cli::cli_abort(c(
+      "Floating part metadata contains unsupported fields.",
+      "x" = "Unsupported field{?s}: {.field {unsupported}}."
+    ))
+  }
+
+  duplicated_fields <- unique(fields[duplicated(fields)])
+  if (length(duplicated_fields) > 0) {
+    cli::cli_abort(c(
+      "Floating part metadata contains duplicated fields.",
+      "x" = "Duplicated field{?s}: {.field {duplicated_fields}}."
+    ))
+  }
+
   required <- c("root", "linkage")
   missing <- setdiff(required, names(part))
   if (length(missing) > 0) {
@@ -206,6 +230,145 @@ validate_floating_graph_shape <- function(graph) {
         "Floating part parent indices must refer to vertices in the main tree."
       )
     }
+  }
+
+  validate_floating_attachment_slots(graph, info)
+
+  invisible(NULL)
+}
+
+floating_linkage_acceptor_positions <- function(linkage) {
+  acceptor <- sub(".*-", "", linkage)
+  if (identical(acceptor, "?")) {
+    return(integer())
+  }
+
+  unique(as.integer(strsplit(acceptor, "/", fixed = TRUE)[[1]]))
+}
+
+definitely_occupied_main_slots <- function(graph, main_vertices) {
+  if (igraph::ecount(graph) == 0) {
+    return(character())
+  }
+
+  endpoints <- igraph::as_edgelist(graph, names = FALSE)
+  linkages <- igraph::edge_attr(graph, "linkage")
+  is_main_edge <- endpoints[, 1] %in%
+    main_vertices &
+    endpoints[, 2] %in% main_vertices
+
+  slots <- character()
+  for (edge_id in which(is_main_edge)) {
+    positions <- floating_linkage_acceptor_positions(linkages[[edge_id]])
+    if (length(positions) == 1) {
+      slots <- c(
+        slots,
+        paste(endpoints[edge_id, 1], positions, sep = "\r")
+      )
+    }
+  }
+
+  unique(slots)
+}
+
+floating_attachment_domain <- function(
+  part,
+  part_id,
+  main_vertices,
+  occupied_slots
+) {
+  positions <- floating_linkage_acceptor_positions(part$linkage)
+  if (length(positions) == 0) {
+    return(list(known = FALSE, slots = character()))
+  }
+
+  explicit <- length(part$parents) > 0
+  parents <- if (explicit) part$parents else main_vertices
+  slots_by_parent <- lapply(parents, function(parent) {
+    candidate_slots <- paste(parent, positions, sep = "\r")
+    setdiff(candidate_slots, occupied_slots)
+  })
+
+  if (explicit) {
+    impossible <- parents[lengths(slots_by_parent) == 0]
+    if (length(impossible) > 0) {
+      cli::cli_abort(c(
+        "Floating part has impossible explicit parent metadata.",
+        "x" = "Floating part {part_id} cannot use explicit parent node{?s} {.val {impossible}} because every acceptor position declared by linkage {.val {part$linkage}} is already occupied."
+      ))
+    }
+  }
+
+  list(
+    known = TRUE,
+    slots = unique(unlist(slots_by_parent, use.names = FALSE))
+  )
+}
+
+has_conflict_free_attachment_assignment <- function(domains) {
+  domains <- domains[vapply(domains, `[[`, logical(1), "known")]
+  if (length(domains) == 0) {
+    return(TRUE)
+  }
+
+  slot_sets <- lapply(domains, `[[`, "slots")
+  if (any(lengths(slot_sets) == 0)) {
+    return(FALSE)
+  }
+  slot_sets <- slot_sets[order(lengths(slot_sets))]
+
+  assign_slot <- function(index, used) {
+    if (index > length(slot_sets)) {
+      return(TRUE)
+    }
+
+    available <- setdiff(slot_sets[[index]], used)
+    for (slot in available) {
+      if (assign_slot(index + 1, c(used, slot))) {
+        return(TRUE)
+      }
+    }
+    FALSE
+  }
+
+  assign_slot(1, character())
+}
+
+validate_floating_attachment_slots <- function(graph, info) {
+  if (
+    !has_edge_attrs(graph, "linkage") ||
+      !is.character(igraph::edge_attr(graph, "linkage"))
+  ) {
+    return(invisible(NULL))
+  }
+
+  linkages <- igraph::edge_attr(graph, "linkage")
+  if (
+    length(linkages) != igraph::ecount(graph) ||
+      anyNA(linkages) ||
+      !all(valid_linkages(linkages))
+  ) {
+    return(invisible(NULL))
+  }
+
+  occupied_slots <- definitely_occupied_main_slots(
+    graph,
+    info$main_vertices
+  )
+  domains <- lapply(seq_along(info$parts), function(part_id) {
+    floating_attachment_domain(
+      info$parts[[part_id]],
+      part_id,
+      info$main_vertices,
+      occupied_slots
+    )
+  })
+
+  if (!has_conflict_free_attachment_assignment(domains)) {
+    cli::cli_abort(c(
+      "Floating parts cannot be attached simultaneously.",
+      "x" = "No conflict-free assignment exists for the declared parent and acceptor positions."
+    ))
   }
 
   invisible(NULL)
