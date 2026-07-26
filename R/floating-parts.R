@@ -2,8 +2,39 @@
 
 #' Detect Floating Glycan Parts
 #'
-#' Test whether each glycan structure contains one or more floating
-#' substructures whose attachment to the main tree is not fully localized.
+#' @description
+#' Test whether each glycan structure contains one or more unresolved floating
+#' parts.
+#'
+#' @details
+#' A floating part is a known glycan residue or substructure whose parent
+#' residue on the main glycan tree is not fully localized. For example, a
+#' bi-antennary N-glycan may contain one sialic acid while the available
+#' evidence cannot determine which of its two terminal galactoses carries that
+#' residue. The sialic acid can then be represented as a floating part with
+#' both galactoses as candidate parents.
+#'
+#' In the `glyrepr` IUPAC extension, floating parts appear in braces before the
+#' main glycan:
+#'
+#' - `{<floating>}<main>` means every feasible main-tree node is a candidate
+#'   parent.
+#' - `{<floating>|<parents>}<main>` restricts the candidates to the
+#'   comma-separated main-tree node indices in `<parents>`.
+#'
+#' Main-tree indices follow residue order in the IUPAC-condensed sequence. A
+#' floating part may contain one residue or an entire subtree, and its virtual
+#' attachment linkage may be fully known, partially known, or unknown.
+#'
+#' Internally, an unresolved structure is an annotated forest containing one
+#' main tree and one disconnected tree per floating part. The virtual linkage
+#' and candidate parents are stored as graph metadata rather than as an edge;
+#' [structure_floating_parts()] exposes this metadata in tabular form.
+#'
+#' An explicit singleton parent list fully localizes the attachment, as does an
+#' omitted parent list when the main tree has only one node. Such a part is
+#' normalized to an ordinary graph edge, so `has_floating_parts()` returns
+#' `FALSE` for the normalized structure.
 #'
 #' @param x A [glycan_structure()] vector.
 #'
@@ -11,12 +42,24 @@
 #'   structures produce `NA`.
 #'
 #' @examples
-#' glycans <- as_glycan_structure(c(
-#'   "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-#'   "Gal(b1-3)GalNAc(a1-"
-#' ))
+#' main <- paste0(
+#'   "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)",
+#'   "[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]",
+#'   "Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+#' )
+#' ambiguous <- as_glycan_structure(
+#'   paste0("{Neu5Ac(a2-3)|1,4}", main)
+#' )
+#' glycans <- c(ambiguous = ambiguous, ordinary = as_glycan_structure(main))
 #' has_floating_parts(glycans)
+#' structure_floating_parts(ambiguous)
 #'
+#' localized <- as_glycan_structure(
+#'   "{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-"
+#' )
+#' has_floating_parts(localized)
+#'
+#' @seealso [structure_floating_parts()], [as_glycan_structure()]
 #' @export
 has_floating_parts <- function(x) {
   checkmate::assert_class(x, "glyrepr_structure")
