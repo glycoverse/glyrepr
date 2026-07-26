@@ -34,6 +34,22 @@ test_that("fill_anomer_pos preserves existing anomer annotations", {
   )
 })
 
+test_that("fill_anomer_pos skips floating normalization for ordinary trees", {
+  struc <- as_glycan_structure("Gal(??-?)GalNAc(??-")
+  testthat::local_mocked_bindings(
+    normalize_floating_parts = function(...) {
+      stop("floating normalization should not run")
+    }
+  )
+
+  result <- fill_anomer_pos(struc)
+
+  expect_identical(
+    unname(as.character(result)),
+    "Gal(?1-?)GalNAc(?1-"
+  )
+})
+
 
 test_that("fill_anomer_pos preserves NA values and names", {
   strucs <- c(

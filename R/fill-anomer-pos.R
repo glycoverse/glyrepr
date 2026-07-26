@@ -27,7 +27,12 @@
 #' @export
 fill_anomer_pos <- function(strucs) {
   checkmate::assert_class(strucs, "glyrepr_structure")
-  smap_structure(strucs, .fill_anomer_pos_single)
+  .smap_structure_impl(
+    strucs,
+    .fill_anomer_pos_single,
+    dots = list(),
+    validation = "floating"
+  )
 }
 
 
@@ -38,16 +43,22 @@ fill_anomer_pos <- function(strucs) {
 #' @returns An igraph glycan structure with missing anomer positions filled.
 #' @noRd
 .fill_anomer_pos_single <- function(struc) {
-  parts <- normalize_floating_parts(struc)
-  main_vertices <- if (length(parts) == 0) {
-    seq_len(igraph::vcount(struc))
+  raw_parts <- igraph::graph_attr(struc, "floating_parts")
+  if (is.null(raw_parts)) {
+    root <- which(igraph::degree(struc, mode = "in") == 0)
   } else {
-    floating_main_vertices(struc, parts)
+    parts <- normalize_floating_parts(struc)
+    main_vertices <- if (length(parts) == 0) {
+      seq_len(igraph::vcount(struc))
+    } else {
+      floating_main_vertices(struc, parts)
+    }
+    root <- intersect(
+      which(igraph::degree(struc, mode = "in") == 0),
+      main_vertices
+    )
   }
-  root <- intersect(
-    which(igraph::degree(struc, mode = "in") == 0),
-    main_vertices
-  )
+
   root_mono <- igraph::vertex_attr(struc, "mono", index = root)
   root_anomer <- igraph::graph_attr(struc, "anomer")
   struc <- igraph::set_graph_attr(
@@ -62,6 +73,10 @@ fill_anomer_pos <- function(strucs) {
     donor_monos <- igraph::vertex_attr(struc, "mono", index = edges[, 2])
     linkages <- purrr::map2_chr(linkages, donor_monos, .fill_anomer_pos_value)
     struc <- igraph::set_edge_attr(struc, "linkage", value = linkages)
+  }
+
+  if (is.null(raw_parts)) {
+    return(struc)
   }
 
   parts <- purrr::map(parts, function(part) {

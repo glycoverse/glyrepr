@@ -144,6 +144,40 @@ test_that("remove_linkages() works", {
   expect_equal(igraph::graph_attr(graph, "anomer"), "??")
 })
 
+test_that("remove_linkages skips floating normalization for ordinary trees", {
+  glycan <- o_glycan_core_2(linkage = TRUE)
+  testthat::local_mocked_bindings(
+    normalize_floating_parts = function(...) {
+      stop("floating normalization should not run")
+    }
+  )
+
+  result <- remove_linkages(glycan)
+
+  expect_identical(
+    unname(as.character(result)),
+    "GlcNAc(??-?)[Gal(??-?)]GalNAc(??-"
+  )
+})
+
+test_that("remove_linkages keeps ordinary branch order canonical", {
+  glycan <- as_glycan_structure(
+    "Fuc(b1-2)[Gal(a1-3)]Gal(b1-3)GlcNAc(b1-"
+  )
+
+  result <- remove_linkages(glycan)
+  graph <- get_structure_graphs(result, return_list = FALSE)
+
+  expect_identical(
+    unname(as.character(result)),
+    "Gal(??-?)[Fuc(??-?)]Gal(??-?)GlcNAc(??-"
+  )
+  expect_identical(
+    igraph::V(graph)$mono,
+    c("Gal", "Fuc", "Gal", "GlcNAc")
+  )
+})
+
 test_that("remove_linkages() removes floating attachment linkages", {
   glycan <- as_glycan_structure(
     "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"

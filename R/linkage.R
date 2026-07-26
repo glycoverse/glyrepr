@@ -41,11 +41,16 @@ has_linkages <- function(glycan, strict = FALSE) {
 
 # Internal function to check linkages in a single igraph
 .has_linkages_single <- function(glycan, strict) {
-  floating_linkages <- purrr::map_chr(
-    floating_parts_attr(glycan),
-    "linkage"
-  )
-  linkages <- c(igraph::E(glycan)$linkage, floating_linkages)
+  linkages <- igraph::E(glycan)$linkage
+  parts <- igraph::graph_attr(glycan, "floating_parts")
+  if (length(parts) > 0) {
+    floating_linkages <- vapply(
+      parts,
+      function(part) part$linkage,
+      character(1)
+    )
+    linkages <- c(linkages, floating_linkages)
+  }
 
   if (strict) {
     anomer <- glycan$anomer
@@ -161,13 +166,22 @@ remove_linkages <- function(glycan) {
     ))
   }
 
-  smap_structure(glycan, .remove_linkages_single)
+  .smap_structure_impl(
+    glycan,
+    .remove_linkages_single,
+    dots = list(),
+    validation = "floating"
+  )
 }
 
 # Internal function to remove linkages from a single igraph
 .remove_linkages_single <- function(glycan) {
   res <- igraph::set_edge_attr(glycan, "linkage", value = "??-?")
   res <- igraph::set_graph_attr(res, "anomer", value = "??")
+  if (is.null(igraph::graph_attr(res, "floating_parts"))) {
+    return(res)
+  }
+
   parts <- normalize_floating_parts(res)
   parts <- purrr::map(parts, function(part) {
     part$linkage <- "??-?"
