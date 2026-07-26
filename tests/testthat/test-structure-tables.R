@@ -231,6 +231,53 @@ test_that("structure_component_membership returns typed empty tables", {
   expect_equal(nrow(named), 0)
 })
 
+test_that("structure_candidate_edges exposes potential virtual edges", {
+  glycans <- as_glycan_structure(c(
+    unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+    ordinary = "Gal(a1-",
+    missing = NA
+  ))
+
+  edges <- structure_candidate_edges(glycans)
+
+  expect_named(
+    edges,
+    c(
+      "glycan_id",
+      "glycan_name",
+      "part_id",
+      "from_node",
+      "to_node",
+      "linkage",
+      "scope"
+    )
+  )
+  expect_equal(edges$glycan_id, c(1L, 1L, 2L, 2L))
+  expect_equal(edges$part_id, rep(1L, 4))
+  expect_equal(edges$from_node, c(1L, 2L, 1L, 2L))
+  expect_equal(edges$to_node, rep(3L, 4))
+  expect_equal(edges$linkage, c("a2-3", "a2-3", "a2-6", "a2-6"))
+  expect_equal(edges$scope, c("all", "all", "explicit", "explicit"))
+})
+
+test_that("structure_candidate_edges returns a typed empty table", {
+  edges <- structure_candidate_edges(glycan_structure())
+
+  expect_named(
+    edges,
+    c(
+      "glycan_id",
+      "part_id",
+      "from_node",
+      "to_node",
+      "linkage",
+      "scope"
+    )
+  )
+  expect_equal(nrow(edges), 0)
+})
+
 test_that("structure_from_tibbles recreates structure vectors", {
   glycans <- c(o_glycan_core_1(), n_glycan_core())
   nodes <- structure_nodes(glycans)
