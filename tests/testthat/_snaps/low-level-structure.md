@@ -24,6 +24,14 @@
       Error in `graph_to_iupac()`:
       ! Assertion on 'graph' failed: Must inherit from class 'igraph', but has class 'list'.
 
+# unannotated forests remain invalid
+
+    Code
+      validate_glycan_graph(graph)
+    Condition
+      Error in `validate_floating_graph_shape()`:
+      ! Glycan structure must be an out tree.
+
 # new_glycan_structure checks graph lookup integrity
 
     Code

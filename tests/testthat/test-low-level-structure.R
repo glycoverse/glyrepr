@@ -92,6 +92,63 @@ test_that("graph_to_iupac generates one string from one graph", {
 })
 
 
+test_that("low-level graph pipeline supports annotated floating parts", {
+  graph <- igraph::make_empty_graph(3, directed = TRUE)
+  graph <- igraph::add_edges(graph, c(2, 3))
+  igraph::V(graph)$mono <- c("Neu5Ac", "GalNAc", "Gal")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- "b1-3"
+  graph$anomer <- "a1"
+  graph$floating_parts <- list(
+    list(root = 1L, linkage = "a2-3", parents = 3L)
+  )
+
+  expect_identical(validate_glycan_graph(graph), graph)
+
+  result <- canonicalize_glycan_graph(graph)
+
+  expect_equal(igraph::V(result)$mono, c("Gal", "GalNAc", "Neu5Ac"))
+  expect_equal(
+    result$floating_parts,
+    list(list(root = 3L, linkage = "a2-3", parents = 1L))
+  )
+  expect_identical(
+    graph_to_iupac(result),
+    "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+  )
+})
+
+
+test_that("empty floating parent sets mean every main-tree node is a candidate", {
+  graph <- igraph::make_empty_graph(2, directed = TRUE)
+  igraph::V(graph)$mono <- c("Gal", "Neu5Ac")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- character()
+  graph$anomer <- "a1"
+  graph$floating_parts <- list(
+    list(root = 2L, linkage = "a2-3", parents = integer())
+  )
+
+  result <- canonicalize_glycan_graph(validate_glycan_graph(graph))
+
+  expect_identical(graph_to_iupac(result), "{Neu5Ac(a2-3)}Gal(a1-")
+})
+
+
+test_that("unannotated forests remain invalid", {
+  graph <- igraph::make_empty_graph(2, directed = TRUE)
+  igraph::V(graph)$mono <- c("Gal", "Neu5Ac")
+  igraph::V(graph)$sub <- ""
+  igraph::E(graph)$linkage <- character()
+  graph$anomer <- "a1"
+
+  expect_snapshot(
+    error = TRUE,
+    validate_glycan_graph(graph)
+  )
+})
+
+
 test_that("new_glycan_structure checks graph lookup integrity", {
   graph <- get_structure_graphs(o_glycan_core_1(), return_list = FALSE)
   iupac <- graph_to_iupac(graph)

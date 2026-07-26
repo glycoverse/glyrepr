@@ -25,6 +25,11 @@ reorder_graphs_with_indices <- function(graphs) {
 }
 
 .reorder_one_graph <- function(graph) {
+  if (has_floating_parts_graph(graph)) {
+    return(canonicalize_floating_graph(graph))
+  }
+
+  graph <- delete_floating_parts_attr(graph)
   seq_cache <- build_seq_cache(graph)
   root <- seq_cache$root
   order <- seq_glycan_order(root, seq_cache)
@@ -41,6 +46,7 @@ reorder_graphs_with_indices <- function(graphs) {
 }
 
 .permute_edges <- function(g, order) {
+  graph_attrs <- igraph::graph_attr(g)
   edges <- igraph::as_data_frame(g, what = "edges")
   verts <- igraph::as_data_frame(g, what = "vertices")
   edges <- edges[order, , drop = FALSE]
@@ -58,6 +64,12 @@ reorder_graphs_with_indices <- function(graphs) {
     directed = igraph::is_directed(g),
     vertices = verts
   )
-  new_g$anomer <- g$anomer
+  for (attr_name in names(graph_attrs)) {
+    new_g <- igraph::set_graph_attr(
+      new_g,
+      attr_name,
+      value = graph_attrs[[attr_name]]
+    )
+  }
   new_g
 }
