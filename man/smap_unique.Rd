@@ -10,7 +10,9 @@ smap_unique(.x, .f, ...)
 \item{.x}{A glycan structure vector (glyrepr_structure).}
 
 \item{.f}{A function that takes an igraph object and returns a result.
-Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string naming a function.}
+Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string naming a function.
+A structure with floating parts is passed as one annotated, weakly
+disconnected graph.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
 }

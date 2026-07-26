@@ -29,7 +29,9 @@ simap_structure(.x, .f, ...)
 
 \item{.f}{A function that takes an igraph object (from \code{.x}) and an index/name,
 returning a result.
-Can be a function, purrr-style lambda (\code{~ paste(.x, .y)}), or a character string naming a function.}
+Can be a function, purrr-style lambda (\code{~ paste(.x, .y)}), or a character string naming a function.
+A structure with floating parts is passed as one annotated, weakly
+disconnected graph.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
 
@@ -56,6 +58,10 @@ Similar to purrr imap functions, but optimized for glycan structure vectors.
 These functions only compute \code{.f} once for each unique combination of structure and corresponding
 index/name, then map the results back to the original vector positions. This is much more efficient
 than applying \code{.f} to each element individually when there are duplicate structures.
+
+\code{simap_structure()} validates and canonicalizes every graph returned by
+\code{.f}. A callback that changes vertex identities or components of a floating
+structure must also update its \code{floating_parts} metadata.
 
 \strong{IMPORTANT PERFORMANCE NOTE:}
 Due to the inclusion of position indices, \code{simap} functions have \strong{O(total_structures)}
