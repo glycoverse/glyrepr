@@ -294,6 +294,10 @@ test_that("floating nodes follow their full IUPAC sequence order", {
     2L
   )
   expect_identical(
+    structure_floating_parts(glycan)$nodes,
+    list(c(1L, 2L))
+  )
+  expect_identical(
     structure_floating_parts(glycan)$parents,
     list(c(3L, 5L))
   )

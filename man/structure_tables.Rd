@@ -37,7 +37,8 @@ structure_from_tibbles(nodes, edges, anomers, floating_parts = NULL)
 \item \code{structure_edges()} returns a tibble with columns \code{glycan_id}, \code{edge_id},
 \code{from_node}, \code{to_node}, and \code{linkage}.
 \item \code{structure_floating_parts()} returns a tibble with columns \code{glycan_id},
-\code{part_id}, \code{root_node}, \code{linkage}, and the list-column \code{parents}.
+\code{part_id}, \code{root_node}, the list-column \code{nodes}, \code{linkage}, and the
+list-column \code{parents}.
 \item \code{structure_from_tibbles()} returns a \code{glyrepr_structure} vector.
 }
 }
@@ -59,13 +60,14 @@ column is present.
 IUPAC-condensed string. For a floating structure, nodes from each
 brace-enclosed floating part therefore precede nodes from the main tree.
 
-In \code{structure_floating_parts()}, \code{root_node} and every integer in \code{parents}
-refer to \code{structure_nodes()$node_id} for the same glycan. An empty \code{parents}
-vector means all feasible main-tree nodes are candidates. The \code{linkage}
-column describes the virtual attachment to the main tree; this attachment is
-intentionally absent from \code{structure_edges()}. During reconstruction, a row
-with exactly one effective candidate parent is normalized to an ordinary
-edge and is therefore absent from the resulting
+In \code{structure_floating_parts()}, \code{root_node} and every integer in the \code{nodes}
+and \code{parents} list-columns refer to \code{structure_nodes()$node_id} for the same
+glycan. \code{nodes} contains every node in the floating component. An empty
+\code{parents} vector means all feasible main-tree nodes are candidates. The
+\code{linkage} column describes the virtual attachment to the main tree; this
+attachment is intentionally absent from \code{structure_edges()}. During
+reconstruction, a row with exactly one effective candidate parent is
+normalized to an ordinary edge and is therefore absent from the resulting
 \code{structure_floating_parts()} table.
 
 Parent indices written after \code{|} in an IUPAC-condensed floating part are
