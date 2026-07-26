@@ -352,6 +352,10 @@ To accommodate these scenarios, `glyrepr` defines four levels of glycan structur
 - **Topological**: specific monosaccharides, but all linkage information is missing.
 - **Basic**: generic monosaccharides, with linkage information treated as missing.
 
+Floating parts do not change these definitions. Their attachment linkage is
+assessed like any other linkage, while uncertainty about the candidate parent
+is independent of the structure level.
+
 Structure levels are defined at the vector level,
 so one glycan structure vector has one level.
 
