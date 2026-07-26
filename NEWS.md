@@ -4,6 +4,7 @@
 * `structure_floating_candidates()` returns one row per potential floating-part attachment and expands unrestricted parent domains to every original main-tree node.
 * `structure_component_membership()` identifies main-tree and floating-part nodes without requiring callers to inspect private graph attributes.
 * `structure_candidate_edges()` exposes every potential floating-part attachment as a virtual edge for drawing and constraint-aware graph operations.
+* `localize_floating_parts()` attaches caller-selected floating parts, validates candidate domains and simultaneous linkage-slot conflicts, and remaps remaining candidate indices after canonicalization.
 * Structure-level classification now depends only on residue specificity and linkage completeness: floating candidate-parent metadata does not itself make a structure partial, and floating structures can be reduced to topological resolution.
 * `validate_glycan_graph()` and structure parsing are faster by checking linkage positions in bulk. (#79)
 * `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)
