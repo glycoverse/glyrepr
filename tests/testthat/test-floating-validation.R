@@ -157,6 +157,33 @@ test_that("floating parts require a simultaneous attachment assignment", {
 })
 
 
+test_that("ambiguous main edges participate in slot matching", {
+  one_floating <- make_floating_validation_graph(
+    main_count = 2,
+    main_edges = c(1, 2),
+    main_linkages = "b1-3/6",
+    floating_linkages = "a2-3",
+    floating_parents = list(1L)
+  )
+  expect_s3_class(
+    glycan_structure(one_floating),
+    "glyrepr_structure"
+  )
+
+  conflict <- make_floating_validation_graph(
+    main_count = 2,
+    main_edges = c(1, 2),
+    main_linkages = "b1-3/6",
+    floating_linkages = c("a2-3", "a2-6"),
+    floating_parents = list(1L, 1L)
+  )
+  expect_snapshot(
+    error = TRUE,
+    glycan_structure(conflict)
+  )
+})
+
+
 test_that("unrestricted parents use all available main-tree slots", {
   graph <- make_floating_validation_graph(
     main_count = 2,
