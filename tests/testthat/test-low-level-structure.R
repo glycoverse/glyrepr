@@ -100,7 +100,7 @@ test_that("low-level graph pipeline supports annotated floating parts", {
   igraph::E(graph)$linkage <- "b1-3"
   graph$anomer <- "a1"
   graph$floating_parts <- list(
-    list(root = 1L, linkage = "a2-3", parents = 3L)
+    list(root = 1L, linkage = "a2-6", parents = c(2L, 3L))
   )
 
   expect_identical(validate_glycan_graph(graph), graph)
@@ -110,16 +110,16 @@ test_that("low-level graph pipeline supports annotated floating parts", {
   expect_equal(igraph::V(result)$mono, c("Gal", "GalNAc", "Neu5Ac"))
   expect_equal(
     result$floating_parts,
-    list(list(root = 3L, linkage = "a2-3", parents = 1L))
+    list(list(root = 3L, linkage = "a2-6", parents = c(1L, 2L)))
   )
   expect_identical(
     graph_to_iupac(result),
-    "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
   )
 })
 
 
-test_that("empty floating parent sets mean every main-tree node is a candidate", {
+test_that("unrestricted parts resolve against a one-node main tree", {
   graph <- igraph::make_empty_graph(2, directed = TRUE)
   igraph::V(graph)$mono <- c("Gal", "Neu5Ac")
   igraph::V(graph)$sub <- ""
@@ -131,7 +131,8 @@ test_that("empty floating parent sets mean every main-tree node is a candidate",
 
   result <- canonicalize_glycan_graph(validate_glycan_graph(graph))
 
-  expect_identical(graph_to_iupac(result), "{Neu5Ac(a2-3)}Gal(a1-")
+  expect_identical(graph_to_iupac(result), "Neu5Ac(a2-3)Gal(a1-")
+  expect_null(igraph::graph_attr(result, "floating_parts"))
 })
 
 

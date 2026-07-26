@@ -54,8 +54,8 @@ test_that("get_structure_level treats ambiguous linkage positions as partial", {
 
 test_that("get_structure_level treats floating concrete parts as partial", {
   glycans <- as_glycan_structure(c(
-    "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-",
-    "{Neu5Ac(??-?)|1}Gal(??-?)GalNAc(??-"
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+    "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-"
   ))
 
   expect_identical(get_structure_level(glycans), "partial")
@@ -63,7 +63,7 @@ test_that("get_structure_level treats floating concrete parts as partial", {
 
 test_that("get_structure_level treats floating generic parts as basic", {
   glycan <- as_glycan_structure(
-    "{NeuAc(??-?)|1}Hex(??-?)HexNAc(??-"
+    "{NeuAc(??-?)|1,2}Hex(??-?)HexNAc(??-"
   )
 
   expect_identical(get_structure_level(glycan), "basic")

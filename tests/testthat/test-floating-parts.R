@@ -55,6 +55,72 @@ test_that("unrestricted and explicit candidate parents remain distinguishable", 
   expect_false(unrestricted == explicit)
 })
 
+test_that("a single explicit candidate parent resolves to an ordinary branch", {
+  annotated <- as_glycan_structure(
+    "{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-"
+  )
+  ordinary <- as_glycan_structure(
+    "Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-"
+  )
+
+  expect_identical(
+    structure_to_iupac(annotated),
+    "Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-"
+  )
+  expect_true(unname(annotated == ordinary))
+  expect_false(has_floating_parts(annotated))
+  expect_equal(nrow(structure_floating_parts(annotated)), 0)
+
+  ambiguous_linkage <- as_glycan_structure(
+    "{Neu5Ac(a2-3/6)|1}Gal(a1-"
+  )
+  expect_identical(
+    as.character(ambiguous_linkage),
+    "Neu5Ac(a2-3/6)Gal(a1-"
+  )
+  expect_false(has_floating_parts(ambiguous_linkage))
+})
+
+test_that("an unrestricted part resolves when the main tree has one node", {
+  single_residue <- as_glycan_structure(
+    "{Gal(b1-4)GlcNAc(b1-3)}GalNAc(a1-"
+  )
+
+  expect_identical(
+    structure_to_iupac(single_residue),
+    "Gal(b1-4)GlcNAc(b1-3)GalNAc(a1-"
+  )
+  expect_false(has_floating_parts(single_residue))
+})
+
+test_that("multiple single-parent parts resolve together", {
+  annotated <- as_glycan_structure(
+    "{Fuc(a1-2)|1}{Neu5Ac(a2-3)|1}GalNAc(a1-"
+  )
+  ordinary <- as_glycan_structure(
+    "Fuc(a1-2)[Neu5Ac(a2-3)]GalNAc(a1-"
+  )
+
+  expect_true(unname(annotated == ordinary))
+  expect_false(has_floating_parts(annotated))
+})
+
+test_that("resolving one part preserves unrestricted candidate parents", {
+  glycan <- as_glycan_structure(
+    "{Fuc(a1-2)|1}{Neu5Ac(a2-6)}Gal(b1-3)GalNAc(a1-"
+  )
+
+  expect_identical(
+    structure_to_iupac(glycan),
+    "{Neu5Ac(a2-6)|2,3}Fuc(a1-2)Gal(b1-3)GalNAc(a1-"
+  )
+  expect_true(has_floating_parts(glycan))
+  expect_identical(
+    structure_floating_parts(glycan)$parents[[1]],
+    c(2L, 3L)
+  )
+})
+
 test_that("has_floating_parts is vectorized and preserves missing values", {
   glycans <- as_glycan_structure(c(
     floating = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
@@ -92,7 +158,7 @@ test_that("explicit candidate parents use canonical main-tree node indices", {
   igraph::E(graph)$linkage <- "b1-3"
   graph$anomer <- "a1"
   graph$floating_parts <- list(
-    list(root = 1L, linkage = "a2-3", parents = 3L)
+    list(root = 1L, linkage = "a2-6", parents = c(2L, 3L))
   )
 
   constructed <- glycan_structure(graph)
@@ -103,11 +169,11 @@ test_that("explicit candidate parents use canonical main-tree node indices", {
 
   expect_identical(
     structure_to_iupac(constructed),
-    "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
   )
   expect_equal(
     canonical_graph$floating_parts,
-    list(list(root = 3L, linkage = "a2-3", parents = 1L))
+    list(list(root = 3L, linkage = "a2-6", parents = c(1L, 2L)))
   )
 })
 
@@ -115,6 +181,14 @@ test_that("explicit candidate parents use canonical main-tree node indices", {
 test_that("explicit candidate indices are remapped with the main structure", {
   noncanonical_main <- "Fuc(a1-6)[Gal(a1-3)]Man(a1-"
 
+  expect_identical(
+    structure_to_iupac(
+      as_glycan_structure(
+        paste0("{Neu5Ac(a2-4)|1}", noncanonical_main)
+      )
+    ),
+    "Neu5Ac(a2-4)Fuc(a1-6)[Gal(a1-3)]Man(a1-"
+  )
   expect_identical(
     structure_to_iupac(
       as_glycan_structure(
@@ -126,27 +200,30 @@ test_that("explicit candidate indices are remapped with the main structure", {
   expect_identical(
     structure_to_iupac(
       as_glycan_structure(
-        paste0("{Neu5Ac(a2-3)|1}", noncanonical_main)
+        paste0("{Neu5Ac(a2-4)|1,3}", noncanonical_main)
       )
     ),
-    "{Neu5Ac(a2-3)|2}Gal(a1-3)[Fuc(a1-6)]Man(a1-"
+    "{Neu5Ac(a2-4)|2,3}Gal(a1-3)[Fuc(a1-6)]Man(a1-"
   )
 })
 
 
 test_that("multi-residue floating substructures round-trip", {
-  iupac <- "{Gal(b1-4)GlcNAc(b1-3)}GalNAc(a1-"
+  iupac <- "{Gal(b1-4)GlcNAc(b1-6)|1,2}Gal(b1-3)GalNAc(a1-"
 
   glycan <- as_glycan_structure(iupac)
   graph <- get_structure_graphs(glycan, return_list = FALSE)
   components <- igraph::components(graph, mode = "weak")
 
   expect_identical(structure_to_iupac(glycan), iupac)
-  expect_equal(sort(components$csize), c(1L, 2L))
-  expect_identical(igraph::V(graph)$mono, c("GalNAc", "Gal", "GlcNAc"))
+  expect_equal(sort(components$csize), c(2L, 2L))
+  expect_identical(
+    igraph::V(graph)$mono,
+    c("Gal", "GalNAc", "Gal", "GlcNAc")
+  )
   expect_equal(
     graph$floating_parts,
-    list(list(root = 3L, linkage = "b1-3", parents = integer()))
+    list(list(root = 4L, linkage = "b1-6", parents = c(1L, 2L)))
   )
 })
 
@@ -270,7 +347,9 @@ test_that("floating parent indices reject integer overflow", {
   )
 
   graph <- get_structure_graphs(
-    as_glycan_structure("{Neu5Ac(a2-3)|1}Gal(a1-"),
+    as_glycan_structure(
+      "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    ),
     return_list = FALSE
   )
   graph$floating_parts[[1]]$parents <- 2147483648
@@ -282,12 +361,12 @@ test_that("floating parent indices reject integer overflow", {
 
 
 test_that("floating-part identity supports equality and vctrs operations", {
-  main <- "Gal(b1-3)GalNAc(a1-"
+  main <- "Gal(b1-4)GlcNAc(b1-3)GalNAc(a1-"
   unrestricted <- as_glycan_structure(
-    paste0("{Neu5Ac(a2-3)}", main)
+    paste0("{Neu5Ac(a2-6)}", main)
   )
   explicit <- as_glycan_structure(
-    paste0("{Neu5Ac(a2-3)|1}", main)
+    paste0("{Neu5Ac(a2-6)|1,2}", main)
   )
 
   combined <- vctrs::vec_c(unrestricted, unrestricted, explicit, NA)
@@ -301,8 +380,8 @@ test_that("floating-part identity supports equality and vctrs operations", {
   expect_identical(
     structure_to_iupac(vctrs::vec_slice(combined, c(3L, 1L, 4L))),
     c(
-      paste0("{Neu5Ac(a2-3)|1}", main),
-      paste0("{Neu5Ac(a2-3)}", main),
+      paste0("{Neu5Ac(a2-6)|1,2}", main),
+      paste0("{Neu5Ac(a2-6)}", main),
       NA_character_
     )
   )
@@ -310,8 +389,9 @@ test_that("floating-part identity supports equality and vctrs operations", {
 
 
 test_that("floating-part vectors preserve duplicates, missing values, and names", {
-  unrestricted <- "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-"
-  explicit <- "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+  main <- "Gal(b1-4)GlcNAc(b1-3)GalNAc(a1-"
+  unrestricted <- paste0("{Neu5Ac(a2-6)}", main)
+  explicit <- paste0("{Neu5Ac(a2-6)|1,2}", main)
   input <- c(
     first = unrestricted,
     missing = NA_character_,
@@ -337,13 +417,13 @@ test_that("floating components preserve multiplicity and canonical order", {
     "{Neu5Ac(a2-?)}",
     "{Fuc(a1-?)}",
     "{Neu5Ac(a2-?)}",
-    "Gal(a1-"
+    "Gal(b1-4)GlcNAc(a1-"
   )
   expected <- paste0(
     "{Fuc(a1-?)}",
     "{Neu5Ac(a2-?)}",
     "{Neu5Ac(a2-?)}",
-    "Gal(a1-"
+    "Gal(b1-4)GlcNAc(a1-"
   )
 
   glycan <- as_glycan_structure(input)
@@ -353,7 +433,7 @@ test_that("floating components preserve multiplicity and canonical order", {
   expect_length(graph$floating_parts, 3)
   expect_identical(
     purrr::map_int(graph$floating_parts, "root"),
-    c(2L, 3L, 4L)
+    c(3L, 4L, 5L)
   )
   expect_equal(igraph::components(graph, mode = "weak")$no, 4)
   expect_identical(count_mono(glycan, "Neu5Ac"), 2L)

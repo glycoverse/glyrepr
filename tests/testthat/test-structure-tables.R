@@ -76,7 +76,7 @@ test_that("structure_edges includes glycan_name for named structures", {
 test_that("structure_floating_parts returns normalized attachment metadata", {
   glycans <- as_glycan_structure(c(
     unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-    restricted = "{Fuc(a1-2)|1}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Fuc(a1-2)|1,2}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
     ordinary = "Gal(a1-",
     missing = NA
   ))
@@ -98,7 +98,10 @@ test_that("structure_floating_parts returns normalized attachment metadata", {
   expect_equal(parts$glycan_name, c("unrestricted", "restricted", "restricted"))
   expect_equal(parts$part_id, c(1L, 1L, 2L))
   expect_equal(parts$linkage, c("a2-3", "a1-2", "a2-6"))
-  expect_equal(parts$parents, list(integer(), 1L, c(1L, 2L)))
+  expect_equal(
+    parts$parents,
+    list(integer(), c(1L, 2L), c(1L, 2L))
+  )
 })
 
 test_that("structure_from_tibbles recreates structure vectors", {
@@ -117,7 +120,7 @@ test_that("structure tables round-trip floating parts", {
   glycans <- as_glycan_structure(c(
     unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
     missing = NA,
-    restricted = "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
     duplicate = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-"
   ))
 
@@ -131,6 +134,41 @@ test_that("structure tables round-trip floating parts", {
   expect_identical(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
   expect_identical(names(rebuilt), names(glycans))
   expect_identical(is.na(rebuilt), is.na(glycans))
+})
+
+test_that("structure tables resolve a single candidate parent", {
+  nodes <- tibble::tibble(
+    glycan_id = c(1L, 1L),
+    node_id = c(1L, 2L),
+    mono = c("Gal", "Neu5Ac"),
+    sub = c("", "")
+  )
+  edges <- tibble::tibble(
+    glycan_id = integer(),
+    edge_id = integer(),
+    from_node = integer(),
+    to_node = integer(),
+    linkage = character()
+  )
+  floating_parts <- tibble::tibble(
+    glycan_id = 1L,
+    part_id = 1L,
+    root_node = 2L,
+    linkage = "a2-3",
+    parents = list(1L)
+  )
+
+  result <- structure_from_tibbles(
+    nodes,
+    edges,
+    "a1",
+    floating_parts
+  )
+
+  expect_identical(as.character(result), "Neu5Ac(a2-3)Gal(a1-")
+  expect_false(has_floating_parts(result))
+  expect_equal(nrow(structure_floating_parts(result)), 0)
+  expect_identical(structure_edges(result)$linkage, "a2-3")
 })
 
 test_that("structure_from_tibbles restores names from glycan_name", {
