@@ -87,8 +87,11 @@ attribute, a list with one entry per floating component. Each entry contains:
 means that all feasible main-tree nodes are candidates.
 }
 
-The virtual attachment is metadata, not an edge. Floating metadata is
-validated and contributes to the canonical structure key.
+During canonicalization, a floating part with exactly one candidate parent
+is attached to that parent as an ordinary graph edge. This includes an empty
+\code{parents} vector when the main tree has only one node. Only unresolved
+attachments retain floating metadata, where the virtual attachment is
+metadata rather than an edge and contributes to the canonical structure key.
 }
 }
 
@@ -157,7 +160,7 @@ print(complex_struct)
 
 # Example 4: Parse a floating part with explicit candidate parents
 floating <- as_glycan_structure(
-  "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
 )
 structure_floating_parts(floating)
 
