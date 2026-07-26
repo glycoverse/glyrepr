@@ -42,7 +42,7 @@ fill_anomer_pos <- function(strucs) {
   main_vertices <- if (length(parts) == 0) {
     seq_len(igraph::vcount(struc))
   } else {
-    floating_graph_info(struc, parts)$main_vertices
+    floating_main_vertices(struc, parts)
   }
   root <- intersect(
     which(igraph::degree(struc, mode = "in") == 0),

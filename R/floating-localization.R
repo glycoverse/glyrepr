@@ -184,10 +184,10 @@ enumerate_floating_localizations_one <- function(
     return(single_identity_localization(x, input_id))
   }
 
-  info <- floating_graph_info(graph, parts)
+  main_vertices <- floating_main_vertices(graph, parts)
   candidate_domains <- purrr::map(parts, function(part) {
     if (length(part$parents) == 0) {
-      as.integer(info$main_vertices)
+      main_vertices
     } else {
       as.integer(part$parents)
     }
@@ -361,7 +361,7 @@ validate_floating_assignments <- function(assignments, input_size) {
 #' @noRd
 localize_floating_graph <- function(graph, assignments, glycan_id = 1L) {
   parts <- normalize_floating_parts(graph)
-  info <- floating_graph_info(graph, parts)
+  main_vertices <- floating_main_vertices(graph, parts)
 
   nonexistent <- assignments$part_id > length(parts)
   if (any(nonexistent)) {
@@ -377,7 +377,7 @@ localize_floating_graph <- function(graph, assignments, glycan_id = 1L) {
     parent_node <- assignments$parent_node[[row_id]]
     part <- parts[[part_id]]
     candidate_parents <- if (length(part$parents) == 0) {
-      info$main_vertices
+      main_vertices
     } else {
       part$parents
     }
@@ -410,7 +410,7 @@ localize_floating_graph <- function(graph, assignments, glycan_id = 1L) {
   remaining <- parts[-assignments$part_id]
   remaining <- purrr::map(remaining, function(part) {
     if (length(part$parents) == 0) {
-      part$parents <- as.integer(info$main_vertices)
+      part$parents <- main_vertices
     }
     part
   })

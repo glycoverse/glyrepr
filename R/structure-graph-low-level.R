@@ -220,8 +220,8 @@ graph_to_iupac <- function(graph) {
     return(paste0(seq_glycan_iupac(root, seq_cache), "(", graph$anomer, "-"))
   }
 
-  info <- floating_graph_info(graph, parts)
-  main <- igraph::induced_subgraph(graph, info$main_vertices)
+  main_vertices <- floating_main_vertices(graph, parts)
+  main <- igraph::induced_subgraph(graph, main_vertices)
   main <- delete_floating_parts_attr(main)
   seq_cache <- build_seq_cache(main)
   root <- seq_cache$root
@@ -235,7 +235,7 @@ graph_to_iupac <- function(graph) {
     parts,
     floating_part_iupac,
     graph = graph,
-    main_vertices = info$main_vertices
+    main_vertices = main_vertices
   )
 
   paste0(paste0(floating_iupac, collapse = ""), main_iupac)
