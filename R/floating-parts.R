@@ -296,6 +296,14 @@ floating_graph_info <- function(
 }
 
 validate_floating_graph_shape <- function(graph) {
+  raw_parts <- igraph::graph_attr(graph, "floating_parts")
+  if (is.null(raw_parts)) {
+    if (!is_out_tree(graph)) {
+      cli::cli_abort("Glycan structure must be an out tree.")
+    }
+    return(invisible(NULL))
+  }
+
   parts <- normalize_floating_parts(graph)
 
   if (length(parts) == 0) {

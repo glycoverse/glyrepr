@@ -333,6 +333,85 @@ seq_glycan_iupac <- function(node, cache) {
   )
 }
 
+#' Generate IUPAC and Canonical Order in One Traversal
+#'
+#' @param node Current node.
+#' @param cache Precomputed adjacency and edge metadata.
+#' @returns A list with integer vectors `vertices` and `edges`, plus the
+#'   IUPAC-condensed `iupac` string without reducing-end anomer.
+#' @noRd
+seq_glycan_order_iupac <- function(node, cache) {
+  children <- cache$children[[node]]
+
+  if (length(children) == 0) {
+    return(list(
+      vertices = node,
+      edges = integer(),
+      iupac = cache$mono_sub[[node]]
+    ))
+  }
+
+  children_order <- if (length(children) > 1) {
+    order_branches(node, cache)
+  } else {
+    list(backbone = 1L, branches = integer())
+  }
+
+  backbone_index <- children_order$backbone
+  backbone <- seq_glycan_order_iupac(
+    children[[backbone_index]],
+    cache
+  )
+  backbone_edge <- cache$edge_ids[[node]][[backbone_index]]
+  backbone_linkage <- cache$linkages[[node]][[backbone_index]]
+
+  branches <- lapply(
+    children_order$branches,
+    function(branch_index) {
+      branch <- seq_glycan_order_iupac(
+        children[[branch_index]],
+        cache
+      )
+      branch$edges <- c(
+        branch$edges,
+        cache$edge_ids[[node]][[branch_index]]
+      )
+      branch$iupac <- paste0(
+        "[",
+        branch$iupac,
+        "(",
+        cache$linkages[[node]][[branch_index]],
+        ")]"
+      )
+      branch
+    }
+  )
+
+  list(
+    vertices = c(
+      backbone$vertices,
+      unlist(lapply(branches, `[[`, "vertices"), use.names = FALSE),
+      node
+    ),
+    edges = c(
+      backbone$edges,
+      backbone_edge,
+      unlist(lapply(branches, `[[`, "edges"), use.names = FALSE)
+    ),
+    iupac = paste0(
+      backbone$iupac,
+      "(",
+      backbone_linkage,
+      ")",
+      paste0(
+        unlist(lapply(branches, `[[`, "iupac"), use.names = FALSE),
+        collapse = ""
+      ),
+      cache$mono_sub[[node]]
+    )
+  )
+}
+
 #' Order branches
 #'
 #' This function orders all branches of a node by depth, then by linkages.

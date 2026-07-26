@@ -29,6 +29,48 @@ test_that("validate_glycan_graph returns valid input unchanged", {
   expect_identical(validate_glycan_graph(graph), graph)
 })
 
+test_that("ordinary low-level paths bypass floating-part normalization", {
+  graph <- get_structure_graphs(o_glycan_core_1(), return_list = FALSE)
+  expected_iupac <- graph_to_iupac(graph)
+  testthat::local_mocked_bindings(
+    normalize_floating_parts = function(...) {
+      stop("floating normalization should not run")
+    }
+  )
+
+  expect_identical(validate_glycan_graph(graph), graph)
+  expect_identical(canonicalize_glycan_graph(graph), graph)
+  expect_identical(graph_to_iupac(graph), expected_iupac)
+})
+
+test_that("empty floating metadata preserves the validation contract", {
+  graph <- get_structure_graphs(o_glycan_core_1(), return_list = FALSE)
+  graph$floating_parts <- list()
+
+  expect_identical(validate_glycan_graph(graph), graph)
+  canonical <- canonicalize_glycan_graph(graph)
+  expect_null(igraph::graph_attr(canonical, "floating_parts"))
+  expect_false(
+    "floating_parts" %in% igraph::graph_attr_names(canonical)
+  )
+
+  graph <- igraph::set_graph_attr(
+    graph,
+    "floating_parts",
+    value = NULL
+  )
+  canonical <- canonicalize_glycan_graph(validate_glycan_graph(graph))
+  expect_false(
+    "floating_parts" %in% igraph::graph_attr_names(canonical)
+  )
+
+  graph$floating_parts <- integer()
+  expect_snapshot(
+    validate_glycan_graph(graph),
+    error = TRUE
+  )
+})
+
 
 test_that("legacy scalar graph validation remains available", {
   graph <- get_structure_graphs(o_glycan_core_1(), return_list = FALSE)
@@ -61,6 +103,45 @@ test_that("canonicalize_glycan_graph restores IUPAC ordering", {
   )
   expect_equal(igraph::V(result)$mono, igraph::V(expected)$mono)
   expect_equal(igraph::E(result)$linkage, igraph::E(expected)$linkage)
+})
+
+test_that("combined ordinary canonicalization preserves the public pipeline", {
+  graph <- get_structure_graphs(n_glycan_core(), return_list = FALSE)
+  scrambled <- igraph::permute(
+    graph,
+    rev(seq_len(igraph::vcount(graph)))
+  )
+  expected_graph <- canonicalize_glycan_graph(scrambled)
+  expected_iupac <- graph_to_iupac(expected_graph)
+
+  result <- canonicalize_graph_with_iupac(scrambled)
+
+  expect_identical(result$iupac, expected_iupac)
+  expect_equal(
+    igraph::as_data_frame(result$graph, what = "vertices"),
+    igraph::as_data_frame(expected_graph, what = "vertices")
+  )
+  expect_equal(
+    igraph::as_data_frame(result$graph, what = "edges"),
+    igraph::as_data_frame(expected_graph, what = "edges")
+  )
+  expect_identical(
+    igraph::graph_attr(result$graph),
+    igraph::graph_attr(expected_graph)
+  )
+})
+
+test_that("combined ordinary traversal matches separate order and IUPAC paths", {
+  graph <- get_structure_graphs(n_glycan_core(), return_list = FALSE)
+  cache <- build_seq_cache(graph)
+
+  combined <- seq_glycan_order_iupac(cache$root, cache)
+  expected_order <- seq_glycan_order(cache$root, cache)
+  expected_iupac <- seq_glycan_iupac(cache$root, cache)
+
+  expect_identical(combined$vertices, expected_order$vertices)
+  expect_identical(combined$edges, expected_order$edges)
+  expect_identical(combined$iupac, expected_iupac)
 })
 
 

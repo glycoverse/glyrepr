@@ -131,7 +131,10 @@ validate_single_glycan_structure <- function(glycan) {
 canonicalize_glycan_graph <- function(graph) {
   checkmate::assert_class(graph, "igraph")
   graph <- ensure_name_vertex_attr(graph)
-  igraph::V(graph)$name <- as.character(seq_len(igraph::vcount(graph)))
+  canonical_names <- as.character(seq_len(igraph::vcount(graph)))
+  if (!identical(igraph::V(graph)$name, canonical_names)) {
+    igraph::V(graph)$name <- canonical_names
+  }
   .reorder_one_graph(graph)
 }
 
@@ -212,6 +215,13 @@ validate_glycan_graph_vector <- function(graphs, label = NULL) {
 #' @export
 graph_to_iupac <- function(graph) {
   checkmate::assert_class(graph, "igraph")
+  raw_parts <- igraph::graph_attr(graph, "floating_parts")
+  if (is.null(raw_parts)) {
+    seq_cache <- build_seq_cache(graph)
+    root <- seq_cache$root
+    return(paste0(seq_glycan_iupac(root, seq_cache), "(", graph$anomer, "-"))
+  }
+
   parts <- normalize_floating_parts(graph)
 
   if (length(parts) == 0) {
