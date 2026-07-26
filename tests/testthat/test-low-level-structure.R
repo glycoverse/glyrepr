@@ -107,10 +107,10 @@ test_that("low-level graph pipeline supports annotated floating parts", {
 
   result <- canonicalize_glycan_graph(graph)
 
-  expect_equal(igraph::V(result)$mono, c("Gal", "GalNAc", "Neu5Ac"))
+  expect_equal(igraph::V(result)$mono, c("Neu5Ac", "Gal", "GalNAc"))
   expect_equal(
     result$floating_parts,
-    list(list(root = 3L, linkage = "a2-6", parents = c(1L, 2L)))
+    list(list(root = 1L, linkage = "a2-6", parents = c(2L, 3L)))
   )
   expect_identical(
     graph_to_iupac(result),

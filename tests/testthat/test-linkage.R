@@ -157,5 +157,5 @@ test_that("remove_linkages() removes floating attachment linkages", {
   )
   parts <- structure_floating_parts(result)
   expect_identical(parts$linkage, "??-?")
-  expect_identical(parts$parents[[1]], c(1L, 2L))
+  expect_identical(parts$parents[[1]], c(2L, 3L))
 })

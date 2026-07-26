@@ -132,7 +132,12 @@ floating_augmented_main_labels <- function(graph, main, info) {
       part$parents <- integer()
       paste(
         "floating-parent-set",
-        floating_part_iupac(graph, part, info$membership),
+        floating_part_iupac(
+          graph,
+          part,
+          info$membership,
+          info$main_vertices
+        ),
         sep = "\r"
       )
     }

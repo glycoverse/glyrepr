@@ -31,12 +31,12 @@
 
     Code
       localize_floating_parts(glycans, tibble::tibble(glycan_id = 1L, part_id = 1L,
-        parent_node = 3L))
+        parent_node = 1L))
     Condition
       Error in `localize_floating_graph()`:
       ! Assignment selects a parent outside the candidate domain.
-      x Glycan 1 floating part 1 cannot attach to parent node 3.
-      i Candidate parent domain: 1 and 2.
+      x Glycan 1 floating part 1 cannot attach to parent node 1.
+      i Candidate parent domain: 2 and 3.
 
 ---
 
@@ -62,7 +62,7 @@
 
     Code
       localize_floating_parts(glycan, tibble::tibble(glycan_id = c(1L, 1L), part_id = c(
-        1L, 2L), parent_node = c(1L, 1L)))
+        1L, 2L), parent_node = c(3L, 3L)))
     Condition
       Error in `validate_floating_attachment_slots()`:
       ! Floating parts cannot be attached simultaneously.
@@ -72,11 +72,11 @@
 
     Code
       localize_floating_parts(glycan, tibble::tibble(glycan_id = 1L, part_id = 1L,
-        parent_node = 2L))
+        parent_node = 3L))
     Condition
       Error in `floating_attachment_domain()`:
       ! Floating part has impossible explicit parent metadata.
-      x Floating part 1 cannot use explicit parent node 2 because every acceptor position declared by linkage "a2-3" is already occupied.
+      x Floating part 1 cannot use explicit parent node 3 because every acceptor position declared by linkage "a2-3" is already occupied.
 
 # enumerate_floating_localizations enforces a conservative bound
 

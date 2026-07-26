@@ -14,7 +14,7 @@ test_that("floating parts parse and serialize for a bi-antennary N-glycan", {
   expect_equal(igraph::components(graph, mode = "weak")$no, 2)
   expect_equal(
     graph$floating_parts,
-    list(list(root = 10L, linkage = "a2-3", parents = integer()))
+    list(list(root = 1L, linkage = "a2-3", parents = integer()))
   )
 
   ordinary <- as_glycan_structure(main)
@@ -49,7 +49,7 @@ test_that("unrestricted and explicit candidate parents remain distinguishable", 
     unrestricted_graph$floating_parts[[1]]$parents,
     integer()
   )
-  expect_identical(explicit_graph$floating_parts[[1]]$parents, c(1L, 4L))
+  expect_identical(explicit_graph$floating_parts[[1]]$parents, c(2L, 5L))
   expect_identical(structure_to_iupac(unrestricted), unrestricted_iupac)
   expect_identical(structure_to_iupac(explicit), explicit_iupac)
   expect_false(unrestricted == explicit)
@@ -117,7 +117,7 @@ test_that("resolving one part preserves unrestricted candidate parents", {
   expect_true(has_floating_parts(glycan))
   expect_identical(
     structure_floating_parts(glycan)$parents[[1]],
-    c(2L, 3L)
+    c(3L, 4L)
   )
 })
 
@@ -146,9 +146,9 @@ test_that("explicit candidate parents use canonical main-tree node indices", {
     structure_to_iupac(parsed),
     paste0("{Neu5Ac(a2-6)|1,2}", main)
   )
-  expect_identical(parsed_graph$floating_parts[[1]]$parents, c(1L, 2L))
+  expect_identical(parsed_graph$floating_parts[[1]]$parents, c(2L, 3L))
   expect_identical(igraph::V(parsed_graph)$name, c("1", "2", "3"))
-  expect_identical(igraph::V(parsed_graph)$mono, c("Gal", "GalNAc", "Neu5Ac"))
+  expect_identical(igraph::V(parsed_graph)$mono, c("Neu5Ac", "Gal", "GalNAc"))
 
   graph <- igraph::make_empty_graph(3, directed = TRUE)
   graph <- igraph::add_edges(graph, c(2, 3))
@@ -173,7 +173,7 @@ test_that("explicit candidate parents use canonical main-tree node indices", {
   )
   expect_equal(
     canonical_graph$floating_parts,
-    list(list(root = 3L, linkage = "a2-6", parents = c(1L, 2L)))
+    list(list(root = 1L, linkage = "a2-6", parents = c(2L, 3L)))
   )
 })
 
@@ -219,12 +219,47 @@ test_that("multi-residue floating substructures round-trip", {
   expect_equal(sort(components$csize), c(2L, 2L))
   expect_identical(
     igraph::V(graph)$mono,
-    c("Gal", "GalNAc", "Gal", "GlcNAc")
+    c("Gal", "GlcNAc", "Gal", "GalNAc")
   )
   expect_equal(
     graph$floating_parts,
-    list(list(root = 4L, linkage = "b1-6", parents = c(1L, 2L)))
+    list(list(root = 2L, linkage = "b1-6", parents = c(3L, 4L)))
   )
+})
+
+test_that("floating nodes follow their full IUPAC sequence order", {
+  iupac <- paste0(
+    "{Neu5Ac(a2-8)Neu5Ac(a2-3)|1,3}",
+    "Gal(a1-?)[Gal(a1-?)]Glc(a1-"
+  )
+
+  glycan <- as_glycan_structure(iupac)
+
+  expect_identical(
+    structure_nodes(glycan)$mono,
+    c("Neu5Ac", "Neu5Ac", "Gal", "Gal", "Glc")
+  )
+  expect_identical(
+    structure_edges(glycan)[1, c("from_node", "to_node", "linkage")],
+    tibble::tibble(from_node = 2L, to_node = 1L, linkage = "a2-8")
+  )
+  expect_identical(
+    structure_floating_parts(glycan)$root_node,
+    2L
+  )
+  expect_identical(
+    structure_floating_parts(glycan)$parents,
+    list(c(3L, 5L))
+  )
+  expect_identical(
+    structure_floating_candidates(glycan)$parent_node,
+    c(3L, 5L)
+  )
+  expect_identical(
+    structure_component_membership(glycan)$component_type,
+    c("floating", "floating", "main", "main", "main")
+  )
+  expect_identical(structure_to_iupac(glycan), iupac)
 })
 
 
@@ -433,7 +468,7 @@ test_that("floating components preserve multiplicity and canonical order", {
   expect_length(graph$floating_parts, 3)
   expect_identical(
     purrr::map_int(graph$floating_parts, "root"),
-    c(3L, 4L, 5L)
+    c(1L, 2L, 3L)
   )
   expect_equal(igraph::components(graph, mode = "weak")$no, 4)
   expect_identical(count_mono(glycan, "Neu5Ac"), 2L)

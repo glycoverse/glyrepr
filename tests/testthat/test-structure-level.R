@@ -205,7 +205,7 @@ test_that("reduce_structure_level preserves floating topology", {
   )
   expect_identical(
     structure_floating_parts(topological)$parents[[1]],
-    c(1L, 2L)
+    c(2L, 3L)
   )
   expect_identical(get_structure_level(topological), "topological")
 
@@ -216,7 +216,7 @@ test_that("reduce_structure_level preserves floating topology", {
   )
   expect_identical(
     structure_floating_parts(basic)$parents[[1]],
-    c(1L, 2L)
+    c(2L, 3L)
   )
   expect_identical(get_structure_level(basic), "basic")
 })
