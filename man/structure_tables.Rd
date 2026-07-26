@@ -4,6 +4,7 @@
 \alias{structure_tables}
 \alias{structure_nodes}
 \alias{structure_edges}
+\alias{structure_floating_parts}
 \alias{structure_from_tibbles}
 \title{Convert Glycan Structures to Graph Tables}
 \usage{
@@ -11,7 +12,9 @@ structure_nodes(x)
 
 structure_edges(x)
 
-structure_from_tibbles(nodes, edges, anomers)
+structure_floating_parts(x)
+
+structure_from_tibbles(nodes, edges, anomers, floating_parts = NULL)
 }
 \arguments{
 \item{x}{A glycan structure vector.}
@@ -23,6 +26,9 @@ structure_from_tibbles(nodes, edges, anomers)
 \code{to_node}, and \code{linkage}, and optionally \code{glycan_name}.}
 
 \item{anomers}{A character vector of reducing-end anomers, one per glycan.}
+
+\item{floating_parts}{A data frame returned by
+\code{structure_floating_parts()}, or \code{NULL} when no floating parts are present.}
 }
 \value{
 \itemize{
@@ -30,27 +36,34 @@ structure_from_tibbles(nodes, edges, anomers)
 \code{mono}, and \code{sub}.
 \item \code{structure_edges()} returns a tibble with columns \code{glycan_id}, \code{edge_id},
 \code{from_node}, \code{to_node}, and \code{linkage}.
+\item \code{structure_floating_parts()} returns a tibble with columns \code{glycan_id},
+\code{part_id}, \code{root_node}, \code{linkage}, and the list-column \code{parents}.
 \item \code{structure_from_tibbles()} returns a \code{glyrepr_structure} vector.
 }
 }
 \description{
-\code{structure_nodes()} and \code{structure_edges()} convert a glycan structure vector
-to node and edge tibbles. \code{structure_from_tibbles()} rebuilds a
-\code{glyrepr_structure} vector from those tibbles and a vector of reducing-end
-anomers.
+\code{structure_nodes()}, \code{structure_edges()}, and
+\code{structure_floating_parts()} convert a glycan structure vector to normalized
+graph tables. \code{structure_from_tibbles()} rebuilds a \code{glyrepr_structure}
+vector from those tables and a vector of reducing-end anomers.
 
 The \code{glycan_id} column is the integer position of each glycan in the input
 vector. Duplicate structures are expanded to their original vector positions.
 Missing structures have no node or edge rows and are reconstructed from
 missing values in \code{anomers}.
-If \code{x} is named, the node and edge tibbles also contain a \code{glycan_name}
-column. \code{structure_from_tibbles()} uses \code{glycan_name} as output names when
-that column is present.
+If \code{x} is named, all three tibbles also contain a \code{glycan_name} column.
+\code{structure_from_tibbles()} uses \code{glycan_name} as output names when that
+column is present.
 }
 \examples{
 glycans <- c(o_glycan_core_1(), o_glycan_core_1())
 nodes <- structure_nodes(glycans)
 edges <- structure_edges(glycans)
 structure_from_tibbles(nodes, edges, get_anomer(glycans))
+
+floating <- as_glycan_structure(
+  "{Neu5Ac(a2-3)|1}Gal(b1-3)GalNAc(a1-"
+)
+structure_floating_parts(floating)
 
 }

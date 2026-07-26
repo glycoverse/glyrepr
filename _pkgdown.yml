@@ -21,9 +21,11 @@ reference:
   - get_anomer
   - get_mono_type
   - get_structure_graphs
+  - has_floating_parts
   - has_linkages
   - structure_nodes
   - structure_edges
+  - structure_floating_parts
   - structure_to_iupac
   - get_structure_level
 - title: "Low-Level Glycan Graph Infrastructure"

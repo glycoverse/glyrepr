@@ -1,5 +1,28 @@
 # Internal helpers for floating glycan substructures.
 
+#' Detect Floating Glycan Parts
+#'
+#' Test whether each glycan structure contains one or more floating
+#' substructures whose attachment to the main tree is not fully localized.
+#'
+#' @param x A [glycan_structure()] vector.
+#'
+#' @returns A logical vector with the same length and names as `x`. Missing
+#'   structures produce `NA`.
+#'
+#' @examples
+#' glycans <- as_glycan_structure(c(
+#'   "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
+#'   "Gal(b1-3)GalNAc(a1-"
+#' ))
+#' has_floating_parts(glycans)
+#'
+#' @export
+has_floating_parts <- function(x) {
+  checkmate::assert_class(x, "glyrepr_structure")
+  smap_lgl(x, has_floating_parts_graph)
+}
+
 floating_parts_attr <- function(graph) {
   parts <- igraph::graph_attr(graph, "floating_parts")
   if (is.null(parts)) {
