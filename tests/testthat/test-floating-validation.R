@@ -62,6 +62,20 @@ test_that("floating metadata rejects duplicated fields", {
   )
 })
 
+test_that("floating metadata requires every supported field", {
+  graph <- make_floating_validation_graph(
+    main_count = 1,
+    floating_linkages = "a2-3",
+    floating_parents = list(1L)
+  )
+  graph$floating_parts[[1]]$parents <- NULL
+
+  expect_snapshot(
+    error = TRUE,
+    glycan_structure(graph)
+  )
+})
+
 
 test_that("explicit parents reject definitely occupied acceptor slots", {
   graph <- make_floating_validation_graph(

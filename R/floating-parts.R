@@ -79,7 +79,7 @@ normalize_floating_part <- function(part, graph_size) {
     ))
   }
 
-  required <- c("root", "linkage")
+  required <- c("root", "linkage", "parents")
   missing <- setdiff(required, names(part))
   if (length(missing) > 0) {
     cli::cli_abort(c(
@@ -115,9 +115,6 @@ normalize_floating_part <- function(part, graph_size) {
   }
 
   parents <- part$parents
-  if (is.null(parents)) {
-    parents <- integer()
-  }
   if (
     !is.numeric(parents) ||
       anyNA(parents) ||

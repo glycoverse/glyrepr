@@ -24,6 +24,19 @@
       ! Floating part metadata contains duplicated fields.
       x Duplicated field: root.
 
+# floating metadata requires every supported field
+
+    Code
+      glycan_structure(graph)
+    Condition
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `.f()`:
+      ! Floating part metadata is incomplete.
+      x Missing field: parents.
+
 # explicit parents reject definitely occupied acceptor slots
 
     Code
