@@ -1,14 +1,14 @@
 # glyrepr (development version)
 
-* `glycan_structure()` now supports floating glycan substructures with optional candidate-parent indices through `{<floating>}` and `{<floating>|<parents>}` syntax, together with floating-aware graph validation, canonicalization, transformations, and graph-table conversion. Singleton parent sets are normalized to ordinary graph edges.
-* Floating structure nodes now follow the complete IUPAC-condensed sequence, including brace-prefixed components; tabular parent IDs are global node IDs while serialized parent indices remain local to the main tree.
-* Canonical `floating_parts` graph metadata now stores a `nodes` vector containing every node in each floating component, and internal consumers use it instead of rediscovering component membership; legacy graph inputs without this field remain supported.
-* `structure_floating_candidates()` returns one row per potential floating-part attachment and expands unrestricted parent domains to every original main-tree node.
-* `structure_component_membership()` identifies main-tree and floating-part nodes without requiring callers to inspect private graph attributes.
-* `structure_candidate_edges()` exposes every potential floating-part attachment as a virtual edge for drawing and constraint-aware graph operations.
-* `localize_floating_parts()` attaches caller-selected floating parts, validates candidate domains and simultaneous linkage-slot conflicts, and remaps remaining candidate indices after canonicalization.
-* `enumerate_floating_localizations()` returns every conflict-free, canonical floating-part localization with assignment provenance and a conservative per-input variant bound.
-* Structure-level classification now depends only on residue specificity and linkage completeness: floating candidate-parent metadata does not itself make a structure partial, and floating structures can be reduced to topological resolution.
+* `glycan_structure()` now supports floating glycan substructures with optional candidate-parent indices through `{<floating>}` and `{<floating>|<parents>}` syntax, together with floating-aware graph validation, canonicalization, transformations, and graph-table conversion. Singleton parent sets are normalized to ordinary graph edges. (#80)
+* Floating structure nodes now follow the complete IUPAC-condensed sequence, including brace-prefixed components; tabular parent IDs are global node IDs while serialized parent indices remain local to the main tree. (#80)
+* Canonical `floating_parts` graph metadata now stores a `nodes` vector containing every node in each floating component, and internal consumers use it instead of rediscovering component membership; legacy graph inputs without this field remain supported. (#80)
+* `structure_floating_candidates()` returns one row per potential floating-part attachment and expands unrestricted parent domains to every original main-tree node. (#80)
+* `structure_component_membership()` identifies main-tree and floating-part nodes without requiring callers to inspect private graph attributes. (#80)
+* `structure_candidate_edges()` exposes every potential floating-part attachment as a virtual edge for drawing and constraint-aware graph operations. (#80)
+* `localize_floating_parts()` attaches caller-selected floating parts, validates candidate domains and simultaneous linkage-slot conflicts, and remaps remaining candidate indices after canonicalization. (#80)
+* `enumerate_floating_localizations()` returns every conflict-free, canonical floating-part localization with assignment provenance and a conservative per-input variant bound. (#80)
+* Structure-level classification now depends only on residue specificity and linkage completeness: floating candidate-parent metadata does not itself make a structure partial, and floating structures can be reduced to topological resolution. (#80)
 * `validate_glycan_graph()` and structure parsing are faster by checking linkage positions in bulk. (#79)
 * `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)
 * IUPAC-condensed sequence generation from glycan graphs is faster by reducing repeated `igraph` extraction. (#78)
