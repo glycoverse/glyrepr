@@ -5,6 +5,14 @@
 #' ordinary construction. Incorrect use of these functions can create invalid
 #' structure vectors that fail in later operations.
 #'
+#' @section Floating graph schema:
+#' A floating structure is one weakly disconnected graph with exactly one main
+#' outward tree and one outward tree per floating part. Its `floating_parts`
+#' graph attribute is a list of entries with integer `root`, character
+#' `linkage`, and integer `parents` fields. `parents = integer()` means all
+#' feasible main-tree nodes. The virtual attachment linkage is not a graph edge.
+#' See [glycan_structure()] for the complete contract.
+#'
 #' @section Name-preserving manual construction:
 #' The five low-level functions can reproduce strict graph-based construction
 #' while preserving the names of the input graph list:
