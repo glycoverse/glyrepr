@@ -60,3 +60,33 @@ test_that("fill_anomer_pos accepts generic monosaccharides", {
     "Hex(?1-?)[Hex(?1-?)]Hex(?1-?)HexNAc(?1-?)HexNAc(?1-"
   )
 })
+
+test_that("fill_anomer_pos fills floating attachment positions", {
+  strucs <- as_glycan_structure(c(
+    "{Neu5Ac(??-?)|1}Gal(??-?)GalNAc(??-",
+    "{Gal(??-?)Neu5Ac(??-?)|1}GalNAc(??-"
+  ))
+
+  result <- fill_anomer_pos(strucs)
+
+  expect_identical(
+    as.character(result),
+    c(
+      "{Neu5Ac(?2-?)|1}Gal(?1-?)GalNAc(?1-",
+      "{Gal(?1-?)Neu5Ac(?2-?)|1}GalNAc(?1-"
+    )
+  )
+})
+
+test_that("fill_anomer_pos preserves known floating attachment positions", {
+  struc <- as_glycan_structure(
+    "{Neu5Ac(a2-3)|1}GalNAc(??-"
+  )
+
+  result <- fill_anomer_pos(struc)
+
+  expect_identical(
+    as.character(result),
+    "{Neu5Ac(a2-3)|1}GalNAc(?1-"
+  )
+})

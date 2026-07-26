@@ -7,6 +7,10 @@
 #' For anomer positions that are already specified in the input structures,
 #' this function does not modify them.
 #'
+#' For a structure with floating parts, the reducing-end position is inferred
+#' from the root of the main tree. Positions in virtual floating-part
+#' attachment linkages are inferred from each floating part's root residue.
+#'
 #' @param strucs A [glycan_structure()] vector with concrete or generic
 #'   monosaccharides.
 #'
@@ -34,7 +38,16 @@ fill_anomer_pos <- function(strucs) {
 #' @returns An igraph glycan structure with missing anomer positions filled.
 #' @noRd
 .fill_anomer_pos_single <- function(struc) {
-  root <- which(igraph::degree(struc, mode = "in") == 0)
+  parts <- normalize_floating_parts(struc)
+  main_vertices <- if (length(parts) == 0) {
+    seq_len(igraph::vcount(struc))
+  } else {
+    floating_graph_info(struc, parts)$main_vertices
+  }
+  root <- intersect(
+    which(igraph::degree(struc, mode = "in") == 0),
+    main_vertices
+  )
   root_mono <- igraph::vertex_attr(struc, "mono", index = root)
   root_anomer <- igraph::graph_attr(struc, "anomer")
   struc <- igraph::set_graph_attr(
@@ -44,14 +57,19 @@ fill_anomer_pos <- function(strucs) {
   )
 
   linkages <- igraph::edge_attr(struc, "linkage")
-  if (length(linkages) == 0) {
-    return(struc)
+  if (length(linkages) > 0) {
+    edges <- igraph::ends(struc, igraph::E(struc), names = FALSE)
+    donor_monos <- igraph::vertex_attr(struc, "mono", index = edges[, 2])
+    linkages <- purrr::map2_chr(linkages, donor_monos, .fill_anomer_pos_value)
+    struc <- igraph::set_edge_attr(struc, "linkage", value = linkages)
   }
 
-  edges <- igraph::ends(struc, igraph::E(struc), names = FALSE)
-  donor_monos <- igraph::vertex_attr(struc, "mono", index = edges[, 2])
-  linkages <- purrr::map2_chr(linkages, donor_monos, .fill_anomer_pos_value)
-  igraph::set_edge_attr(struc, "linkage", value = linkages)
+  parts <- purrr::map(parts, function(part) {
+    root_mono <- igraph::vertex_attr(struc, "mono", index = part$root)
+    part$linkage <- .fill_anomer_pos_value(part$linkage, root_mono)
+    part
+  })
+  set_floating_parts_attr(struc, parts)
 }
 
 
