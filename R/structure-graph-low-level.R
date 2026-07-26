@@ -22,9 +22,7 @@ validate_glycan_graph <- function(graph) {
     cli::cli_abort("Glycan structure must be directed.")
   }
 
-  if (!is_out_tree(graph)) {
-    cli::cli_abort("Glycan structure must be an out tree.")
-  }
+  validate_floating_graph_shape(graph)
 
   if (!has_vertex_attrs(graph, "mono")) {
     cli::cli_abort("Glycan structure must have a vertex attribute 'mono'.")
@@ -213,9 +211,33 @@ validate_glycan_graph_vector <- function(graphs, label = NULL) {
 #' @export
 graph_to_iupac <- function(graph) {
   checkmate::assert_class(graph, "igraph")
-  seq_cache <- build_seq_cache(graph)
+  parts <- normalize_floating_parts(graph)
+
+  if (length(parts) == 0) {
+    seq_cache <- build_seq_cache(graph)
+    root <- seq_cache$root
+    return(paste0(seq_glycan_iupac(root, seq_cache), "(", graph$anomer, "-"))
+  }
+
+  info <- floating_graph_info(graph, parts)
+  main <- igraph::induced_subgraph(graph, info$main_vertices)
+  main <- delete_floating_parts_attr(main)
+  seq_cache <- build_seq_cache(main)
   root <- seq_cache$root
-  paste0(seq_glycan_iupac(root, seq_cache), "(", graph$anomer, "-")
+  main_iupac <- paste0(
+    seq_glycan_iupac(root, seq_cache),
+    "(",
+    graph$anomer,
+    "-"
+  )
+  floating_iupac <- purrr::map_chr(
+    parts,
+    floating_part_iupac,
+    graph = graph,
+    membership = info$membership
+  )
+
+  paste0(paste0(floating_iupac, collapse = ""), main_iupac)
 }
 
 
