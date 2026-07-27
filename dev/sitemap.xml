@@ -24,6 +24,7 @@
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/count_mono.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/dot-extract_base_mono.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/dot-parse_iupac_condensed_single.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/format_glycan_structure_subset.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/get_anomer.html</loc></url>
@@ -36,10 +37,12 @@
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/glyrepr-package.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/glyrepr-vctrs.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/graph_to_iupac.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/has_floating_parts.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/has_linkages.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/index.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/infer_anomer_pos.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/is_known_monosaccharide.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/localize_floating_parts.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/n_glycan_core.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/new_glycan_structure.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/possible_linkages.html</loc></url>
@@ -53,6 +56,9 @@
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/smap_predicates.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/smap_unique.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/spmap.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/structure_candidate_edges.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/structure_component_membership.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/dev/reference/structure_floating_candidates.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/structure_to_iupac.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/dev/reference/valid_linkages.html</loc></url>

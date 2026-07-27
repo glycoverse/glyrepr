@@ -72,6 +72,9 @@ missing.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For anomer positions that are already specified in the input structures,
 this function does not modify them.</p>
+<p>For a structure with floating parts, the reducing-end position is inferred
+from the root of the main tree. Positions in virtual floating-part
+attachment linkages are inferred from each floating part's root residue.</p>
     </div>
 
     <div class="section level2">
@@ -82,8 +85,8 @@ this function does not modify them.</p>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">fill_anomer_pos</span><span class="op">(</span><span class="va">glycans</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[2]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FFD700;">Gal</span>(?1-?)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">?1-</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #AF5FAF;">Neu5Ac</span>(?2-?)<span style="color: #FFD700;">Gal</span>(?1-?)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">?1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">?1-?</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">?1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">?2-?</span>)<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">?1-?</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">?1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 2</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

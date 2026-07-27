@@ -83,7 +83,10 @@ glycan structure vectors. Supports mixed input of multiple objects.</p></dd>
 <p>Each glycan structure must satisfy the following constraints:</p><div class="section">
 <h3 id="graph-structure-requirements">Graph Structure Requirements<a class="anchor" aria-label="anchor" href="#graph-structure-requirements"></a></h3>
 
-<ul><li><p>Must be a directed graph with an outward tree structure (reducing end as root)</p></li>
+<ul><li><p>An ordinary structure must be a directed outward tree (reducing end as
+root).</p></li>
+<li><p>A structure with floating parts must be one annotated forest containing
+exactly one main outward tree and one outward tree per floating part.</p></li>
 <li><p>Must have a graph attribute <code>anomer</code> in the format "a1" or "b1"</p><ul><li><p>Unknown parts can be represented with "?", e.g., "?1", "a?", "??"</p></li>
 </ul></li>
 </ul></div>
@@ -115,15 +118,42 @@ e.g., "3Me,4Ac", "2S,6P"</p></li>
 </ul></li>
 </ul></div>
 
+<div class="section">
+<h3 id="floating-parts">Floating Parts<a class="anchor" aria-label="anchor" href="#floating-parts"></a></h3>
+
+
+<p>Floating parts are disconnected substructures whose attachment to the main
+tree is not fully localized. They are declared by the <code>floating_parts</code> graph
+attribute, a list with one entry per floating component. Each entry contains:</p><ul><li><p><code>root</code>: the integer vertex index of the floating component root.</p></li>
+<li><p><code>nodes</code>: all integer vertex indices in the floating component, ordered as
+the component appears in the complete IUPAC-condensed sequence.</p></li>
+<li><p><code>linkage</code>: the virtual linkage from that root to the main tree.</p></li>
+<li><p><code>parents</code>: integer vertex indices in the main tree. An empty integer vector
+means that all feasible main-tree nodes are candidates.</p></li>
+</ul><p>Canonical graphs always contain <code>nodes</code>. For backward compatibility, input
+graphs may omit it; <code>glycan_structure()</code> derives the component membership
+before validation and stores <code>nodes</code> in the canonical result.</p>
+<p>During canonicalization, a floating part with exactly one candidate parent
+is attached to that parent as an ordinary graph edge. This includes an empty
+<code>parents</code> vector when the main tree has only one node. Only unresolved
+attachments retain floating metadata, where the virtual attachment is
+metadata rather than an edge and contributes to the canonical structure key.</p>
+</div>
+
     </div>
     <div class="section level2">
     <h2 id="node-and-edge-order">Node and Edge Order<a class="anchor" aria-label="anchor" href="#node-and-edge-order"></a></h2>
-    <p>The indices of vertices and linkages in a glycan correspond directly to their
-order in the IUPAC-condensed string, which is printed when you print a
-<code>glycan_structure()</code>.
+    <p>For an ordinary tree, the indices of vertices and linkages correspond
+directly to their order in the printed IUPAC-condensed string.
 For example, for the glycan <code>Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-</code>,
 the vertices are "Man", "Man", "Man", "GlcNAc", "GlcNAc",
 and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".</p>
+<p>For a floating structure, floating-component vertices and edges precede the
+main tree, exactly as their brace-enclosed components precede the main glycan
+in the complete IUPAC-condensed string. Parent indices written inside braces
+are local to the main tree, while <code>floating_parts$parents</code> stores the
+corresponding global graph vertex indices. A virtual floating attachment is
+not an edge.</p>
     </div>
     <div class="section level2">
     <h2 id="na-support">NA Support<a class="anchor" aria-label="anchor" href="#na-support"></a></h2>
@@ -180,7 +210,17 @@ explicitly convert it to IUPAC-condensed strings when needed.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">a2-3</span>)<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 4: Check if object is a glycan structure</span></span></span>
+<span class="r-in"><span><span class="co"># Example 4: Parse a floating part with explicit candidate parents</span></span></span>
+<span class="r-in"><span><span class="va">floating</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="structure_tables.html">structure_floating_parts</a></span><span class="op">(</span><span class="va">floating</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   glycan_id part_id root_node nodes     linkage parents  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>         1       1         1 <span style="color: #949494;">&lt;int [1]&gt;</span> a2-3    <span style="color: #949494;">&lt;int [2]&gt;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example 5: Check if object is a glycan structure</span></span></span>
 <span class="r-in"><span><span class="fu">is_glycan_structure</span><span class="op">(</span><span class="va">simple_struct</span><span class="op">)</span>  <span class="co"># TRUE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span><span class="fu">is_glycan_structure</span><span class="op">(</span><span class="va">graph</span><span class="op">)</span>          <span class="co"># FALSE</span></span></span>

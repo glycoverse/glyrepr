@@ -273,7 +273,7 @@ tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.227 sec elapsed
+#> Naive approach (all graphs): 0.233 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -299,6 +299,18 @@ summary(clustering_coeffs)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
 #>       0       0       0       0       0       0    2000
 ```
+
+For a structure with floating parts, the callback receives one
+annotated, weakly disconnected graph containing the main tree and every
+floating component. Use
+[`has_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/has_floating_parts.md)
+before applying code that assumes a single tree. Structure-returning
+variants such as
+[`smap_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)
+validate and canonicalize changed graphs while reusing unchanged graphs
+that are already valid and canonical; a callback that changes vertex
+identities or components must also update the graph’s `floating_parts`
+metadata.
 
 ### Combining Multiple Metrics
 

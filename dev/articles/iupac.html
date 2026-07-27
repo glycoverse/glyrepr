@@ -313,6 +313,56 @@ tells us about its anomeric state without a target.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="floating-parts">Floating Parts<a class="anchor" aria-label="anchor" href="#floating-parts"></a>
+</h2>
+<p>Sometimes a substructure is known but its parent in the main glycan
+is not. For example, a bi-antennary N-glycan may contain one sialic acid
+without enough evidence to determine which terminal galactose carries
+it.</p>
+<p><code>glyrepr</code> represents such a floating part in braces before
+the main IUPAC-condensed structure:</p>
+<pre><code>{Neu5Ac(a2-3)}&lt;main glycan&gt;</code></pre>
+<p>Omitting a parent list means that every feasible node of the main
+tree is a candidate. To retain a known candidate set, add a pipe
+followed by comma-separated main-tree node indices:</p>
+<pre><code>{Neu5Ac(a2-3)|1,4}&lt;main glycan&gt;</code></pre>
+<p>This means that the virtual <code>a2-3</code> attachment can use node
+1 or node 4. The indices follow the left-to-right residue order of the
+main IUPAC-condensed sequence; residues inside floating blocks are not
+counted. The <code>|1,4</code> suffix is a <code>glyrepr</code>
+extension to curly-brace IUPAC notation. An explicit candidate set needs
+at least two nodes to remain floating. Singleton syntax is still
+accepted, but it fully localizes the attachment and is serialized as an
+ordinary linkage. For example,
+<code>{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-</code> becomes
+<code>Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-</code>. The same normalization
+occurs when the parent list is omitted and the main glycan has only one
+node.</p>
+<p>Here is the complete bi-antennary example:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">floating_n_glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>    <span class="st">"{Neu5Ac(a2-3)|1,4}"</span>,</span>
+<span>    <span class="st">"Gal(b1-4)GlcNAc(b1-2)Man(a1-3)"</span>,</span>
+<span>    <span class="st">"[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]"</span>,</span>
+<span>    <span class="st">"Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">floating_n_glycan</span></span>
+<span><span class="co">#&gt; &lt;glycan_structure[1]&gt;</span></span>
+<span><span class="co">#&gt; [1] {<span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">a2-3</span>)|1,4}<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
+<span><span class="co">#&gt; # Unique structures: 1</span></span>
+<span><span class="fu"><a href="../reference/structure_tables.html">structure_floating_parts</a></span><span class="op">(</span><span class="va">floating_n_glycan</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
+<span><span class="co">#&gt;   glycan_id part_id root_node nodes     linkage parents  </span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>         1       1         1 <span style="color: #949494;">&lt;int [1]&gt;</span> a2-3    <span style="color: #949494;">&lt;int [2]&gt;</span></span></span></code></pre></div>
+<p>Floating blocks may contain more than one residue, and multiple
+blocks may precede the same main glycan. <code>glyrepr</code>
+canonicalizes their order while preserving duplicate floating parts and
+each candidate-parent set.</p>
+</div>
+<div class="section level2">
 <h2 id="practice">Practice<a class="anchor" aria-label="anchor" href="#practice"></a>
 </h2>
 <p><strong>Challenge</strong>: Look at the complex N-glycan at the
@@ -321,7 +371,7 @@ yourself.</p>
 <p><strong>Hint</strong>: Start by identifying the main chain, then work
 on the branches one by one.</p>
 <p><strong>Test your answer:</strong></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Try your hand-written string here!</span></span>
 <span><span class="va">my_attempt</span> <span class="op">&lt;-</span> <span class="st">"Your_IUPAC_string_here"</span></span>
 <span></span>
@@ -364,7 +414,7 @@ IUPAC-condensed strings</li>
 <div class="section level2">
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.6.1 (2026-06-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -390,16 +440,17 @@ IUPAC-condensed strings</li>
 <span><span class="co">#&gt; [1] glyrepr_0.14.0.9000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] vctrs_0.7.3       cli_3.6.6         knitr_1.51        rlang_1.3.0      </span></span>
-<span><span class="co">#&gt;  [5] xfun_0.60         stringi_1.8.7     otel_0.2.0        purrr_1.2.2      </span></span>
-<span><span class="co">#&gt;  [9] generics_0.1.4    textshaping_1.0.5 jsonlite_2.0.0    glue_1.8.1       </span></span>
-<span><span class="co">#&gt; [13] backports_1.5.1   htmltools_0.5.9   ragg_1.5.2        sass_0.4.10      </span></span>
-<span><span class="co">#&gt; [17] rmarkdown_2.31    tibble_3.3.1      evaluate_1.0.5    jquerylib_0.1.4  </span></span>
-<span><span class="co">#&gt; [21] fastmap_1.2.0     yaml_2.3.12       lifecycle_1.0.5   stringr_1.6.0    </span></span>
-<span><span class="co">#&gt; [25] compiler_4.6.1    dplyr_1.2.1       fs_2.1.0          pkgconfig_2.0.3  </span></span>
-<span><span class="co">#&gt; [29] systemfonts_1.3.2 digest_0.6.39     R6_2.6.1          tidyselect_1.2.1 </span></span>
-<span><span class="co">#&gt; [33] pillar_1.11.1     magrittr_2.0.5    checkmate_2.3.4   bslib_0.11.0     </span></span>
-<span><span class="co">#&gt; [37] tools_4.6.1       pkgdown_2.2.1     cachem_1.1.0      desc_1.4.3</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.1    tidyselect_1.2.1 </span></span>
+<span><span class="co">#&gt;  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5</span></span>
+<span><span class="co">#&gt;  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   </span></span>
+<span><span class="co">#&gt; [13] igraph_2.3.3      knitr_1.51        backports_1.5.1   checkmate_2.3.4  </span></span>
+<span><span class="co">#&gt; [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.11.0     </span></span>
+<span><span class="co">#&gt; [21] pillar_1.11.1     rlang_1.3.0       utf8_1.2.6        cachem_1.1.0     </span></span>
+<span><span class="co">#&gt; [25] stringi_1.8.7     xfun_0.60         fs_2.1.0          sass_0.4.10      </span></span>
+<span><span class="co">#&gt; [29] otel_0.2.0        cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5   </span></span>
+<span><span class="co">#&gt; [33] digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.3       evaluate_1.0.5   </span></span>
+<span><span class="co">#&gt; [37] glue_1.8.1        ragg_1.5.2        rmarkdown_2.31    purrr_1.2.2      </span></span>
+<span><span class="co">#&gt; [41] tools_4.6.1       pkgconfig_2.0.3   htmltools_0.5.9</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

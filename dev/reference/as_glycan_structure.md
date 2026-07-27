@@ -29,6 +29,20 @@ as_glycan_structure(x, on_failure = c("error", "na"))
 
 A glyrepr_structure object.
 
+## Details
+
+Character input supports floating-part blocks before the main
+IUPAC-condensed structure. `{Neu5Ac(a2-3)}<main>` allows every feasible
+main-tree node as a candidate parent, while `{Neu5Ac(a2-3)|1,4}<main>`
+restricts the candidates to main-tree nodes 1 and 4. Parent indices
+follow residue order in the supplied main sequence and are remapped to
+canonical IUPAC order in the result. The `|<parents>` suffix is a
+`glyrepr` extension to curly-brace IUPAC notation. A singleton candidate
+set is accepted as input but fully localizes the attachment, so
+`{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-` canonicalizes to the ordinary
+structure `Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`. An omitted parent list
+behaves the same way when the main tree contains only one node.
+
 ## Examples
 
 ``` r
@@ -68,6 +82,18 @@ as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
 #> [1] GlcNAc(b1-4)GlcNAc(b1-
 #> [2] Man(a1-2)GlcNAc(b1-
 #> # Unique structures: 2
+
+# Parse a floating residue with two candidate parents
+floating_iupac <- paste0(
+  "{Neu5Ac(a2-3)|1,4}",
+  "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)",
+  "[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]",
+  "Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+)
+as_glycan_structure(floating_iupac)
+#> <glycan_structure[1]>
+#> [1] {Neu5Ac(a2-3)|1,4}Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
+#> # Unique structures: 1
 
 # Preserve valid elements while replacing an invalid element with NA
 as_glycan_structure(

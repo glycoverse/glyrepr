@@ -8,10 +8,12 @@ reference.
 
 ## Glycans as Graphs
 
-Glycans are naturally represented as directed graphs. In `glyrepr`, a
-glycan structure is stored as an outward-directed tree, where each
-vertex represents a monosaccharide and each edge represents a glycosidic
-linkage.
+Glycans are naturally represented as directed graphs. In `glyrepr`, an
+ordinary glycan structure is stored as an outward-directed tree, where
+each vertex represents a monosaccharide and each edge represents a
+glycosidic linkage. A structure with floating parts is stored as an
+annotated forest: one main tree plus one disconnected tree for each
+floating part.
 
 Behind the scenes, each
 [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
@@ -58,9 +60,9 @@ underlying graph with
 glycan <- n_glycan_core()
 graph <- get_structure_graphs(glycan)
 graph
-#> IGRAPH 4856a82 DN-- 5 4 -- 
+#> IGRAPH 05a8c0c DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 4856a82 (vertex names):
+#> + edges from 05a8c0c (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 ```
 
@@ -72,6 +74,8 @@ units) and 4 edges (bonds).
 **Graph-level attributes:**
 
 - `anomer`: the anomeric configuration of the reducing end.
+- `floating_parts`, when present: virtual attachment metadata for
+  disconnected floating components.
 
 **Vertex attributes:**
 
@@ -177,12 +181,68 @@ graph$anomer
 #> [1] "b1"
 ```
 
+### Floating Parts
+
+A floating structure remains one `igraph`, but it is weakly
+disconnected. The floating-component vertices come first in complete
+IUPAC-condensed order, followed by the main-tree vertices in their
+canonical order.
+
+``` r
+
+floating <- as_glycan_structure(
+  "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
+)
+floating_graph <- get_structure_graphs(floating)
+
+igraph::components(floating_graph, mode = "weak")$no
+#> [1] 2
+igraph::graph_attr(floating_graph, "floating_parts")
+#> [[1]]
+#> [[1]]$root
+#> [1] 1
+#> 
+#> [[1]]$nodes
+#> [1] 1
+#> 
+#> [[1]]$linkage
+#> [1] "a2-3"
+#> 
+#> [[1]]$parents
+#> [1] 2 3
+structure_floating_parts(floating)
+#> # A tibble: 1 × 6
+#>   glycan_id part_id root_node nodes     linkage parents  
+#>       <int>   <int>     <int> <list>    <chr>   <list>   
+#> 1         1       1         1 <int [1]> a2-3    <int [2]>
+```
+
+Each `floating_parts` entry has four fields:
+
+- `root`: the vertex index at the root of the floating component.
+- `nodes`: every vertex index in the floating component.
+- `linkage`: the virtual linkage from that root to the main tree.
+- `parents`: candidate vertex indices in the main tree.
+  [`integer()`](https://rdrr.io/r/base/integer.html) means all feasible
+  main-tree nodes. In a canonical structure, an explicit vector has at
+  least two entries; a singleton is normalized to an ordinary edge.
+
+The virtual attachment is not stored in `igraph::E(floating_graph)`,
+because its endpoint is unresolved. Use
+[`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+when a tabular representation must round-trip this metadata.
+
 ## Working with the Graph
 
 ### Using `igraph`
 
 Once you understand the graph structure, you can use `igraph` functions
-for custom structure analysis.
+for custom structure analysis. Remember that tree-specific functions
+need special handling for a structure with floating parts:
+[`get_structure_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_graphs.md)
+and
+[`smap()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)
+pass the complete annotated forest, not only the main tree.
 
 **Example 1:** Count branched structures (sugars with multiple
 children):
@@ -199,7 +259,7 @@ sum(igraph::degree(graph, mode = "out") > 1)
 
 bfs_result <- igraph::bfs(graph, root = 1, mode = "out")
 bfs_result$order
-#> + 5/5 vertices, named, from 4856a82:
+#> + 5/5 vertices, named, from 05a8c0c:
 #> [1] 1 2 3 4 5
 ```
 

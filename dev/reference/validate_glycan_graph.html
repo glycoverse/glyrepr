@@ -80,6 +80,21 @@ ordinary construction. Incorrect use of these functions can create invalid
 structure vectors that fail in later operations.</p>
     </div>
     <div class="section level2">
+    <h2 id="floating-graph-schema">Floating graph schema<a class="anchor" aria-label="anchor" href="#floating-graph-schema"></a></h2>
+
+
+<p>A floating structure is one weakly disconnected graph with exactly one main
+outward tree and one outward tree per floating part. Its <code>floating_parts</code>
+graph attribute is a list of entries with integer <code>root</code>, integer <code>nodes</code>,
+character <code>linkage</code>, and integer <code>parents</code> fields. <code>nodes</code> contains every
+vertex in that floating component. <code>parents = integer()</code> means all feasible
+main-tree nodes. Legacy input graphs may omit <code>nodes</code>; canonical output
+graphs always contain it. During canonicalization, a part with exactly one
+effective candidate parent is converted to an ordinary graph edge and its
+floating metadata is removed. Otherwise, the virtual attachment linkage is
+not a graph edge. See <code><a href="glycan_structure.html">glycan_structure()</a></code> for the complete contract.</p>
+    </div>
+    <div class="section level2">
     <h2 id="name-preserving-manual-construction">Name-preserving manual construction<a class="anchor" aria-label="anchor" href="#name-preserving-manual-construction"></a></h2>
 
 

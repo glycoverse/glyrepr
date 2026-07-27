@@ -207,6 +207,62 @@ The root monosaccharide (rightmost) doesn’t connect to anything further,
 so its anomeric carbon is “free.” The format `(xy-` tells us about its
 anomeric state without a target.
 
+## Floating Parts
+
+Sometimes a substructure is known but its parent in the main glycan is
+not. For example, a bi-antennary N-glycan may contain one sialic acid
+without enough evidence to determine which terminal galactose carries
+it.
+
+`glyrepr` represents such a floating part in braces before the main
+IUPAC-condensed structure:
+
+    {Neu5Ac(a2-3)}<main glycan>
+
+Omitting a parent list means that every feasible node of the main tree
+is a candidate. To retain a known candidate set, add a pipe followed by
+comma-separated main-tree node indices:
+
+    {Neu5Ac(a2-3)|1,4}<main glycan>
+
+This means that the virtual `a2-3` attachment can use node 1 or node 4.
+The indices follow the left-to-right residue order of the main
+IUPAC-condensed sequence; residues inside floating blocks are not
+counted. The `|1,4` suffix is a `glyrepr` extension to curly-brace IUPAC
+notation. An explicit candidate set needs at least two nodes to remain
+floating. Singleton syntax is still accepted, but it fully localizes the
+attachment and is serialized as an ordinary linkage. For example,
+`{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-` becomes
+`Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`. The same normalization occurs when
+the parent list is omitted and the main glycan has only one node.
+
+Here is the complete bi-antennary example:
+
+``` r
+
+floating_n_glycan <- as_glycan_structure(
+  paste0(
+    "{Neu5Ac(a2-3)|1,4}",
+    "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)",
+    "[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]",
+    "Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  )
+)
+floating_n_glycan
+#> <glycan_structure[1]>
+#> [1] {Neu5Ac(a2-3)|1,4}Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
+#> # Unique structures: 1
+structure_floating_parts(floating_n_glycan)
+#> # A tibble: 1 × 6
+#>   glycan_id part_id root_node nodes     linkage parents  
+#>       <int>   <int>     <int> <list>    <chr>   <list>   
+#> 1         1       1         1 <int [1]> a2-3    <int [2]>
+```
+
+Floating blocks may contain more than one residue, and multiple blocks
+may precede the same main glycan. `glyrepr` canonicalizes their order
+while preserving duplicate floating parts and each candidate-parent set.
+
 ## Practice
 
 **Challenge**: Look at the complex N-glycan at the beginning of this
@@ -284,14 +340,15 @@ sessionInfo()
 #> [1] glyrepr_0.14.0.9000
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] vctrs_0.7.3       cli_3.6.6         knitr_1.51        rlang_1.3.0      
-#>  [5] xfun_0.60         stringi_1.8.7     otel_0.2.0        purrr_1.2.2      
-#>  [9] generics_0.1.4    textshaping_1.0.5 jsonlite_2.0.0    glue_1.8.1       
-#> [13] backports_1.5.1   htmltools_0.5.9   ragg_1.5.2        sass_0.4.10      
-#> [17] rmarkdown_2.31    tibble_3.3.1      evaluate_1.0.5    jquerylib_0.1.4  
-#> [21] fastmap_1.2.0     yaml_2.3.12       lifecycle_1.0.5   stringr_1.6.0    
-#> [25] compiler_4.6.1    dplyr_1.2.1       fs_2.1.0          pkgconfig_2.0.3  
-#> [29] systemfonts_1.3.2 digest_0.6.39     R6_2.6.1          tidyselect_1.2.1 
-#> [33] pillar_1.11.1     magrittr_2.0.5    checkmate_2.3.4   bslib_0.11.0     
-#> [37] tools_4.6.1       pkgdown_2.2.1     cachem_1.1.0      desc_1.4.3
+#>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.1    tidyselect_1.2.1 
+#>  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5
+#>  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   
+#> [13] igraph_2.3.3      knitr_1.51        backports_1.5.1   checkmate_2.3.4  
+#> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.11.0     
+#> [21] pillar_1.11.1     rlang_1.3.0       utf8_1.2.6        cachem_1.1.0     
+#> [25] stringi_1.8.7     xfun_0.60         fs_2.1.0          sass_0.4.10      
+#> [29] otel_0.2.0        cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5   
+#> [33] digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.3       evaluate_1.0.5   
+#> [37] glue_1.8.1        ragg_1.5.2        rmarkdown_2.31    purrr_1.2.2      
+#> [41] tools_4.6.1       pkgconfig_2.0.3   htmltools_0.5.9
 ```

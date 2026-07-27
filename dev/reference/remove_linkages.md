@@ -1,7 +1,8 @@
 # Remove All Linkages from a Glycan
 
-This function replaces all linkages in a glycan structure with "??-?",
-as well as the reducing end anomer with "??-".
+This function replaces all graph-edge and floating-part attachment
+linkages in a glycan structure with "??-?", as well as the reducing end
+anomer with "??-".
 
 ## Usage
 

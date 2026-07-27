@@ -14,6 +14,7 @@
   : Convert to Glycan Structure Vector
 - [`structure_nodes()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_edges()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+  [`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   : Convert Glycan Structures to Graph Tables
 
@@ -27,12 +28,21 @@
   : Get Monosaccharide Types
 - [`get_structure_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_graphs.md)
   : Access Individual Glycan Structures
+- [`has_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/has_floating_parts.md)
+  : Detect Floating Glycan Parts
 - [`has_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/has_linkages.md)
   : Determine if a Glycan Structure has Linkages
 - [`structure_nodes()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_edges()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+  [`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   : Convert Glycan Structures to Graph Tables
+- [`structure_floating_candidates()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_floating_candidates.md)
+  : List Candidate Attachments for Floating Parts
+- [`structure_component_membership()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_component_membership.md)
+  : Identify Main and Floating Structure Components
+- [`structure_candidate_edges()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_candidate_edges.md)
+  : List Potential Virtual Edges for Floating Parts
 - [`structure_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_to_iupac.md)
   : Convert Glycan Structure to IUPAC-like Sequence
 - [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md)
@@ -59,8 +69,12 @@ structure vectors.
 
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md)
   : Convert Monosaccharides to Generic Type
+- [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md)
+  : Enumerate Floating-Part Localizations
 - [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md)
   : Fill Anomer Positions
+- [`localize_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/localize_floating_parts.md)
+  : Localize Floating Glycan Parts
 - [`remove_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_linkages.md)
   : Remove All Linkages from a Glycan
 - [`remove_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_substituents.md)

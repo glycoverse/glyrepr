@@ -1,7 +1,12 @@
 # Access Individual Glycan Structures
 
 Extract individual glycan structure graphs from a glycan structure
-vector.
+vector. A structure with floating parts is returned as one annotated,
+weakly disconnected `igraph`: its main tree and floating components
+share the graph, and the `floating_parts` graph attribute records each
+component's node indices, virtual attachment, and candidate parents. See
+[`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+for the metadata schema.
 
 ## Usage
 
@@ -19,7 +24,8 @@ get_structure_graphs(x, return_list = NULL)
 
   If `TRUE`, always returns a list. If `FALSE` and `x` has a length of
   1, return the igraph object directly. If not provided (default),
-  `FALSE` when `x` has a length of 1 and `TRUE` otherwise.
+  `FALSE` when `x` has a length of 1 and `TRUE` otherwise, including for
+  an empty vector.
 
 ## Value
 
@@ -32,28 +38,28 @@ parameter).
 structures <- c(o_glycan_core_1(), n_glycan_core())
 get_structure_graphs(structures)
 #> [[1]]
-#> IGRAPH 4542842 DN-- 2 1 -- 
+#> IGRAPH 0c377d4 DN-- 2 1 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 4542842 (vertex names):
+#> + edge from 0c377d4 (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH a9994ee DN-- 5 4 -- 
+#> IGRAPH 977c231 DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from a9994ee (vertex names):
+#> + edges from 977c231 (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 #> 
 get_structure_graphs(structures)
 #> [[1]]
-#> IGRAPH 4542842 DN-- 2 1 -- 
+#> IGRAPH 0c377d4 DN-- 2 1 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 4542842 (vertex names):
+#> + edge from 0c377d4 (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH a9994ee DN-- 5 4 -- 
+#> IGRAPH 977c231 DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from a9994ee (vertex names):
+#> + edges from 977c231 (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 #> 
 ```

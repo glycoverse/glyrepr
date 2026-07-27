@@ -72,6 +72,20 @@ produce an error.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A glyrepr_structure object.</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Character input supports floating-part blocks before the main
+IUPAC-condensed structure. <code>{Neu5Ac(a2-3)}&lt;main&gt;</code> allows every feasible
+main-tree node as a candidate parent, while
+<code>{Neu5Ac(a2-3)|1,4}&lt;main&gt;</code> restricts the candidates to main-tree nodes 1 and
+4. Parent indices follow residue order in the supplied main sequence and are
+remapped to canonical IUPAC order in the result. The <code>|&lt;parents&gt;</code> suffix is a
+<code>glyrepr</code> extension to curly-brace IUPAC notation. A singleton candidate set
+is accepted as input but fully localizes the attachment, so
+<code>{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-</code> canonicalizes to the ordinary structure
+<code>Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-</code>. An omitted parent list behaves the same way
+when the main tree contains only one node.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -111,6 +125,18 @@ produce an error.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-2</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 2</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Parse a floating residue with two candidate parents</span></span></span>
+<span class="r-in"><span><span class="va">floating_iupac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"{Neu5Ac(a2-3)|1,4}"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"Gal(b1-4)GlcNAc(b1-2)Man(a1-3)"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">as_glycan_structure</span><span class="op">(</span><span class="va">floating_iupac</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[1]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] {<span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">a2-3</span>)|1,4}<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Preserve valid elements while replacing an invalid element with NA</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_structure</span><span class="op">(</span></span></span>

@@ -441,15 +441,15 @@ access the underlying `igraph` objects using
 
 get_structure_graphs(strucs)
 #> [[1]]
-#> IGRAPH 11053f5 DN-- 2 1 -- 
+#> IGRAPH 98e19d6 DN-- 2 1 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 11053f5 (vertex names):
+#> + edge from 98e19d6 (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 402197a DN-- 3 2 -- 
+#> IGRAPH 8ed323d DN-- 3 2 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 402197a (vertex names):
+#> + edges from 8ed323d (vertex names):
 #> [1] 3->1 3->2
 ```
 
@@ -513,6 +513,10 @@ structures:
   is missing.
 - **Basic**: generic monosaccharides, with linkage information treated
   as missing.
+
+Floating parts do not change these definitions. Their attachment linkage
+is assessed like any other linkage, while uncertainty about the
+candidate parent is independent of the structure level.
 
 Structure levels are defined at the vector level, so one glycan
 structure vector has one level.

@@ -1,17 +1,40 @@
 # Convert Glycan Structures to Graph Tables
 
-`structure_nodes()` and `structure_edges()` convert a glycan structure
-vector to node and edge tibbles. `structure_from_tibbles()` rebuilds a
-`glyrepr_structure` vector from those tibbles and a vector of
+`structure_nodes()`, `structure_edges()`, and
+`structure_floating_parts()` convert a glycan structure vector to
+normalized graph tables. `structure_from_tibbles()` rebuilds a
+`glyrepr_structure` vector from those tables and a vector of
 reducing-end anomers.
 
 The `glycan_id` column is the integer position of each glycan in the
 input vector. Duplicate structures are expanded to their original vector
 positions. Missing structures have no node or edge rows and are
-reconstructed from missing values in `anomers`. If `x` is named, the
-node and edge tibbles also contain a `glycan_name` column.
+reconstructed from missing values in `anomers`. If `x` is named, all
+three tibbles also contain a `glycan_name` column.
 `structure_from_tibbles()` uses `glycan_name` as output names when that
 column is present.
+
+`structure_nodes()$node_id` follows residue order in the complete
+canonical IUPAC-condensed string. For a floating structure, nodes from
+each brace-enclosed floating part therefore precede nodes from the main
+tree.
+
+In `structure_floating_parts()`, `root_node` and every integer in the
+`nodes` and `parents` list-columns refer to `structure_nodes()$node_id`
+for the same glycan. `nodes` contains every node in the floating
+component. An empty `parents` vector means all feasible main-tree nodes
+are candidates. The `linkage` column describes the virtual attachment to
+the main tree; this attachment is intentionally absent from
+`structure_edges()`. During reconstruction, a row with exactly one
+effective candidate parent is normalized to an ordinary edge and is
+therefore absent from the resulting `structure_floating_parts()` table.
+
+Parent indices written after `|` in an IUPAC-condensed floating part are
+local to the main tree. `structure_floating_parts()` translates those
+values to global `structure_nodes()$node_id` values, so they can differ
+when floating nodes precede the main tree. `structure_from_tibbles()`
+expects these global node IDs and translates them back during
+serialization.
 
 ## Usage
 
@@ -20,7 +43,9 @@ structure_nodes(x)
 
 structure_edges(x)
 
-structure_from_tibbles(nodes, edges, anomers)
+structure_floating_parts(x)
+
+structure_from_tibbles(nodes, edges, anomers, floating_parts = NULL)
 ```
 
 ## Arguments
@@ -43,6 +68,11 @@ structure_from_tibbles(nodes, edges, anomers)
 
   A character vector of reducing-end anomers, one per glycan.
 
+- floating_parts:
+
+  A data frame returned by `structure_floating_parts()`, or `NULL` when
+  no floating parts are present.
+
 ## Value
 
 - `structure_nodes()` returns a tibble with columns `glycan_id`,
@@ -50,6 +80,10 @@ structure_from_tibbles(nodes, edges, anomers)
 
 - `structure_edges()` returns a tibble with columns `glycan_id`,
   `edge_id`, `from_node`, `to_node`, and `linkage`.
+
+- `structure_floating_parts()` returns a tibble with columns
+  `glycan_id`, `part_id`, `root_node`, the list-column `nodes`,
+  `linkage`, and the list-column `parents`.
 
 - `structure_from_tibbles()` returns a `glyrepr_structure` vector.
 
@@ -63,5 +97,19 @@ structure_from_tibbles(nodes, edges, get_anomer(glycans))
 #> <glycan_structure[2]>
 #> [1] Gal(b1-3)GalNAc(a1-
 #> [2] Gal(b1-3)GalNAc(a1-
+#> # Unique structures: 1
+
+floating <- as_glycan_structure(
+  "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
+)
+floating_parts <- structure_floating_parts(floating)
+structure_from_tibbles(
+  structure_nodes(floating),
+  structure_edges(floating),
+  get_anomer(floating),
+  floating_parts
+)
+#> <glycan_structure[1]>
+#> [1] {Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-
 #> # Unique structures: 1
 ```

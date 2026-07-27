@@ -27,7 +27,8 @@ has_linkages(glycan, strict = FALSE)
 
   - If `TRUE`, a glycan is considered to have linkages only if all
     linkages are fully determined (no "?" or multiple positions in the
-    linkage).
+    linkage). Linkages include both graph edges and the virtual
+    attachment linkage of each floating part.
 
 ## Value
 

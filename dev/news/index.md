@@ -2,6 +2,48 @@
 
 ## glyrepr (development version)
 
+- [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+  now supports floating glycan substructures with optional
+  candidate-parent indices through `{<floating>}` and
+  `{<floating>|<parents>}` syntax, together with floating-aware graph
+  validation, canonicalization, transformations, and graph-table
+  conversion. Singleton parent sets are normalized to ordinary graph
+  edges. ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
+- Floating structure nodes now follow the complete IUPAC-condensed
+  sequence, including brace-prefixed components; tabular parent IDs are
+  global node IDs while serialized parent indices remain local to the
+  main tree. ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
+- Canonical `floating_parts` graph metadata now stores a `nodes` vector
+  containing every node in each floating component, and internal
+  consumers use it instead of rediscovering component membership; legacy
+  graph inputs without this field remain supported.
+  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
+- [`structure_floating_candidates()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_floating_candidates.md)
+  returns one row per potential floating-part attachment and expands
+  unrestricted parent domains to every original main-tree node.
+  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
+- [`structure_component_membership()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_component_membership.md)
+  identifies main-tree and floating-part nodes without requiring callers
+  to inspect private graph attributes.
+  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
+- [`structure_candidate_edges()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_candidate_edges.md)
+  exposes every potential floating-part attachment as a virtual edge for
+  drawing and constraint-aware graph operations.
+  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
+- [`localize_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/localize_floating_parts.md)
+  attaches caller-selected floating parts, validates candidate domains
+  and simultaneous linkage-slot conflicts, and remaps remaining
+  candidate indices after canonicalization.
+  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
+- [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md)
+  returns every conflict-free, canonical floating-part localization with
+  assignment provenance and a conservative per-input variant bound.
+  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
+- Structure-level classification now depends only on residue specificity
+  and linkage completeness: floating candidate-parent metadata does not
+  itself make a structure partial, and floating structures can be
+  reduced to topological resolution.
+  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph.md)
   and structure parsing are faster by checking linkage positions in
   bulk. ([\#79](https://github.com/glycoverse/glyrepr/issues/79))

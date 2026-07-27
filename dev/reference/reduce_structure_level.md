@@ -52,6 +52,9 @@ The logic is as follows:
   [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md)
   to convert all monosaccharides to generic.
 
+Both reductions preserve floating components and their candidate-parent
+metadata.
+
 ## See also
 
 [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md)

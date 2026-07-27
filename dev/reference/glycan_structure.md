@@ -38,8 +38,12 @@ Each glycan structure must satisfy the following constraints:
 
 ### Graph Structure Requirements
 
-- Must be a directed graph with an outward tree structure (reducing end
-  as root)
+- An ordinary structure must be a directed outward tree (reducing end as
+  root).
+
+- A structure with floating parts must be one annotated forest
+  containing exactly one main outward tree and one outward tree per
+  floating part.
 
 - Must have a graph attribute `anomer` in the format "a1" or "b1"
 
@@ -81,14 +85,49 @@ Each glycan structure must satisfy the following constraints:
 
   - NA values are not allowed
 
+### Floating Parts
+
+Floating parts are disconnected substructures whose attachment to the
+main tree is not fully localized. They are declared by the
+`floating_parts` graph attribute, a list with one entry per floating
+component. Each entry contains:
+
+- `root`: the integer vertex index of the floating component root.
+
+- `nodes`: all integer vertex indices in the floating component, ordered
+  as the component appears in the complete IUPAC-condensed sequence.
+
+- `linkage`: the virtual linkage from that root to the main tree.
+
+- `parents`: integer vertex indices in the main tree. An empty integer
+  vector means that all feasible main-tree nodes are candidates.
+
+Canonical graphs always contain `nodes`. For backward compatibility,
+input graphs may omit it; `glycan_structure()` derives the component
+membership before validation and stores `nodes` in the canonical result.
+
+During canonicalization, a floating part with exactly one candidate
+parent is attached to that parent as an ordinary graph edge. This
+includes an empty `parents` vector when the main tree has only one node.
+Only unresolved attachments retain floating metadata, where the virtual
+attachment is metadata rather than an edge and contributes to the
+canonical structure key.
+
 ## Node and Edge Order
 
-The indices of vertices and linkages in a glycan correspond directly to
-their order in the IUPAC-condensed string, which is printed when you
-print a `glycan_structure()`. For example, for the glycan
+For an ordinary tree, the indices of vertices and linkages correspond
+directly to their order in the printed IUPAC-condensed string. For
+example, for the glycan
 `Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-`, the vertices are
 "Man", "Man", "Man", "GlcNAc", "GlcNAc", and the linkages are "a1-3",
 "a1-6", "b1-4", "b1-4".
+
+For a floating structure, floating-component vertices and edges precede
+the main tree, exactly as their brace-enclosed components precede the
+main glycan in the complete IUPAC-condensed string. Parent indices
+written inside braces are local to the main tree, while
+`floating_parts$parents` stores the corresponding global graph vertex
+indices. A virtual floating attachment is not an edge.
 
 ## NA Support
 
@@ -154,7 +193,17 @@ print(complex_struct)
 #> [1] Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-
 #> # Unique structures: 1
 
-# Example 4: Check if object is a glycan structure
+# Example 4: Parse a floating part with explicit candidate parents
+floating <- as_glycan_structure(
+  "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
+)
+structure_floating_parts(floating)
+#> # A tibble: 1 × 6
+#>   glycan_id part_id root_node nodes     linkage parents  
+#>       <int>   <int>     <int> <list>    <chr>   <list>   
+#> 1         1       1         1 <int [1]> a2-3    <int [2]>
+
+# Example 5: Check if object is a glycan structure
 is_glycan_structure(simple_struct)  # TRUE
 #> [1] TRUE
 is_glycan_structure(graph)          # FALSE

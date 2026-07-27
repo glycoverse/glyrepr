@@ -37,7 +37,8 @@ spmap_structure(.l, .f, ...)
   A function that takes an igraph object (from first element of `.l`)
   and values from other elements, returning a result. Can be a function,
   purrr-style lambda (`~ .x + .y + .z`), or a character string naming a
-  function.
+  function. A structure with floating parts is passed as one annotated,
+  weakly disconnected graph.
 
 - ...:
 
@@ -62,6 +63,11 @@ spmap_structure(.l, .f, ...)
 These functions only compute `.f` once for each unique combination of
 structure and corresponding values from other vectors, then map the
 results back to the original vector positions.
+
+`spmap_structure()` reuses unchanged graphs and validates and
+canonicalizes changed graphs returned by `.f`. A callback that changes
+vertex identities or components of a floating structure must also update
+its `floating_parts` metadata.
 
 **NA Handling:** NA elements in the first argument (glycan structure
 vector) are preserved in the output.

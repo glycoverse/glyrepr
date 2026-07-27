@@ -29,6 +29,11 @@ vector with anomer positions added where missing.
 For anomer positions that are already specified in the input structures,
 this function does not modify them.
 
+For a structure with floating parts, the reducing-end position is
+inferred from the root of the main tree. Positions in virtual
+floating-part attachment linkages are inferred from each floating part's
+root residue.
+
 ## Examples
 
 ``` r

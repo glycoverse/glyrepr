@@ -37,6 +37,22 @@ guarantee all glycan graph and `glyrepr_structure` invariants. Prefer
 for ordinary construction. Incorrect use of these functions can create
 invalid structure vectors that fail in later operations.
 
+## Floating graph schema
+
+A floating structure is one weakly disconnected graph with exactly one
+main outward tree and one outward tree per floating part. Its
+`floating_parts` graph attribute is a list of entries with integer
+`root`, integer `nodes`, character `linkage`, and integer `parents`
+fields. `nodes` contains every vertex in that floating component.
+`parents = integer()` means all feasible main-tree nodes. Legacy input
+graphs may omit `nodes`; canonical output graphs always contain it.
+During canonicalization, a part with exactly one effective candidate
+parent is converted to an ordinary graph edge and its floating metadata
+is removed. Otherwise, the virtual attachment linkage is not a graph
+edge. See
+[`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+for the complete contract.
+
 ## Name-preserving manual construction
 
 The five low-level functions can reproduce strict graph-based

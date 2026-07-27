@@ -21,7 +21,8 @@ smap_unique(.x, .f, ...)
 
   A function that takes an igraph object and returns a result. Can be a
   function, purrr-style lambda (`~ .x$attr`), or a character string
-  naming a function.
+  naming a function. A structure with floating parts is passed as one
+  annotated, weakly disconnected graph.
 
 - ...:
 

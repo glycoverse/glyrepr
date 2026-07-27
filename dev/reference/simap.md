@@ -34,7 +34,9 @@ simap_structure(.x, .f, ...)
 
   A function that takes an igraph object (from `.x`) and an index/name,
   returning a result. Can be a function, purrr-style lambda
-  (`~ paste(.x, .y)`), or a character string naming a function.
+  (`~ paste(.x, .y)`), or a character string naming a function. A
+  structure with floating parts is passed as one annotated, weakly
+  disconnected graph.
 
 - ...:
 
@@ -66,6 +68,11 @@ These functions only compute `.f` once for each unique combination of
 structure and corresponding index/name, then map the results back to the
 original vector positions. This is much more efficient than applying
 `.f` to each element individually when there are duplicate structures.
+
+`simap_structure()` reuses unchanged graphs and validates and
+canonicalizes changed graphs returned by `.f`. A callback that changes
+vertex identities or components of a floating structure must also update
+its `floating_parts` metadata.
 
 **IMPORTANT PERFORMANCE NOTE:** Due to the inclusion of position
 indices, `simap` functions have **O(total_structures)** time complexity
