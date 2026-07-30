@@ -80,9 +80,11 @@ localize_floating_parts <- function(x, assignments) {
 #'
 #' Candidate combinations are validated simultaneously, including linkages
 #' with multiple possible acceptor positions such as `"a2-3/6"`. Variants are
-#' canonicalized and then deduplicated by structure; when multiple assignments
-#' produce the same canonical structure, the first assignment in deterministic
-#' candidate order is retained.
+#' canonicalized and, by default, deduplicated by structure. When multiple
+#' assignments produce the same canonical structure, the first assignment in
+#' deterministic candidate order is retained. Set `deduplicate = FALSE` to
+#' retain every valid assignment and its original-node provenance, including
+#' assignments that produce identical canonical structures.
 #'
 #' `max_variants` is a conservative per-input safeguard. It limits the raw
 #' Cartesian product before conflict filtering or canonical deduplication, so
@@ -96,11 +98,15 @@ localize_floating_parts <- function(x, assignments) {
 #' @param x A glycan structure vector.
 #' @param max_variants A positive integer giving the maximum raw candidate
 #'   combinations allowed for each input structure.
+#' @param deduplicate A logical value. If `TRUE` (default), retain only the
+#'   first assignment for each canonical structure. If `FALSE`, retain every
+#'   conflict-free assignment.
 #'
 #' @returns A tibble with columns:
 #'
 #' - `input_id`: the integer position in `x`.
-#' - `variant_id`: the sequential identifier after canonical deduplication.
+#' - `variant_id`: the sequential identifier after optional canonical
+#'   deduplication.
 #' - `structure`: a `glyrepr_structure` vector column containing fully
 #'   localized variants.
 #' - `assignments`: a list-column of tibbles with `glycan_id`, `part_id`, and
@@ -115,10 +121,12 @@ localize_floating_parts <- function(x, assignments) {
 #' @export
 enumerate_floating_localizations <- function(
   x,
-  max_variants = 256
+  max_variants = 256,
+  deduplicate = TRUE
 ) {
   checkmate::assert_class(x, "glyrepr_structure")
   checkmate::assert_count(max_variants, positive = TRUE)
+  checkmate::assert_flag(deduplicate)
   if (max_variants > .Machine$integer.max) {
     cli::cli_abort(
       "{.arg max_variants} must not exceed {.val {(.Machine$integer.max)}}."
@@ -141,7 +149,8 @@ enumerate_floating_localizations <- function(
       enumerate_floating_localizations_one(
         x[input_id],
         input_id,
-        max_variants
+        max_variants,
+        deduplicate
       )
     }
   )
@@ -167,12 +176,14 @@ empty_floating_assignments <- function() {
 #' @param x A length-one glycan structure vector.
 #' @param input_id Original input position.
 #' @param max_variants Maximum raw candidate combinations.
+#' @param deduplicate Whether to deduplicate canonical structures.
 #' @returns A localization result tibble for one input.
 #' @noRd
 enumerate_floating_localizations_one <- function(
   x,
   input_id,
-  max_variants
+  max_variants,
+  deduplicate
 ) {
   if (is.na(x)) {
     return(single_identity_localization(x, input_id))
@@ -257,12 +268,16 @@ enumerate_floating_localizations_one <- function(
   }
 
   iupacs <- purrr::map_chr(localized_graphs, graph_to_iupac)
-  unique_variants <- !duplicated(iupacs)
-  iupacs <- iupacs[unique_variants]
-  localized_graphs <- localized_graphs[unique_variants]
-  assignment_tables <- assignment_tables[unique_variants]
-  names(localized_graphs) <- iupacs
-  structures <- new_glycan_structure(iupacs, localized_graphs)
+  if (deduplicate) {
+    unique_variants <- !duplicated(iupacs)
+    iupacs <- iupacs[unique_variants]
+    localized_graphs <- localized_graphs[unique_variants]
+    assignment_tables <- assignment_tables[unique_variants]
+  }
+  unique_graphs <- !duplicated(iupacs)
+  structure_graphs <- localized_graphs[unique_graphs]
+  names(structure_graphs) <- iupacs[unique_graphs]
+  structures <- new_glycan_structure(iupacs, structure_graphs)
   if (!is.null(names(x))) {
     names(structures) <- rep(names(x), length(structures))
   }

@@ -288,6 +288,30 @@ test_that("enumerate_floating_localizations deduplicates canonical variants", {
   expect_identical(variants$assignments[[1]]$parent_node, 2L)
 })
 
+test_that("enumerate_floating_localizations can retain assignment provenance", {
+  glycan <- as_glycan_structure(
+    paste0(
+      "{Neu5Ac(a2-3)|1,2}",
+      "Gal(??-?)[Gal(??-?)]GlcNAc(??-"
+    )
+  )
+
+  variants <- enumerate_floating_localizations(
+    glycan,
+    deduplicate = FALSE
+  )
+
+  expect_identical(variants$variant_id, c(1L, 2L))
+  expect_identical(
+    as.character(variants$structure),
+    rep(as.character(variants$structure[[1]]), 2L)
+  )
+  expect_identical(
+    purrr::map_int(variants$assignments, ~ .x$parent_node),
+    c(2L, 3L)
+  )
+})
+
 test_that("enumerate_floating_localizations retains every input position", {
   glycans <- as_glycan_structure(c(
     missing = NA,
@@ -339,6 +363,10 @@ test_that("enumerate_floating_localizations enforces a conservative bound", {
   )
   expect_error(
     enumerate_floating_localizations(glycan, max_variants = 0),
+    class = "error"
+  )
+  expect_error(
+    enumerate_floating_localizations(glycan, deduplicate = NA),
     class = "error"
   )
 })

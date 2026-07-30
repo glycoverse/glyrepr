@@ -4,19 +4,24 @@
 \alias{enumerate_floating_localizations}
 \title{Enumerate Floating-Part Localizations}
 \usage{
-enumerate_floating_localizations(x, max_variants = 256)
+enumerate_floating_localizations(x, max_variants = 256, deduplicate = TRUE)
 }
 \arguments{
 \item{x}{A glycan structure vector.}
 
 \item{max_variants}{A positive integer giving the maximum raw candidate
 combinations allowed for each input structure.}
+
+\item{deduplicate}{A logical value. If \code{TRUE} (default), retain only the
+first assignment for each canonical structure. If \code{FALSE}, retain every
+conflict-free assignment.}
 }
 \value{
 A tibble with columns:
 \itemize{
 \item \code{input_id}: the integer position in \code{x}.
-\item \code{variant_id}: the sequential identifier after canonical deduplication.
+\item \code{variant_id}: the sequential identifier after optional canonical
+deduplication.
 \item \code{structure}: a \code{glyrepr_structure} vector column containing fully
 localized variants.
 \item \code{assignments}: a list-column of tibbles with \code{glycan_id}, \code{part_id}, and
@@ -30,9 +35,11 @@ Each variant records the complete assignment that produced it.
 
 Candidate combinations are validated simultaneously, including linkages
 with multiple possible acceptor positions such as \code{"a2-3/6"}. Variants are
-canonicalized and then deduplicated by structure; when multiple assignments
-produce the same canonical structure, the first assignment in deterministic
-candidate order is retained.
+canonicalized and, by default, deduplicated by structure. When multiple
+assignments produce the same canonical structure, the first assignment in
+deterministic candidate order is retained. Set \code{deduplicate = FALSE} to
+retain every valid assignment and its original-node provenance, including
+assignments that produce identical canonical structures.
 
 \code{max_variants} is a conservative per-input safeguard. It limits the raw
 Cartesian product before conflict filtering or canonical deduplication, so
