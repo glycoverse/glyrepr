@@ -41,6 +41,11 @@
   `deduplicate = FALSE` retains distinct original-node assignments that
   canonicalize to the same structure.
   ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
+- [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md)
+  returns every conflict-free graph localization without canonicalizing
+  or renumbering vertices, so downstream graph algorithms can retain
+  original node IDs.
+  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - Structure-level classification now depends only on residue specificity
   and linkage completeness: floating candidate-parent metadata does not
   itself make a structure partial, and floating structures can be

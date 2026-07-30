@@ -60,6 +60,8 @@ structure vectors.
   : Canonicalize a Glycan Graph
 - [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph_vector.md)
   : Validate Compatibility Across Glycan Graphs
+- [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md)
+  : Enumerate Floating-Part Graph Localizations
 - [`graph_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/graph_to_iupac.md)
   : Generate IUPAC-Condensed from a Glycan Graph
 - [`new_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/new_glycan_structure.md)
