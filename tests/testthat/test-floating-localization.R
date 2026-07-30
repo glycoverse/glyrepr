@@ -312,6 +312,119 @@ test_that("enumerate_floating_localizations can retain assignment provenance", {
   )
 })
 
+test_that("graph localizations preserve original vertex IDs", {
+  glycan <- as_glycan_structure(
+    paste0(
+      "{Neu5Ac(a2-3)|1,2}",
+      "Gal(??-?)[Gal(??-?)]GlcNAc(??-"
+    )
+  )
+  graph <- get_structure_graphs(glycan, return_list = FALSE)
+  original_edges <- igraph::as_edgelist(graph, names = FALSE)
+
+  variants <- enumerate_floating_graph_localizations(graph)
+
+  expect_s3_class(variants, "tbl_df")
+  expect_named(variants, c("variant_id", "graph", "assignments"))
+  expect_identical(variants$variant_id, c(1L, 2L))
+  expect_identical(
+    purrr::map_int(variants$assignments, ~ .x$parent_node),
+    c(2L, 3L)
+  )
+  expect_identical(
+    purrr::map_lgl(variants$graph, igraph::is_igraph),
+    c(TRUE, TRUE)
+  )
+  expect_identical(
+    purrr::map_lgl(
+      variants$graph,
+      ~ identical(igraph::V(.x)$name, igraph::V(graph)$name)
+    ),
+    c(TRUE, TRUE)
+  )
+  expect_identical(
+    purrr::map_lgl(
+      variants$graph,
+      ~ identical(
+        igraph::vertex_attr(.x),
+        igraph::vertex_attr(graph)
+      )
+    ),
+    c(TRUE, TRUE)
+  )
+  expect_identical(
+    purrr::map_lgl(
+      variants$graph,
+      ~ identical(
+        igraph::as_edgelist(.x, names = FALSE)[
+          seq_len(nrow(original_edges)),
+          ,
+          drop = FALSE
+        ],
+        original_edges
+      )
+    ),
+    c(TRUE, TRUE)
+  )
+  expect_identical(
+    purrr::map2(
+      variants$graph,
+      variants$assignments,
+      ~ unname(igraph::as_edgelist(.x, names = FALSE)[
+        igraph::ecount(.x),
+        ,
+        drop = TRUE
+      ])
+    ),
+    purrr::map(
+      variants$assignments,
+      ~ as.numeric(c(.x$parent_node, 1L))
+    )
+  )
+  expect_identical(
+    purrr::map_lgl(
+      variants$graph,
+      ~ !("floating_parts" %in% igraph::graph_attr_names(.x))
+    ),
+    c(TRUE, TRUE)
+  )
+})
+
+test_that("graph localization returns an ordinary graph unchanged", {
+  graph <- get_structure_graphs(
+    as_glycan_structure("Gal(b1-4)GlcNAc(b1-"),
+    return_list = FALSE
+  )
+
+  variants <- enumerate_floating_graph_localizations(graph)
+
+  expect_identical(variants$variant_id, 1L)
+  expect_identical(variants$graph, list(graph))
+  expect_identical(variants$assignments, list(empty_floating_assignments()))
+})
+
+test_that("graph localization validates inputs and its conservative bound", {
+  graph <- get_structure_graphs(
+    as_glycan_structure(
+      paste0(
+        "{Fuc(a1-3)|1,2}",
+        "{Neu5Ac(a2-3)|1,2}",
+        "Gal(b1-4)GalNAc(a1-"
+      )
+    ),
+    return_list = FALSE
+  )
+
+  expect_snapshot(
+    enumerate_floating_graph_localizations(graph, max_variants = 3),
+    error = TRUE
+  )
+  expect_error(
+    enumerate_floating_graph_localizations("not a graph"),
+    class = "error"
+  )
+})
+
 test_that("enumerate_floating_localizations retains every input position", {
   glycans <- as_glycan_structure(c(
     missing = NA,

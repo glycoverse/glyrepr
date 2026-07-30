@@ -78,6 +78,16 @@
       ! Floating part has impossible explicit parent metadata.
       x Floating part 1 cannot use explicit parent node 3 because every acceptor position declared by linkage "a2-3" is already occupied.
 
+# graph localization validates inputs and its conservative bound
+
+    Code
+      enumerate_floating_graph_localizations(graph, max_variants = 3)
+    Condition
+      Error in `enumerate_floating_graph_localizations()`:
+      ! Floating localization count exceeds `max_variants`.
+      x Input 1 has 4 raw candidate combinations; the limit is 3.
+      i Increase `max_variants` to enumerate this input.
+
 # enumerate_floating_localizations enforces a conservative bound
 
     Code

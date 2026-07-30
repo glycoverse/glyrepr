@@ -39,6 +39,7 @@ reference:
   - validate_glycan_graph
   - canonicalize_glycan_graph
   - validate_glycan_graph_vector
+  - enumerate_floating_graph_localizations
   - graph_to_iupac
   - new_glycan_structure
 - title: "Glycan Composition and Structure Manipulation"

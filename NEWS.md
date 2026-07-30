@@ -8,6 +8,7 @@
 * `structure_candidate_edges()` exposes every potential floating-part attachment as a virtual edge for drawing and constraint-aware graph operations. (#80)
 * `localize_floating_parts()` attaches caller-selected floating parts, validates candidate domains and simultaneous linkage-slot conflicts, and remaps remaining candidate indices after canonicalization. (#80)
 * `enumerate_floating_localizations()` returns every conflict-free, canonical floating-part localization with assignment provenance and a conservative per-input variant bound; `deduplicate = FALSE` retains distinct original-node assignments that canonicalize to the same structure. (#80)
+* `enumerate_floating_graph_localizations()` returns every conflict-free graph localization without canonicalizing or renumbering vertices, so downstream graph algorithms can retain original node IDs. (#80)
 * Structure-level classification now depends only on residue specificity and linkage completeness: floating candidate-parent metadata does not itself make a structure partial, and floating structures can be reduced to topological resolution. (#80)
 * `validate_glycan_graph()` and structure parsing are faster by checking linkage positions in bulk. (#79)
 * `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)

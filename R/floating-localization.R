@@ -71,6 +71,73 @@ localize_floating_parts <- function(x, assignments) {
 }
 
 
+#' Enumerate Floating-Part Graph Localizations
+#'
+#' @description
+#' `enumerate_floating_graph_localizations()` generates every conflict-free,
+#' fully localized graph permitted by the candidate-parent domains in `graph`.
+#' It is the graph-level counterpart to [enumerate_floating_localizations()].
+#'
+#' The returned graphs are validated but are not canonicalized. Adding the
+#' selected attachment edges does not reorder vertices, so every vertex keeps
+#' the same integer ID, name, and attributes as in `graph`. Assignment
+#' `parent_node` values therefore refer directly to vertex IDs in both the
+#' input and localized graphs.
+#'
+#' Every conflict-free assignment is retained, even when multiple assignments
+#' would produce the same canonical IUPAC-condensed structure. A graph without
+#' floating parts produces one identity row with an empty assignment table.
+#'
+#' `max_variants` is a conservative safeguard. It limits the raw Cartesian
+#' product before conflict filtering, so the function may ask for a higher
+#' bound even when fewer variants would ultimately remain.
+#'
+#' @param graph A valid glycan `igraph`, optionally containing unresolved
+#'   floating parts.
+#' @param max_variants A positive integer giving the maximum raw candidate
+#'   combinations allowed.
+#'
+#' @returns A tibble with columns:
+#'
+#' - `variant_id`: the sequential localization identifier.
+#' - `graph`: a list-column of fully localized `igraph` objects whose vertex
+#'   IDs are identical to those in `graph`.
+#' - `assignments`: a list-column of tibbles with `glycan_id`, `part_id`, and
+#'   `parent_node`. `glycan_id` is always `1L`.
+#'
+#' @examples
+#' glycan <- as_glycan_structure(
+#'   "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#' )
+#' graph <- get_structure_graphs(glycan, return_list = FALSE)
+#' localizations <- enumerate_floating_graph_localizations(graph)
+#' localizations$graph
+#'
+#' @template low-level-structure-pipeline
+#'
+#' @seealso [enumerate_floating_localizations()]
+#' @export
+enumerate_floating_graph_localizations <- function(
+  graph,
+  max_variants = 256
+) {
+  error_call <- rlang::current_call()
+  graph <- validate_glycan_graph(graph)
+  max_variants <- validate_floating_max_variants(max_variants)
+
+  variants <- enumerate_floating_graph_localizations_one(
+    graph,
+    max_variants,
+    error_call = error_call
+  )
+  tibble::tibble(
+    variant_id = seq_along(variants$graphs),
+    graph = variants$graphs,
+    assignments = variants$assignments
+  )
+}
+
+
 #' Enumerate Floating-Part Localizations
 #'
 #' @description
@@ -125,14 +192,8 @@ enumerate_floating_localizations <- function(
   deduplicate = TRUE
 ) {
   checkmate::assert_class(x, "glyrepr_structure")
-  checkmate::assert_count(max_variants, positive = TRUE)
+  max_variants <- validate_floating_max_variants(max_variants)
   checkmate::assert_flag(deduplicate)
-  if (max_variants > .Machine$integer.max) {
-    cli::cli_abort(
-      "{.arg max_variants} must not exceed {.val {(.Machine$integer.max)}}."
-    )
-  }
-  max_variants <- as.integer(max_variants)
 
   if (length(x) == 0) {
     return(tibble::tibble(
@@ -195,6 +256,82 @@ enumerate_floating_localizations_one <- function(
     return(single_identity_localization(x, input_id))
   }
 
+  error_call <- rlang::current_call()
+  variants <- enumerate_floating_graph_localizations_one(
+    graph,
+    max_variants,
+    input_id,
+    error_call
+  )
+  localized_graphs <- purrr::map(
+    variants$graphs,
+    canonicalize_glycan_graph
+  )
+  assignment_tables <- variants$assignments
+
+  iupacs <- purrr::map_chr(localized_graphs, graph_to_iupac)
+  if (deduplicate) {
+    unique_variants <- !duplicated(iupacs)
+    iupacs <- iupacs[unique_variants]
+    localized_graphs <- localized_graphs[unique_variants]
+    assignment_tables <- assignment_tables[unique_variants]
+  }
+  unique_graphs <- !duplicated(iupacs)
+  structure_graphs <- localized_graphs[unique_graphs]
+  names(structure_graphs) <- iupacs[unique_graphs]
+  structures <- new_glycan_structure(iupacs, structure_graphs)
+  if (!is.null(names(x))) {
+    names(structures) <- rep(names(x), length(structures))
+  }
+
+  tibble::tibble(
+    input_id = rep(as.integer(input_id), length(structures)),
+    variant_id = seq_along(structures),
+    structure = structures,
+    assignments = assignment_tables
+  )
+}
+
+
+#' Validate the floating localization variant bound
+#'
+#' @param max_variants Maximum raw candidate combinations.
+#' @returns `max_variants` as an integer.
+#' @noRd
+validate_floating_max_variants <- function(max_variants) {
+  checkmate::assert_count(max_variants, positive = TRUE)
+  if (max_variants > .Machine$integer.max) {
+    cli::cli_abort(
+      "{.arg max_variants} must not exceed {.val {(.Machine$integer.max)}}."
+    )
+  }
+  as.integer(max_variants)
+}
+
+
+#' Enumerate graph localizations while preserving vertex IDs
+#'
+#' @param graph A validated glycan graph.
+#' @param max_variants Maximum raw candidate combinations.
+#' @param input_id Optional structure input position used in assignments and
+#'   diagnostics.
+#' @param error_call The call to report in localization errors.
+#' @returns A list with `graphs` and `assignments` elements.
+#' @noRd
+enumerate_floating_graph_localizations_one <- function(
+  graph,
+  max_variants,
+  input_id = 1L,
+  error_call = rlang::caller_call()
+) {
+  parts <- normalize_floating_parts(graph)
+  if (length(parts) == 0) {
+    return(list(
+      graphs = list(graph),
+      assignments = list(empty_floating_assignments())
+    ))
+  }
+
   main_vertices <- floating_main_vertices(graph, parts)
   candidate_domains <- purrr::map(parts, function(part) {
     if (length(part$parents) == 0) {
@@ -206,11 +343,14 @@ enumerate_floating_localizations_one <- function(
   combination_count <- prod(as.double(lengths(candidate_domains)))
   if (!is.finite(combination_count) || combination_count > max_variants) {
     combination_label <- format(combination_count, scientific = FALSE)
-    cli::cli_abort(c(
-      "Floating localization count exceeds {.arg max_variants}.",
-      "x" = "Input {.val {input_id}} has {combination_label} raw candidate combinations; the limit is {.val {max_variants}}.",
-      "i" = "Increase {.arg max_variants} to enumerate this input."
-    ))
+    cli::cli_abort(
+      c(
+        "Floating localization count exceeds {.arg max_variants}.",
+        "x" = "Input {.val {input_id}} has {combination_label} raw candidate combinations; the limit is {.val {max_variants}}.",
+        "i" = "Increase {.arg max_variants} to enumerate this input."
+      ),
+      call = error_call
+    )
   }
 
   names(candidate_domains) <- paste0(
@@ -256,38 +396,53 @@ enumerate_floating_localizations_one <- function(
 
     localized_graphs <- append(
       localized_graphs,
-      list(localize_floating_graph(graph, assignments, input_id))
+      list(localize_floating_graph_preserve_ids(
+        graph,
+        parts,
+        assignments
+      ))
     )
     assignment_tables <- append(assignment_tables, list(assignments))
   }
 
   if (length(localized_graphs) == 0) {
     cli::cli_abort(
-      "Input {.val {input_id}} has no conflict-free floating localization."
+      "Input {.val {input_id}} has no conflict-free floating localization.",
+      call = error_call
     )
   }
 
-  iupacs <- purrr::map_chr(localized_graphs, graph_to_iupac)
-  if (deduplicate) {
-    unique_variants <- !duplicated(iupacs)
-    iupacs <- iupacs[unique_variants]
-    localized_graphs <- localized_graphs[unique_variants]
-    assignment_tables <- assignment_tables[unique_variants]
-  }
-  unique_graphs <- !duplicated(iupacs)
-  structure_graphs <- localized_graphs[unique_graphs]
-  names(structure_graphs) <- iupacs[unique_graphs]
-  structures <- new_glycan_structure(iupacs, structure_graphs)
-  if (!is.null(names(x))) {
-    names(structures) <- rep(names(x), length(structures))
-  }
-
-  tibble::tibble(
-    input_id = rep(as.integer(input_id), length(structures)),
-    variant_id = seq_along(structures),
-    structure = structures,
+  list(
+    graphs = localized_graphs,
     assignments = assignment_tables
   )
+}
+
+
+#' Apply complete floating assignments without canonicalizing
+#'
+#' @param graph A validated floating glycan graph.
+#' @param parts Normalized floating-part metadata.
+#' @param assignments A complete compatible assignment table.
+#' @returns A validated graph with its original vertex order.
+#' @noRd
+localize_floating_graph_preserve_ids <- function(
+  graph,
+  parts,
+  assignments
+) {
+  for (row_id in seq_len(nrow(assignments))) {
+    part_id <- assignments$part_id[[row_id]]
+    part <- parts[[part_id]]
+    graph <- igraph::add_edges(
+      graph,
+      c(assignments$parent_node[[row_id]], part$root),
+      linkage = part$linkage
+    )
+  }
+
+  graph <- delete_floating_parts_attr(graph)
+  validate_glycan_graph(graph)
 }
 
 
