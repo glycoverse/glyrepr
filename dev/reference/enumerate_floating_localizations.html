@@ -4,9 +4,11 @@ fully localized structure permitted by the candidate-parent domains in x.
 Each variant records the complete assignment that produced it.
 Candidate combinations are validated simultaneously, including linkages
 with multiple possible acceptor positions such as "a2-3/6". Variants are
-canonicalized and then deduplicated by structure; when multiple assignments
-produce the same canonical structure, the first assignment in deterministic
-candidate order is retained.
+canonicalized and, by default, deduplicated by structure. When multiple
+assignments produce the same canonical structure, the first assignment in
+deterministic candidate order is retained. Set deduplicate = FALSE to
+retain every valid assignment and its original-node provenance, including
+assignments that produce identical canonical structures.
 max_variants is a conservative per-input safeguard. It limits the raw
 Cartesian product before conflict filtering or canonical deduplication, so
 the function may ask for a higher bound even when fewer variants would
@@ -18,9 +20,11 @@ fully localized structure permitted by the candidate-parent domains in x.
 Each variant records the complete assignment that produced it.
 Candidate combinations are validated simultaneously, including linkages
 with multiple possible acceptor positions such as "a2-3/6". Variants are
-canonicalized and then deduplicated by structure; when multiple assignments
-produce the same canonical structure, the first assignment in deterministic
-candidate order is retained.
+canonicalized and, by default, deduplicated by structure. When multiple
+assignments produce the same canonical structure, the first assignment in
+deterministic candidate order is retained. Set deduplicate = FALSE to
+retain every valid assignment and its original-node provenance, including
+assignments that produce identical canonical structures.
 max_variants is a conservative per-input safeguard. It limits the raw
 Cartesian product before conflict filtering or canonical deduplication, so
 the function may ask for a higher bound even when fewer variants would
@@ -73,9 +77,11 @@ fully localized structure permitted by the candidate-parent domains in <code>x</
 Each variant records the complete assignment that produced it.</p>
 <p>Candidate combinations are validated simultaneously, including linkages
 with multiple possible acceptor positions such as <code>"a2-3/6"</code>. Variants are
-canonicalized and then deduplicated by structure; when multiple assignments
-produce the same canonical structure, the first assignment in deterministic
-candidate order is retained.</p>
+canonicalized and, by default, deduplicated by structure. When multiple
+assignments produce the same canonical structure, the first assignment in
+deterministic candidate order is retained. Set <code>deduplicate = FALSE</code> to
+retain every valid assignment and its original-node provenance, including
+assignments that produce identical canonical structures.</p>
 <p><code>max_variants</code> is a conservative per-input safeguard. It limits the raw
 Cartesian product before conflict filtering or canonical deduplication, so
 the function may ask for a higher bound even when fewer variants would
@@ -87,7 +93,7 @@ table. Empty structure vectors produce a zero-row result.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">enumerate_floating_localizations</span><span class="op">(</span><span class="va">x</span>, max_variants <span class="op">=</span> <span class="fl">256</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">enumerate_floating_localizations</span><span class="op">(</span><span class="va">x</span>, max_variants <span class="op">=</span> <span class="fl">256</span>, deduplicate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -102,11 +108,18 @@ table. Empty structure vectors produce a zero-row result.</p>
 <dd><p>A positive integer giving the maximum raw candidate
 combinations allowed for each input structure.</p></dd>
 
+
+<dt id="arg-deduplicate">deduplicate<a class="anchor" aria-label="anchor" href="#arg-deduplicate"></a></dt>
+<dd><p>A logical value. If <code>TRUE</code> (default), retain only the
+first assignment for each canonical structure. If <code>FALSE</code>, retain every
+conflict-free assignment.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble with columns:</p><ul><li><p><code>input_id</code>: the integer position in <code>x</code>.</p></li>
-<li><p><code>variant_id</code>: the sequential identifier after canonical deduplication.</p></li>
+<li><p><code>variant_id</code>: the sequential identifier after optional canonical
+deduplication.</p></li>
 <li><p><code>structure</code>: a <code>glyrepr_structure</code> vector column containing fully
 localized variants.</p></li>
 <li><p><code>assignments</code>: a list-column of tibbles with <code>glycan_id</code>, <code>part_id</code>, and

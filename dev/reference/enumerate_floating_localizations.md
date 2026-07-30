@@ -6,9 +6,12 @@ fully localized structure permitted by the candidate-parent domains in
 
 Candidate combinations are validated simultaneously, including linkages
 with multiple possible acceptor positions such as `"a2-3/6"`. Variants
-are canonicalized and then deduplicated by structure; when multiple
-assignments produce the same canonical structure, the first assignment
-in deterministic candidate order is retained.
+are canonicalized and, by default, deduplicated by structure. When
+multiple assignments produce the same canonical structure, the first
+assignment in deterministic candidate order is retained. Set
+`deduplicate = FALSE` to retain every valid assignment and its
+original-node provenance, including assignments that produce identical
+canonical structures.
 
 `max_variants` is a conservative per-input safeguard. It limits the raw
 Cartesian product before conflict filtering or canonical deduplication,
@@ -22,7 +25,7 @@ assignment table. Empty structure vectors produce a zero-row result.
 ## Usage
 
 ``` r
-enumerate_floating_localizations(x, max_variants = 256)
+enumerate_floating_localizations(x, max_variants = 256, deduplicate = TRUE)
 ```
 
 ## Arguments
@@ -36,13 +39,20 @@ enumerate_floating_localizations(x, max_variants = 256)
   A positive integer giving the maximum raw candidate combinations
   allowed for each input structure.
 
+- deduplicate:
+
+  A logical value. If `TRUE` (default), retain only the first assignment
+  for each canonical structure. If `FALSE`, retain every conflict-free
+  assignment.
+
 ## Value
 
 A tibble with columns:
 
 - `input_id`: the integer position in `x`.
 
-- `variant_id`: the sequential identifier after canonical deduplication.
+- `variant_id`: the sequential identifier after optional canonical
+  deduplication.
 
 - `structure`: a `glyrepr_structure` vector column containing fully
   localized variants.

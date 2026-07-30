@@ -37,7 +37,9 @@
   ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md)
   returns every conflict-free, canonical floating-part localization with
-  assignment provenance and a conservative per-input variant bound.
+  assignment provenance and a conservative per-input variant bound;
+  `deduplicate = FALSE` retains distinct original-node assignments that
+  canonicalize to the same structure.
   ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - Structure-level classification now depends only on residue specificity
   and linkage completeness: floating candidate-parent metadata does not
