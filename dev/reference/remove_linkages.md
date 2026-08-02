@@ -14,11 +14,12 @@ remove_linkages(glycan)
 
 - glycan:
 
-  A glyrepr_structure vector.
+  A glyrepr_structure vector or a glycan `igraph`.
 
 ## Value
 
-A glyrepr_structure vector with all linkages removed.
+An object of the same representation as `glycan` with all linkages
+removed. Graph input retains its vertex IDs and order.
 
 ## Examples
 

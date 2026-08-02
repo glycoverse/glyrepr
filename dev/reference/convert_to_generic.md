@@ -16,6 +16,9 @@ convert_to_generic(x)
 # S3 method for class 'glyrepr_structure'
 convert_to_generic(x)
 
+# S3 method for class 'igraph'
+convert_to_generic(x)
+
 # S3 method for class 'glyrepr_composition'
 convert_to_generic(x)
 ```
@@ -30,12 +33,14 @@ convert_to_generic(x)
 
   - A glycan composition vector ("glyrepr_composition" object);
 
-  - A glycan structure vector ("glyrepr_structure" object).
+  - A glycan structure vector ("glyrepr_structure" object);
+
+  - A glycan `igraph`.
 
 ## Value
 
 A new object of the same class as `x` with monosaccharides converted to
-generic type.
+generic type. Graph input retains its vertex IDs and order.
 
 ## Two types of monosaccharides
 

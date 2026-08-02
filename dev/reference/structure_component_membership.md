@@ -12,8 +12,9 @@ corresponding `part_id` from
 
 Node indices refer to `structure_nodes()$node_id` for the same glycan.
 Missing structures contribute no rows. Duplicate structures are expanded
-to their original vector positions. If `x` is named, the result also
-contains a `glycan_name` column.
+to their original vector positions. For graph input, node indices are
+current numeric vertex positions and `glycan_id` is `1L`. If vector
+input is named, the result also contains a `glycan_name` column.
 
 ## Usage
 
@@ -25,7 +26,7 @@ structure_component_membership(x)
 
 - x:
 
-  A glycan structure vector.
+  A glycan structure vector or one glycan `igraph`.
 
 ## Value
 

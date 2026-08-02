@@ -16,7 +16,9 @@ floating parts remain floating. The resulting structures are
 canonicalized, and candidate-parent indices for remaining parts are
 remapped to the new canonical main-tree order.
 
-Missing values, vector positions, and names in `x` are preserved.
+Missing values, vector positions, and names in structure-vector input
+are preserved. For graph input, `glycan_id` must be `1L`, and selected
+edges are appended without canonicalizing or renumbering vertices.
 
 ## Usage
 
@@ -28,7 +30,7 @@ localize_floating_parts(x, assignments)
 
 - x:
 
-  A glycan structure vector.
+  A glycan structure vector or a glycan `igraph`.
 
 - assignments:
 
@@ -38,7 +40,9 @@ localize_floating_parts(x, assignments)
 
 ## Value
 
-A glycan structure vector with the same length and names as `x`.
+An object of the same representation as `x`. Structure-vector output has
+the same length and names as `x`; graph output retains its vertex IDs
+and order.
 
 ## Examples
 

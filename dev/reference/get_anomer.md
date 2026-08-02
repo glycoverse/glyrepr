@@ -12,11 +12,12 @@ get_anomer(x)
 
 - x:
 
-  A glycan structure vector (glyrepr_structure).
+  A glycan structure vector or a glycan `igraph`.
 
 ## Value
 
-a character vector of the anomeric information.
+A character vector for structure-vector input, or a character scalar for
+graph input.
 
 ## Examples
 

@@ -68,7 +68,7 @@ because the "partial" level is not deterministic.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector.</p></dd>
+<dd><p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector or a glycan <code>igraph</code>.</p></dd>
 
 
 <dt id="arg-to-level">to_level<a class="anchor" aria-label="anchor" href="#arg-to-level"></a></dt>
@@ -82,7 +82,8 @@ You can use <code><a href="get_structure_level.html">get_structure_level()</a></
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector reduced to the given resolution level.</p>
+    <p>An object of the same representation as <code>x</code>, reduced to the given
+resolution level. Graph input retains its vertex IDs and order.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

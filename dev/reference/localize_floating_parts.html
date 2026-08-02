@@ -11,7 +11,9 @@ Selected virtual attachments become ordinary graph edges. Unassigned
 floating parts remain floating. The resulting structures are canonicalized,
 and candidate-parent indices for remaining parts are remapped to the new
 canonical main-tree order.
-Missing values, vector positions, and names in x are preserved."><meta property="og:description" content="localize_floating_parts() attaches selected floating parts to
+Missing values, vector positions, and names in structure-vector input are
+preserved. For graph input, glycan_id must be 1L, and selected edges are
+appended without canonicalizing or renumbering vertices."><meta property="og:description" content="localize_floating_parts() attaches selected floating parts to
 caller-supplied parent nodes. The assignments are interpreted against the
 canonical node and part identifiers returned by
 structure_floating_candidates().
@@ -23,7 +25,9 @@ Selected virtual attachments become ordinary graph edges. Unassigned
 floating parts remain floating. The resulting structures are canonicalized,
 and candidate-parent indices for remaining parts are remapped to the new
 canonical main-tree order.
-Missing values, vector positions, and names in x are preserved."><meta property="og:image" content="https://glycoverse.github.io/glyrepr/logo.png"><meta name="robots" content="noindex"></head><body>
+Missing values, vector positions, and names in structure-vector input are
+preserved. For graph input, glycan_id must be 1L, and selected edges are
+appended without canonicalizing or renumbering vertices."><meta property="og:image" content="https://glycoverse.github.io/glyrepr/logo.png"><meta name="robots" content="noindex"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -76,7 +80,9 @@ compatible with occupied and potential acceptor linkage positions.</p>
 floating parts remain floating. The resulting structures are canonicalized,
 and candidate-parent indices for remaining parts are remapped to the new
 canonical main-tree order.</p>
-<p>Missing values, vector positions, and names in <code>x</code> are preserved.</p>
+<p>Missing values, vector positions, and names in structure-vector input are
+preserved. For graph input, <code>glycan_id</code> must be <code>1L</code>, and selected edges are
+appended without canonicalizing or renumbering vertices.</p>
     </div>
 
     <div class="section level2">
@@ -89,7 +95,7 @@ canonical main-tree order.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A glycan structure vector.</p></dd>
+<dd><p>A glycan structure vector or a glycan <code>igraph</code>.</p></dd>
 
 
 <dt id="arg-assignments">assignments<a class="anchor" aria-label="anchor" href="#arg-assignments"></a></dt>
@@ -99,7 +105,9 @@ and <code>parent_node</code>. Each <code>(glycan_id, part_id)</code> pair may oc
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A glycan structure vector with the same length and names as <code>x</code>.</p>
+    <p>An object of the same representation as <code>x</code>. Structure-vector
+output has the same length and names as <code>x</code>; graph output retains its
+vertex IDs and order.</p>
     </div>
 
     <div class="section level2">

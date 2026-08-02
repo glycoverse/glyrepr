@@ -1,9 +1,9 @@
 # Convert Glycan Structures to Graph Tables
 
 `structure_nodes()`, `structure_edges()`, and
-`structure_floating_parts()` convert a glycan structure vector to
-normalized graph tables. `structure_from_tibbles()` rebuilds a
-`glyrepr_structure` vector from those tables and a vector of
+`structure_floating_parts()` convert a glycan structure vector or one
+glycan `igraph` to normalized graph tables. `structure_from_tibbles()`
+rebuilds a `glyrepr_structure` vector from those tables and a vector of
 reducing-end anomers.
 
 The `glycan_id` column is the integer position of each glycan in the
@@ -14,10 +14,11 @@ three tibbles also contain a `glycan_name` column.
 `structure_from_tibbles()` uses `glycan_name` as output names when that
 column is present.
 
-`structure_nodes()$node_id` follows residue order in the complete
-canonical IUPAC-condensed string. For a floating structure, nodes from
-each brace-enclosed floating part therefore precede nodes from the main
-tree.
+For structure-vector input, `structure_nodes()$node_id` follows residue
+order in the complete canonical IUPAC-condensed string. For graph input,
+it follows the graph's current numeric vertex positions without
+canonicalizing or renumbering them. A graph is represented with
+`glycan_id = 1L` and no `glycan_name` column.
 
 In `structure_floating_parts()`, `root_node` and every integer in the
 `nodes` and `parents` list-columns refer to `structure_nodes()$node_id`
@@ -52,7 +53,7 @@ structure_from_tibbles(nodes, edges, anomers, floating_parts = NULL)
 
 - x:
 
-  A glycan structure vector.
+  A glycan structure vector or one glycan `igraph`.
 
 - nodes:
 

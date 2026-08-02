@@ -9,8 +9,10 @@ with {&amp;lt;floating&amp;gt;|&amp;lt;parents&amp;gt;}, only the declared paren
 scope is "explicit".
 Node indices refer to structure_nodes()$node_id for the same glycan. Missing
 structures and structures without floating parts contribute no rows.
-Duplicate structures are expanded to their original vector positions. If
-x is named, the result also contains a glycan_name column.'><meta property="og:description" content='structure_floating_candidates() expands floating-part attachment metadata
+Duplicate structures are expanded to their original vector positions. For
+graph input, node indices are current numeric vertex positions and
+glycan_id is 1L. If vector input is named, the result also contains a
+glycan_name column.'><meta property="og:description" content='structure_floating_candidates() expands floating-part attachment metadata
 to one row per candidate parent. This provides a uniform representation for
 both explicitly restricted floating parts and unrestricted {&amp;lt;floating&amp;gt;}
 parts.
@@ -20,8 +22,10 @@ with {&amp;lt;floating&amp;gt;|&amp;lt;parents&amp;gt;}, only the declared paren
 scope is "explicit".
 Node indices refer to structure_nodes()$node_id for the same glycan. Missing
 structures and structures without floating parts contribute no rows.
-Duplicate structures are expanded to their original vector positions. If
-x is named, the result also contains a glycan_name column.'><meta property="og:image" content="https://glycoverse.github.io/glyrepr/logo.png"><meta name="robots" content="noindex"></head><body>
+Duplicate structures are expanded to their original vector positions. For
+graph input, node indices are current numeric vertex positions and
+glycan_id is 1L. If vector input is named, the result also contains a
+glycan_name column.'><meta property="og:image" content="https://glycoverse.github.io/glyrepr/logo.png"><meta name="robots" content="noindex"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -72,8 +76,10 @@ with <code>{&lt;floating&gt;|&lt;parents&gt;}</code>, only the declared parent n
 <code>scope</code> is <code>"explicit"</code>.</p>
 <p>Node indices refer to <code>structure_nodes()$node_id</code> for the same glycan. Missing
 structures and structures without floating parts contribute no rows.
-Duplicate structures are expanded to their original vector positions. If
-<code>x</code> is named, the result also contains a <code>glycan_name</code> column.</p>
+Duplicate structures are expanded to their original vector positions. For
+graph input, node indices are current numeric vertex positions and
+<code>glycan_id</code> is <code>1L</code>. If vector input is named, the result also contains a
+<code>glycan_name</code> column.</p>
     </div>
 
     <div class="section level2">
@@ -86,7 +92,7 @@ Duplicate structures are expanded to their original vector positions. If
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A glycan structure vector.</p></dd>
+<dd><p>A glycan structure vector or one glycan <code>igraph</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

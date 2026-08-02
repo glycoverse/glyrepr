@@ -25,6 +25,8 @@ as_glycan_composition(x)
   - `glyrepr_structure` objects (counts both monosaccharides and
     substituents)
 
+  - Glycan `igraph` objects (returns a length-one composition vector)
+
   - Existing `glyrepr_composition` objects (returned as-is)
 
 ## Value
@@ -77,10 +79,14 @@ as_glycan_composition(comp)
 #> <glycan_composition[1]>
 #> [1] Hex(5)HexNAc(2)
 
-# From a glycan structure vector
+# From a glycan structure vector or graph
 strucs <- c(n_glycan_core(), o_glycan_core_1())
 as_glycan_composition(strucs)
 #> <glycan_composition[2]>
 #> [1] Man(3)GlcNAc(2)
 #> [2] Gal(1)GalNAc(1)
+graph <- get_structure_graphs(strucs[[1]])
+as_glycan_composition(graph)
+#> <glycan_composition[1]>
+#> [1] Man(3)GlcNAc(2)
 ```

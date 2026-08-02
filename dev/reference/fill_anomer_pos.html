@@ -59,14 +59,15 @@ information. For example, <code>"Gal(??-?)GalNAc(??-"</code> is converted to
 
 
 <dl><dt id="arg-strucs">strucs<a class="anchor" aria-label="anchor" href="#arg-strucs"></a></dt>
-<dd><p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector with concrete or generic
-monosaccharides.</p></dd>
+<dd><p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector or glycan <code>igraph</code> with concrete
+or generic monosaccharides.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector with anomer positions added where
-missing.</p>
+    <p>An object of the same representation as <code>strucs</code> with anomer
+positions added where missing. Graph input retains its vertex IDs and
+order.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

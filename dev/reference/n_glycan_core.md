@@ -28,7 +28,9 @@ o_glycan_core_2(linkage = TRUE, mono_type = "concrete")
 
 ## Value
 
-A glycan structure (igraph) object.
+A
+[`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+vector of length one.
 
 ## N-Glycan Core
 

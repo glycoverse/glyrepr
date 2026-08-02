@@ -18,14 +18,17 @@ count_mono(x, mono = NULL, include_subs = FALSE)
 
 # S3 method for class 'glyrepr_structure'
 count_mono(x, mono = NULL, include_subs = FALSE)
+
+# S3 method for class 'igraph'
+count_mono(x, mono = NULL, include_subs = FALSE)
 ```
 
 ## Arguments
 
 - x:
 
-  A glycan composition (`glyrepr_composition`) or a glycan structure
-  (`glyrepr_structure`) vector.
+  A glycan composition (`glyrepr_composition`), a glycan structure
+  (`glyrepr_structure`) vector, or a glycan `igraph`.
 
 - mono:
 
@@ -39,7 +42,8 @@ count_mono(x, mono = NULL, include_subs = FALSE)
 
 ## Value
 
-A numeric vector of the same length as `x`.
+A numeric vector of the same length as `x`, or a numeric scalar for
+graph input.
 
 ## Details
 

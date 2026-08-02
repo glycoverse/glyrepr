@@ -16,7 +16,7 @@ has_linkages(glycan, strict = FALSE)
 
   A
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-  vector.
+  vector or a glycan `igraph`.
 
 - strict:
 
@@ -32,7 +32,8 @@ has_linkages(glycan, strict = FALSE)
 
 ## Value
 
-A logical vector indicating if each glycan structure has linkages.
+A logical vector for structure-vector input, or a logical scalar for
+graph input.
 
 ## See also
 

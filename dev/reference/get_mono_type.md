@@ -15,6 +15,9 @@ get_mono_type(x)
 # S3 method for class 'glyrepr_structure'
 get_mono_type(x)
 
+# S3 method for class 'igraph'
+get_mono_type(x)
+
 # S3 method for class 'glyrepr_composition'
 get_mono_type(x)
 ```
@@ -29,15 +32,17 @@ get_mono_type(x)
 
   - A glycan composition vector ("glyrepr_composition" object);
 
-  - A glycan structure vector ("glyrepr_structure" object).
+  - A glycan structure vector ("glyrepr_structure" object);
+
+  - A glycan `igraph`.
 
 ## Value
 
 - For character input, returns a character vector of the same length as
   `x`.
 
-- For `glyrepr_structure` and `glyrepr_composition` input, returns a
-  character scalar.
+- For `glyrepr_structure`, `glyrepr_composition`, and `igraph` input,
+  returns a character scalar.
 
 ## Two types of monosaccharides
 

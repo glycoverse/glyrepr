@@ -15,12 +15,12 @@ has_floating_parts(x)
 
   A
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-  vector.
+  vector or a glycan `igraph`.
 
 ## Value
 
-A logical vector with the same length and names as `x`. Missing
-structures produce `NA`.
+A logical vector with the same length and names as vector input, or a
+logical scalar for graph input. Missing structures produce `NA`.
 
 ## Details
 

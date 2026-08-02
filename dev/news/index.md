@@ -2,6 +2,11 @@
 
 ## glyrepr (development version)
 
+- Core structure inspection, transformation, graph-table, composition,
+  and IUPAC APIs now accept individual glycan `igraph` objects directly
+  while preserving existing `glyrepr_structure` vector behavior; graph
+  transformations and tables retain current vertex IDs.
+  ([\#81](https://github.com/glycoverse/glyrepr/issues/81))
 - [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
   now supports floating glycan substructures with optional
   candidate-parent indices through `{<floating>}` and

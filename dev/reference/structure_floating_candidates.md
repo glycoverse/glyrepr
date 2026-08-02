@@ -13,8 +13,9 @@ are returned and `scope` is `"explicit"`.
 Node indices refer to `structure_nodes()$node_id` for the same glycan.
 Missing structures and structures without floating parts contribute no
 rows. Duplicate structures are expanded to their original vector
-positions. If `x` is named, the result also contains a `glycan_name`
-column.
+positions. For graph input, node indices are current numeric vertex
+positions and `glycan_id` is `1L`. If vector input is named, the result
+also contains a `glycan_name` column.
 
 ## Usage
 
@@ -26,7 +27,7 @@ structure_floating_candidates(x)
 
 - x:
 
-  A glycan structure vector.
+  A glycan structure vector or one glycan `igraph`.
 
 ## Value
 

@@ -21,7 +21,7 @@ reduce_structure_level(x, to_level)
 
   A
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-  vector.
+  vector or a glycan `igraph`.
 
 - to_level:
 
@@ -34,9 +34,8 @@ reduce_structure_level(x, to_level)
 
 ## Value
 
-A
-[`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-vector reduced to the given resolution level.
+An object of the same representation as `x`, reduced to the given
+resolution level. Graph input retains its vertex IDs and order.
 
 ## Details
 

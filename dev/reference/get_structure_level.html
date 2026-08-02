@@ -116,13 +116,14 @@ This kind of glycan structure is also assigned to "basic" level.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector.</p></dd>
+<dd><p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector or a glycan <code>igraph</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A character scalar containing the structure level for <code>x</code>.
-If <code>x</code> is empty or all structures in <code>x</code> are NA, returns NA_character_.</p>
+For vector input, if <code>x</code> is empty or all structures in <code>x</code> are <code>NA</code>,
+returns <code>NA_character_</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

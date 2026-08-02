@@ -42,12 +42,13 @@ get_structure_level(x)
 
   A
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-  vector.
+  vector or a glycan `igraph`.
 
 ## Value
 
-A character scalar containing the structure level for `x`. If `x` is
-empty or all structures in `x` are NA, returns NA_character\_.
+A character scalar containing the structure level for `x`. For vector
+input, if `x` is empty or all structures in `x` are `NA`, returns
+`NA_character_`.
 
 ## See also
 
