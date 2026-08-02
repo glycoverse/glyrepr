@@ -72,6 +72,22 @@ test_that("remove_substituents works on glycan structures", {
   expect_equal(igraph::V(clean_graph)$mono, c("Gal", "Glc")) # Monos should be unchanged
 })
 
+test_that("remove_substituents works on glycan graphs without reordering", {
+  structure <- as_glycan_structure("Gal3Me6S(b1-3)GalNAc(a1-")
+  graph <- get_structure_graphs(structure)
+  names_before <- igraph::V(graph)$name
+  edges_before <- igraph::as_edgelist(graph, names = FALSE)
+  monos_before <- igraph::V(graph)$mono
+
+  result <- remove_substituents(graph)
+
+  expect_s3_class(result, "igraph")
+  expect_identical(igraph::V(result)$name, names_before)
+  expect_identical(igraph::as_edgelist(result, names = FALSE), edges_before)
+  expect_identical(igraph::V(result)$mono, monos_before)
+  expect_identical(igraph::V(result)$sub, c("", ""))
+})
+
 test_that("remove_substituents input validation", {
   expect_error(remove_substituents("not_a_glycan"))
   expect_error(remove_substituents(123))

@@ -207,3 +207,21 @@ test_that("remove_linkages() removes floating attachment linkages", {
   expect_identical(parts$linkage, "??-?")
   expect_identical(parts$parents[[1]], c(2L, 3L))
 })
+
+test_that("remove_linkages works with glycan graphs without reordering", {
+  structure <- as_glycan_structure(
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  )
+  graph <- get_structure_graphs(structure)
+  names_before <- igraph::V(graph)$name
+  edges_before <- igraph::as_edgelist(graph, names = FALSE)
+
+  result <- remove_linkages(graph)
+
+  expect_s3_class(result, "igraph")
+  expect_identical(igraph::V(result)$name, names_before)
+  expect_identical(igraph::as_edgelist(result, names = FALSE), edges_before)
+  expect_identical(igraph::E(result)$linkage, "??-?")
+  expect_identical(result$anomer, "??")
+  expect_identical(result$floating_parts[[1]]$linkage, "??-?")
+})

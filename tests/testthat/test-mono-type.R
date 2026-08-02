@@ -91,6 +91,23 @@ test_that("convert_to_generic works with glycan structures", {
   )
 })
 
+test_that("convert_to_generic works with glycan graphs without reordering", {
+  structure <- as_glycan_structure(
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  )
+  graph <- get_structure_graphs(structure)
+  names_before <- igraph::V(graph)$name
+  edges_before <- igraph::as_edgelist(graph, names = FALSE)
+
+  result <- convert_to_generic(graph)
+
+  expect_s3_class(result, "igraph")
+  expect_identical(igraph::V(result)$name, names_before)
+  expect_identical(igraph::as_edgelist(result, names = FALSE), edges_before)
+  expect_identical(igraph::V(result)$mono, c("NeuAc", "Hex", "HexNAc"))
+  expect_identical(result$floating_parts, graph$floating_parts)
+})
+
 test_that("convert_to_generic with already generic structure returns same", {
   glycan <- n_glycan_core(mono_type = "generic")
   result <- convert_to_generic(glycan)

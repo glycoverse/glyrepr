@@ -153,9 +153,10 @@ possible_linkages <- function(
 #' linkages in a glycan structure with "??-?", as well as the reducing end
 #' anomer with "??-".
 #'
-#' @param glycan A glyrepr_structure vector.
+#' @param glycan A glyrepr_structure vector or a glycan `igraph`.
 #'
-#' @returns A glyrepr_structure vector with all linkages removed.
+#' @returns An object of the same representation as `glycan` with all linkages
+#'   removed. Graph input retains its vertex IDs and order.
 #'
 #' @examples
 #' glycan <- o_glycan_core_1(linkage = TRUE)
@@ -164,6 +165,10 @@ possible_linkages <- function(
 #'
 #' @export
 remove_linkages <- function(glycan) {
+  if (inherits(glycan, "igraph")) {
+    return(.remove_linkages_single(glycan))
+  }
+
   if (!is_glycan_structure(glycan)) {
     cli::cli_abort(c(
       "Input must be a glyrepr_structure vector.",

@@ -7,7 +7,7 @@
 reduce_structure_level(x, to_level)
 }
 \arguments{
-\item{x}{A \code{\link[=glycan_structure]{glycan_structure()}} vector.}
+\item{x}{A \code{\link[=glycan_structure]{glycan_structure()}} vector or a glycan \code{igraph}.}
 
 \item{to_level}{The resolution level to reduce to. Can be "basic" or "topological".
 Must be a lower resolution level than \code{x}
@@ -17,7 +17,8 @@ the result will be the same as the input.
 You can use \code{\link[=get_structure_level]{get_structure_level()}} to check the structure level of \code{x}.}
 }
 \value{
-A \code{\link[=glycan_structure]{glycan_structure()}} vector reduced to the given resolution level.
+An object of the same representation as \code{x}, reduced to the given
+resolution level. Graph input retains its vertex IDs and order.
 }
 \description{
 This function reduces a glycan structure from a higher resolution level to a lower resolution level

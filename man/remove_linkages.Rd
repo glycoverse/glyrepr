@@ -7,10 +7,11 @@
 remove_linkages(glycan)
 }
 \arguments{
-\item{glycan}{A glyrepr_structure vector.}
+\item{glycan}{A glyrepr_structure vector or a glycan \code{igraph}.}
 }
 \value{
-A glyrepr_structure vector with all linkages removed.
+An object of the same representation as \code{glycan} with all linkages
+removed. Graph input retains its vertex IDs and order.
 }
 \description{
 This function replaces all graph-edge and floating-part attachment

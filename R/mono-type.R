@@ -18,10 +18,12 @@
 #' @param x Either of these objects:
 #'   - A character of monosaccharide;
 #'   - A glycan composition vector ("glyrepr_composition" object);
-#'   - A glycan structure vector ("glyrepr_structure" object).
+#'   - A glycan structure vector ("glyrepr_structure" object);
+#'   - A glycan `igraph`.
 #'
 #' @returns A new object of the same class as `x`
-#' with monosaccharides converted to generic type.
+#' with monosaccharides converted to generic type. Graph input retains its
+#' vertex IDs and order.
 #'
 #' @examples
 #' # Convert character vectors
@@ -86,6 +88,16 @@ convert_to_generic.glyrepr_structure <- function(x) {
     }
     convert_glycan_mono_type_impl(graph, from, "generic")
   })
+}
+
+#' @export
+#' @rdname convert_to_generic
+convert_to_generic.igraph <- function(x) {
+  from <- get_graph_mono_type(x)
+  if (from == "generic") {
+    return(x)
+  }
+  convert_glycan_mono_type_impl(x, from, "generic")
 }
 
 #' @export

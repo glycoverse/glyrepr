@@ -7,13 +7,15 @@
 localize_floating_parts(x, assignments)
 }
 \arguments{
-\item{x}{A glycan structure vector.}
+\item{x}{A glycan structure vector or a glycan \code{igraph}.}
 
 \item{assignments}{A data frame with integer columns \code{glycan_id}, \code{part_id},
 and \code{parent_node}. Each \verb{(glycan_id, part_id)} pair may occur at most once.}
 }
 \value{
-A glycan structure vector with the same length and names as \code{x}.
+An object of the same representation as \code{x}. Structure-vector
+output has the same length and names as \code{x}; graph output retains its
+vertex IDs and order.
 }
 \description{
 \code{localize_floating_parts()} attaches selected floating parts to
@@ -31,7 +33,9 @@ floating parts remain floating. The resulting structures are canonicalized,
 and candidate-parent indices for remaining parts are remapped to the new
 canonical main-tree order.
 
-Missing values, vector positions, and names in \code{x} are preserved.
+Missing values, vector positions, and names in structure-vector input are
+preserved. For graph input, \code{glycan_id} must be \code{1L}, and selected edges are
+appended without canonicalizing or renumbering vertices.
 }
 \examples{
 glycan <- as_glycan_structure(
