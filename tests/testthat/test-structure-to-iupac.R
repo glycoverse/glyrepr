@@ -17,6 +17,35 @@ test_that("structure_to_iupac works with basic linear structures", {
   expect_equal(result2, "Gal(b1-3)GlcNAc(b1-4)Glc(?1-")
 })
 
+test_that("structure_to_iupac works with ordinary and floating glycan graphs", {
+  structures <- list(
+    n_glycan_core(),
+    as_glycan_structure(
+      "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    )
+  )
+
+  for (structure in structures) {
+    graph <- get_structure_graphs(structure)
+    expect_identical(
+      structure_to_iupac(graph),
+      unname(structure_to_iupac(structure))
+    )
+  }
+})
+
+test_that("structure_to_iupac safely canonicalizes graph input", {
+  structure <- n_glycan_core()
+  graph <- get_structure_graphs(structure)
+  graph <- igraph::permute(graph, rev(seq_len(igraph::vcount(graph))))
+  names_before <- igraph::V(graph)$name
+
+  result <- structure_to_iupac(graph)
+
+  expect_identical(result, unname(structure_to_iupac(structure)))
+  expect_identical(igraph::V(graph)$name, names_before)
+})
+
 test_that("structure_to_iupac works with branched structures", {
   # Test with N-glycan core
   glycan <- n_glycan_core()

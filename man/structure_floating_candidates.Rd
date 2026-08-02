@@ -7,7 +7,7 @@
 structure_floating_candidates(x)
 }
 \arguments{
-\item{x}{A glycan structure vector.}
+\item{x}{A glycan structure vector or one glycan \code{igraph}.}
 }
 \value{
 A tibble with columns \code{glycan_id}, \code{part_id}, \code{root_node},
@@ -27,8 +27,10 @@ with \verb{\{<floating>|<parents>\}}, only the declared parent nodes are returne
 
 Node indices refer to \code{structure_nodes()$node_id} for the same glycan. Missing
 structures and structures without floating parts contribute no rows.
-Duplicate structures are expanded to their original vector positions. If
-\code{x} is named, the result also contains a \code{glycan_name} column.
+Duplicate structures are expanded to their original vector positions. For
+graph input, node indices are current numeric vertex positions and
+\code{glycan_id} is \code{1L}. If vector input is named, the result also contains a
+\code{glycan_name} column.
 }
 \examples{
 glycans <- as_glycan_structure(c(

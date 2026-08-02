@@ -7,14 +7,16 @@
 structure_to_iupac(glycan)
 }
 \arguments{
-\item{glycan}{A glyrepr_structure vector.}
+\item{glycan}{A glyrepr_structure vector or one glycan \code{igraph}.}
 }
 \value{
-A character vector representing the IUPAC sequences.
+A character vector for structure-vector input, or one unnamed
+character scalar for graph input.
 }
 \description{
-Convert a glycan structure to a sequence representation in the form of
-mono(linkage)mono, with branches represented by square brackets [].
+Convert a glycan structure vector or one glycan \code{igraph} to a sequence
+representation in the form of mono(linkage)mono, with branches represented
+by square brackets [].
 The backbone is chosen as the longest path, and for branches, linkages are
 ordered lexicographically with smaller linkages on the backbone.
 }
@@ -42,6 +44,11 @@ Linkages are compared lexicographically:
 }
 
 Smaller linkages are placed on the backbone, larger ones in branches.
+
+For graph input, \code{structure_to_iupac()} validates and canonicalizes a copy of
+the graph before generating the sequence. Use \code{\link[=graph_to_iupac]{graph_to_iupac()}} when the
+graph is already valid and canonical and the lower-level trusted-input path
+is desired.
 }
 
 \examples{
@@ -59,6 +66,7 @@ igraph::E(graph)$linkage <- "b1-4"
 graph$anomer <- "a1"
 glycan <- glycan_structure(graph)
 structure_to_iupac(glycan)  # Returns "GlcNAc6Ac(b1-4)Glc3Me(a1-"
+structure_to_iupac(graph)
 
 # Vectorized structures
 structs <- c(o_glycan_core_1(), n_glycan_core())

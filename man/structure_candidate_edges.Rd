@@ -7,7 +7,7 @@
 structure_candidate_edges(x)
 }
 \arguments{
-\item{x}{A glycan structure vector.}
+\item{x}{A glycan structure vector or one glycan \code{igraph}.}
 }
 \value{
 A tibble with columns \code{glycan_id}, \code{part_id}, \code{from_node},
@@ -26,7 +26,9 @@ parent nodes are returned and \code{scope} is \code{"explicit"}.
 Node indices refer to \code{structure_nodes()$node_id} for the same glycan.
 Missing structures and structures without floating parts contribute no
 rows. Duplicate structures are expanded to their original vector positions.
-If \code{x} is named, the result also contains a \code{glycan_name} column.
+For graph input, node indices are current numeric vertex positions and
+\code{glycan_id} is \code{1L}. If vector input is named, the result also contains a
+\code{glycan_name} column.
 }
 \examples{
 glycan <- as_glycan_structure(

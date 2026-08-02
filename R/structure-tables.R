@@ -2,9 +2,10 @@
 #'
 #' @description
 #' `structure_nodes()`, `structure_edges()`, and
-#' `structure_floating_parts()` convert a glycan structure vector to normalized
-#' graph tables. `structure_from_tibbles()` rebuilds a `glyrepr_structure`
-#' vector from those tables and a vector of reducing-end anomers.
+#' `structure_floating_parts()` convert a glycan structure vector or one glycan
+#' `igraph` to normalized graph tables. `structure_from_tibbles()` rebuilds a
+#' `glyrepr_structure` vector from those tables and a vector of reducing-end
+#' anomers.
 #'
 #' The `glycan_id` column is the integer position of each glycan in the input
 #' vector. Duplicate structures are expanded to their original vector positions.
@@ -14,9 +15,11 @@
 #' `structure_from_tibbles()` uses `glycan_name` as output names when that
 #' column is present.
 #'
-#' `structure_nodes()$node_id` follows residue order in the complete canonical
-#' IUPAC-condensed string. For a floating structure, nodes from each
-#' brace-enclosed floating part therefore precede nodes from the main tree.
+#' For structure-vector input, `structure_nodes()$node_id` follows residue order
+#' in the complete canonical IUPAC-condensed string. For graph input, it follows
+#' the graph's current numeric vertex positions without canonicalizing or
+#' renumbering them. A graph is represented with `glycan_id = 1L` and no
+#' `glycan_name` column.
 #'
 #' In `structure_floating_parts()`, `root_node` and every integer in the `nodes`
 #' and `parents` list-columns refer to `structure_nodes()$node_id` for the same
@@ -34,7 +37,7 @@
 #' floating nodes precede the main tree. `structure_from_tibbles()` expects
 #' these global node IDs and translates them back during serialization.
 #'
-#' @param x A glycan structure vector.
+#' @param x A glycan structure vector or one glycan `igraph`.
 #' @param nodes A data frame with columns `glycan_id`, `node_id`, `mono`, and
 #'   `sub`, and optionally `glycan_name`.
 #' @param edges A data frame with columns `glycan_id`, `edge_id`, `from_node`,
@@ -73,14 +76,22 @@
 #' @name structure_tables
 NULL
 
+structure_table_input <- function(x) {
+  if (inherits(x, "igraph")) {
+    return(list(graphs = list(x), glycan_names = NULL))
+  }
+
+  checkmate::assert_class(x, "glyrepr_structure")
+  list(graphs = as.list(x), glycan_names = names(x))
+}
+
 
 #' @rdname structure_tables
 #' @export
 structure_nodes <- function(x) {
-  checkmate::assert_class(x, "glyrepr_structure")
-
-  graphs <- as.list(x)
-  glycan_names <- names(x)
+  input <- structure_table_input(x)
+  graphs <- input$graphs
+  glycan_names <- input$glycan_names
   has_glycan_names <- !is.null(glycan_names)
   if (length(graphs) == 0) {
     return(empty_structure_nodes(has_glycan_names))
@@ -106,10 +117,9 @@ structure_nodes <- function(x) {
 #' @rdname structure_tables
 #' @export
 structure_edges <- function(x) {
-  checkmate::assert_class(x, "glyrepr_structure")
-
-  graphs <- as.list(x)
-  glycan_names <- names(x)
+  input <- structure_table_input(x)
+  graphs <- input$graphs
+  glycan_names <- input$glycan_names
   has_glycan_names <- !is.null(glycan_names)
   if (length(graphs) == 0) {
     return(empty_structure_edges(has_glycan_names))
@@ -135,10 +145,9 @@ structure_edges <- function(x) {
 #' @rdname structure_tables
 #' @export
 structure_floating_parts <- function(x) {
-  checkmate::assert_class(x, "glyrepr_structure")
-
-  graphs <- as.list(x)
-  glycan_names <- names(x)
+  input <- structure_table_input(x)
+  graphs <- input$graphs
+  glycan_names <- input$glycan_names
   has_glycan_names <- !is.null(glycan_names)
   if (length(graphs) == 0) {
     return(empty_structure_floating_parts(has_glycan_names))
@@ -176,10 +185,12 @@ structure_floating_parts <- function(x) {
 #'
 #' Node indices refer to `structure_nodes()$node_id` for the same glycan. Missing
 #' structures and structures without floating parts contribute no rows.
-#' Duplicate structures are expanded to their original vector positions. If
-#' `x` is named, the result also contains a `glycan_name` column.
+#' Duplicate structures are expanded to their original vector positions. For
+#' graph input, node indices are current numeric vertex positions and
+#' `glycan_id` is `1L`. If vector input is named, the result also contains a
+#' `glycan_name` column.
 #'
-#' @param x A glycan structure vector.
+#' @param x A glycan structure vector or one glycan `igraph`.
 #'
 #' @returns A tibble with columns `glycan_id`, `part_id`, `root_node`,
 #'   `parent_node`, `linkage`, and `scope`, plus `glycan_name` when `x` is
@@ -194,10 +205,9 @@ structure_floating_parts <- function(x) {
 #'
 #' @export
 structure_floating_candidates <- function(x) {
-  checkmate::assert_class(x, "glyrepr_structure")
-
-  graphs <- as.list(x)
-  glycan_names <- names(x)
+  input <- structure_table_input(x)
+  graphs <- input$graphs
+  glycan_names <- input$glycan_names
   has_glycan_names <- !is.null(glycan_names)
   if (length(graphs) == 0) {
     return(empty_structure_floating_candidates(has_glycan_names))
@@ -234,10 +244,11 @@ structure_floating_candidates <- function(x) {
 #'
 #' Node indices refer to `structure_nodes()$node_id` for the same glycan.
 #' Missing structures contribute no rows. Duplicate structures are expanded to
-#' their original vector positions. If `x` is named, the result also contains a
-#' `glycan_name` column.
+#' their original vector positions. For graph input, node indices are current
+#' numeric vertex positions and `glycan_id` is `1L`. If vector input is named,
+#' the result also contains a `glycan_name` column.
 #'
-#' @param x A glycan structure vector.
+#' @param x A glycan structure vector or one glycan `igraph`.
 #'
 #' @returns A tibble with columns `glycan_id`, `node_id`, `component_type`,
 #'   and `part_id`, plus `glycan_name` when `x` is named.
@@ -250,10 +261,9 @@ structure_floating_candidates <- function(x) {
 #'
 #' @export
 structure_component_membership <- function(x) {
-  checkmate::assert_class(x, "glyrepr_structure")
-
-  graphs <- as.list(x)
-  glycan_names <- names(x)
+  input <- structure_table_input(x)
+  graphs <- input$graphs
+  glycan_names <- input$glycan_names
   has_glycan_names <- !is.null(glycan_names)
   if (length(graphs) == 0) {
     return(empty_structure_component_membership(has_glycan_names))
@@ -291,9 +301,11 @@ structure_component_membership <- function(x) {
 #' Node indices refer to `structure_nodes()$node_id` for the same glycan.
 #' Missing structures and structures without floating parts contribute no
 #' rows. Duplicate structures are expanded to their original vector positions.
-#' If `x` is named, the result also contains a `glycan_name` column.
+#' For graph input, node indices are current numeric vertex positions and
+#' `glycan_id` is `1L`. If vector input is named, the result also contains a
+#' `glycan_name` column.
 #'
-#' @param x A glycan structure vector.
+#' @param x A glycan structure vector or one glycan `igraph`.
 #'
 #' @returns A tibble with columns `glycan_id`, `part_id`, `from_node`,
 #'   `to_node`, `linkage`, and `scope`, plus `glycan_name` when `x` is named.
