@@ -164,11 +164,13 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #' @param x Either of these objects:
 #'   - A character vector of monosaccharide names;
 #'   - A glycan composition vector ("glyrepr_composition" object);
-#'   - A glycan structure vector ("glyrepr_structure" object).
+#'   - A glycan structure vector ("glyrepr_structure" object);
+#'   - A glycan `igraph`.
 #'
 #' @returns
 #'   - For character input, returns a character vector of the same length as `x`.
-#'   - For `glyrepr_structure` and `glyrepr_composition` input, returns a character scalar.
+#'   - For `glyrepr_structure`, `glyrepr_composition`, and `igraph` input,
+#'     returns a character scalar.
 #'
 #' @examples
 #' # Character vector
@@ -229,6 +231,12 @@ get_mono_type.glyrepr_structure <- function(x) {
   graphs1 <- graphs[[1]]
   monos1 <- igraph::V(graphs1)$mono
   get_mono_type_impl(monos1)
+}
+
+#' @export
+#' @rdname get_mono_type
+get_mono_type.igraph <- function(x) {
+  get_graph_mono_type(x)
 }
 
 #' @export

@@ -15,6 +15,26 @@ test_that("get_structure_level works for each glycan separately", {
   )
 })
 
+test_that("get_structure_level works with glycan graphs", {
+  levels <- c(
+    intact = "Gal(b1-3)GalNAc(a1-",
+    partial = "Gal(b1-?)GalNAc(a1-",
+    topological = "Gal(??-?)GalNAc(??-",
+    basic = "Hex(??-?)HexNAc(??-"
+  )
+
+  results <- vapply(
+    levels,
+    function(iupac) {
+      graph <- get_structure_graphs(as_glycan_structure(iupac))
+      get_structure_level(graph)
+    },
+    character(1)
+  )
+
+  expect_identical(unname(results), names(levels))
+})
+
 test_that("get_structure_level works for an intact glycan vector", {
   glycans <- as_glycan_structure(c(
     "Gal(b1-3)GalNAc(a1-",

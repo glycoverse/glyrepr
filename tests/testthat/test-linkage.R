@@ -56,6 +56,20 @@ test_that("has_linkages() considers floating attachment linkages", {
   expect_false(has_linkages(partial, strict = TRUE))
 })
 
+test_that("has_linkages() works with glycan graphs", {
+  intact <- get_structure_graphs(
+    as_glycan_structure("Gal(b1-3)GalNAc(a1-")
+  )
+  partial <- get_structure_graphs(
+    as_glycan_structure("Gal(b1-?)GalNAc(a1-")
+  )
+
+  expect_identical(has_linkages(intact), TRUE)
+  expect_identical(has_linkages(intact, strict = TRUE), TRUE)
+  expect_identical(has_linkages(partial), TRUE)
+  expect_identical(has_linkages(partial, strict = TRUE), FALSE)
+})
+
 # ========= possible_linkages() =========
 # Tests for possible_linkages() function
 test_that("possible_linkages() works for a?-2", {

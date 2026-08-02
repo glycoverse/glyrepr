@@ -7,11 +7,11 @@
 has_floating_parts(x)
 }
 \arguments{
-\item{x}{A \code{\link[=glycan_structure]{glycan_structure()}} vector.}
+\item{x}{A \code{\link[=glycan_structure]{glycan_structure()}} vector or a glycan \code{igraph}.}
 }
 \value{
-A logical vector with the same length and names as \code{x}. Missing
-structures produce \code{NA}.
+A logical vector with the same length and names as vector input, or
+a logical scalar for graph input. Missing structures produce \code{NA}.
 }
 \description{
 Test whether each glycan structure contains one or more unresolved floating

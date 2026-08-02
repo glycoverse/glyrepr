@@ -97,6 +97,7 @@ is_glycan_composition <- function(x) {
 #'   - Named integer vectors or lists of named integer vectors
 #'   - Character vectors with composition strings (e.g., "Hex(5)HexNAc(2)")
 #'   - `glyrepr_structure` objects (counts both monosaccharides and substituents)
+#'   - Glycan `igraph` objects (returns a length-one composition vector)
 #'   - Existing `glyrepr_composition` objects (returned as-is)
 #'
 #' @returns A `glyrepr_composition` object.
@@ -131,12 +132,17 @@ is_glycan_composition <- function(x) {
 #' comp <- glycan_composition(c(Hex = 5, HexNAc = 2))
 #' as_glycan_composition(comp)
 #'
-#' # From a glycan structure vector
+#' # From a glycan structure vector or graph
 #' strucs <- c(n_glycan_core(), o_glycan_core_1())
 #' as_glycan_composition(strucs)
+#' graph <- get_structure_graphs(strucs[[1]])
+#' as_glycan_composition(graph)
 #'
 #' @export
 as_glycan_composition <- function(x) {
+  if (inherits(x, "igraph")) {
+    return(new_glycan_composition(list(graph_to_composition(x))))
+  }
   vec_cast(x, new_glycan_composition())
 }
 
@@ -272,34 +278,29 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
 #' @export
 vec_cast.glyrepr_composition.glyrepr_structure <- function(x, to, ...) {
   # Use smap to convert each structure to composition
-  compositions <- smap(x, function(graph) {
-    # Count monosaccharides
-    monos <- igraph::V(graph)$mono
-    mono_tb <- table(monos)
-    mono_result <- as.integer(mono_tb)
-    names(mono_result) <- names(mono_tb)
-
-    # Count substituents
-    subs <- igraph::V(graph)$sub
-    sub_types <- extract_substituent_types(subs)
-    if (length(sub_types) > 0) {
-      sub_tb <- table(sub_types)
-      sub_result <- as.integer(sub_tb)
-      names(sub_result) <- names(sub_tb)
-    } else {
-      sub_result <- integer(0)
-    }
-
-    # Combine monosaccharides and substituents
-    result <- c(mono_result, sub_result)
-
-    # Sort by composition component order (monosaccharides first, then substituents)
-    result <- .reorder_composition_components(result)
-    result
-  })
+  compositions <- smap(x, graph_to_composition)
 
   # Create composition object
   new_glycan_composition(compositions)
+}
+
+graph_to_composition <- function(graph) {
+  monos <- igraph::V(graph)$mono
+  mono_tb <- table(monos)
+  mono_result <- as.integer(mono_tb)
+  names(mono_result) <- names(mono_tb)
+
+  subs <- igraph::V(graph)$sub
+  sub_types <- extract_substituent_types(subs)
+  if (length(sub_types) > 0) {
+    sub_tb <- table(sub_types)
+    sub_result <- as.integer(sub_tb)
+    names(sub_result) <- names(sub_tb)
+  } else {
+    sub_result <- integer()
+  }
+
+  .reorder_composition_components(c(mono_result, sub_result))
 }
 
 #' @export

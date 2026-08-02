@@ -11,14 +11,15 @@
 #' When `mono` is "concrete" (e.g. "Gal", "GalNAc"),
 #' NA is returned when the composition is "generic".
 #'
-#' @param x A glycan composition (`glyrepr_composition`) or
-#'   a glycan structure (`glyrepr_structure`) vector.
+#' @param x A glycan composition (`glyrepr_composition`), a glycan structure
+#'   (`glyrepr_structure`) vector, or a glycan `igraph`.
 #' @param mono The monosaccharide or substituent to count. A character scalar.
 #'   If `NULL` (default), return the total number of monosaccharides.
 #' @param include_subs Whether to include substituents when `mono` is `NULL`.
 #'   Default is `FALSE`.
 #'
-#' @returns A numeric vector of the same length as `x`.
+#' @returns A numeric vector of the same length as `x`, or a numeric scalar for
+#'   graph input.
 #'
 #' @examples
 #' comp <- glycan_composition(c(Gal = 1, Man = 1, GalNAc = 1))
@@ -112,6 +113,14 @@ count_mono.glyrepr_composition <- function(
 #' @rdname count_mono
 #' @export
 count_mono.glyrepr_structure <- function(x, mono = NULL, include_subs = FALSE) {
+  .check_count_mono_args(mono, include_subs)
+  comps <- as_glycan_composition(x)
+  count_mono.glyrepr_composition(comps, mono, include_subs)
+}
+
+#' @rdname count_mono
+#' @export
+count_mono.igraph <- function(x, mono = NULL, include_subs = FALSE) {
   .check_count_mono_args(mono, include_subs)
   comps <- as_glycan_composition(x)
   count_mono.glyrepr_composition(comps, mono, include_subs)

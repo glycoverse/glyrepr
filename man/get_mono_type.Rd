@@ -4,6 +4,7 @@
 \alias{get_mono_type}
 \alias{get_mono_type.character}
 \alias{get_mono_type.glyrepr_structure}
+\alias{get_mono_type.igraph}
 \alias{get_mono_type.glyrepr_composition}
 \title{Get Monosaccharide Types}
 \usage{
@@ -13,6 +14,8 @@ get_mono_type(x)
 
 \method{get_mono_type}{glyrepr_structure}(x)
 
+\method{get_mono_type}{igraph}(x)
+
 \method{get_mono_type}{glyrepr_composition}(x)
 }
 \arguments{
@@ -20,13 +23,15 @@ get_mono_type(x)
 \itemize{
 \item A character vector of monosaccharide names;
 \item A glycan composition vector ("glyrepr_composition" object);
-\item A glycan structure vector ("glyrepr_structure" object).
+\item A glycan structure vector ("glyrepr_structure" object);
+\item A glycan \code{igraph}.
 }}
 }
 \value{
 \itemize{
 \item For character input, returns a character vector of the same length as \code{x}.
-\item For \code{glyrepr_structure} and \code{glyrepr_composition} input, returns a character scalar.
+\item For \code{glyrepr_structure}, \code{glyrepr_composition}, and \code{igraph} input,
+returns a character scalar.
 }
 }
 \description{

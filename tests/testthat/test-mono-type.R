@@ -6,6 +6,14 @@ test_that("get mono type of structures", {
   expect_equal(get_mono_type(glycan), "generic")
 })
 
+test_that("get mono type of glycan graphs", {
+  concrete <- get_structure_graphs(n_glycan_core(mono_type = "concrete"))
+  generic <- get_structure_graphs(n_glycan_core(mono_type = "generic"))
+
+  expect_identical(get_mono_type(concrete), "concrete")
+  expect_identical(get_mono_type(generic), "generic")
+})
+
 test_that("get mono type of character vector", {
   expect_equal(get_mono_type(c("Gal", "GlcNAc")), c("concrete", "concrete"))
   expect_equal(get_mono_type(c("Hex", "HexNAc")), c("generic", "generic"))

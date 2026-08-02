@@ -139,6 +139,16 @@ test_that("has_floating_parts is vectorized and preserves missing values", {
   )
 })
 
+test_that("has_floating_parts works with glycan graphs", {
+  floating <- get_structure_graphs(
+    as_glycan_structure("{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-")
+  )
+  ordinary <- get_structure_graphs(as_glycan_structure("Gal(a1-"))
+
+  expect_identical(has_floating_parts(floating), TRUE)
+  expect_identical(has_floating_parts(ordinary), FALSE)
+})
+
 
 test_that("explicit candidate parents use canonical main-tree node indices", {
   main <- "Gal(b1-3)GalNAc(a1-"
