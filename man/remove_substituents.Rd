@@ -7,10 +7,11 @@
 remove_substituents(glycan)
 }
 \arguments{
-\item{glycan}{A glyrepr_structure vector.}
+\item{glycan}{A glyrepr_structure vector or a glycan \code{igraph}.}
 }
 \value{
-A glyrepr_structure vector with all substituents removed.
+An object of the same representation as \code{glycan} with all
+substituents removed. Graph input retains its vertex IDs and order.
 }
 \description{
 This function replaces all substituents in a glycan structure with empty strings.

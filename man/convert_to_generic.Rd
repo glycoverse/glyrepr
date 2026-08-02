@@ -4,6 +4,7 @@
 \alias{convert_to_generic}
 \alias{convert_to_generic.character}
 \alias{convert_to_generic.glyrepr_structure}
+\alias{convert_to_generic.igraph}
 \alias{convert_to_generic.glyrepr_composition}
 \title{Convert Monosaccharides to Generic Type}
 \usage{
@@ -13,6 +14,8 @@ convert_to_generic(x)
 
 \method{convert_to_generic}{glyrepr_structure}(x)
 
+\method{convert_to_generic}{igraph}(x)
+
 \method{convert_to_generic}{glyrepr_composition}(x)
 }
 \arguments{
@@ -20,12 +23,14 @@ convert_to_generic(x)
 \itemize{
 \item A character of monosaccharide;
 \item A glycan composition vector ("glyrepr_composition" object);
-\item A glycan structure vector ("glyrepr_structure" object).
+\item A glycan structure vector ("glyrepr_structure" object);
+\item A glycan \code{igraph}.
 }}
 }
 \value{
 A new object of the same class as \code{x}
-with monosaccharides converted to generic type.
+with monosaccharides converted to generic type. Graph input retains its
+vertex IDs and order.
 }
 \description{
 This function converts monosaccharide types of monosaccharide characters,

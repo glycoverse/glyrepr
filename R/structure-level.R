@@ -138,7 +138,7 @@ get_graph_structure_level <- function(graph) {
 #' Both reductions preserve floating components and their candidate-parent
 #' metadata.
 #'
-#' @param x A [glycan_structure()] vector.
+#' @param x A [glycan_structure()] vector or a glycan `igraph`.
 #' @param to_level The resolution level to reduce to. Can be "basic" or "topological".
 #'   Must be a lower resolution level than `x`
 #'   ("intact" > "partial" > "topological" > "basic").
@@ -146,7 +146,8 @@ get_graph_structure_level <- function(graph) {
 #'   the result will be the same as the input.
 #'   You can use [get_structure_level()] to check the structure level of `x`.
 #'
-#' @returns A [glycan_structure()] vector reduced to the given resolution level.
+#' @returns An object of the same representation as `x`, reduced to the given
+#'   resolution level. Graph input retains its vertex IDs and order.
 #' @examples
 #' glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
 #' reduce_structure_level(glycan, to_level = "topological")
@@ -154,8 +155,10 @@ get_graph_structure_level <- function(graph) {
 #' @seealso [get_structure_level()]
 #' @export
 reduce_structure_level <- function(x, to_level) {
-  checkmate::assert_class(x, "glyrepr_structure")
   checkmate::assert_choice(to_level, c("basic", "topological"))
+  if (!inherits(x, "igraph")) {
+    checkmate::assert_class(x, "glyrepr_structure")
+  }
 
   from_level <- get_structure_level(x)
 

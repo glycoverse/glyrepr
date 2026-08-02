@@ -138,9 +138,10 @@ collapse_substituent_tokens <- function(subs) {
 #'
 #' This function replaces all substituents in a glycan structure with empty strings.
 #'
-#' @param glycan A glyrepr_structure vector.
+#' @param glycan A glyrepr_structure vector or a glycan `igraph`.
 #'
-#' @returns A glyrepr_structure vector with all substituents removed.
+#' @returns An object of the same representation as `glycan` with all
+#'   substituents removed. Graph input retains its vertex IDs and order.
 #'
 #' @examples
 #' (glycan <- o_glycan_core_1())
@@ -148,6 +149,10 @@ collapse_substituent_tokens <- function(subs) {
 #'
 #' @export
 remove_substituents <- function(glycan) {
+  if (inherits(glycan, "igraph")) {
+    return(.remove_substituents_single(glycan))
+  }
+
   if (!is_glycan_structure(glycan)) {
     cli::cli_abort(c(
       "Input must be a glyrepr_structure vector.",

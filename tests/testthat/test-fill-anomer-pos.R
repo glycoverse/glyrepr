@@ -94,6 +94,24 @@ test_that("fill_anomer_pos fills floating attachment positions", {
   )
 })
 
+test_that("fill_anomer_pos works with glycan graphs without reordering", {
+  structure <- as_glycan_structure(
+    "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-"
+  )
+  graph <- get_structure_graphs(structure)
+  names_before <- igraph::V(graph)$name
+  edges_before <- igraph::as_edgelist(graph, names = FALSE)
+
+  result <- fill_anomer_pos(graph)
+
+  expect_s3_class(result, "igraph")
+  expect_identical(igraph::V(result)$name, names_before)
+  expect_identical(igraph::as_edgelist(result, names = FALSE), edges_before)
+  expect_identical(igraph::E(result)$linkage, "?1-?")
+  expect_identical(result$anomer, "?1")
+  expect_identical(result$floating_parts[[1]]$linkage, "?2-?")
+})
+
 test_that("fill_anomer_pos preserves known floating attachment positions", {
   struc <- as_glycan_structure(
     "{Neu5Ac(a2-3)|1,2}Gal(??-4)GalNAc(??-"

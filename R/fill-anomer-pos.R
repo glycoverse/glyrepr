@@ -11,11 +11,12 @@
 #' from the root of the main tree. Positions in virtual floating-part
 #' attachment linkages are inferred from each floating part's root residue.
 #'
-#' @param strucs A [glycan_structure()] vector with concrete or generic
-#'   monosaccharides.
+#' @param strucs A [glycan_structure()] vector or glycan `igraph` with concrete
+#'   or generic monosaccharides.
 #'
-#' @returns A [glycan_structure()] vector with anomer positions added where
-#'   missing.
+#' @returns An object of the same representation as `strucs` with anomer
+#'   positions added where missing. Graph input retains its vertex IDs and
+#'   order.
 #'
 #' @examples
 #' glycans <- as_glycan_structure(c(
@@ -26,6 +27,9 @@
 #'
 #' @export
 fill_anomer_pos <- function(strucs) {
+  if (inherits(strucs, "igraph")) {
+    return(.fill_anomer_pos_single(strucs))
+  }
   checkmate::assert_class(strucs, "glyrepr_structure")
   .smap_structure_impl(
     strucs,

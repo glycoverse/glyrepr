@@ -193,6 +193,25 @@ test_that("reduce_structure_level works for each glycan separately", {
   )
 })
 
+test_that("reduce_structure_level works with graphs without reordering", {
+  structure <- as_glycan_structure(
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  )
+  graph <- get_structure_graphs(structure)
+  names_before <- igraph::V(graph)$name
+  edges_before <- igraph::as_edgelist(graph, names = FALSE)
+
+  result <- reduce_structure_level(graph, to_level = "basic")
+
+  expect_s3_class(result, "igraph")
+  expect_identical(igraph::V(result)$name, names_before)
+  expect_identical(igraph::as_edgelist(result, names = FALSE), edges_before)
+  expect_identical(igraph::V(result)$mono, c("NeuAc", "Hex", "HexNAc"))
+  expect_identical(igraph::E(result)$linkage, "??-?")
+  expect_identical(result$anomer, "??")
+  expect_identical(result$floating_parts[[1]]$linkage, "??-?")
+})
+
 test_that("reduce_structure_level rejects higher level", {
   glycan <- as_glycan_structure("Hex(??-?)HexNAc(??-")
   expect_snapshot(

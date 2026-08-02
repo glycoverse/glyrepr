@@ -16,13 +16,17 @@
 #' and candidate-parent indices for remaining parts are remapped to the new
 #' canonical main-tree order.
 #'
-#' Missing values, vector positions, and names in `x` are preserved.
+#' Missing values, vector positions, and names in structure-vector input are
+#' preserved. For graph input, `glycan_id` must be `1L`, and selected edges are
+#' appended without canonicalizing or renumbering vertices.
 #'
-#' @param x A glycan structure vector.
+#' @param x A glycan structure vector or a glycan `igraph`.
 #' @param assignments A data frame with integer columns `glycan_id`, `part_id`,
 #'   and `parent_node`. Each `(glycan_id, part_id)` pair may occur at most once.
 #'
-#' @returns A glycan structure vector with the same length and names as `x`.
+#' @returns An object of the same representation as `x`. Structure-vector
+#'   output has the same length and names as `x`; graph output retains its
+#'   vertex IDs and order.
 #'
 #' @examples
 #' glycan <- as_glycan_structure(
@@ -37,11 +41,24 @@
 #'
 #' @export
 localize_floating_parts <- function(x, assignments) {
-  checkmate::assert_class(x, "glyrepr_structure")
-  assignments <- validate_floating_assignments(assignments, length(x))
+  is_graph <- inherits(x, "igraph")
+  if (!is_graph) {
+    checkmate::assert_class(x, "glyrepr_structure")
+  }
+  input_size <- if (is_graph) 1L else length(x)
+  assignments <- validate_floating_assignments(assignments, input_size)
 
   if (nrow(assignments) == 0) {
     return(x)
+  }
+
+  if (is_graph) {
+    return(localize_floating_graph(
+      x,
+      assignments,
+      glycan_id = 1L,
+      canonicalize = FALSE
+    ))
   }
 
   graphs <- as.list(x)
@@ -527,9 +544,15 @@ validate_floating_assignments <- function(assignments, input_size) {
 #' @param graph A valid glycan graph.
 #' @param assignments Assignment rows for this graph.
 #' @param glycan_id Input glycan identifier used in errors.
-#' @returns A valid, canonicalized glycan graph.
+#' @param canonicalize Whether to canonicalize the localized graph.
+#' @returns A valid glycan graph, canonicalized when `canonicalize` is `TRUE`.
 #' @noRd
-localize_floating_graph <- function(graph, assignments, glycan_id = 1L) {
+localize_floating_graph <- function(
+  graph,
+  assignments,
+  glycan_id = 1L,
+  canonicalize = TRUE
+) {
   parts <- normalize_floating_parts(graph)
   main_vertices <- floating_main_vertices(graph, parts)
 
@@ -586,7 +609,10 @@ localize_floating_graph <- function(graph, assignments, glycan_id = 1L) {
   })
   graph <- set_floating_parts_attr(graph, remaining)
   graph <- validate_glycan_graph(graph)
-  canonicalize_glycan_graph(graph)
+  if (canonicalize) {
+    graph <- canonicalize_glycan_graph(graph)
+  }
+  graph
 }
 
 
