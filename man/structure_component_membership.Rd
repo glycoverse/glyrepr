@@ -7,7 +7,7 @@
 structure_component_membership(x)
 }
 \arguments{
-\item{x}{A glycan structure vector.}
+\item{x}{A glycan structure vector or one glycan \code{igraph}.}
 }
 \value{
 A tibble with columns \code{glycan_id}, \code{node_id}, \code{component_type},
@@ -25,8 +25,9 @@ corresponding \code{part_id} from \code{\link[=structure_floating_parts]{structu
 
 Node indices refer to \code{structure_nodes()$node_id} for the same glycan.
 Missing structures contribute no rows. Duplicate structures are expanded to
-their original vector positions. If \code{x} is named, the result also contains a
-\code{glycan_name} column.
+their original vector positions. For graph input, node indices are current
+numeric vertex positions and \code{glycan_id} is \code{1L}. If vector input is named,
+the result also contains a \code{glycan_name} column.
 }
 \examples{
 glycan <- as_glycan_structure(

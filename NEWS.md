@@ -1,5 +1,6 @@
 # glyrepr (development version)
 
+* Core structure inspection, transformation, graph-table, composition, and IUPAC APIs now accept individual glycan `igraph` objects directly while preserving existing `glyrepr_structure` vector behavior; graph transformations and tables retain current vertex IDs.
 * `glycan_structure()` now supports floating glycan substructures with optional candidate-parent indices through `{<floating>}` and `{<floating>|<parents>}` syntax, together with floating-aware graph validation, canonicalization, transformations, and graph-table conversion. Singleton parent sets are normalized to ordinary graph edges. (#80)
 * Floating structure nodes now follow the complete IUPAC-condensed sequence, including brace-prefixed components; tabular parent IDs are global node IDs while serialized parent indices remain local to the main tree. (#80)
 * Canonical `floating_parts` graph metadata now stores a `nodes` vector containing every node in each floating component, and internal consumers use it instead of rediscovering component membership; legacy graph inputs without this field remain supported. (#80)

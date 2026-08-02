@@ -17,7 +17,7 @@ structure_floating_parts(x)
 structure_from_tibbles(nodes, edges, anomers, floating_parts = NULL)
 }
 \arguments{
-\item{x}{A glycan structure vector.}
+\item{x}{A glycan structure vector or one glycan \code{igraph}.}
 
 \item{nodes}{A data frame with columns \code{glycan_id}, \code{node_id}, \code{mono}, and
 \code{sub}, and optionally \code{glycan_name}.}
@@ -44,9 +44,10 @@ list-column \code{parents}.
 }
 \description{
 \code{structure_nodes()}, \code{structure_edges()}, and
-\code{structure_floating_parts()} convert a glycan structure vector to normalized
-graph tables. \code{structure_from_tibbles()} rebuilds a \code{glyrepr_structure}
-vector from those tables and a vector of reducing-end anomers.
+\code{structure_floating_parts()} convert a glycan structure vector or one glycan
+\code{igraph} to normalized graph tables. \code{structure_from_tibbles()} rebuilds a
+\code{glyrepr_structure} vector from those tables and a vector of reducing-end
+anomers.
 
 The \code{glycan_id} column is the integer position of each glycan in the input
 vector. Duplicate structures are expanded to their original vector positions.
@@ -56,9 +57,11 @@ If \code{x} is named, all three tibbles also contain a \code{glycan_name} column
 \code{structure_from_tibbles()} uses \code{glycan_name} as output names when that
 column is present.
 
-\code{structure_nodes()$node_id} follows residue order in the complete canonical
-IUPAC-condensed string. For a floating structure, nodes from each
-brace-enclosed floating part therefore precede nodes from the main tree.
+For structure-vector input, \code{structure_nodes()$node_id} follows residue order
+in the complete canonical IUPAC-condensed string. For graph input, it follows
+the graph's current numeric vertex positions without canonicalizing or
+renumbering them. A graph is represented with \code{glycan_id = 1L} and no
+\code{glycan_name} column.
 
 In \code{structure_floating_parts()}, \code{root_node} and every integer in the \code{nodes}
 and \code{parents} list-columns refer to \code{structure_nodes()$node_id} for the same

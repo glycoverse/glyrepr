@@ -294,6 +294,41 @@ test_that("structure_candidate_edges returns a typed empty table", {
   expect_equal(nrow(edges), 0)
 })
 
+test_that("structure table accessors accept one glycan graph", {
+  structure <- as_glycan_structure(
+    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  )
+  graph <- get_structure_graphs(structure)
+  accessors <- list(
+    structure_nodes,
+    structure_edges,
+    structure_floating_parts,
+    structure_floating_candidates,
+    structure_component_membership,
+    structure_candidate_edges
+  )
+
+  for (accessor in accessors) {
+    expect_identical(accessor(graph), accessor(structure))
+  }
+})
+
+test_that("structure tables retain current graph vertex positions", {
+  graph <- get_structure_graphs(o_glycan_core_1())
+  graph <- igraph::permute(graph, c(2L, 1L))
+
+  nodes <- structure_nodes(graph)
+  edges <- structure_edges(graph)
+  edge_ends <- igraph::as_edgelist(graph, names = FALSE)
+
+  expect_named(nodes, c("glycan_id", "node_id", "mono", "sub"))
+  expect_identical(nodes$glycan_id, rep(1L, igraph::vcount(graph)))
+  expect_identical(nodes$node_id, seq_len(igraph::vcount(graph)))
+  expect_identical(nodes$mono, igraph::V(graph)$mono)
+  expect_identical(edges$from_node, as.integer(edge_ends[, 1]))
+  expect_identical(edges$to_node, as.integer(edge_ends[, 2]))
+})
+
 test_that("structure_from_tibbles recreates structure vectors", {
   glycans <- c(o_glycan_core_1(), n_glycan_core())
   nodes <- structure_nodes(glycans)
