@@ -41,10 +41,10 @@
 #' normalized to an ordinary graph edge, so `has_floating_parts()` returns
 #' `FALSE` for the normalized structure.
 #'
-#' @param x A [glycan_structure()] vector.
+#' @param x A [glycan_structure()] vector or a glycan `igraph`.
 #'
-#' @returns A logical vector with the same length and names as `x`. Missing
-#'   structures produce `NA`.
+#' @returns A logical vector with the same length and names as vector input, or
+#'   a logical scalar for graph input. Missing structures produce `NA`.
 #'
 #' @examples
 #' main <- paste0(
@@ -67,6 +67,9 @@
 #' @seealso [structure_floating_parts()], [as_glycan_structure()]
 #' @export
 has_floating_parts <- function(x) {
+  if (inherits(x, "igraph")) {
+    return(has_floating_parts_graph(x))
+  }
   checkmate::assert_class(x, "glyrepr_structure")
   smap_lgl(x, has_floating_parts_graph)
 }

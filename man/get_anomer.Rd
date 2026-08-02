@@ -7,10 +7,11 @@
 get_anomer(x)
 }
 \arguments{
-\item{x}{A glycan structure vector (glyrepr_structure).}
+\item{x}{A glycan structure vector or a glycan \code{igraph}.}
 }
 \value{
-a character vector of the anomeric information.
+A character vector for structure-vector input, or a character scalar
+for graph input.
 }
 \description{
 Get the Anomeric information

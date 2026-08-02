@@ -13,6 +13,7 @@ Supported inputs include:
 \item Named integer vectors or lists of named integer vectors
 \item Character vectors with composition strings (e.g., "Hex(5)HexNAc(2)")
 \item \code{glyrepr_structure} objects (counts both monosaccharides and substituents)
+\item Glycan \code{igraph} objects (returns a length-one composition vector)
 \item Existing \code{glyrepr_composition} objects (returned as-is)
 }}
 }
@@ -54,8 +55,10 @@ as_glycan_composition(c("H5N2", "H5N4S1F1"))
 comp <- glycan_composition(c(Hex = 5, HexNAc = 2))
 as_glycan_composition(comp)
 
-# From a glycan structure vector
+# From a glycan structure vector or graph
 strucs <- c(n_glycan_core(), o_glycan_core_1())
 as_glycan_composition(strucs)
+graph <- get_structure_graphs(strucs[[1]])
+as_glycan_composition(graph)
 
 }

@@ -5,7 +5,7 @@
 #' This function checks if a glycan structure has linkages,
 #' in a strict or lenient way.
 #'
-#' @param glycan A [glycan_structure()] vector.
+#' @param glycan A [glycan_structure()] vector or a glycan `igraph`.
 #' @param strict A logical value.
 #'   * If `FALSE` (default), a glycan is considered to have linkages if any
 #'     linkage is partially known (not "??-?").
@@ -14,7 +14,8 @@
 #'   Linkages include both graph edges and the virtual attachment linkage of
 #'   each floating part.
 #'
-#' @returns A logical vector indicating if each glycan structure has linkages.
+#' @returns A logical vector for structure-vector input, or a logical scalar for
+#'   graph input.
 #'
 #' @examples
 #' glycan <- o_glycan_core_1(linkage = TRUE)
@@ -33,9 +34,13 @@
 #'
 #' @export
 has_linkages <- function(glycan, strict = FALSE) {
-  checkmate::assert_class(glycan, "glyrepr_structure")
   checkmate::assert_flag(strict)
 
+  if (inherits(glycan, "igraph")) {
+    return(.has_linkages_single(glycan, strict))
+  }
+
+  checkmate::assert_class(glycan, "glyrepr_structure")
   smap_lgl(glycan, .has_linkages_single, strict = strict)
 }
 

@@ -7,11 +7,12 @@
 get_structure_level(x)
 }
 \arguments{
-\item{x}{A \code{\link[=glycan_structure]{glycan_structure()}} vector.}
+\item{x}{A \code{\link[=glycan_structure]{glycan_structure()}} vector or a glycan \code{igraph}.}
 }
 \value{
 A character scalar containing the structure level for \code{x}.
-If \code{x} is empty or all structures in \code{x} are NA, returns NA_character_.
+For vector input, if \code{x} is empty or all structures in \code{x} are \code{NA},
+returns \code{NA_character_}.
 }
 \description{
 Glycan structures can have four possible levels of resolution:

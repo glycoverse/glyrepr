@@ -105,6 +105,17 @@ test_that("as_glycan_composition works for a glycan structure", {
   expect_equal(comp, expected_comp)
 })
 
+test_that("as_glycan_composition works for a glycan graph", {
+  structure <- as_glycan_structure("Gal3Me6S(b1-3)GalNAc(a1-")
+  graph <- get_structure_graphs(structure)
+
+  result <- as_glycan_composition(graph)
+  expected <- glycan_composition(c(Gal = 1L, GalNAc = 1L, Me = 1L, S = 1L))
+
+  expect_s3_class(result, "glyrepr_composition")
+  expect_identical(result, expected)
+})
+
 test_that("as_glycan_composition works for a glycan structure with substituents", {
   graph <- igraph::make_graph(~ 1 - +2, 2 - +3)
   igraph::V(graph)$mono <- c("Glc", "Gal", "Glc")

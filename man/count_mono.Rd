@@ -4,6 +4,7 @@
 \alias{count_mono}
 \alias{count_mono.glyrepr_composition}
 \alias{count_mono.glyrepr_structure}
+\alias{count_mono.igraph}
 \title{Get the Number of Monosaccharides}
 \usage{
 count_mono(x, mono = NULL, include_subs = FALSE)
@@ -11,10 +12,12 @@ count_mono(x, mono = NULL, include_subs = FALSE)
 \method{count_mono}{glyrepr_composition}(x, mono = NULL, include_subs = FALSE)
 
 \method{count_mono}{glyrepr_structure}(x, mono = NULL, include_subs = FALSE)
+
+\method{count_mono}{igraph}(x, mono = NULL, include_subs = FALSE)
 }
 \arguments{
-\item{x}{A glycan composition (\code{glyrepr_composition}) or
-a glycan structure (\code{glyrepr_structure}) vector.}
+\item{x}{A glycan composition (\code{glyrepr_composition}), a glycan structure
+(\code{glyrepr_structure}) vector, or a glycan \code{igraph}.}
 
 \item{mono}{The monosaccharide or substituent to count. A character scalar.
 If \code{NULL} (default), return the total number of monosaccharides.}
@@ -23,7 +26,8 @@ If \code{NULL} (default), return the total number of monosaccharides.}
 Default is \code{FALSE}.}
 }
 \value{
-A numeric vector of the same length as \code{x}.
+A numeric vector of the same length as \code{x}, or a numeric scalar for
+graph input.
 }
 \description{
 When \code{mono} is:

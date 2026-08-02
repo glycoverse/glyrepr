@@ -162,6 +162,16 @@ test_that("count_mono works with glycan structures", {
   expect_equal(count_mono(struct2, "HexNAc"), 1) # Count GlcNAc
 })
 
+test_that("count_mono works with a glycan graph", {
+  structure <- as_glycan_structure("Gal3Me6S(b1-3)GalNAc(a1-")
+  graph <- get_structure_graphs(structure)
+
+  expect_identical(count_mono(graph), 2L)
+  expect_identical(count_mono(graph, include_subs = TRUE), 4L)
+  expect_identical(count_mono(graph, "HexNAc"), 1L)
+  expect_identical(count_mono(graph, "S"), 1L)
+})
+
 test_that("count_mono works with multiple structures", {
   # Test with N-glycan and O-glycan cores
   n_glycan <- n_glycan_core()

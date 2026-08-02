@@ -25,10 +25,11 @@
 #' because linkage information is far more difficult to acquire than monosaccharide information.
 #' This kind of glycan structure is also assigned to "basic" level.
 #'
-#' @param x A [glycan_structure()] vector.
+#' @param x A [glycan_structure()] vector or a glycan `igraph`.
 #'
 #' @returns A character scalar containing the structure level for `x`.
-#'   If `x` is empty or all structures in `x` are NA, returns NA_character_.
+#'   For vector input, if `x` is empty or all structures in `x` are `NA`,
+#'   returns `NA_character_`.
 #'
 #' @examples
 #' glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")
@@ -42,6 +43,9 @@
 #' @seealso [has_linkages()], [has_floating_parts()], [get_mono_type()]
 #' @export
 get_structure_level <- function(x) {
+  if (inherits(x, "igraph")) {
+    return(get_graph_structure_level(x))
+  }
   checkmate::assert_class(x, "glyrepr_structure")
 
   non_na <- !structure_na_mask(x)
@@ -68,6 +72,27 @@ get_structure_level <- function(x) {
   }
 
   if (any(has_linkages_lenient)) {
+    return("partial")
+  }
+
+  "topological"
+}
+
+get_graph_structure_level <- function(graph) {
+  mono_type <- get_graph_mono_type(graph)
+  has_linkages_strict <- .has_linkages_single(graph, strict = TRUE)
+  has_linkages_lenient <- .has_linkages_single(graph, strict = FALSE)
+
+  if (mono_type == "generic") {
+    .warn_generic_linkage_structure_level(has_linkages_lenient)
+    return("basic")
+  }
+
+  if (has_linkages_strict) {
+    return("intact")
+  }
+
+  if (has_linkages_lenient) {
     return("partial")
   }
 
