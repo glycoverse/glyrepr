@@ -21,7 +21,7 @@ Can be "generic" (Hex, HexNAc, dHex, NeuAc, etc.)
 or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".}
 }
 \value{
-A glycan structure (igraph) object.
+A \code{\link[=glycan_structure]{glycan_structure()}} vector of length one.
 }
 \description{
 Create example glycan structures for testing and demonstration.

@@ -54,7 +54,7 @@
 #'   Can be "generic" (Hex, HexNAc, dHex, NeuAc, etc.)
 #'   or "concrete" (Man, Gal, HexNAc, Fuc, etc.). Default is "concrete".
 #'
-#' @returns A glycan structure (igraph) object.
+#' @returns A [glycan_structure()] vector of length one.
 #'
 #' @examples
 #' print(n_glycan_core(), verbose = TRUE)
