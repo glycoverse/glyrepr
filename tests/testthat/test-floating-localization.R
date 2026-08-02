@@ -117,6 +117,43 @@ test_that("localize_floating_parts preserves graph vertex IDs", {
   )
 })
 
+test_that("graph localization keeps unrestricted domains on the original main tree", {
+  structure <- as_glycan_structure(
+    paste0(
+      "{Fuc(a1-2)|1,2}",
+      "{Neu5Ac(a2-6)}",
+      "Gal(b1-3)GalNAc(a1-"
+    )
+  )
+  graph <- get_structure_graphs(structure)
+  names_before <- igraph::V(graph)$name
+  edges_before <- igraph::as_edgelist(graph, names = FALSE)
+
+  result <- localize_floating_parts(
+    graph,
+    tibble::tibble(
+      glycan_id = 1L,
+      part_id = 1L,
+      parent_node = 3L
+    )
+  )
+
+  expect_identical(igraph::V(result)$name, names_before)
+  expect_identical(
+    igraph::as_edgelist(result, names = FALSE),
+    rbind(edges_before, c(3, 1))
+  )
+  expect_identical(
+    result$floating_parts,
+    list(list(
+      root = 2L,
+      nodes = 2L,
+      linkage = "a2-6",
+      parents = c(3L, 4L)
+    ))
+  )
+})
+
 test_that("localize_floating_parts returns an unchanged graph for no assignments", {
   graph <- get_structure_graphs(as_glycan_structure(
     "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
