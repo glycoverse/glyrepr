@@ -50,7 +50,10 @@ There are two types of monosaccharides:
 
 - generic: e.g. "Hex", "HexNAc", "HexA", "HexN", etc. Concrete furanose
   forms such as "Galf" and "GlcfNAc" convert to the same generic names
-  as their ringless forms: "Hex" and "HexNAc", respectively.
+  as their ringless forms: "Hex" and "HexNAc", respectively. Explicit
+  unusual configurations also convert to the same generic names as their
+  natural counterparts. For example, "DFuc" and "DFucf" both convert to
+  "dHex".
 
 For the full list of monosaccharides, use
 [`available_monosaccharides()`](https://glycoverse.github.io/glyrepr/dev/reference/available_monosaccharides.md).

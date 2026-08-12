@@ -31,6 +31,10 @@ A glyrepr_structure object.
 
 ## Details
 
+Character input assumes the natural absolute configuration for
+unprefixed monosaccharides. Less common configurations use a leading `D`
+or `L` without a separator, such as `DFuc`, `LGul`, and `DFucf`.
+
 Character input supports floating-part blocks before the main
 IUPAC-condensed structure. `{Neu5Ac(a2-3)}<main>` allows every feasible
 main-tree node as a candidate parent, while `{Neu5Ac(a2-3)|1,4}<main>`
@@ -82,6 +86,12 @@ as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
 #> [1] GlcNAc(b1-4)GlcNAc(b1-
 #> [2] Man(a1-2)GlcNAc(b1-
 #> # Unique structures: 2
+as_glycan_structure(c("DFuc(a1-", "LGul(b1-", "DFucf(a1-"))
+#> <glycan_structure[3]>
+#> [1] DFuc(a1-
+#> [2] LGul(b1-
+#> [3] DFucf(a1-
+#> # Unique structures: 3
 
 # Parse a floating residue with two candidate parents
 floating_iupac <- paste0(
