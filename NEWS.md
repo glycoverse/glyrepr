@@ -1,5 +1,6 @@
 # glyrepr (development version)
 
+* `as_glycan_structure()` now accepts omitted reducing-end annotations by inferring the anomer position, normalizes `(?-?)` to `(??-?)`, and collapses linkage-position choices containing `?` to a single unknown position. (#83)
 * Concrete monosaccharides now support explicit furanose forms such as `Galf` and `GlcfNAc`; generic conversion remains unchanged, so these become `Hex` and `HexNAc`, respectively. (#82)
 * Structure inspection, transformation, graph-table, composition, and IUPAC APIs now accept individual glycan `igraph` objects directly while preserving existing `glyrepr_structure` vector behavior and vertex IDs. (#81)
 * `glycan_structure()` and `as_glycan_structure()` now support floating glycan substructures with optional candidate-parent indices using `{<floating>}` and `{<floating>|<parents>}` syntax. Floating structures are validated, canonicalized, transformed, and converted to graph tables while preserving parent-index semantics. (#80)
