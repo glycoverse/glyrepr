@@ -1,16 +1,21 @@
 # glyrepr (development version)
 
-* `as_glycan_structure()` now accepts omitted reducing-end annotations by inferring the anomer position, normalizes `(?-?)` to `(??-?)`, and collapses linkage-position choices containing `?` to a single unknown position. (#83)
+## New features
+
+* `as_glycan_structure()` and `glycan_structure()` now support floating glycan substructures with optional candidate-parent indices using `{<floating>}` and `{<floating>|<parents>}` syntax. Floating structures are validated, canonicalized, transformed, and converted to graph tables while preserving parent-index semantics. (#80)
 * Concrete monosaccharides now support explicit furanose forms such as `Galf` and `GlcfNAc`; generic conversion remains unchanged, so these become `Hex` and `HexNAc`, respectively. (#82)
+* New `enumerate_floating_graph_localizations()`, `enumerate_floating_localizations()`, and `localize_floating_parts()` APIs attach or enumerate conflict-free floating-part assignments with provenance; graph-level results retain original vertex IDs, and `deduplicate = FALSE` retains assignments that canonicalize to the same structure. (#80)
+* `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)
+* New `structure_candidate_edges()`, `structure_component_membership()`, and `structure_floating_candidates()` helpers expose floating-part membership and candidate attachments for inspection, drawing, and constraint-aware graph operations. (#80)
 * Structure inspection, transformation, graph-table, composition, and IUPAC APIs now accept individual glycan `igraph` objects directly while preserving existing `glyrepr_structure` vector behavior and vertex IDs. (#81)
-* `glycan_structure()` and `as_glycan_structure()` now support floating glycan substructures with optional candidate-parent indices using `{<floating>}` and `{<floating>|<parents>}` syntax. Floating structures are validated, canonicalized, transformed, and converted to graph tables while preserving parent-index semantics. (#80)
-* New `structure_component_membership()`, `structure_floating_candidates()`, and `structure_candidate_edges()` helpers expose floating-part membership and candidate attachments for inspection, drawing, and constraint-aware graph operations. (#80)
-* New `localize_floating_parts()`, `enumerate_floating_localizations()`, and `enumerate_floating_graph_localizations()` APIs attach or enumerate conflict-free floating-part assignments with provenance; graph-level results retain original vertex IDs, and `deduplicate = FALSE` retains assignments that canonicalize to the same structure. (#80)
+
+## Minor improvements and fixes
+
+* `as_glycan_structure()` now accepts omitted reducing-end annotations by inferring the anomer position, normalizes `(?-?)` to `(??-?)`, and collapses linkage-position choices containing `?` to a single unknown position. (#83)
 * Floating-part graph metadata now records the nodes in each component, while legacy graph inputs without this metadata remain supported. (#80)
 * `get_structure_level()` and `reduce_structure_level()` now treat floating candidate-parent ambiguity independently from linkage resolution; fully specified floating structures can be intact and reduced to topological resolution. (#80)
-* `validate_glycan_graph()` and `as_glycan_structure()` are faster through bulk linkage-position validation. (#79)
-* `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)
 * IUPAC-condensed sequence generation from glycan graphs is faster by reducing repeated `igraph` extraction. (#78)
+* `validate_glycan_graph()` and `as_glycan_structure()` are faster through bulk linkage-position validation. (#79)
 
 # glyrepr 0.14.0
 
