@@ -7,6 +7,12 @@
 #' @return An igraph object representing the glycan structure
 #' @keywords internal
 .parse_iupac_condensed_single <- function(x) {
+  x <- stringr::str_replace_all(
+    x,
+    stringr::fixed("(?-?)"),
+    "(??-?)"
+  )
+
   if (!isTRUE(startsWith(x, "{"))) {
     return(.parse_iupac_tree_single(x))
   }
