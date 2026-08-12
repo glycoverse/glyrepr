@@ -185,6 +185,9 @@ test_that("as_glycan_structure.character handles unknown linkages", {
   glycan <- as_glycan_structure(iupac)
   expect_s3_class(glycan, "glyrepr_structure")
   expect_equal(structure_to_iupac(glycan), "Man(a1-?)Man(?1-3)Man(?1-")
+
+  shorthand <- as_glycan_structure("Gal(?-?)GalNAc(?1-")
+  expect_equal(structure_to_iupac(shorthand), "Gal(??-?)GalNAc(?1-")
 })
 
 test_that("as_glycan_structure.character handles multiple linkages", {
