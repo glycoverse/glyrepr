@@ -31,6 +31,43 @@ substituent_name_pattern <- function(longest_first = FALSE) {
   stringr::str_c(stringr::str_escape(substituents), collapse = "|")
 }
 
+#' Build a Substituent Position Regex Pattern
+#'
+#' @returns A regex alternation pattern for one substituent position, ambiguous
+#'   slash-separated positions, or an unknown position.
+#'
+#' @noRd
+substituent_position_pattern <- function() {
+  "(?:[1-9](?:/[1-9])*|\\?)"
+}
+
+#' Build a Substituent Token Regex Pattern
+#'
+#' @param longest_first Whether to sort longer substituent names before shorter
+#'   names in the regex alternation.
+#' @param anchored Whether to anchor the pattern at the start and end.
+#'
+#' @returns A regex pattern for one complete substituent token.
+#'
+#' @noRd
+substituent_token_pattern <- function(
+  longest_first = FALSE,
+  anchored = FALSE
+) {
+  checkmate::assert_flag(longest_first)
+  checkmate::assert_flag(anchored)
+
+  position <- substituent_position_pattern()
+  name <- substituent_name_pattern(longest_first = longest_first)
+  pattern <- stringr::str_glue("{position}(?:{name})")
+
+  if (anchored) {
+    pattern <- stringr::str_glue("^{pattern}$")
+  }
+
+  pattern
+}
+
 #' Normalize Substituent String
 #'
 #' Takes a substituent string (potentially with multiple substituents) and
@@ -74,9 +111,11 @@ normalize_substituents <- function(sub) {
 #'
 #' @noRd
 substituent_position_tokens <- function(subs) {
+  pattern <- stringr::str_glue("^{substituent_position_pattern()}")
+
   purrr::map_chr(
     subs,
-    ~ stringr::str_extract(.x, "^[\\d\\?]")
+    ~ stringr::str_extract(.x, pattern)
   )
 }
 
@@ -94,7 +133,11 @@ substituent_position_values <- function(subs) {
   positions <- substituent_position_tokens(subs)
 
   purrr::map_dbl(positions, function(pos) {
-    if (pos == "?") Inf else as.numeric(pos)
+    if (pos == "?") {
+      Inf
+    } else {
+      as.numeric(stringr::str_extract(pos, "^[1-9]"))
+    }
   })
 }
 

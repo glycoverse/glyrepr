@@ -11,6 +11,7 @@
 
 ## Minor improvements and fixes
 
+* `as_glycan_structure()` and `glycan_structure()` now support ambiguous substituent positions such as `Gal4/6S(a1-` and preserve them during graph and IUPAC conversion.
 * `as_glycan_structure()` now accepts omitted reducing-end annotations by inferring the anomer position, normalizes `(?-?)` to `(??-?)`, and collapses linkage-position choices containing `?` to a single unknown position. (#83)
 * Floating-part graph metadata now records the nodes in each component, while legacy graph inputs without this metadata remain supported. (#80)
 * `get_structure_level()` and `reduce_structure_level()` now treat floating candidate-parent ambiguity independently from linkage resolution; fully specified floating structures can be intact and reduced to topological resolution. (#80)

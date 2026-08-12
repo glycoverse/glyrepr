@@ -172,7 +172,7 @@ patrick::with_parameters_test_that(
     graph$anomer <- "b1"
     expect_no_error(glycan_structure(graph))
   },
-  sub = c("6S", "9Ac", "2P", "?S")
+  sub = c("6S", "9Ac", "2P", "?S", "4/6S", "3/4/6Ac")
 )
 
 

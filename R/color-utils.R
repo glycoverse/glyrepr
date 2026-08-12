@@ -220,8 +220,7 @@ colorize_iupac_string <- function(iupac_text, mono_names) {
   }
 
   # For other monosaccharides, remove substituents
-  subs_pattern <- substituent_name_pattern(longest_first = TRUE)
-  single_sub_pattern <- stringr::str_glue("[1-9\\?]({subs_pattern})")
+  single_sub_pattern <- substituent_token_pattern(longest_first = TRUE)
 
   # Find all substituents
   all_subs <- stringr::str_extract_all(mono, single_sub_pattern)[[1]]
