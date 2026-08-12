@@ -102,9 +102,7 @@ as_glycan_structure(
 )
 #> Warning: 1 structure failed validation and was replaced with `NA`.
 #> ✖ Position 2 (`invalid`): Could not parse IUPAC-condensed string:
-#>   "not-a-structure" ℹ Can't extract anomer information. ℹ Anomer information is
-#>   required for the reducing-end monosaccharide. ℹ For example, use 'Man(a1-'
-#>   instead of 'Man'.
+#>   "not-a-structure" ℹ Invalid characters or format in IUPAC-condensed string
 #> <glycan_structure[2]>
 #> [1] valid    Glc(?1-
 #> [2] invalid  NA

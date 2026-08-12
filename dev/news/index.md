@@ -2,6 +2,11 @@
 
 ## glyrepr (development version)
 
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  now accepts omitted reducing-end annotations by inferring the anomer
+  position, normalizes `(?-?)` to `(??-?)`, and collapses
+  linkage-position choices containing `?` to a single unknown position.
+  ([\#83](https://github.com/glycoverse/glyrepr/issues/83))
 - Concrete monosaccharides now support explicit furanose forms such as
   `Galf` and `GlcfNAc`; generic conversion remains unchanged, so these
   become `Hex` and `HexNAc`, respectively.
