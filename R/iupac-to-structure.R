@@ -433,13 +433,29 @@ combine_floating_iupac_graphs <- function(main, parts) {
 .extract_substituent <- function(mono) {
   single_sub_pattern <- substituent_token_pattern(longest_first = TRUE)
 
-  # Handle different types of monosaccharides
-  result <- if (stringr::str_starts(mono, "Neu")) {
-    # Handle all Neu-based monosaccharides
-    .handle_neu_monosaccharide(mono, single_sub_pattern)
+  unusual_mono <- .match_unusual_configuration_monosaccharide(mono)
+  if (!is.na(unusual_mono)) {
+    natural_mono <- .natural_configuration_monosaccharide(unusual_mono)
+    suffix <- stringr::str_remove(mono, stringr::fixed(unusual_mono))
+    result <- .extract_substituent_without_configuration(
+      paste0(natural_mono, suffix),
+      single_sub_pattern
+    )
+    restored_mono <- unname(
+      unusual_configuration_monosaccharides[result[["mono"]]]
+    )
+    if (is.na(restored_mono)) {
+      restored_mono <- paste0(
+        stringr::str_sub(unusual_mono, 1, 1),
+        result[["mono"]]
+      )
+    }
+    result[["mono"]] <- restored_mono
   } else {
-    # Handle non-Neu monosaccharides
-    .handle_general_monosaccharide(mono, single_sub_pattern)
+    result <- .extract_substituent_without_configuration(
+      mono,
+      single_sub_pattern
+    )
   }
 
   # Validate that the monosaccharide is known
@@ -448,6 +464,21 @@ combine_floating_iupac_graphs <- function(main, parts) {
   }
 
   result
+}
+
+
+.extract_substituent_without_configuration <- function(
+  mono,
+  single_sub_pattern
+) {
+  # Handle different types of monosaccharides
+  if (stringr::str_starts(mono, "Neu")) {
+    # Handle all Neu-based monosaccharides
+    .handle_neu_monosaccharide(mono, single_sub_pattern)
+  } else {
+    # Handle non-Neu monosaccharides
+    .handle_general_monosaccharide(mono, single_sub_pattern)
+  }
 }
 
 # Handle Neu-based monosaccharides with substituents

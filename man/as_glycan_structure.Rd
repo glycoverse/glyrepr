@@ -26,6 +26,10 @@ A glyrepr_structure object.
 Convert an object to a glycan structure vector.
 }
 \details{
+Character input assumes the natural absolute configuration for unprefixed
+monosaccharides. Less common configurations use a leading \code{D} or \code{L} without
+a separator, such as \code{DFuc}, \code{LGul}, and \code{DFucf}.
+
 Character input supports floating-part blocks before the main
 IUPAC-condensed structure. \verb{\{Neu5Ac(a2-3)\}<main>} allows every feasible
 main-tree node as a candidate parent, while
@@ -56,6 +60,7 @@ as_glycan_structure(list(graph, o_glycan_graph))
 
 # Convert a character vector of IUPAC-condensed strings
 as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
+as_glycan_structure(c("DFuc(a1-", "LGul(b1-", "DFucf(a1-"))
 
 # Parse a floating residue with two candidate parents
 floating_iupac <- paste0(

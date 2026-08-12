@@ -192,6 +192,13 @@ colorize_iupac_string <- function(iupac_text, mono_names) {
   # Use a simplified version of the substituent extraction logic
   # This avoids circular dependency with iupac-to-structure.R
 
+  unusual_mono <- .match_unusual_configuration_monosaccharide(mono)
+  if (!is.na(unusual_mono)) {
+    natural_mono <- .natural_configuration_monosaccharide(unusual_mono)
+    suffix <- stringr::str_remove(mono, stringr::fixed(unusual_mono))
+    return(.extract_base_mono(paste0(natural_mono, suffix)))
+  }
+
   # Handle special cases first
   if (mono == "Neu5Ac") {
     return("Neu5Ac")

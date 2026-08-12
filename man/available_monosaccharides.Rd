@@ -18,6 +18,9 @@ This function returns a character vector of monosaccharide names of
 the given type. See \code{\link[=get_mono_type]{get_mono_type()}} for monosaacharide types.
 Concrete furanose forms use an \code{f} after the monosaccharide stem, such as
 \code{Galf} and \code{GlcfNAc}. Generic names do not encode ring form.
+Less common absolute configurations use a leading \code{D} or \code{L} without a
+separator, such as \code{DFuc}, \code{LGul}, and \code{DFucf}. Unprefixed names retain
+their natural configurations.
 }
 \examples{
 available_monosaccharides()
