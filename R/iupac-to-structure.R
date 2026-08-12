@@ -12,6 +12,11 @@
     stringr::fixed("(?-?)"),
     "(??-?)"
   )
+  x <- stringr::str_replace_all(
+    x,
+    "\\(([ab\\?][12\\?])-(?:[1-9]/)*\\?(?:/[1-9])*\\)",
+    "(\\1-?)"
+  )
 
   if (!isTRUE(startsWith(x, "{"))) {
     return(.parse_iupac_tree_single(x))

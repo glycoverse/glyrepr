@@ -207,6 +207,17 @@ test_that("as_glycan_structure.character handles multiple linkages", {
   glycan <- as_glycan_structure(iupac)
   expect_s3_class(glycan, "glyrepr_structure")
   expect_equal(structure_to_iupac(glycan), "Neu5Ac(a2-3/6)Gal(?1-")
+
+  unknown_choices <- c(
+    "Gal(b1-4/?)GlcNAc(?1-",
+    "Gal(b1-?/4)GlcNAc(?1-",
+    "Gal(b1-3/?/6)GlcNAc(?1-"
+  )
+  normalized <- as_glycan_structure(unknown_choices)
+  expect_equal(
+    structure_to_iupac(normalized),
+    rep("Gal(b1-?)GlcNAc(?1-", length(unknown_choices))
+  )
 })
 
 test_that("as_glycan_structure.character works with vectors", {
