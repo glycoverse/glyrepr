@@ -1,5 +1,5 @@
 # This table referred to https://www.ncbi.nlm.nih.gov/glycans/snfg.html
-monosaccharides <- tibble::tribble(
+monosaccharide_definitions <- tibble::tribble(
   ~generic  , ~concrete  , ~anomer_pos ,
   # Hexose
   "Hex"     , "Glc"      , 1L          ,
@@ -90,10 +90,111 @@ monosaccharides <- tibble::tribble(
 )
 
 
+# Furanose ring forms use an "f" after the monosaccharide stem. Pyranose
+# forms remain implicit and retain their existing names.
+furanose_monosaccharides <- c(
+  Glc = "Glcf",
+  Man = "Manf",
+  Gal = "Galf",
+  Gul = "Gulf",
+  Alt = "Altf",
+  All = "Allf",
+  Tal = "Talf",
+  Ido = "Idof",
+  GlcNAc = "GlcfNAc",
+  GalNAc = "GalfNAc",
+  ManNAc = "ManfNAc",
+  GulNAc = "GulfNAc",
+  AltNAc = "AltfNAc",
+  AllNAc = "AllfNAc",
+  TalNAc = "TalfNAc",
+  IdoNAc = "IdofNAc",
+  GlcN = "GlcfN",
+  ManN = "ManfN",
+  GalN = "GalfN",
+  GulN = "GulfN",
+  AltN = "AltfN",
+  AllN = "AllfN",
+  TalN = "TalfN",
+  IdoN = "IdofN",
+  GlcA = "GlcfA",
+  ManA = "ManfA",
+  GalA = "GalfA",
+  GulA = "GulfA",
+  AltA = "AltfA",
+  AllA = "AllfA",
+  TalA = "TalfA",
+  IdoA = "IdofA",
+  Fuc = "Fucf",
+  Qui = "Quif",
+  Rha = "Rhaf",
+  `6dGul` = "6dGulf",
+  `6dAlt` = "6dAltf",
+  `6dTal` = "6dTalf",
+  QuiNAc = "QuifNAc",
+  RhaNAc = "RhafNAc",
+  `6dAltNAc` = "6dAltfNAc",
+  `6dTalNAc` = "6dTalfNAc",
+  FucNAc = "FucfNAc",
+  Oli = "Olif",
+  Tyv = "Tyvf",
+  Abe = "Abef",
+  Par = "Parf",
+  Dig = "Digf",
+  Col = "Colf",
+  Ara = "Araf",
+  Lyx = "Lyxf",
+  Xyl = "Xylf",
+  Rib = "Ribf",
+  Neu5Ac = "Neuf5Ac",
+  Neu5Gc = "Neuf5Gc",
+  Neu = "Neuf",
+  Kdn = "Kdnf",
+  Pse = "Psef",
+  Leg = "Legf",
+  Aci = "Acif",
+  `4eLeg` = "4eLegf",
+  Bac = "Bacf",
+  LDmanHep = "LDmanHepf",
+  Kdo = "Kdof",
+  Dha = "Dhaf",
+  DDmanHep = "DDmanHepf",
+  MurNAc = "MurfNAc",
+  MurNGc = "MurfNGc",
+  Mur = "Murf",
+  Api = "Apif",
+  Fru = "Fruf",
+  Tag = "Tagf",
+  Sor = "Sorf",
+  Psi = "Psif"
+)
+
+furanose_rows <- monosaccharide_definitions
+furanose_rows$concrete <- unname(
+  furanose_monosaccharides[furanose_rows$concrete]
+)
+monosaccharides <- dplyr::bind_rows(
+  monosaccharide_definitions,
+  furanose_rows
+)
+
+
+.ringless_monosaccharide <- function(mono) {
+  furanose_index <- match(mono, unname(furanose_monosaccharides))
+  is_furanose <- !is.na(furanose_index)
+  mono[is_furanose] <- names(furanose_monosaccharides)[
+    furanose_index[is_furanose]
+  ]
+  mono
+}
+
+
 #' Get Available Monosaacharides
 #'
 #' This function returns a character vector of monosaccharide names of
 #' the given type. See [get_mono_type()] for monosaacharide types.
+#' Concrete furanose forms use an `f` after the monosaccharide stem, such as
+#' `Galf` and `GlcfNAc`. Generic names do not encode ring form.
 #'
 #' @param mono_type A character string specifying the type of monosaccharides.
 #'  Can be "all", "generic", or "concrete". Default is "all".
@@ -102,6 +203,7 @@ monosaccharides <- tibble::tribble(
 #'
 #' @examples
 #' available_monosaccharides()
+#' available_monosaccharides("concrete")
 #'
 #' @export
 available_monosaccharides <- function(mono_type = "all") {

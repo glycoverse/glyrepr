@@ -12,6 +12,8 @@
 #' There are two types of monosaccharides:
 #' - concrete: e.g. "Gal", "GlcNAc", "Glc", "Fuc", etc.
 #' - generic: e.g. "Hex", "HexNAc", "HexA", "HexN", etc.
+#' Concrete furanose forms such as "Galf" and "GlcfNAc" convert to the same
+#' generic names as their ringless forms: "Hex" and "HexNAc", respectively.
 #'
 #' For the full list of monosaccharides, use [available_monosaccharides()].
 #'
@@ -27,7 +29,7 @@
 #'
 #' @examples
 #' # Convert character vectors
-#' convert_to_generic(c("Gal", "GlcNAc"))
+#' convert_to_generic(c("Gal", "GlcNAc", "Galf", "GlcfNAc"))
 #'
 #' # Convert glycan compositions
 #' comps <- glycan_composition(

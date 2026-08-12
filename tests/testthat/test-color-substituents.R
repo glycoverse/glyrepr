@@ -7,6 +7,21 @@ test_that("monosaccharides with substituents are colored correctly", {
   expect_equal(get_mono_color("Glc"), "#0072BC") # Blue for Glc
 })
 
+test_that("furanose forms use the same colors as their ringless forms", {
+  ringless <- names(furanose_monosaccharides)
+  furanose <- unname(furanose_monosaccharides)
+
+  expect_identical(
+    purrr::map_chr(furanose, get_mono_color),
+    purrr::map_chr(ringless, get_mono_color)
+  )
+  expect_identical(get_mono_color("Galf3Me"), get_mono_color("Gal3Me"))
+  expect_identical(
+    get_mono_color("Neuf5Ac9Ac"),
+    get_mono_color("Neu5Ac9Ac")
+  )
+})
+
 test_that("special sialic acid cases are handled correctly", {
   # Test color assignment for special cases
   expect_equal(get_mono_color("Neu4Ac5Ac"), "#A54399") # Purple for Neu5Ac

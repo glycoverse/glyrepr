@@ -138,6 +138,47 @@ test_that("as_glycan_structure.character parses digit-leading monosaccharides", 
 })
 
 
+test_that("as_glycan_structure.character parses every furanose form", {
+  monos <- unname(furanose_monosaccharides)
+  iupacs <- paste0(monos, "(?", infer_anomer_pos(monos), "-")
+
+  glycans <- as_glycan_structure(iupacs)
+  graphs <- get_structure_graphs(glycans)
+
+  expect_identical(
+    purrr::map_chr(graphs, ~ igraph::V(.x)$mono),
+    monos
+  )
+  expect_identical(unname(structure_to_iupac(glycans)), iupacs)
+})
+
+
+test_that("furanose forms retain additional substituents", {
+  iupacs <- c(
+    "Galf3Me(b1-",
+    "GlcfNAc6Ac(b1-",
+    "Neuf5Ac9Ac(a2-",
+    "Neuf4Ac5Gc(a2-"
+  )
+
+  glycans <- as_glycan_structure(iupacs)
+  graphs <- get_structure_graphs(glycans)
+
+  expect_identical(
+    purrr::map_chr(graphs, ~ igraph::V(.x)$mono),
+    c("Galf", "GlcfNAc", "Neuf5Ac", "Neuf5Gc")
+  )
+  expect_identical(
+    purrr::map_chr(graphs, ~ igraph::V(.x)$sub),
+    c("3Me", "6Ac", "9Ac", "4Ac")
+  )
+  expect_identical(
+    unname(structure_to_iupac(glycans)),
+    c(iupacs[1:3], "Neuf5Gc4Ac(a2-")
+  )
+})
+
+
 test_that("as_glycan_structure.character handles unknown linkages", {
   # Unknown linkages
   iupac <- "Man(a1-?)Man(?1-3)Man(?1-"

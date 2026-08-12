@@ -20,13 +20,43 @@ test_that("get all generic monosaccharides", {
   res <- available_monosaccharides("generic")
   expect_contains(res, c("Hex", "HexNAc", "dHex"))
   expect_true(length(unique(res)) == length(res))
+  expect_identical(res, unique(monosaccharide_definitions$generic))
 })
 
 
 test_that("get all concrete monosaccharides", {
   res <- available_monosaccharides("concrete")
-  expect_contains(res, c("Gal", "Man", "GlcNAc"))
+  expect_contains(res, c("Gal", "Man", "GlcNAc", "Galf", "GlcfNAc"))
   expect_true(length(unique(res)) == length(res))
+})
+
+
+test_that("every concrete monosaccharide has a furanose form", {
+  ringless <- names(furanose_monosaccharides)
+  furanose <- unname(furanose_monosaccharides)
+
+  expect_length(furanose, length(ringless))
+  expect_setequal(ringless, monosaccharide_definitions$concrete)
+  expect_setequal(
+    available_monosaccharides("concrete"),
+    c(ringless, furanose)
+  )
+  expect_identical(
+    is_known_monosaccharide(furanose),
+    rep(TRUE, length(furanose))
+  )
+  expect_identical(
+    get_mono_type(furanose),
+    rep("concrete", length(furanose))
+  )
+  expect_identical(
+    infer_anomer_pos(furanose),
+    infer_anomer_pos(ringless)
+  )
+  expect_identical(
+    convert_to_generic(furanose),
+    convert_to_generic(ringless)
+  )
 })
 
 

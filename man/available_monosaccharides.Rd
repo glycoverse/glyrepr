@@ -16,8 +16,11 @@ A character vector of monosaccharide names.
 \description{
 This function returns a character vector of monosaccharide names of
 the given type. See \code{\link[=get_mono_type]{get_mono_type()}} for monosaacharide types.
+Concrete furanose forms use an \code{f} after the monosaccharide stem, such as
+\code{Galf} and \code{GlcfNAc}. Generic names do not encode ring form.
 }
 \examples{
 available_monosaccharides()
+available_monosaccharides("concrete")
 
 }
