@@ -433,29 +433,32 @@ combine_floating_iupac_graphs <- function(main, parts) {
 .extract_substituent <- function(mono) {
   single_sub_pattern <- substituent_token_pattern(longest_first = TRUE)
 
-  unusual_mono <- .match_unusual_configuration_monosaccharide(mono)
-  if (!is.na(unusual_mono)) {
-    natural_mono <- .natural_configuration_monosaccharide(unusual_mono)
-    suffix <- stringr::str_remove(mono, stringr::fixed(unusual_mono))
-    result <- .extract_substituent_without_configuration(
-      paste0(natural_mono, suffix),
+  result <- .extract_substituent_without_configuration(
+    mono,
+    single_sub_pattern
+  )
+
+  if (
+    !is_known_monosaccharide(result[["mono"]]) &&
+      stringr::str_detect(mono, "^[DL]")
+  ) {
+    configuration <- stringr::str_sub(mono, 1, 1)
+    unconfigured <- stringr::str_sub(mono, 2)
+    configured_result <- .extract_substituent_without_configuration(
+      unconfigured,
       single_sub_pattern
     )
-    restored_mono <- unname(
-      unusual_configuration_monosaccharides[result[["mono"]]]
+    configured_mono <- unname(
+      unusual_configuration_monosaccharides[configured_result[["mono"]]]
     )
-    if (is.na(restored_mono)) {
-      restored_mono <- paste0(
-        stringr::str_sub(unusual_mono, 1, 1),
-        result[["mono"]]
-      )
+
+    if (
+      !is.na(configured_mono) &&
+        stringr::str_starts(configured_mono, configuration)
+    ) {
+      result <- configured_result
+      result[["mono"]] <- configured_mono
     }
-    result[["mono"]] <- restored_mono
-  } else {
-    result <- .extract_substituent_without_configuration(
-      mono,
-      single_sub_pattern
-    )
   }
 
   # Validate that the monosaccharide is known

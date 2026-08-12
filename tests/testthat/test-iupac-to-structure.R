@@ -197,7 +197,14 @@ test_that("unusual configurations retain substituents", {
   iupacs <- c(
     "DFuc3S(a1-",
     "LNeu5Ac9Ac(a2-",
-    "LNeuf5Gc9Ac(a2-"
+    "LNeuf5Gc9Ac(a2-",
+    "LNeu4Ac5Ac(a2-",
+    "LNeuf4Ac5Gc(a2-"
+  )
+  expected_iupacs <- c(
+    iupacs[1:3],
+    "LNeu5Ac4Ac(a2-",
+    "LNeuf5Gc4Ac(a2-"
   )
 
   glycans <- as_glycan_structure(iupacs)
@@ -205,13 +212,13 @@ test_that("unusual configurations retain substituents", {
 
   expect_identical(
     purrr::map_chr(graphs, ~ igraph::V(.x)$mono),
-    c("DFuc", "LNeu5Ac", "LNeuf5Gc")
+    c("DFuc", "LNeu5Ac", "LNeuf5Gc", "LNeu5Ac", "LNeuf5Gc")
   )
   expect_identical(
     purrr::map_chr(graphs, ~ igraph::V(.x)$sub),
-    c("3S", "9Ac", "9Ac")
+    c("3S", "9Ac", "9Ac", "4Ac", "4Ac")
   )
-  expect_identical(unname(structure_to_iupac(glycans)), iupacs)
+  expect_identical(unname(structure_to_iupac(glycans)), expected_iupacs)
 })
 
 
