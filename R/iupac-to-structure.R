@@ -248,6 +248,7 @@ combine_floating_iupac_graphs <- function(main, parts) {
       if (!.validate_brackets(x)) {
         cli::cli_abort("Malformed brackets in IUPAC-condensed string")
       }
+      x <- .infer_reducing_end_anomer(x)
       anomer <- .extract_anomer(x)
       x <- stringr::str_sub(x, 1, -stringr::str_length(anomer) - 3)
 
@@ -338,6 +339,17 @@ combine_floating_iupac_graphs <- function(main, parts) {
   }
 
   return(depth == 0)
+}
+
+# Infer a missing reducing-end anomer position
+.infer_reducing_end_anomer <- function(iupac) {
+  if (stringr::str_detect(iupac, "\\(([ab\\?][12\\?])-$")) {
+    return(iupac)
+  }
+
+  reducing_end <- .tokenize_iupac(iupac)[[1]]
+  mono <- .extract_substituent(reducing_end)[["mono"]]
+  paste0(iupac, "(?", infer_anomer_pos(mono), "-")
 }
 
 # Extract anomer from IUPAC condensed string

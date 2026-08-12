@@ -14,7 +14,7 @@
     Condition
       Warning:
       1 structure failed validation and was replaced with `NA`.
-      x Position 2 (`invalid`): Could not parse IUPAC-condensed string: "not-a-structure" i Can't extract anomer information. i Anomer information is required for the reducing-end monosaccharide. i For example, use 'Man(a1-' instead of 'Man'.
+      x Position 2 (`invalid`): Could not parse IUPAC-condensed string: "not-a-structure" i Invalid characters or format in IUPAC-condensed string
 
 # as_glycan_structure keeps strict failures as the default
 
@@ -121,4 +121,3 @@
       Error in `get_structure_graphs()`:
       ! `return_list` must be `TRUE` or `NULL` unless `x` has length 1.
       i Length of `x`: 0
-
