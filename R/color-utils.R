@@ -6,6 +6,7 @@
 get_mono_color <- function(mono) {
   # Extract base monosaccharide name (without substituents)
   base_mono <- .extract_base_mono(mono)
+  base_mono <- .ringless_monosaccharide(base_mono)
 
   dplyr::recode_values(
     base_mono,
@@ -196,14 +197,26 @@ colorize_iupac_string <- function(iupac_text, mono_names) {
     return("Neu5Ac")
   } else if (stringr::str_starts(mono, "Neu5Ac") && nchar(mono) > 6) {
     return("Neu5Ac")
+  } else if (mono == "Neuf5Ac") {
+    return("Neuf5Ac")
+  } else if (stringr::str_starts(mono, "Neuf5Ac") && nchar(mono) > 7) {
+    return("Neuf5Ac")
   } else if (mono == "Neu5Gc") {
     return("Neu5Gc")
   } else if (stringr::str_starts(mono, "Neu5Gc") && nchar(mono) > 6) {
     return("Neu5Gc")
+  } else if (mono == "Neuf5Gc") {
+    return("Neuf5Gc")
+  } else if (stringr::str_starts(mono, "Neuf5Gc") && nchar(mono) > 7) {
+    return("Neuf5Gc")
   } else if (mono == "Neu4Ac5Ac") {
     return("Neu5Ac")
+  } else if (mono == "Neuf4Ac5Ac") {
+    return("Neuf5Ac")
   } else if (mono == "Neu4Ac5Gc") {
     return("Neu5Gc")
+  } else if (mono == "Neuf4Ac5Gc") {
+    return("Neuf5Gc")
   }
 
   # For other monosaccharides, remove substituents

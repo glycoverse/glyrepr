@@ -58,6 +58,20 @@ test_that("count_mono works for compositions with special monosaccharides", {
   expect_equal(count_mono(comp, "Glc"), NA_integer_)
 })
 
+test_that("generic counts include furanose concrete forms", {
+  furanose <- unname(furanose_monosaccharides)
+  generic <- convert_to_generic(furanose)
+  comp <- glycan_composition(stats::setNames(
+    rep(1L, length(furanose)),
+    furanose
+  ))
+
+  expect_identical(count_mono(comp), length(furanose))
+  for (mono in unique(generic)) {
+    expect_identical(count_mono(comp, mono), sum(generic == mono))
+  }
+})
+
 test_that("count_mono works when counting generic in concrete compositions", {
   # When mono is generic, it should count all matching concrete monos
   comp <- glycan_composition(c(

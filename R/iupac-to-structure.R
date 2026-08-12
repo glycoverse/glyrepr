@@ -440,12 +440,22 @@ combine_floating_iupac_graphs <- function(main, parts) {
 
   # Handle all Neu variants containing 5Ac
   if (stringr::str_detect(mono, "Neu.*5Ac")) {
-    return(.handle_neu5ac_variant(mono, single_sub_pattern))
+    base_mono <- if (stringr::str_starts(mono, "Neuf")) {
+      "Neuf5Ac"
+    } else {
+      "Neu5Ac"
+    }
+    return(.handle_neu5ac_variant(mono, single_sub_pattern, base_mono))
   }
 
   # Handle all Neu variants containing 5Gc
   if (stringr::str_detect(mono, "Neu.*5Gc")) {
-    return(.handle_neu5gc_variant(mono, single_sub_pattern))
+    base_mono <- if (stringr::str_starts(mono, "Neuf")) {
+      "Neuf5Gc"
+    } else {
+      "Neu5Gc"
+    }
+    return(.handle_neu5gc_variant(mono, single_sub_pattern, base_mono))
   }
 
   # Handle other Neu-based monosaccharides (no 5Ac or 5Gc)
@@ -474,13 +484,21 @@ combine_floating_iupac_graphs <- function(main, parts) {
 }
 
 # Handle all Neu variants containing 5Ac
-.handle_neu5ac_variant <- function(mono, single_sub_pattern) {
-  .handle_neu_with_marker(mono, single_sub_pattern, "5Ac", "Neu5Ac")
+.handle_neu5ac_variant <- function(
+  mono,
+  single_sub_pattern,
+  base_mono = "Neu5Ac"
+) {
+  .handle_neu_with_marker(mono, single_sub_pattern, "5Ac", base_mono)
 }
 
 # Handle all Neu variants containing 5Gc
-.handle_neu5gc_variant <- function(mono, single_sub_pattern) {
-  .handle_neu_with_marker(mono, single_sub_pattern, "5Gc", "Neu5Gc")
+.handle_neu5gc_variant <- function(
+  mono,
+  single_sub_pattern,
+  base_mono = "Neu5Gc"
+) {
+  .handle_neu_with_marker(mono, single_sub_pattern, "5Gc", base_mono)
 }
 
 # Generic helper function for handling Neu variants with specific markers
