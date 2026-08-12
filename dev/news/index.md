@@ -46,6 +46,12 @@
 ### Minor improvements and fixes
 
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  and
+  [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+  now support ambiguous substituent positions such as `Gal4/6S(a1-` and
+  preserve them during graph and IUPAC conversion.
+  ([\#84](https://github.com/glycoverse/glyrepr/issues/84))
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   now accepts omitted reducing-end annotations by inferring the anomer
   position, normalizes `(?-?)` to `(??-?)`, and collapses
   linkage-position choices containing `?` to a single unknown position.

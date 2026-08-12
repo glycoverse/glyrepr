@@ -54,6 +54,8 @@
 <div class="section level3">
 <h3 id="minor-improvements-and-fixes-development-version">Minor improvements and fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-development-version"></a></h3>
 <ul><li>
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> now support ambiguous substituent positions such as <code>Gal4/6S(a1-</code> and preserve them during graph and IUPAC conversion. (<a href="https://github.com/glycoverse/glyrepr/issues/84" class="external-link">#84</a>)</li>
+<li>
 <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> now accepts omitted reducing-end annotations by inferring the anomer position, normalizes <code>(?-?)</code> to <code>(??-?)</code>, and collapses linkage-position choices containing <code>?</code> to a single unknown position. (<a href="https://github.com/glycoverse/glyrepr/issues/83" class="external-link">#83</a>)</li>
 <li>Floating-part graph metadata now records the nodes in each component, while legacy graph inputs without this metadata remain supported. (<a href="https://github.com/glycoverse/glyrepr/issues/80" class="external-link">#80</a>)</li>
 <li>

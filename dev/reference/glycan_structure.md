@@ -66,6 +66,9 @@ Each glycan structure must satisfy the following constraints:
   - Single substituent format: "xY" (x = position, Y = substituent
     name), e.g., "2Ac", "3S"
 
+  - Ambiguous substituent positions use slash-separated alternatives,
+    e.g., "4/6S", "3/4/6Ac"
+
   - Multiple substituents separated by commas and ordered by position,
     e.g., "3Me,4Ac", "2S,6P"
 
