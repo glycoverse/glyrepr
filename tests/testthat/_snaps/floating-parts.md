@@ -57,7 +57,7 @@
       i In index: 1.
       Caused by error in `value[[3L]]()`:
       ! Could not parse IUPAC-condensed string: "Gal(b1-3)GalNAc(a1-{Neu5Ac(a2-3)}"
-      i Can't extract anomer information. i Anomer information is required for the reducing-end monosaccharide. i For example, use 'Man(a1-' instead of 'Man'.
+      i Invalid characters or format in IUPAC-condensed string
 
 # invalid floating-part graph annotations are rejected
 

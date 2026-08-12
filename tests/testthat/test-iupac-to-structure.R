@@ -17,6 +17,17 @@ test_that("as_glycan_structure.character parses simple IUPAC-condensed strings",
   expect_equal(structure_to_iupac(glycan3), "Gal(b1-3)GalNAc(a1-")
 })
 
+test_that("as_glycan_structure.character infers reducing-end anomer positions", {
+  iupacs <- c("Man", "Neu5Ac", "Gal(b1-3)GalNAc")
+
+  glycans <- as_glycan_structure(iupacs)
+
+  expect_equal(
+    structure_to_iupac(glycans),
+    c("Man(?1-", "Neu5Ac(?2-", "Gal(b1-3)GalNAc(?1-")
+  )
+})
+
 test_that("ordinary IUPAC parsing bypasses floating-part splitting", {
   testthat::local_mocked_bindings(
     split_floating_iupac = function(...) {
@@ -232,17 +243,6 @@ test_that("as_glycan_structure.character error handling", {
 
   # Invalid format - unknown monosaccharide
   expect_error(as_glycan_structure("invalid_format"), "Could not parse")
-
-  # Missing anomer information
-  expect_error(as_glycan_structure("Man"), "Can't extract anomer information")
-  expect_error(
-    as_glycan_structure("Neu5Ac"),
-    "Can't extract anomer information"
-  )
-  expect_error(
-    as_glycan_structure("Gal(b1-3)GalNAc"),
-    "Can't extract anomer information"
-  )
 })
 
 test_that("as_glycan_structure.character round-trip consistency", {
