@@ -1,5 +1,5 @@
 # This table referred to https://www.ncbi.nlm.nih.gov/glycans/snfg.html
-monosaccharide_definitions <- tibble::tribble(
+natural_monosaccharide_definitions <- tibble::tribble(
   ~generic  , ~concrete  , ~anomer_pos ,
   # Hexose
   "Hex"     , "Glc"      , 1L          ,
@@ -90,9 +90,73 @@ monosaccharide_definitions <- tibble::tribble(
 )
 
 
+# SNFG assumes the L configuration for these residues and the D configuration
+# for other applicable residues. Names that encode multiple configurations or
+# do not have a single D/L configuration are excluded.
+l_configuration_monosaccharides <- c(
+  "Alt",
+  "AltNAc",
+  "AltN",
+  "AltA",
+  "Ido",
+  "IdoNAc",
+  "IdoN",
+  "IdoA",
+  "Fuc",
+  "Rha",
+  "6dAlt",
+  "RhaNAc",
+  "6dAltNAc",
+  "FucNAc",
+  "Col",
+  "Ara",
+  "Sor",
+  "Api"
+)
+
+configuration_unspecified_monosaccharides <- c(
+  "Neu",
+  "Pse",
+  "Leg",
+  "Aci",
+  "4eLeg",
+  "LDmanHep",
+  "DDmanHep"
+)
+
+configuration_monos <- setdiff(
+  natural_monosaccharide_definitions$concrete,
+  configuration_unspecified_monosaccharides
+)
+natural_monosaccharide_configurations <- stats::setNames(
+  ifelse(configuration_monos %in% l_configuration_monosaccharides, "L", "D"),
+  configuration_monos
+)
+unusual_configurations <- ifelse(
+  natural_monosaccharide_configurations == "D",
+  "L",
+  "D"
+)
+unusual_configuration_monosaccharides <- stats::setNames(
+  paste0(unusual_configurations, configuration_monos),
+  configuration_monos
+)
+
+unusual_configuration_rows <- natural_monosaccharide_definitions[
+  match(configuration_monos, natural_monosaccharide_definitions$concrete),
+]
+unusual_configuration_rows$concrete <- unname(
+  unusual_configuration_monosaccharides[unusual_configuration_rows$concrete]
+)
+monosaccharide_definitions <- dplyr::bind_rows(
+  natural_monosaccharide_definitions,
+  unusual_configuration_rows
+)
+
+
 # Furanose ring forms use an "f" after the monosaccharide stem. Pyranose
 # forms remain implicit and retain their existing names.
-furanose_monosaccharides <- c(
+natural_furanose_monosaccharides <- c(
   Glc = "Glcf",
   Man = "Manf",
   Gal = "Galf",
@@ -169,13 +233,40 @@ furanose_monosaccharides <- c(
   Psi = "Psif"
 )
 
-furanose_rows <- monosaccharide_definitions
-furanose_rows$concrete <- unname(
-  furanose_monosaccharides[furanose_rows$concrete]
+unusual_configuration_furanose_monosaccharides <- stats::setNames(
+  paste0(
+    unusual_configurations,
+    unname(natural_furanose_monosaccharides[configuration_monos])
+  ),
+  unname(unusual_configuration_monosaccharides)
+)
+furanose_monosaccharides <- c(
+  natural_furanose_monosaccharides,
+  unusual_configuration_furanose_monosaccharides
+)
+unusual_configuration_monosaccharides <- c(
+  unusual_configuration_monosaccharides,
+  stats::setNames(
+    unname(unusual_configuration_furanose_monosaccharides),
+    unname(natural_furanose_monosaccharides[configuration_monos])
+  )
+)
+
+natural_furanose_rows <- natural_monosaccharide_definitions
+natural_furanose_rows$concrete <- unname(
+  natural_furanose_monosaccharides[natural_furanose_rows$concrete]
+)
+unusual_furanose_rows <- unusual_configuration_rows
+unusual_furanose_rows$concrete <- unname(
+  unusual_configuration_furanose_monosaccharides[
+    unusual_furanose_rows$concrete
+  ]
 )
 monosaccharides <- dplyr::bind_rows(
-  monosaccharide_definitions,
-  furanose_rows
+  natural_monosaccharide_definitions,
+  natural_furanose_rows,
+  unusual_configuration_rows,
+  unusual_furanose_rows
 )
 
 
@@ -189,12 +280,36 @@ monosaccharides <- dplyr::bind_rows(
 }
 
 
+.natural_configuration_monosaccharide <- function(mono) {
+  unusual_index <- match(
+    mono,
+    unname(unusual_configuration_monosaccharides)
+  )
+  is_unusual <- !is.na(unusual_index)
+  mono[is_unusual] <- names(unusual_configuration_monosaccharides)[
+    unusual_index[is_unusual]
+  ]
+  mono
+}
+
+
+.match_unusual_configuration_monosaccharide <- function(mono) {
+  candidates <- unname(unusual_configuration_monosaccharides)
+  candidates <- candidates[order(nchar(candidates), decreasing = TRUE)]
+  matches <- candidates[stringr::str_starts(mono, candidates)]
+  if (length(matches) == 0) NA_character_ else matches[[1]]
+}
+
+
 #' Get Available Monosaacharides
 #'
 #' This function returns a character vector of monosaccharide names of
 #' the given type. See [get_mono_type()] for monosaacharide types.
 #' Concrete furanose forms use an `f` after the monosaccharide stem, such as
 #' `Galf` and `GlcfNAc`. Generic names do not encode ring form.
+#' Less common absolute configurations use a leading `D` or `L` without a
+#' separator, such as `DFuc`, `LGul`, and `DFucf`. Unprefixed names retain
+#' their natural configurations.
 #'
 #' @param mono_type A character string specifying the type of monosaccharides.
 #'  Can be "all", "generic", or "concrete". Default is "all".

@@ -13,6 +13,19 @@ test_that("concrete composition is valid", {
   expect_s3_class(comp, "glyrepr_composition")
 })
 
+test_that("natural and unusual configurations coexist in compositions", {
+  comp <- glycan_composition(c(Fuc = 1, DFuc = 2, Gul = 3, LGul = 4))
+
+  expect_identical(
+    as.character(comp),
+    "Gul(3)Fuc(1)LGul(4)DFuc(2)"
+  )
+  expect_identical(
+    as.character(convert_to_generic(comp)),
+    "Hex(7)dHex(3)"
+  )
+})
+
 test_that("compositions can contain substituents", {
   comp <- glycan_composition(c(Glc = 1, S = 1))
   expect_equal(as.character(comp), "Glc(1)S(1)")

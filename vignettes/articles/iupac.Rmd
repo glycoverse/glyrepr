@@ -91,6 +91,13 @@ and IUPAC notation gives each one a short abbreviation:
 For a broader list of symbols,
 see the [SNFG website](https://www.ncbi.nlm.nih.gov/glycans/snfg.html) or run `available_monosaccharides()`.
 
+IUPAC-condensed names normally omit absolute configuration and assume the
+natural form, such as L-fucose for `Fuc` and D-gulose for `Gul`.
+`glyrepr` writes a less common configuration by concatenating `D` or `L` before
+the residue name: `DFuc`, `LGul`, or `DFucf` for D-fucofuranose.
+The unprefixed natural names remain canonical; redundant forms such as `LFuc`
+and `DGul` are not accepted.
+
 ### Step 2: Substituents
 
 Glycans can contain chemical modifications called **substituents**.

@@ -703,6 +703,10 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #'
 #' Convert an object to a glycan structure vector.
 #'
+#' Character input assumes the natural absolute configuration for unprefixed
+#' monosaccharides. Less common configurations use a leading `D` or `L` without
+#' a separator, such as `DFuc`, `LGul`, and `DFucf`.
+#'
 #' Character input supports floating-part blocks before the main
 #' IUPAC-condensed structure. `{Neu5Ac(a2-3)}<main>` allows every feasible
 #' main-tree node as a candidate parent, while
@@ -746,6 +750,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #'
 #' # Convert a character vector of IUPAC-condensed strings
 #' as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
+#' as_glycan_structure(c("DFuc(a1-", "LGul(b1-", "DFucf(a1-"))
 #'
 #' # Parse a floating residue with two candidate parents
 #' floating_iupac <- paste0(

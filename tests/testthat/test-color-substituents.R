@@ -23,6 +23,21 @@ test_that("furanose forms use the same colors as their ringless forms", {
   )
 })
 
+test_that("unusual configurations use their natural counterparts' colors", {
+  natural <- names(unusual_configuration_monosaccharides)
+  unusual <- unname(unusual_configuration_monosaccharides)
+
+  expect_identical(
+    purrr::map_chr(unusual, get_mono_color),
+    purrr::map_chr(natural, get_mono_color)
+  )
+  expect_identical(get_mono_color("DFuc3S"), get_mono_color("Fuc3S"))
+  expect_identical(
+    get_mono_color("LNeu5Ac9Ac"),
+    get_mono_color("Neu5Ac9Ac")
+  )
+})
+
 test_that("special sialic acid cases are handled correctly", {
   # Test color assignment for special cases
   expect_equal(get_mono_color("Neu4Ac5Ac"), "#A54399") # Purple for Neu5Ac
