@@ -440,31 +440,8 @@ floating_attachment_domain <- function(
 
 has_conflict_free_attachment_assignment <- function(domains) {
   domains <- domains[vapply(domains, `[[`, logical(1), "known")]
-  if (length(domains) == 0) {
-    return(TRUE)
-  }
-
   slot_sets <- lapply(domains, `[[`, "slots")
-  if (any(lengths(slot_sets) == 0)) {
-    return(FALSE)
-  }
-  slot_sets <- slot_sets[order(lengths(slot_sets))]
-
-  assign_slot <- function(index, used) {
-    if (index > length(slot_sets)) {
-      return(TRUE)
-    }
-
-    available <- setdiff(slot_sets[[index]], used)
-    for (slot in available) {
-      if (assign_slot(index + 1, c(used, slot))) {
-        return(TRUE)
-      }
-    }
-    FALSE
-  }
-
-  assign_slot(1, character())
+  has_conflict_free_assignment(slot_sets)
 }
 
 validate_floating_attachment_slots <- function(graph, info) {

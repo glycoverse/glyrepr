@@ -55,6 +55,8 @@ exactly one main outward tree and one outward tree per floating part.
 \itemize{
 \item Single substituent format: "xY" (x = position, Y = substituent name),
 e.g., "2Ac", "3S"
+\item Ambiguous substituent positions use slash-separated alternatives,
+e.g., "4/6S", "3/4/6Ac"
 \item Multiple substituents separated by commas and ordered by position,
 e.g., "3Me,4Ac", "2S,6P"
 \item Unknown substituent positions can be repeated, e.g., "?Me,?S"

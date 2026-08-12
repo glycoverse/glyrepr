@@ -172,7 +172,7 @@ patrick::with_parameters_test_that(
     graph$anomer <- "b1"
     expect_no_error(glycan_structure(graph))
   },
-  sub = c("6S", "9Ac", "2P", "?S")
+  sub = c("6S", "9Ac", "2P", "?S", "4/6S", "3/4/6Ac")
 )
 
 
@@ -207,6 +207,21 @@ test_that("duplicate positions in substituents are not allowed", {
   graph$anomer <- "a1"
   expect_error(glycan_structure(graph), "Unknown substituent")
 })
+
+
+patrick::with_parameters_test_that(
+  "ambiguous substituent positions must be canonical and assignable",
+  {
+    skip_on_old_win()
+    graph <- igraph::make_empty_graph(n = 1)
+    igraph::V(graph)$mono <- "Glc"
+    igraph::V(graph)$sub <- sub
+    igraph::E(graph)$linkage <- character(0)
+    graph$anomer <- "a1"
+    expect_error(glycan_structure(graph), "Unknown substituent")
+  },
+  sub = c("6/4S", "4/4S", "4Ac,4/6S,6Me")
+)
 
 
 test_that("duplicate unknown substituent positions are allowed", {

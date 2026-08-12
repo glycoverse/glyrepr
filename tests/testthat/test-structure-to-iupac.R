@@ -335,6 +335,18 @@ test_that("structure_to_iupac supports substituents", {
   expect_equal(result2, "GlcNAc6Ac(b1-4)Glc3Me(a1-")
 })
 
+test_that("structure_to_iupac preserves ambiguous substituent positions", {
+  graph <- igraph::make_empty_graph(n = 1)
+  igraph::V(graph)$mono <- "Gal"
+  igraph::V(graph)$sub <- "4/6S"
+  igraph::E(graph)$linkage <- character(0)
+  graph$anomer <- "a1"
+
+  glycan <- glycan_structure(graph)
+
+  expect_identical(structure_to_iupac(glycan), "Gal4/6S(a1-")
+})
+
 test_that("structure_to_iupac handles empty substituents", {
   # Test with empty substituents (should work as before)
   graph <- igraph::make_graph(~ 1 - +2)

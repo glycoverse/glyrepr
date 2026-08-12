@@ -31,6 +31,43 @@ substituent_name_pattern <- function(longest_first = FALSE) {
   stringr::str_c(stringr::str_escape(substituents), collapse = "|")
 }
 
+#' Build a Substituent Position Regex Pattern
+#'
+#' @returns A regex alternation pattern for one substituent position, ambiguous
+#'   slash-separated positions, or an unknown position.
+#'
+#' @noRd
+substituent_position_pattern <- function() {
+  "(?:[1-9](?:/[1-9])*|\\?)"
+}
+
+#' Build a Substituent Token Regex Pattern
+#'
+#' @param longest_first Whether to sort longer substituent names before shorter
+#'   names in the regex alternation.
+#' @param anchored Whether to anchor the pattern at the start and end.
+#'
+#' @returns A regex pattern for one complete substituent token.
+#'
+#' @noRd
+substituent_token_pattern <- function(
+  longest_first = FALSE,
+  anchored = FALSE
+) {
+  checkmate::assert_flag(longest_first)
+  checkmate::assert_flag(anchored)
+
+  position <- substituent_position_pattern()
+  name <- substituent_name_pattern(longest_first = longest_first)
+  pattern <- stringr::str_glue("{position}(?:{name})")
+
+  if (anchored) {
+    pattern <- stringr::str_glue("^{pattern}$")
+  }
+
+  pattern
+}
+
 #' Normalize Substituent String
 #'
 #' Takes a substituent string (potentially with multiple substituents) and
@@ -74,10 +111,82 @@ normalize_substituents <- function(sub) {
 #'
 #' @noRd
 substituent_position_tokens <- function(subs) {
+  pattern <- stringr::str_glue("^{substituent_position_pattern()}")
+
   purrr::map_chr(
     subs,
-    ~ stringr::str_extract(.x, "^[\\d\\?]")
+    ~ stringr::str_extract(.x, pattern)
   )
+}
+
+#' Normalize One Substituent Token
+#'
+#' Sorts and deduplicates slash-separated candidate positions while preserving
+#' the substituent name.
+#'
+#' @param sub One valid substituent token.
+#'
+#' @returns A canonical substituent token.
+#'
+#' @noRd
+normalize_substituent_token <- function(sub) {
+  position <- substituent_position_tokens(sub)
+  if (position == "?") {
+    return(sub)
+  }
+
+  candidates <- stringr::str_split(position, stringr::fixed("/"))[[1]]
+  candidates <- sort(unique(as.integer(candidates)))
+  name <- stringr::str_sub(sub, stringr::str_length(position) + 1L)
+
+  paste0(stringr::str_c(candidates, collapse = "/"), name)
+}
+
+#' Get Candidate Position Sets for Substituent Tokens
+#'
+#' @param subs A character vector of valid substituent tokens.
+#'
+#' @returns A list of character vectors. Unknown-position substituents are
+#'   omitted because they do not constrain known position assignments.
+#'
+#' @noRd
+substituent_position_domains <- function(subs) {
+  positions <- substituent_position_tokens(subs)
+  positions <- positions[positions != "?"]
+  lapply(positions, stringr::str_split_1, pattern = stringr::fixed("/"))
+}
+
+#' Check for a Conflict-Free Assignment
+#'
+#' @param domains A list of candidate value vectors.
+#'
+#' @returns `TRUE` when each domain can be assigned a distinct value.
+#'
+#' @noRd
+has_conflict_free_assignment <- function(domains) {
+  if (length(domains) == 0) {
+    return(TRUE)
+  }
+  if (any(lengths(domains) == 0)) {
+    return(FALSE)
+  }
+
+  domains <- domains[order(lengths(domains))]
+  assign_value <- function(index, used) {
+    if (index > length(domains)) {
+      return(TRUE)
+    }
+
+    available <- setdiff(domains[[index]], used)
+    for (value in available) {
+      if (assign_value(index + 1L, c(used, value))) {
+        return(TRUE)
+      }
+    }
+    FALSE
+  }
+
+  assign_value(1L, character())
 }
 
 #' Get Numeric Substituent Position Values
@@ -94,7 +203,11 @@ substituent_position_values <- function(subs) {
   positions <- substituent_position_tokens(subs)
 
   purrr::map_dbl(positions, function(pos) {
-    if (pos == "?") Inf else as.numeric(pos)
+    if (pos == "?") {
+      Inf
+    } else {
+      as.numeric(stringr::str_extract(pos, "^[1-9]"))
+    }
   })
 }
 
@@ -131,6 +244,7 @@ collapse_substituent_tokens <- function(subs) {
     return("")
   }
 
+  subs <- purrr::map_chr(subs, normalize_substituent_token)
   stringr::str_c(sort_substituent_tokens(subs), collapse = ",")
 }
 

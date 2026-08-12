@@ -450,6 +450,56 @@ test_that("as_glycan_structure.character handles multiple unknown substituents",
   expect_equal(structure_to_iupac(glycans), iupacs)
 })
 
+test_that("as_glycan_structure.character handles ambiguous substituent positions", {
+  iupacs <- c(
+    "Gal4/6S(a1-",
+    "Gal3/4/6S(a1-",
+    "Gal4/6Ac(a1-",
+    "Neu4/5Ac(a2-"
+  )
+
+  glycans <- as_glycan_structure(iupacs)
+  graphs <- get_structure_graphs(glycans)
+
+  expect_identical(
+    purrr::map_chr(graphs, \(graph) igraph::V(graph)$mono),
+    c("Gal", "Gal", "Gal", "Neu")
+  )
+  expect_identical(
+    purrr::map_chr(graphs, \(graph) igraph::V(graph)$sub),
+    c("4/6S", "3/4/6S", "4/6Ac", "4/5Ac")
+  )
+  expect_identical(unname(structure_to_iupac(glycans)), iupacs)
+  expect_identical(unname(count_mono(glycans, "S")), c(1L, 1L, 0L, 0L))
+})
+
+test_that("ambiguous substituent alternatives are canonicalized", {
+  iupacs <- c("Gal6/4S(a1-", "Gal4/6S(a1-", "Gal4/4S(a1-")
+
+  glycans <- as_glycan_structure(iupacs)
+
+  expect_identical(
+    unname(structure_to_iupac(glycans)),
+    c("Gal4/6S(a1-", "Gal4/6S(a1-", "Gal4S(a1-")
+  )
+  expect_identical(glycans[[1]], glycans[[2]])
+})
+
+test_that("as_glycan_structure.character rejects malformed ambiguous positions", {
+  iupacs <- c("Gal/6S(a1-", "Gal4/S(a1-", "Gal4//6S(a1-")
+  parsed <- purrr::map_lgl(iupacs, function(iupac) {
+    tryCatch(
+      {
+        as_glycan_structure(iupac)
+        TRUE
+      },
+      error = \(error) FALSE
+    )
+  })
+
+  expect_identical(parsed, rep(FALSE, length(iupacs)))
+})
+
 test_that("as_glycan_structure.character prefers longer substituent tokens", {
   iupacs <- c("Glc3Pyr(a1-", "Glc3PC(a1-", "Glc3PPEtn(a1-", "Glc3PEtn(a1-")
   expected_subs <- c("3Pyr", "3PC", "3PPEtn", "3PEtn")

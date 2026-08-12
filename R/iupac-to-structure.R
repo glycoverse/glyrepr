@@ -379,9 +379,10 @@ combine_floating_iupac_graphs <- function(main, parts) {
 .tokenize_iupac <- function(iupac) {
   # Monosaccharide name pattern (including potential substituents)
   # Allow known names that start with digits, e.g. "6dGul" and "4eLeg".
-  # Allow letters, digits, and ? for substituents like "Man?S", "Glc3Me6S", etc.
+  # Allow letters, digits, ?, and / for substituents like "Man?S",
+  # "Glc3Me6S", and "Gal4/6S".
   # Substituents are directly concatenated in IUPAC format, no commas
-  mono_pattern <- "([A-Za-z]|[0-9][A-Za-z])[A-Za-z0-9\\?]*"
+  mono_pattern <- "([A-Za-z]|[0-9][A-Za-z])[A-Za-z0-9\\?/]*"
   mono_linkage_pattern <- stringr::str_glue(
     "{mono_pattern}(\\({linkage_pattern(anchored = FALSE)}\\))?"
   )
@@ -430,8 +431,7 @@ combine_floating_iupac_graphs <- function(main, parts) {
 
 # Extract substituent from monosaccharide name
 .extract_substituent <- function(mono) {
-  subs_pattern <- substituent_name_pattern(longest_first = TRUE)
-  single_sub_pattern <- stringr::str_glue("[1-9\\?]({subs_pattern})") # Pattern for a single substituent
+  single_sub_pattern <- substituent_token_pattern(longest_first = TRUE)
 
   # Handle different types of monosaccharides
   result <- if (stringr::str_starts(mono, "Neu")) {
@@ -455,14 +455,14 @@ combine_floating_iupac_graphs <- function(main, parts) {
 # based on the presence of 5Ac or 5Gc substituents
 .handle_neu_monosaccharide <- function(mono, single_sub_pattern) {
   # Check for conflicting 5Ac5Gc pattern
-  if (stringr::str_detect(mono, "5Gc") && stringr::str_detect(mono, "5Ac")) {
+  if (.has_neu_marker(mono, "5Gc") && .has_neu_marker(mono, "5Ac")) {
     cli::cli_abort(
       "Monosaccharide cannot have both 5Ac and 5Gc substituents: {mono}"
     )
   }
 
   # Handle all Neu variants containing 5Ac
-  if (stringr::str_detect(mono, "Neu.*5Ac")) {
+  if (.has_neu_marker(mono, "5Ac")) {
     base_mono <- if (stringr::str_starts(mono, "Neuf")) {
       "Neuf5Ac"
     } else {
@@ -472,7 +472,7 @@ combine_floating_iupac_graphs <- function(main, parts) {
   }
 
   # Handle all Neu variants containing 5Gc
-  if (stringr::str_detect(mono, "Neu.*5Gc")) {
+  if (.has_neu_marker(mono, "5Gc")) {
     base_mono <- if (stringr::str_starts(mono, "Neuf")) {
       "Neuf5Gc"
     } else {
@@ -483,6 +483,14 @@ combine_floating_iupac_graphs <- function(main, parts) {
 
   # Handle other Neu-based monosaccharides (no 5Ac or 5Gc)
   .handle_general_monosaccharide(mono, single_sub_pattern)
+}
+
+.neu_marker_pattern <- function(marker) {
+  stringr::str_glue("(?<![0-9/]){stringr::str_escape(marker)}")
+}
+
+.has_neu_marker <- function(mono, marker) {
+  stringr::str_detect(mono, .neu_marker_pattern(marker))
 }
 
 # Handle general (non-Neu) monosaccharides with substituents
@@ -532,7 +540,10 @@ combine_floating_iupac_graphs <- function(main, parts) {
   base_mono
 ) {
   # Remove the marker from the monosaccharide name to get the remaining part
-  mono_without_marker <- stringr::str_remove(mono, marker)
+  mono_without_marker <- stringr::str_remove(
+    mono,
+    .neu_marker_pattern(marker)
+  )
 
   # Extract all substituents from the remaining part using normal logic
   all_subs <- stringr::str_extract_all(

@@ -66,8 +66,7 @@ valid_substituent <- function(sub) {
     individual_subs <- stringr::str_split(single_sub, ",")[[1]]
 
     # Check if each individual substituent is valid
-    subs_pattern <- substituent_name_pattern()
-    pattern <- stringr::str_glue("^[\\d\\?]({subs_pattern})$")
+    pattern <- substituent_token_pattern(anchored = TRUE)
 
     individual_valid <- purrr::map_lgl(
       individual_subs,
@@ -79,17 +78,23 @@ valid_substituent <- function(sub) {
       return(FALSE)
     }
 
+    is_canonical <- individual_subs ==
+      purrr::map_chr(individual_subs, normalize_substituent_token)
+    if (!all(is_canonical)) {
+      return(FALSE)
+    }
+
     positions <- substituent_position_tokens(individual_subs)
     numeric_positions <- substituent_position_values(individual_subs)
 
     # Check if positions are sorted in ascending order
     is_sorted <- all(numeric_positions == sort(numeric_positions))
 
-    # Check for duplicate known positions (not allowed)
-    known_positions <- positions[positions != "?"]
-    has_duplicates <- any(duplicated(known_positions))
+    has_assignment <- has_conflict_free_assignment(
+      substituent_position_domains(individual_subs)
+    )
 
-    return(is_sorted && !has_duplicates)
+    is_sorted && has_assignment
   })
 }
 

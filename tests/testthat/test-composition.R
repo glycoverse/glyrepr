@@ -146,6 +146,15 @@ test_that("as_glycan_composition works for a glycan structure with multiple subs
   expect_equal(comp, expected_comp)
 })
 
+test_that("ambiguous positions contribute one substituent to compositions", {
+  structure <- as_glycan_structure("Gal4/6S(a1-")
+
+  expect_equal(
+    as_glycan_composition(structure),
+    glycan_composition(c(Gal = 1L, S = 1L))
+  )
+})
+
 test_that("as.list returns named integer vectors for compositions", {
   comp <- glycan_composition(
     c(Hex = 5, HexNAc = 2),
