@@ -2,6 +2,10 @@
 
 ## glyrepr (development version)
 
+- Concrete monosaccharides now support explicit furanose forms such as
+  `Galf` and `GlcfNAc`; generic conversion remains unchanged, so these
+  become `Hex` and `HexNAc`, respectively.
+  ([\#82](https://github.com/glycoverse/glyrepr/issues/82))
 - Structure inspection, transformation, graph-table, composition, and
   IUPAC APIs now accept individual glycan `igraph` objects directly
   while preserving existing `glyrepr_structure` vector behavior and

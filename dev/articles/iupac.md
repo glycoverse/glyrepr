@@ -344,9 +344,9 @@ sessionInfo()
 #>  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5
 #>  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   
 #> [13] igraph_2.3.3      knitr_1.51        backports_1.5.1   checkmate_2.3.4  
-#> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.11.0     
+#> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.12.0     
 #> [21] pillar_1.11.1     rlang_1.3.0       utf8_1.2.6        cachem_1.1.0     
-#> [25] stringi_1.8.7     xfun_0.60         fs_2.1.0          sass_0.4.10      
+#> [25] stringi_1.8.9     xfun_0.60         fs_2.1.0          sass_0.4.10      
 #> [29] otel_0.2.0        cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5   
 #> [33] digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.3       evaluate_1.0.5   
 #> [37] glue_1.8.1        ragg_1.5.2        rmarkdown_2.31    purrr_1.2.2      
