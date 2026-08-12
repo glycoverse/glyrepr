@@ -78,19 +78,23 @@ valid_substituent <- function(sub) {
       return(FALSE)
     }
 
+    is_canonical <- individual_subs ==
+      purrr::map_chr(individual_subs, normalize_substituent_token)
+    if (!all(is_canonical)) {
+      return(FALSE)
+    }
+
     positions <- substituent_position_tokens(individual_subs)
     numeric_positions <- substituent_position_values(individual_subs)
 
     # Check if positions are sorted in ascending order
     is_sorted <- all(numeric_positions == sort(numeric_positions))
 
-    # Check for duplicate definite positions (not allowed)
-    definite_positions <- positions[
-      positions != "?" & !stringr::str_detect(positions, stringr::fixed("/"))
-    ]
-    has_duplicates <- any(duplicated(definite_positions))
+    has_assignment <- has_conflict_free_assignment(
+      substituent_position_domains(individual_subs)
+    )
 
-    return(is_sorted && !has_duplicates)
+    is_sorted && has_assignment
   })
 }
 

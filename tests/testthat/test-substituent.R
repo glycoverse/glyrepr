@@ -18,6 +18,8 @@ test_that("normalize_substituents handles empty strings", {
 test_that("normalize_substituents handles single substituents", {
   expect_equal(normalize_substituents("6S"), "6S")
   expect_equal(normalize_substituents("4/6S"), "4/6S")
+  expect_equal(normalize_substituents("6/4S"), "4/6S")
+  expect_equal(normalize_substituents("4/4S"), "4S")
   expect_equal(normalize_substituents("3Me"), "3Me")
   expect_equal(normalize_substituents("?Ac"), "?Ac")
 })
@@ -63,6 +65,18 @@ test_that("ambiguous substituent position validation rejects malformed syntax", 
   expect_identical(
     valid_substituent(c("4/6S", "3/4/6Ac", "/6S", "4/S", "4//6S")),
     c(TRUE, TRUE, FALSE, FALSE, FALSE)
+  )
+})
+
+test_that("substituent positions require a conflict-free assignment", {
+  expect_identical(
+    valid_substituent(c(
+      "4Ac,4/6S",
+      "4/6Ac,4/6S",
+      "4Ac,4/6S,6Me",
+      "4/6Ac,4/6S,4/6Me"
+    )),
+    c(TRUE, TRUE, FALSE, FALSE)
   )
 })
 
