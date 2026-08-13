@@ -73,12 +73,12 @@ test_that("generic counts include furanose concrete forms", {
 })
 
 test_that("counts distinguish configurations and aggregate generic classes", {
-  comp <- glycan_composition(c(Fuc = 1, DFuc = 2, Gul = 3, LGul = 4))
+  comp <- glycan_composition(c(Fuc = 1, `D-Fuc` = 2, Gul = 3, `L-Gul` = 4))
 
   expect_identical(count_mono(comp, "Fuc"), 1L)
-  expect_identical(count_mono(comp, "DFuc"), 2L)
+  expect_identical(count_mono(comp, "D-Fuc"), 2L)
   expect_identical(count_mono(comp, "Gul"), 3L)
-  expect_identical(count_mono(comp, "LGul"), 4L)
+  expect_identical(count_mono(comp, "L-Gul"), 4L)
   expect_identical(count_mono(comp, "dHex"), 3L)
   expect_identical(count_mono(comp, "Hex"), 7L)
 })

@@ -633,7 +633,7 @@ parse_single_composition <- function(char) {
 
 .parse_byonic_comp <- function(x) {
   # Use regex to find all patterns like "MonoName(number)"
-  pattern <- "([A-Za-z0-9]+)\\((\\d+)\\)"
+  pattern <- "((?:[DL]-)?[A-Za-z0-9]+)\\((\\d+)\\)"
   matches <- stringr::str_extract_all(x, pattern, simplify = FALSE)[[1]]
 
   if (length(matches) == 0) {

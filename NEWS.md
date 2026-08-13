@@ -2,7 +2,7 @@
 
 ## New features
 
-* Concrete monosaccharides now support explicit unusual absolute configurations using a leading `D` or `L`, such as `DFuc`, `LGul`, and `DFucf`; unprefixed names retain their natural configurations. (#85)
+* Concrete monosaccharides now support explicit unusual absolute configurations using a leading `D-` or `L-`, such as `D-Fuc`, `L-Gul`, and `D-Fucf`; unprefixed names retain their natural configurations. (#85)
 * `as_glycan_structure()` and `glycan_structure()` now support floating glycan substructures with optional candidate-parent indices using `{<floating>}` and `{<floating>|<parents>}` syntax. Floating structures are validated, canonicalized, transformed, and converted to graph tables while preserving parent-index semantics. (#80)
 * Concrete monosaccharides now support explicit furanose forms such as `Galf` and `GlcfNAc`; generic conversion remains unchanged, so these become `Hex` and `HexNAc`, respectively. (#82)
 * New `enumerate_floating_graph_localizations()`, `enumerate_floating_localizations()`, and `localize_floating_parts()` APIs attach or enumerate conflict-free floating-part assignments with provenance; graph-level results retain original vertex IDs, and `deduplicate = FALSE` retains assignments that canonicalize to the same structure. (#80)

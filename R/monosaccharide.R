@@ -138,7 +138,7 @@ unusual_configurations <- ifelse(
   "D"
 )
 unusual_configuration_monosaccharides <- stats::setNames(
-  paste0(unusual_configurations, configuration_monos),
+  paste0(unusual_configurations, "-", configuration_monos),
   configuration_monos
 )
 
@@ -236,6 +236,7 @@ natural_furanose_monosaccharides <- c(
 unusual_configuration_furanose_monosaccharides <- stats::setNames(
   paste0(
     unusual_configurations,
+    "-",
     unname(natural_furanose_monosaccharides[configuration_monos])
   ),
   unname(unusual_configuration_monosaccharides)
@@ -307,8 +308,8 @@ monosaccharides <- dplyr::bind_rows(
 #' the given type. See [get_mono_type()] for monosaacharide types.
 #' Concrete furanose forms use an `f` after the monosaccharide stem, such as
 #' `Galf` and `GlcfNAc`. Generic names do not encode ring form.
-#' Less common absolute configurations use a leading `D` or `L` without a
-#' separator, such as `DFuc`, `LGul`, and `DFucf`. Unprefixed names retain
+#' Less common absolute configurations use a leading `D-` or `L-`, such as
+#' `D-Fuc`, `L-Gul`, and `D-Fucf`. Unprefixed names retain
 #' their natural configurations.
 #'
 #' @param mono_type A character string specifying the type of monosaccharides.
