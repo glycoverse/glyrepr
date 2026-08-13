@@ -3,7 +3,7 @@
 structure_floating_substituents() convert
 a glycan structure vector or one glycan igraph to normalized graph tables.
 structure_from_tibbles() rebuilds a glyrepr_structure vector from those
-tables and a vector of reducing-end anomers.
+tables, a vector of reducing-end anomers, and optional alditol status.
 The glycan_id column is the integer position of each glycan in the input
 vector. Duplicate structures are expanded to their original vector positions.
 Missing structures have no node or edge rows and are reconstructed from
@@ -39,7 +39,7 @@ floating-substituent table."><meta property="og:description" content="structure_
 structure_floating_substituents() convert
 a glycan structure vector or one glycan igraph to normalized graph tables.
 structure_from_tibbles() rebuilds a glyrepr_structure vector from those
-tables and a vector of reducing-end anomers.
+tables, a vector of reducing-end anomers, and optional alditol status.
 The glycan_id column is the integer position of each glycan in the input
 vector. Duplicate structures are expanded to their original vector positions.
 Missing structures have no node or edge rows and are reconstructed from
@@ -116,7 +116,7 @@ floating-substituent table."><meta property="og:image" content="https://glycover
 <code>structure_floating_substituents()</code> convert
 a glycan structure vector or one glycan <code>igraph</code> to normalized graph tables.
 <code>structure_from_tibbles()</code> rebuilds a <code>glyrepr_structure</code> vector from those
-tables and a vector of reducing-end anomers.</p>
+tables, a vector of reducing-end anomers, and optional alditol status.</p>
 <p>The <code>glycan_id</code> column is the integer position of each glycan in the input
 vector. Duplicate structures are expanded to their original vector positions.
 Missing structures have no node or edge rows and are reconstructed from
@@ -166,7 +166,8 @@ floating-substituent table.</p>
 <span>  <span class="va">edges</span>,</span>
 <span>  <span class="va">anomers</span>,</span>
 <span>  floating_parts <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  floating_substituents <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  floating_substituents <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  alditols <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -201,6 +202,12 @@ floating-substituent table.</p>
 <dd><p>A data frame returned by
 <code>structure_floating_substituents()</code>, or <code>NULL</code> when no floating
 substituents are present.</p></dd>
+
+
+<dt id="arg-alditols">alditols<a class="anchor" aria-label="anchor" href="#arg-alditols"></a></dt>
+<dd><p>A logical vector indicating alditol status, either one value
+or one per glycan. Missing values are allowed only for missing glycans.
+Defaults to <code>FALSE</code> for backward compatibility.</p></dd>
 
 </dl></div>
     <div class="section level2">

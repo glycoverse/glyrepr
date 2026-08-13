@@ -37,6 +37,9 @@ The sequence follows the format mono(linkage)mono, where:
 - Substituents are appended directly to monosaccharide names (e.g.,
   Glc3Me for Glc with 3Me substituent)
 
+- An alditol reducing end has an `-ol` suffix before its reducing-end
+  annotation (e.g., `GlcNAc-ol(a1-`)
+
 ## Backbone Selection
 
 The backbone is selected as the longest path in the tree. For branches,
@@ -82,6 +85,8 @@ structure_to_iupac(glycan)  # Returns "GlcNAc6Ac(b1-4)Glc3Me(a1-"
 #> [1] "GlcNAc6Ac(b1-4)Glc3Me(a1-"
 structure_to_iupac(graph)
 #> [1] "GlcNAc6Ac(b1-4)Glc3Me(a1-"
+structure_to_iupac(as_glycan_structure("GlcNAc-ol(a1-"))
+#> [1] "GlcNAc-ol(a1-"
 
 # Vectorized structures
 structs <- c(o_glycan_core_1(), n_glycan_core())

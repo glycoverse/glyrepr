@@ -90,6 +90,8 @@ exactly one main outward tree and one outward tree per floating part.</p></li>
 <li><p>Floating substituents add graph metadata but no vertices or edges.</p></li>
 <li><p>Must have a graph attribute <code>anomer</code> in the format "a1" or "b1"</p><ul><li><p>Unknown parts can be represented with "?", e.g., "?1", "a?", "??"</p></li>
 </ul></li>
+<li><p>May have a graph attribute <code>alditol</code>, containing one logical value.
+Missing attributes are treated as <code>FALSE</code> and canonicalized explicitly.</p></li>
 </ul></div>
 
 <div class="section">

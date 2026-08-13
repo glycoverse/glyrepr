@@ -23,6 +23,8 @@
 
 - [`count_mono()`](https://glycoverse.github.io/glyrepr/dev/reference/count_mono.md)
   : Get the Number of Monosaccharides
+- [`get_alditol()`](https://glycoverse.github.io/glyrepr/dev/reference/get_alditol.md)
+  : Get Alditol Status
 - [`get_anomer()`](https://glycoverse.github.io/glyrepr/dev/reference/get_anomer.md)
   : Get the Anomeric information
 - [`get_mono_type()`](https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.md)

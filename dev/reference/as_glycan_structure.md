@@ -33,7 +33,10 @@ A glyrepr_structure object.
 
 Character input assumes the natural absolute configuration for
 unprefixed monosaccharides. Less common configurations use a leading
-`D-` or `L-`, such as `D-Fuc`, `L-Gul`, and `D-Fucf`.
+`D-` or `L-`, such as `D-Fuc`, `L-Gul`, and `D-Fucf`. Alditols use `-ol`
+on the main reducing-end residue, for example `Gal(b1-4)GlcNAc-ol(a1-`.
+The reducing-end anomer annotation remains part of the canonical
+representation.
 
 Character input supports floating-part blocks before the main
 IUPAC-condensed structure. `{Neu5Ac(a2-3)}<main>` allows every feasible
@@ -99,6 +102,10 @@ as_glycan_structure(c("D-Fuc(a1-", "L-Gul(b1-", "D-Fucf(a1-"))
 #> [2] L-Gul(b1-
 #> [3] D-Fucf(a1-
 #> # Unique structures: 3
+as_glycan_structure("Gal(b1-4)GlcNAc-ol(a1-")
+#> <glycan_structure[1]>
+#> [1] Gal(b1-4)GlcNAc-ol(a1-
+#> # Unique structures: 1
 
 # Parse a floating residue with two candidate parents
 floating_iupac <- paste0(

@@ -76,7 +76,10 @@ produce an error.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Character input assumes the natural absolute configuration for unprefixed
 monosaccharides. Less common configurations use a leading <code>D-</code> or <code>L-</code>, such
-as <code>D-Fuc</code>, <code>L-Gul</code>, and <code>D-Fucf</code>.</p>
+as <code>D-Fuc</code>, <code>L-Gul</code>, and <code>D-Fucf</code>.
+Alditols use <code>-ol</code> on the main reducing-end residue, for example
+<code>Gal(b1-4)GlcNAc-ol(a1-</code>. The reducing-end anomer annotation remains part of
+the canonical representation.</p>
 <p>Character input supports floating-part blocks before the main
 IUPAC-condensed structure. <code>{Neu5Ac(a2-3)}&lt;main&gt;</code> allows every feasible
 main-tree node as a candidate parent, while
@@ -139,6 +142,10 @@ into the selected residue's ordinary <code>sub</code> attribute.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #FF8700;">L-Gul</span>(<span style="color: #B2B2B2;">b1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3] <span style="color: #FF0000;">D-Fucf</span>(<span style="color: #B2B2B2;">a1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 3</span>
+<span class="r-in"><span><span class="fu">as_glycan_structure</span><span class="op">(</span><span class="st">"Gal(b1-4)GlcNAc-ol(a1-"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[1]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>-ol(<span style="color: #B2B2B2;">a1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Parse a floating residue with two candidate parents</span></span></span>
 <span class="r-in"><span><span class="va">floating_iupac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>

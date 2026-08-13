@@ -4,6 +4,14 @@
 
 ### New features
 
+- Glycan structures now support alditols through reducing-end `-ol`
+  IUPAC syntax, such as `Gal(b1-4)GlcNAc-ol(a1-`. New
+  [`get_alditol()`](https://glycoverse.github.io/glyrepr/dev/reference/get_alditol.md)
+  inspects the graph-level status, and
+  [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+  gains an `alditols` argument for lossless table round-trips; legacy
+  graphs without the attribute remain non-alditols.
+  ([\#88](https://github.com/glycoverse/glyrepr/issues/88))
 - Concrete monosaccharides now support explicit unusual absolute
   configurations using a leading `D-` or `L-`, such as `D-Fuc`, `L-Gul`,
   and `D-Fucf`; unprefixed names retain their natural configurations.

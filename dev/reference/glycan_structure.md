@@ -51,6 +51,10 @@ Each glycan structure must satisfy the following constraints:
 
   - Unknown parts can be represented with "?", e.g., "?1", "a?", "??"
 
+- May have a graph attribute `alditol`, containing one logical value.
+  Missing attributes are treated as `FALSE` and canonicalized
+  explicitly.
+
 ### Node Attributes
 
 - `mono`: Monosaccharide names, must be known monosaccharide types

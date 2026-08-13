@@ -60,9 +60,10 @@ underlying graph with
 glycan <- n_glycan_core()
 graph <- get_structure_graphs(glycan)
 graph
-#> IGRAPH c0054d1 DN-- 5 4 -- 
-#> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from c0054d1 (vertex names):
+#> IGRAPH dd8353d DN-- 5 4 -- 
+#> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
+#> | linkage (e/c)
+#> + edges from dd8353d (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 ```
 
@@ -74,6 +75,7 @@ units) and 4 edges (bonds).
 **Graph-level attributes:**
 
 - `anomer`: the anomeric configuration of the reducing end.
+- `alditol`: whether the reducing-end residue is an alditol.
 - `floating_parts`, when present: virtual attachment metadata for
   disconnected floating components.
 - `floating_substituents`, when present: unresolved substituent tokens
@@ -183,6 +185,21 @@ graph$anomer
 #> [1] "b1"
 ```
 
+**Alditol:** Whether the reducing-end residue has been reduced. The
+attribute is always explicit on canonical graphs; legacy inputs without
+it are treated as `FALSE`. In IUPAC-condensed strings, `-ol` follows the
+reducing-end residue.
+
+``` r
+
+alditol <- as_glycan_structure("Gal(b1-4)GlcNAc-ol(a1-")
+alditol_graph <- get_structure_graphs(alditol)
+alditol_graph$alditol
+#> [1] TRUE
+get_alditol(alditol)
+#> [1] TRUE
+```
+
 ### Floating Parts
 
 A floating structure remains one `igraph`, but it is weakly
@@ -289,7 +306,7 @@ sum(igraph::degree(graph, mode = "out") > 1)
 
 bfs_result <- igraph::bfs(graph, root = 1, mode = "out")
 bfs_result$order
-#> + 5/5 vertices, named, from c0054d1:
+#> + 5/5 vertices, named, from dd8353d:
 #> [1] 1 2 3 4 5
 ```
 
