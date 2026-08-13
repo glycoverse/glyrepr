@@ -31,8 +31,7 @@ and the remaining elements are vectors of the same length or length 1 (will be r
 \item{.f}{A function that takes an igraph object (from first element of \code{.l}) and
 values from other elements, returning a result.
 Can be a function, purrr-style lambda (\code{~ .x + .y + .z}), or a character string naming a function.
-A structure with floating parts is passed as one annotated, weakly
-disconnected graph.}
+A structure with floating metadata is passed as one annotated graph.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
 
@@ -59,7 +58,7 @@ values from other vectors, then map the results back to the original vector posi
 \code{spmap_structure()} reuses unchanged graphs and validates and canonicalizes
 changed graphs returned by \code{.f}. A callback that changes vertex identities
 or components of a floating structure must also update its \code{floating_parts}
-metadata.
+and \code{floating_substituents} metadata.
 
 \strong{NA Handling:}
 NA elements in the first argument (glycan structure vector) are preserved in the output.

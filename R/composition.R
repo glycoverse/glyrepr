@@ -106,8 +106,9 @@ is_glycan_composition <- function(x) {
 #' This function uses the vctrs casting framework for type conversion.
 #' When converting from glycan structures, both monosaccharides and substituents
 #' are counted. Substituents are extracted from the `sub` attribute of each
-#' vertex in the structure. For example, a vertex with `sub = "3Me"`
-#' contributes one "Me" substituent to the composition.
+#' vertex and from the `floating_substituents` graph attribute. For example, a
+#' vertex with `sub = "3Me"` or an unresolved `{?Me}` each contributes one
+#' "Me" substituent to the composition.
 #'
 #' Simple composition strings use one-letter residue codes: "H" for "Hex",
 #' "N" for "HexNAc", "F" for "dHex", "S"/"A" for "NeuAc", and "G" for
@@ -291,6 +292,13 @@ graph_to_composition <- function(graph) {
   names(mono_result) <- names(mono_tb)
 
   subs <- igraph::V(graph)$sub
+  floating_substituents <- normalize_floating_substituents(graph)
+  if (length(floating_substituents) > 0) {
+    subs <- c(
+      subs,
+      purrr::map_chr(floating_substituents, "substituent")
+    )
+  }
   sub_types <- extract_substituent_types(subs)
   if (length(sub_types) > 0) {
     sub_tb <- table(sub_types)

@@ -23,6 +23,7 @@ validate_glycan_graph <- function(graph) {
   }
 
   validate_floating_graph_shape(graph)
+  validate_floating_substituent_parents(graph)
 
   if (!has_vertex_attrs(graph, "mono")) {
     cli::cli_abort("Glycan structure must have a vertex attribute 'mono'.")
@@ -92,6 +93,8 @@ validate_glycan_graph <- function(graph) {
   if (any_dup_linkage_pos(graph, linkages)) {
     cli::cli_abort("Duplicated linkage positions.")
   }
+
+  validate_floating_substituent_slots(graph)
 
   if (is.null(graph$anomer)) {
     cli::cli_abort("Glycan structure must have a graph attribute 'anomer'.")
@@ -216,23 +219,26 @@ validate_glycan_graph_vector <- function(graphs, label = NULL) {
 graph_to_iupac <- function(graph) {
   checkmate::assert_class(graph, "igraph")
   raw_parts <- igraph::graph_attr(graph, "floating_parts")
-  if (is.null(raw_parts)) {
+  raw_substituents <- igraph::graph_attr(graph, "floating_substituents")
+  if (is.null(raw_parts) && is.null(raw_substituents)) {
     seq_cache <- build_seq_cache(graph)
     root <- seq_cache$root
     return(paste0(seq_glycan_iupac(root, seq_cache), "(", graph$anomer, "-"))
   }
 
   parts <- normalize_floating_parts(graph)
+  substituents <- normalize_floating_substituents(graph)
 
-  if (length(parts) == 0) {
+  if (length(parts) == 0 && length(substituents) == 0) {
     seq_cache <- build_seq_cache(graph)
     root <- seq_cache$root
     return(paste0(seq_glycan_iupac(root, seq_cache), "(", graph$anomer, "-"))
   }
 
-  main_vertices <- floating_main_vertices(graph, parts)
+  main_vertices <- floating_metadata_main_vertices(graph, parts)
   main <- igraph::induced_subgraph(graph, main_vertices)
   main <- delete_floating_parts_attr(main)
+  main <- delete_floating_substituents_attr(main)
   seq_cache <- build_seq_cache(main)
   root <- seq_cache$root
   main_iupac <- paste0(
@@ -247,6 +253,12 @@ graph_to_iupac <- function(graph) {
     graph = graph,
     main_vertices = main_vertices
   )
+  floating_sub_iupac <- purrr::map_chr(
+    substituents,
+    floating_substituent_iupac,
+    main_vertices = main_vertices
+  )
+  floating_iupac <- sort(c(floating_iupac, floating_sub_iupac))
 
   paste0(paste0(floating_iupac, collapse = ""), main_iupac)
 }

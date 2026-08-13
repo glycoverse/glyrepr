@@ -1,17 +1,17 @@
 #' Convert Glycan Structures to Graph Tables
 #'
 #' @description
-#' `structure_nodes()`, `structure_edges()`, and
-#' `structure_floating_parts()` convert a glycan structure vector or one glycan
-#' `igraph` to normalized graph tables. `structure_from_tibbles()` rebuilds a
-#' `glyrepr_structure` vector from those tables and a vector of reducing-end
-#' anomers.
+#' `structure_nodes()`, `structure_edges()`, `structure_floating_parts()`, and
+#' `structure_floating_substituents()` convert
+#' a glycan structure vector or one glycan `igraph` to normalized graph tables.
+#' `structure_from_tibbles()` rebuilds a `glyrepr_structure` vector from those
+#' tables and a vector of reducing-end anomers.
 #'
 #' The `glycan_id` column is the integer position of each glycan in the input
 #' vector. Duplicate structures are expanded to their original vector positions.
 #' Missing structures have no node or edge rows and are reconstructed from
 #' missing values in `anomers`.
-#' If `x` is named, all three tibbles also contain a `glycan_name` column.
+#' If `x` is named, all four tibbles also contain a `glycan_name` column.
 #' `structure_from_tibbles()` uses `glycan_name` as output names when that
 #' column is present.
 #'
@@ -37,6 +37,13 @@
 #' floating nodes precede the main tree. `structure_from_tibbles()` expects
 #' these global node IDs and translates them back during serialization.
 #'
+#' In `structure_floating_substituents()`, each row describes one unresolved
+#' substituent. `substituent` is its canonical position-and-name token, and the
+#' `parents` list-column contains candidate global node IDs. An empty vector
+#' means all feasible main-tree nodes are candidates. A singleton candidate is
+#' normalized into `structure_nodes()$sub`, so it does not remain in the
+#' floating-substituent table.
+#'
 #' @param x A glycan structure vector or one glycan `igraph`.
 #' @param nodes A data frame with columns `glycan_id`, `node_id`, `mono`, and
 #'   `sub`, and optionally `glycan_name`.
@@ -45,6 +52,9 @@
 #' @param anomers A character vector of reducing-end anomers, one per glycan.
 #' @param floating_parts A data frame returned by
 #'   `structure_floating_parts()`, or `NULL` when no floating parts are present.
+#' @param floating_substituents A data frame returned by
+#'   `structure_floating_substituents()`, or `NULL` when no floating
+#'   substituents are present.
 #'
 #' @returns
 #' - `structure_nodes()` returns a tibble with columns `glycan_id`, `node_id`,
@@ -54,6 +64,9 @@
 #' - `structure_floating_parts()` returns a tibble with columns `glycan_id`,
 #'   `part_id`, `root_node`, the list-column `nodes`, `linkage`, and the
 #'   list-column `parents`.
+#' - `structure_floating_substituents()` returns a tibble with columns
+#'   `glycan_id`, `substituent_id`, `substituent`, and the list-column
+#'   `parents`.
 #' - `structure_from_tibbles()` returns a `glyrepr_structure` vector.
 #'
 #' @examples
@@ -63,14 +76,16 @@
 #' structure_from_tibbles(nodes, edges, get_anomer(glycans))
 #'
 #' floating <- as_glycan_structure(
-#'   "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
+#'   "{8S|1,2}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
 #' )
 #' floating_parts <- structure_floating_parts(floating)
+#' floating_substituents <- structure_floating_substituents(floating)
 #' structure_from_tibbles(
 #'   structure_nodes(floating),
 #'   structure_edges(floating),
 #'   get_anomer(floating),
-#'   floating_parts
+#'   floating_parts,
+#'   floating_substituents
 #' )
 #'
 #' @name structure_tables
@@ -167,6 +182,38 @@ structure_floating_parts <- function(x) {
   )
 
   dplyr::bind_rows(part_tables)
+}
+
+
+#' @rdname structure_tables
+#' @export
+structure_floating_substituents <- function(x) {
+  input <- structure_table_input(x)
+  graphs <- input$graphs
+  glycan_names <- input$glycan_names
+  has_glycan_names <- !is.null(glycan_names)
+  if (length(graphs) == 0) {
+    return(empty_structure_floating_substituents(has_glycan_names))
+  }
+
+  substituent_tables <- purrr::map2(
+    seq_along(graphs),
+    graphs,
+    function(glycan_id, graph) {
+      glycan_name <- if (has_glycan_names) {
+        glycan_names[[glycan_id]]
+      } else {
+        NULL
+      }
+      structure_floating_substituents_one(
+        glycan_id,
+        graph,
+        glycan_name
+      )
+    }
+  )
+
+  dplyr::bind_rows(substituent_tables)
 }
 
 
@@ -345,12 +392,16 @@ structure_from_tibbles <- function(
   nodes,
   edges,
   anomers,
-  floating_parts = NULL
+  floating_parts = NULL,
+  floating_substituents = NULL
 ) {
   nodes <- validate_structure_nodes_table(nodes)
   edges <- validate_structure_edges_table(edges)
   anomers <- validate_structure_anomers(anomers)
   floating_parts <- validate_structure_floating_parts_table(floating_parts)
+  floating_substituents <- validate_structure_floating_substituents_table(
+    floating_substituents
+  )
 
   validate_structure_table_glycan_ids(
     nodes$glycan_id,
@@ -367,10 +418,16 @@ structure_from_tibbles <- function(
     length(anomers),
     "floating_parts"
   )
+  validate_structure_table_glycan_ids(
+    floating_substituents$glycan_id,
+    length(anomers),
+    "floating_substituents"
+  )
   glycan_names <- structure_table_glycan_names(
     nodes,
     edges,
     floating_parts,
+    floating_substituents,
     anomers
   )
 
@@ -384,6 +441,11 @@ structure_from_tibbles <- function(
       edges[edges$glycan_id == glycan_id, , drop = FALSE],
       floating_parts[
         floating_parts$glycan_id == glycan_id,
+        ,
+        drop = FALSE
+      ],
+      floating_substituents[
+        floating_substituents$glycan_id == glycan_id,
         ,
         drop = FALSE
       ],
@@ -461,6 +523,34 @@ empty_structure_floating_parts <- function(has_glycan_name = FALSE) {
     root_node = integer(),
     nodes = list(),
     linkage = character(),
+    parents = list()
+  )
+
+  if (has_glycan_name) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = character(),
+      .after = "glycan_id"
+    )
+  }
+
+  out
+}
+
+
+#' Create an empty floating-substituent tibble
+#'
+#' @param has_glycan_name Whether to include a `glycan_name` column.
+#' @returns A zero-row tibble with the
+#'   `structure_floating_substituents()` columns.
+#' @noRd
+empty_structure_floating_substituents <- function(
+  has_glycan_name = FALSE
+) {
+  out <- tibble::tibble(
+    glycan_id = integer(),
+    substituent_id = integer(),
+    substituent = character(),
     parents = list()
   )
 
@@ -634,6 +724,46 @@ structure_floating_parts_one <- function(
     out <- tibble::add_column(
       out,
       glycan_name = rep(glycan_name, length(parts)),
+      .after = "glycan_id"
+    )
+  }
+
+  out
+}
+
+
+#' Convert one graph to a floating-substituent tibble
+#'
+#' @param glycan_id Integer position of the glycan.
+#' @param graph An igraph object or `NULL` for a missing structure.
+#' @param glycan_name Optional glycan name.
+#' @returns A tibble with floating-substituent rows for one glycan.
+#' @noRd
+structure_floating_substituents_one <- function(
+  glycan_id,
+  graph,
+  glycan_name = NULL
+) {
+  if (is.null(graph)) {
+    return(empty_structure_floating_substituents(!is.null(glycan_name)))
+  }
+
+  substituents <- normalize_floating_substituents(graph)
+  if (length(substituents) == 0) {
+    return(empty_structure_floating_substituents(!is.null(glycan_name)))
+  }
+
+  out <- tibble::tibble(
+    glycan_id = rep(as.integer(glycan_id), length(substituents)),
+    substituent_id = seq_along(substituents),
+    substituent = purrr::map_chr(substituents, "substituent"),
+    parents = purrr::map(substituents, "parents")
+  )
+
+  if (!is.null(glycan_name)) {
+    out <- tibble::add_column(
+      out,
+      glycan_name = rep(glycan_name, length(substituents)),
       .after = "glycan_id"
     )
   }
@@ -929,6 +1059,88 @@ validate_structure_floating_parts_table <- function(floating_parts) {
 }
 
 
+#' Validate a floating-substituent table
+#'
+#' @param floating_substituents A candidate floating-substituent table or
+#'   `NULL`.
+#' @returns A tibble with the required floating-substituent columns.
+#' @noRd
+validate_structure_floating_substituents_table <- function(
+  floating_substituents
+) {
+  if (is.null(floating_substituents)) {
+    return(empty_structure_floating_substituents())
+  }
+
+  required_cols <- c(
+    "glycan_id",
+    "substituent_id",
+    "substituent",
+    "parents"
+  )
+  floating_substituents <- validate_structure_table(
+    floating_substituents,
+    required_cols,
+    "floating_substituents",
+    optional_cols = "glycan_name"
+  )
+
+  validate_integerish_structure_column(
+    floating_substituents,
+    "glycan_id",
+    "floating_substituents"
+  )
+  validate_integerish_structure_column(
+    floating_substituents,
+    "substituent_id",
+    "floating_substituents"
+  )
+  validate_character_structure_column(
+    floating_substituents,
+    "substituent",
+    "floating_substituents"
+  )
+  if (!is.list(floating_substituents$parents)) {
+    cli::cli_abort(
+      "{.arg floating_substituents} column {.field parents} must be a list-column."
+    )
+  }
+  valid_parents <- purrr::map_lgl(
+    floating_substituents$parents,
+    ~ checkmate::test_integerish(
+      .x,
+      lower = 1,
+      any.missing = FALSE
+    )
+  )
+  if (!all(valid_parents)) {
+    cli::cli_abort(
+      "{.arg floating_substituents} column {.field parents} must contain positive integer vectors."
+    )
+  }
+  if ("glycan_name" %in% names(floating_substituents)) {
+    validate_character_structure_column(
+      floating_substituents,
+      "glycan_name",
+      "floating_substituents",
+      any.missing = TRUE
+    )
+  }
+
+  floating_substituents$glycan_id <- as.integer(
+    floating_substituents$glycan_id
+  )
+  floating_substituents$substituent_id <- as.integer(
+    floating_substituents$substituent_id
+  )
+  floating_substituents$parents <- purrr::map(
+    floating_substituents$parents,
+    as.integer
+  )
+  floating_substituents
+}
+
+
 #' Validate a graph-table input
 #'
 #' @param table A candidate graph table.
@@ -1018,6 +1230,7 @@ validate_character_structure_column <- function(
 #' @param nodes A validated node table.
 #' @param edges A validated edge table.
 #' @param floating_parts A validated floating-part table.
+#' @param floating_substituents A validated floating-substituent table.
 #' @param anomers A validated anomer vector.
 #' @returns A character vector of names, or `NULL`.
 #' @noRd
@@ -1025,12 +1238,14 @@ structure_table_glycan_names <- function(
   nodes,
   edges,
   floating_parts,
+  floating_substituents,
   anomers
 ) {
   table_names <- structure_table_glycan_names_from_rows(
     nodes,
     edges,
     floating_parts,
+    floating_substituents,
     anomers
   )
   if (is.null(table_names)) {
@@ -1053,6 +1268,7 @@ structure_table_glycan_names <- function(
 #' @param nodes A validated node table.
 #' @param edges A validated edge table.
 #' @param floating_parts A validated floating-part table.
+#' @param floating_substituents A validated floating-substituent table.
 #' @param anomers A validated anomer vector.
 #' @returns A character vector with `NA` where no table name is available, or
 #'   `NULL` when neither table contains `glycan_name`.
@@ -1061,12 +1277,14 @@ structure_table_glycan_names_from_rows <- function(
   nodes,
   edges,
   floating_parts,
+  floating_substituents,
   anomers
 ) {
   name_rows <- dplyr::bind_rows(
     structure_table_name_rows(nodes),
     structure_table_name_rows(edges),
-    structure_table_name_rows(floating_parts)
+    structure_table_name_rows(floating_parts),
+    structure_table_name_rows(floating_substituents)
   )
 
   if (nrow(name_rows) == 0) {
@@ -1163,6 +1381,7 @@ validate_structure_table_glycan_ids <- function(
 #' @param node_rows Node rows for one glycan.
 #' @param edge_rows Edge rows for one glycan.
 #' @param floating_rows Floating-part rows for one glycan.
+#' @param floating_substituent_rows Floating-substituent rows for one glycan.
 #' @param anomer Reducing-end anomer for the glycan.
 #' @param glycan_id Integer glycan ID used in error messages.
 #' @returns An igraph object, or `NA` for a missing glycan.
@@ -1171,6 +1390,7 @@ build_structure_graph_from_table_rows <- function(
   node_rows,
   edge_rows,
   floating_rows,
+  floating_substituent_rows,
   anomer,
   glycan_id
 ) {
@@ -1183,6 +1403,11 @@ build_structure_graph_from_table_rows <- function(
     if (nrow(floating_rows) > 0) {
       cli::cli_abort(
         "Glycan {.val {glycan_id}} has floating parts without nodes."
+      )
+    }
+    if (nrow(floating_substituent_rows) > 0) {
+      cli::cli_abort(
+        "Glycan {.val {glycan_id}} has floating substituents without nodes."
       )
     }
     if (!is.na(anomer)) {
@@ -1207,6 +1432,11 @@ build_structure_graph_from_table_rows <- function(
     ,
     drop = FALSE
   ]
+  floating_substituent_rows <- floating_substituent_rows[
+    order(floating_substituent_rows$substituent_id),
+    ,
+    drop = FALSE
+  ]
 
   validate_consecutive_structure_ids(
     node_rows$node_id,
@@ -1221,6 +1451,11 @@ build_structure_graph_from_table_rows <- function(
   validate_consecutive_structure_ids(
     floating_rows$part_id,
     "part_id",
+    glycan_id
+  )
+  validate_consecutive_structure_ids(
+    floating_substituent_rows$substituent_id,
+    "substituent_id",
     glycan_id
   )
   validate_structure_edge_nodes(edge_rows, nrow(node_rows), glycan_id)
@@ -1250,6 +1485,16 @@ build_structure_graph_from_table_rows <- function(
     part
   })
   graph <- set_floating_parts_attr(graph, parts)
+  substituents <- lapply(
+    seq_len(nrow(floating_substituent_rows)),
+    function(row_id) {
+      list(
+        substituent = floating_substituent_rows$substituent[[row_id]],
+        parents = floating_substituent_rows$parents[[row_id]]
+      )
+    }
+  )
+  graph <- set_floating_substituents_attr(graph, substituents)
 
   graph
 }

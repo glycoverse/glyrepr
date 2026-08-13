@@ -19,6 +19,7 @@
 #'   root).
 #' - A structure with floating parts must be one annotated forest containing
 #'   exactly one main outward tree and one outward tree per floating part.
+#' - Floating substituents add graph metadata but no vertices or edges.
 #' - Must have a graph attribute `anomer` in the format "a1" or "b1"
 #'   - Unknown parts can be represented with "?", e.g., "?1", "a?", "??"
 #'
@@ -68,6 +69,21 @@
 #' attachments retain floating metadata, where the virtual attachment is
 #' metadata rather than an edge and contributes to the canonical structure key.
 #'
+#' ## Floating Substituents
+#'
+#' A floating substituent has known chemistry but an unresolved parent residue.
+#' It is declared by the `floating_substituents` graph attribute, a list with
+#' one entry per substituent. Each entry contains:
+#'
+#' - `substituent`: one canonical substituent token such as `"6S"`, `"4/6Ac"`,
+#'   or `"?Me"`.
+#' - `parents`: integer vertex indices in the main tree. An empty integer vector
+#'   means that all feasible main-tree nodes are candidates.
+#'
+#' A singleton candidate is normalized into the corresponding vertex's `sub`
+#' attribute. Candidate parents must permit a conflict-free assignment of
+#' occupied carbon positions.
+#'
 #' # Node and Edge Order
 #'
 #' For an ordinary tree, the indices of vertices and linkages correspond
@@ -80,8 +96,9 @@
 #' main tree, exactly as their brace-enclosed components precede the main glycan
 #' in the complete IUPAC-condensed string. Parent indices written inside braces
 #' are local to the main tree, while `floating_parts$parents` stores the
-#' corresponding global graph vertex indices. A virtual floating attachment is
-#' not an edge.
+#' corresponding global graph vertex indices. The same rule applies to
+#' `floating_substituents$parents`. A virtual floating attachment is not an
+#' edge, and a floating substituent is not a vertex.
 #'
 #' # NA Support
 #'
@@ -144,7 +161,13 @@
 #' )
 #' structure_floating_parts(floating)
 #'
-#' # Example 5: Check if object is a glycan structure
+#' # Example 5: Parse a substituent with two candidate residues
+#' floating_sub <- as_glycan_structure(
+#'   "{6S|1,2}Gal(a1-3)Glc(a1-3)Man(a1-"
+#' )
+#' get_structure_graphs(floating_sub)$floating_substituents
+#'
+#' # Example 6: Check if object is a glycan structure
 #' is_glycan_structure(simple_struct)  # TRUE
 #' is_glycan_structure(graph)          # FALSE
 #'
@@ -719,6 +742,12 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #' `Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`. An omitted parent list behaves the same way
 #' when the main tree contains only one node.
 #'
+#' Floating substituents use the same leading-brace and candidate-parent syntax.
+#' For example, `{6S}<main>` leaves the sulfated residue unrestricted,
+#' `{6S|1,2}<main>` restricts it to main-tree residues 1 and 2, and `{?S}<main>`
+#' also leaves the carbon position unknown. A singleton candidate is normalized
+#' into the selected residue's ordinary `sub` attribute.
+#'
 #' @param x An object to convert to a glycan structure vector.
 #'   Can be an igraph object, a list of igraph objects,
 #'   a character vector of IUPAC-condensed strings,
@@ -998,6 +1027,8 @@ warn_structure_failures <- function(positions, reasons, input_names = NULL) {
 #' and the `floating_parts` graph attribute records each component's node
 #' indices, virtual attachment, and candidate parents. See [glycan_structure()]
 #' for the metadata schema.
+#' A structure with floating substituents carries a `floating_substituents`
+#' graph attribute containing their tokens and candidate parent indices.
 #'
 #' @param x A glycan structure vector.
 #' @param return_list If `TRUE`, always returns a list.

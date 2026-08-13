@@ -35,6 +35,7 @@ Each glycan structure must satisfy the following constraints:
 root).
 \item A structure with floating parts must be one annotated forest containing
 exactly one main outward tree and one outward tree per floating part.
+\item Floating substituents add graph metadata but no vertices or edges.
 \item Must have a graph attribute \code{anomer} in the format "a1" or "b1"
 \itemize{
 \item Unknown parts can be represented with "?", e.g., "?1", "a?", "??"
@@ -101,6 +102,23 @@ is attached to that parent as an ordinary graph edge. This includes an empty
 attachments retain floating metadata, where the virtual attachment is
 metadata rather than an edge and contributes to the canonical structure key.
 }
+
+\subsection{Floating Substituents}{
+
+A floating substituent has known chemistry but an unresolved parent residue.
+It is declared by the \code{floating_substituents} graph attribute, a list with
+one entry per substituent. Each entry contains:
+\itemize{
+\item \code{substituent}: one canonical substituent token such as \code{"6S"}, \code{"4/6Ac"},
+or \code{"?Me"}.
+\item \code{parents}: integer vertex indices in the main tree. An empty integer vector
+means that all feasible main-tree nodes are candidates.
+}
+
+A singleton candidate is normalized into the corresponding vertex's \code{sub}
+attribute. Candidate parents must permit a conflict-free assignment of
+occupied carbon positions.
+}
 }
 
 \section{Node and Edge Order}{
@@ -114,8 +132,9 @@ For a floating structure, floating-component vertices and edges precede the
 main tree, exactly as their brace-enclosed components precede the main glycan
 in the complete IUPAC-condensed string. Parent indices written inside braces
 are local to the main tree, while \code{floating_parts$parents} stores the
-corresponding global graph vertex indices. A virtual floating attachment is
-not an edge.
+corresponding global graph vertex indices. The same rule applies to
+\code{floating_substituents$parents}. A virtual floating attachment is not an
+edge, and a floating substituent is not a vertex.
 }
 
 \section{NA Support}{
@@ -174,7 +193,13 @@ floating <- as_glycan_structure(
 )
 structure_floating_parts(floating)
 
-# Example 5: Check if object is a glycan structure
+# Example 5: Parse a substituent with two candidate residues
+floating_sub <- as_glycan_structure(
+  "{6S|1,2}Gal(a1-3)Glc(a1-3)Man(a1-"
+)
+get_structure_graphs(floating_sub)$floating_substituents
+
+# Example 6: Check if object is a glycan structure
 is_glycan_structure(simple_struct)  # TRUE
 is_glycan_structure(graph)          # FALSE
 

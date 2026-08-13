@@ -120,6 +120,43 @@ test_that("structure_floating_parts returns normalized attachment metadata", {
   expect_identical(empty$nodes, list())
 })
 
+test_that("structure_floating_substituents returns normalized metadata", {
+  glycans <- as_glycan_structure(c(
+    unrestricted = "{6S}Gal(a1-3)Glc(a1-",
+    restricted = "{?Me|1,2}Gal(a1-3)Glc(a1-",
+    ordinary = "Gal6S(a1-",
+    missing = NA
+  ))
+
+  substituents <- structure_floating_substituents(glycans)
+
+  expect_named(
+    substituents,
+    c(
+      "glycan_id",
+      "glycan_name",
+      "substituent_id",
+      "substituent",
+      "parents"
+    )
+  )
+  expect_identical(substituents$glycan_id, c(1L, 2L))
+  expect_identical(
+    substituents$glycan_name,
+    c("unrestricted", "restricted")
+  )
+  expect_identical(substituents$substituent_id, c(1L, 1L))
+  expect_identical(substituents$substituent, c("6S", "?Me"))
+  expect_identical(substituents$parents, list(integer(), c(1L, 2L)))
+
+  empty <- structure_floating_substituents(glycan_structure())
+  expect_named(
+    empty,
+    c("glycan_id", "substituent_id", "substituent", "parents")
+  )
+  expect_identical(empty$parents, list())
+})
+
 test_that("structure_floating_candidates expands every attachment candidate", {
   glycans <- as_glycan_structure(c(
     unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
@@ -303,6 +340,7 @@ test_that("structure table accessors accept one glycan graph", {
     structure_nodes,
     structure_edges,
     structure_floating_parts,
+    structure_floating_substituents,
     structure_floating_candidates,
     structure_component_membership,
     structure_candidate_edges
@@ -363,6 +401,58 @@ test_that("structure tables round-trip floating parts", {
     structure_floating_parts(rebuilt)$nodes,
     structure_floating_parts(glycans)$nodes
   )
+})
+
+test_that("structure tables round-trip floating substituents", {
+  glycans <- as_glycan_structure(c(
+    unrestricted = "{6S}Gal(a1-3)Glc(a1-",
+    missing = NA,
+    restricted = "{?Me|1,2}Gal(a1-3)Glc(a1-",
+    duplicate = "{6S}Gal(a1-3)Glc(a1-"
+  ))
+
+  rebuilt <- structure_from_tibbles(
+    structure_nodes(glycans),
+    structure_edges(glycans),
+    get_anomer(glycans),
+    structure_floating_parts(glycans),
+    structure_floating_substituents(glycans)
+  )
+
+  expect_identical(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
+  expect_identical(names(rebuilt), names(glycans))
+  expect_identical(is.na(rebuilt), is.na(glycans))
+  expect_identical(
+    structure_floating_substituents(rebuilt),
+    structure_floating_substituents(glycans)
+  )
+})
+
+test_that("structure tables resolve a single substituent candidate", {
+  nodes <- tibble::tibble(
+    glycan_id = 1L,
+    node_id = 1L,
+    mono = "Gal",
+    sub = ""
+  )
+  edges <- empty_structure_edges()
+  floating_substituents <- tibble::tibble(
+    glycan_id = 1L,
+    substituent_id = 1L,
+    substituent = "6S",
+    parents = list(1L)
+  )
+
+  result <- structure_from_tibbles(
+    nodes,
+    edges,
+    "a1",
+    floating_substituents = floating_substituents
+  )
+
+  expect_identical(as.character(result), "Gal6S(a1-")
+  expect_false(has_floating_substituents(result))
+  expect_equal(nrow(structure_floating_substituents(result)), 0)
 })
 
 test_that("structure tables resolve a single candidate parent", {

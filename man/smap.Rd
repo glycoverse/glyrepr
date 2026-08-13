@@ -29,8 +29,9 @@ smap_structure(.x, .f, ...)
 
 \item{.f}{A function that takes an igraph object and returns a result.
 Can be a function, purrr-style lambda (\code{~ .x$attr}), or a character string naming a function.
-A structure with floating parts is passed as one annotated, weakly
-disconnected graph, including its \code{floating_parts} graph attribute.}
+A structure with floating metadata is passed as one annotated graph,
+including its \code{floating_parts} and/or \code{floating_substituents} graph
+attributes.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
 
@@ -57,7 +58,7 @@ than applying \code{.f} to each element individually when there are duplicate st
 Structure-returning variants reuse unchanged graphs and validate and
 canonicalize changed graphs returned by \code{.f}. A callback that changes vertex
 identities or components of a floating structure must also update its
-\code{floating_parts} metadata.
+\code{floating_parts} and \code{floating_substituents} metadata.
 
 \strong{Return Types:}
 \itemize{

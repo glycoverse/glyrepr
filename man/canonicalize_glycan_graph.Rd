@@ -29,7 +29,7 @@ ordinary construction. Incorrect use of these functions can create invalid
 structure vectors that fail in later operations.
 }
 
-\section{Floating graph schema}{
+\section{Floating graph schemas}{
 
 A floating structure is one weakly disconnected graph with exactly one main
 outward tree and one outward tree per floating part. Its \code{floating_parts}
@@ -41,6 +41,11 @@ graphs always contain it. During canonicalization, a part with exactly one
 effective candidate parent is converted to an ordinary graph edge and its
 floating metadata is removed. Otherwise, the virtual attachment linkage is
 not a graph edge. See \code{\link[=glycan_structure]{glycan_structure()}} for the complete contract.
+
+A graph may also have a \code{floating_substituents} attribute. It is a list of
+entries with character \code{substituent} and integer \code{parents} fields. An empty
+parent vector means all feasible main-tree nodes. A singleton candidate is
+moved into the selected vertex's \code{sub} attribute during canonicalization.
 }
 
 \section{Name-preserving manual construction}{

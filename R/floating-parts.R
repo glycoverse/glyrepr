@@ -64,7 +64,8 @@
 #' )
 #' has_floating_parts(localized)
 #'
-#' @seealso [structure_floating_parts()], [as_glycan_structure()]
+#' @seealso [structure_floating_parts()], [has_floating_substituents()],
+#'   [as_glycan_structure()]
 #' @export
 has_floating_parts <- function(x) {
   if (inherits(x, "igraph")) {
@@ -489,6 +490,7 @@ validate_floating_attachment_slots <- function(graph, info) {
 component_sequence_order <- function(graph, vertices) {
   subgraph <- igraph::induced_subgraph(graph, vertices)
   subgraph <- delete_floating_parts_attr(subgraph)
+  subgraph <- delete_floating_substituents_attr(subgraph)
   cache <- build_seq_cache(subgraph)
   order <- seq_glycan_order(cache$root, cache)
 
@@ -527,6 +529,11 @@ resolve_single_parent_floating_parts <- function(graph) {
     return(graph)
   }
 
+  graph <- materialize_unrestricted_floating_substituents(
+    graph,
+    main_vertices
+  )
+
   for (part_id in which(resolved)) {
     part <- parts[[part_id]]
     graph <- igraph::add_edges(
@@ -553,17 +560,20 @@ resolve_single_parent_floating_parts <- function(graph) {
 }
 
 canonicalize_floating_graph <- function(graph) {
+  graph <- resolve_single_parent_floating_substituents(graph)
   graph <- resolve_single_parent_floating_parts(graph)
-  if (!has_floating_parts_graph(graph)) {
+  if (!has_floating_metadata(graph)) {
     seq_cache <- build_seq_cache(graph)
     order <- seq_glycan_order(seq_cache$root, seq_cache)
     return(.reorder_by_sequence_order(graph, order))
   }
 
   parts <- normalize_floating_parts(graph)
+  substituents <- normalize_floating_substituents(graph)
   info <- list(
-    main_vertices = floating_main_vertices(graph, parts),
-    parts = parts
+    main_vertices = floating_metadata_main_vertices(graph, parts),
+    parts = parts,
+    substituents = substituents
   )
   original_names <- igraph::V(graph)$name
 
@@ -607,6 +617,31 @@ canonicalize_floating_graph <- function(graph) {
   floating_order <- order(purrr::map_chr(floating_orders, "key"))
   floating_orders <- floating_orders[floating_order]
 
+  floating_substituent_orders <- purrr::map(
+    substituents,
+    function(substituent) {
+      parent_names <- original_names[substituent$parents]
+      parents <- unname(main_index[parent_names])
+      parents <- sort(as.integer(parents))
+      suffix <- if (length(parents) == 0) {
+        ""
+      } else {
+        paste0("|", paste(parents, collapse = ","))
+      }
+      list(
+        substituent = substituent$substituent,
+        parents = parents,
+        key = paste0("{", substituent$substituent, suffix, "}")
+      )
+    }
+  )
+  floating_substituent_order <- order(
+    purrr::map_chr(floating_substituent_orders, "key")
+  )
+  floating_substituent_orders <- floating_substituent_orders[
+    floating_substituent_order
+  ]
+
   floating_vertices <- unlist(
     purrr::map(floating_orders, c("order", "vertices")),
     use.names = FALSE
@@ -619,6 +654,7 @@ canonicalize_floating_graph <- function(graph) {
   edge_order <- c(floating_edges, main_order$edges)
 
   graph <- delete_floating_parts_attr(graph)
+  graph <- delete_floating_substituents_attr(graph)
   graph <- .reorder_by_sequence_order(
     graph,
     list(vertices = vertex_order, edges = edge_order)
@@ -643,7 +679,17 @@ canonicalize_floating_graph <- function(graph) {
     offset <- offset + component_size
   }
 
-  set_floating_parts_attr(graph, canonical_parts)
+  graph <- set_floating_parts_attr(graph, canonical_parts)
+  canonical_substituents <- purrr::map(
+    floating_substituent_orders,
+    function(substituent) {
+      list(
+        substituent = substituent$substituent,
+        parents = as.integer(floating_size + substituent$parents)
+      )
+    }
+  )
+  set_floating_substituents_attr(graph, canonical_substituents)
 }
 
 floating_part_iupac <- function(
@@ -653,6 +699,7 @@ floating_part_iupac <- function(
 ) {
   subgraph <- igraph::induced_subgraph(graph, part$nodes)
   subgraph <- delete_floating_parts_attr(subgraph)
+  subgraph <- delete_floating_substituents_attr(subgraph)
   cache <- build_seq_cache(subgraph)
   parents <- if (length(part$parents) == 0) {
     ""

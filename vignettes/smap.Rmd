@@ -248,7 +248,8 @@ component. Use `has_floating_parts()` before applying code that assumes a
 single tree. Structure-returning variants such as `smap_structure()` validate
 and canonicalize changed graphs while reusing unchanged graphs that are
 already valid and canonical; a callback that changes vertex identities or
-components must also update the graph's `floating_parts` metadata.
+components must also update the graph's `floating_parts` and
+`floating_substituents` metadata.
 
 ### Combining Multiple Metrics
 

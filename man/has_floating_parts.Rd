@@ -73,5 +73,6 @@ has_floating_parts(localized)
 
 }
 \seealso{
-\code{\link[=structure_floating_parts]{structure_floating_parts()}}, \code{\link[=as_glycan_structure]{as_glycan_structure()}}
+\code{\link[=structure_floating_parts]{structure_floating_parts()}}, \code{\link[=has_floating_substituents]{has_floating_substituents()}},
+\code{\link[=as_glycan_structure]{as_glycan_structure()}}
 }

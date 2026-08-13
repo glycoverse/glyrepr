@@ -24,6 +24,8 @@ disconnected \code{igraph}: its main tree and floating components share the grap
 and the \code{floating_parts} graph attribute records each component's node
 indices, virtual attachment, and candidate parents. See \code{\link[=glycan_structure]{glycan_structure()}}
 for the metadata schema.
+A structure with floating substituents carries a \code{floating_substituents}
+graph attribute containing their tokens and candidate parent indices.
 }
 \examples{
 structures <- c(o_glycan_core_1(), n_glycan_core())
