@@ -40,6 +40,8 @@ exactly one main outward tree and one outward tree per floating part.
 \itemize{
 \item Unknown parts can be represented with "?", e.g., "?1", "a?", "??"
 }
+\item May have a graph attribute \code{alditol}, containing one logical value.
+Missing attributes are treated as \code{FALSE} and canonicalized explicitly.
 }
 }
 

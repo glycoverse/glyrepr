@@ -104,6 +104,16 @@ validate_glycan_graph <- function(graph) {
     cli::cli_abort(glue::glue("Invalid anomer: {graph$anomer}"))
   }
 
+  alditol <- igraph::graph_attr(graph, "alditol")
+  if (
+    !is.null(alditol) &&
+      (!is.logical(alditol) || length(alditol) != 1 || is.na(alditol))
+  ) {
+    cli::cli_abort(
+      "Glycan structure graph attribute {.field alditol} must be one non-missing logical value."
+    )
+  }
+
   graph
 }
 
@@ -133,6 +143,7 @@ validate_single_glycan_structure <- function(glycan) {
 #' @export
 canonicalize_glycan_graph <- function(graph) {
   checkmate::assert_class(graph, "igraph")
+  graph <- normalize_alditol_attr(graph)
   graph <- ensure_name_vertex_attr(graph)
   canonical_names <- as.character(seq_len(igraph::vcount(graph)))
   if (!identical(igraph::V(graph)$name, canonical_names)) {
@@ -223,7 +234,10 @@ graph_to_iupac <- function(graph) {
   if (is.null(raw_parts) && is.null(raw_substituents)) {
     seq_cache <- build_seq_cache(graph)
     root <- seq_cache$root
-    return(paste0(seq_glycan_iupac(root, seq_cache), "(", graph$anomer, "-"))
+    return(format_reducing_end_iupac(
+      seq_glycan_iupac(root, seq_cache),
+      graph
+    ))
   }
 
   parts <- normalize_floating_parts(graph)
@@ -232,7 +246,10 @@ graph_to_iupac <- function(graph) {
   if (length(parts) == 0 && length(substituents) == 0) {
     seq_cache <- build_seq_cache(graph)
     root <- seq_cache$root
-    return(paste0(seq_glycan_iupac(root, seq_cache), "(", graph$anomer, "-"))
+    return(format_reducing_end_iupac(
+      seq_glycan_iupac(root, seq_cache),
+      graph
+    ))
   }
 
   main_vertices <- floating_metadata_main_vertices(graph, parts)
@@ -241,11 +258,9 @@ graph_to_iupac <- function(graph) {
   main <- delete_floating_substituents_attr(main)
   seq_cache <- build_seq_cache(main)
   root <- seq_cache$root
-  main_iupac <- paste0(
+  main_iupac <- format_reducing_end_iupac(
     seq_glycan_iupac(root, seq_cache),
-    "(",
-    graph$anomer,
-    "-"
+    graph
   )
   floating_iupac <- purrr::map_chr(
     parts,

@@ -79,6 +79,7 @@ The printed graph contains several pieces of information.
 **Graph-level attributes:**
 
 - `anomer`: the anomeric configuration of the reducing end.
+- `alditol`: whether the reducing-end residue is an alditol.
 - `floating_parts`, when present: virtual attachment metadata for disconnected
   floating components.
 - `floating_substituents`, when present: unresolved substituent tokens and
@@ -179,6 +180,17 @@ for example "Neu5Ac with an a2-3 linkage".
 
 ```{r}
 graph$anomer
+```
+
+**Alditol:** Whether the reducing-end residue has been reduced. The attribute
+is always explicit on canonical graphs; legacy inputs without it are treated as
+`FALSE`. In IUPAC-condensed strings, `-ol` follows the reducing-end residue.
+
+```{r}
+alditol <- as_glycan_structure("Gal(b1-4)GlcNAc-ol(a1-")
+alditol_graph <- get_structure_graphs(alditol)
+alditol_graph$alditol
+get_alditol(alditol)
 ```
 
 ### Floating Parts

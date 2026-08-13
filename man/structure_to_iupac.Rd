@@ -27,6 +27,8 @@ The sequence follows the format mono(linkage)mono, where:
 \item linkage: glycosidic linkage (e.g., b1-4, a1-3)
 \item Branches are enclosed in square brackets []
 \item Substituents are appended directly to monosaccharide names (e.g., Glc3Me for Glc with 3Me substituent)
+\item An alditol reducing end has an \code{-ol} suffix before its reducing-end
+annotation (e.g., \verb{GlcNAc-ol(a1-})
 }
 }
 
@@ -67,6 +69,7 @@ graph$anomer <- "a1"
 glycan <- glycan_structure(graph)
 structure_to_iupac(glycan)  # Returns "GlcNAc6Ac(b1-4)Glc3Me(a1-"
 structure_to_iupac(graph)
+structure_to_iupac(as_glycan_structure("GlcNAc-ol(a1-"))
 
 # Vectorized structures
 structs <- c(o_glycan_core_1(), n_glycan_core())

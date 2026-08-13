@@ -2,6 +2,7 @@
 
 ## New features
 
+* Glycan structures now support alditols through reducing-end `-ol` IUPAC syntax, such as `Gal(b1-4)GlcNAc-ol(a1-`. New `get_alditol()` inspects the graph-level status, and `structure_from_tibbles()` gains an `alditols` argument for lossless table round-trips; legacy graphs without the attribute remain non-alditols.
 * Concrete monosaccharides now support explicit unusual absolute configurations using a leading `D-` or `L-`, such as `D-Fuc`, `L-Gul`, and `D-Fucf`; unprefixed names retain their natural configurations. (#85, #86)
 * `as_glycan_structure()` and `glycan_structure()` now support floating substituents with unresolved parent residues using `{<substituent>}` and `{<substituent>|<parents>}` syntax, including unknown carbon positions such as `{?S}`. (#87)
 * `as_glycan_structure()` and `glycan_structure()` now support floating glycan substructures with optional candidate-parent indices using `{<floating>}` and `{<floating>|<parents>}` syntax. Floating structures are validated, canonicalized, transformed, and converted to graph tables while preserving parent-index semantics. (#80)

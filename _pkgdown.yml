@@ -18,6 +18,7 @@ reference:
 - title: "Glycan Composition and Structure Inspection"
   contents:
   - count_mono
+  - get_alditol
   - get_anomer
   - get_mono_type
   - get_structure_graphs

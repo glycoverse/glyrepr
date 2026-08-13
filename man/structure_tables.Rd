@@ -22,7 +22,8 @@ structure_from_tibbles(
   edges,
   anomers,
   floating_parts = NULL,
-  floating_substituents = NULL
+  floating_substituents = NULL,
+  alditols = FALSE
 )
 }
 \arguments{
@@ -42,6 +43,10 @@ structure_from_tibbles(
 \item{floating_substituents}{A data frame returned by
 \code{structure_floating_substituents()}, or \code{NULL} when no floating
 substituents are present.}
+
+\item{alditols}{A logical vector indicating alditol status, either one value
+or one per glycan. Missing values are allowed only for missing glycans.
+Defaults to \code{FALSE} for backward compatibility.}
 }
 \value{
 \itemize{
@@ -63,7 +68,7 @@ list-column \code{parents}.
 \code{structure_floating_substituents()} convert
 a glycan structure vector or one glycan \code{igraph} to normalized graph tables.
 \code{structure_from_tibbles()} rebuilds a \code{glyrepr_structure} vector from those
-tables and a vector of reducing-end anomers.
+tables, a vector of reducing-end anomers, and optional alditol status.
 
 The \code{glycan_id} column is the integer position of each glycan in the input
 vector. Duplicate structures are expanded to their original vector positions.

@@ -5,7 +5,7 @@
 #' `structure_floating_substituents()` convert
 #' a glycan structure vector or one glycan `igraph` to normalized graph tables.
 #' `structure_from_tibbles()` rebuilds a `glyrepr_structure` vector from those
-#' tables and a vector of reducing-end anomers.
+#' tables, a vector of reducing-end anomers, and optional alditol status.
 #'
 #' The `glycan_id` column is the integer position of each glycan in the input
 #' vector. Duplicate structures are expanded to their original vector positions.
@@ -55,6 +55,9 @@
 #' @param floating_substituents A data frame returned by
 #'   `structure_floating_substituents()`, or `NULL` when no floating
 #'   substituents are present.
+#' @param alditols A logical vector indicating alditol status, either one value
+#'   or one per glycan. Missing values are allowed only for missing glycans.
+#'   Defaults to `FALSE` for backward compatibility.
 #'
 #' @returns
 #' - `structure_nodes()` returns a tibble with columns `glycan_id`, `node_id`,
@@ -404,7 +407,8 @@ structure_from_tibbles <- function(
   edges,
   anomers,
   floating_parts = NULL,
-  floating_substituents = NULL
+  floating_substituents = NULL,
+  alditols = FALSE
 ) {
   nodes <- validate_structure_nodes_table(nodes)
   edges <- validate_structure_edges_table(edges)
@@ -413,6 +417,7 @@ structure_from_tibbles <- function(
   floating_substituents <- validate_structure_floating_substituents_table(
     floating_substituents
   )
+  alditols <- validate_structure_alditols(alditols, anomers)
 
   validate_structure_table_glycan_ids(
     nodes$glycan_id,
@@ -461,6 +466,7 @@ structure_from_tibbles <- function(
         drop = FALSE
       ],
       anomers[[glycan_id]],
+      alditols[[glycan_id]],
       glycan_id
     )
   })
@@ -1399,6 +1405,34 @@ validate_structure_anomers <- function(anomers) {
 }
 
 
+#' Validate alditol status for graph-table reconstruction
+#'
+#' @param alditols Candidate alditol values.
+#' @param anomers Validated reducing-end anomers.
+#' @returns A logical vector with one value per anomer.
+#' @noRd
+validate_structure_alditols <- function(alditols, anomers) {
+  checkmate::assert_logical(alditols, any.missing = TRUE)
+
+  n_glycans <- length(anomers)
+  if (!length(alditols) %in% c(1L, n_glycans)) {
+    cli::cli_abort(
+      "{.arg alditols} must have length one or the same length as {.arg anomers}."
+    )
+  }
+
+  alditols <- vctrs::vec_recycle(alditols, n_glycans)
+  invalid_missing <- !is.na(anomers) & is.na(alditols)
+  if (any(invalid_missing)) {
+    cli::cli_abort(
+      "{.arg alditols} cannot be missing for a non-missing glycan."
+    )
+  }
+
+  alditols
+}
+
+
 #' Validate graph-table glycan IDs against anomer length
 #'
 #' @param glycan_id Integer glycan IDs from a graph table.
@@ -1432,6 +1466,7 @@ validate_structure_table_glycan_ids <- function(
 #' @param floating_rows Floating-part rows for one glycan.
 #' @param floating_substituent_rows Floating-substituent rows for one glycan.
 #' @param anomer Reducing-end anomer for the glycan.
+#' @param alditol Alditol status for the glycan.
 #' @param glycan_id Integer glycan ID used in error messages.
 #' @returns An igraph object, or `NA` for a missing glycan.
 #' @noRd
@@ -1441,6 +1476,7 @@ build_structure_graph_from_table_rows <- function(
   floating_rows,
   floating_substituent_rows,
   anomer,
+  alditol,
   glycan_id
 ) {
   if (nrow(node_rows) == 0) {
@@ -1522,6 +1558,7 @@ build_structure_graph_from_table_rows <- function(
   igraph::V(graph)$sub <- node_rows$sub
   igraph::E(graph)$linkage <- edge_rows$linkage
   graph$anomer <- anomer
+  graph$alditol <- alditol
   parts <- lapply(seq_len(nrow(floating_rows)), function(row_id) {
     part <- list(
       root = floating_rows$root_node[[row_id]],

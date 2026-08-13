@@ -191,6 +191,11 @@ parse_floating_iupac_part <- function(part, main_size) {
   )
   donor <- stringr::str_sub(linkage, 1, 2)
   graph <- .parse_iupac_tree_single(paste0(sequence, "(", donor, "-"))
+  if (isTRUE(graph$alditol)) {
+    cli::cli_abort(
+      "A floating glycan part cannot contain an alditol reducing end."
+    )
+  }
 
   list(
     graph = graph,
@@ -239,6 +244,7 @@ combine_floating_iupac_graphs <- function(
     use.names = FALSE
   )
   graph$anomer <- main$anomer
+  graph$alditol <- main$alditol
 
   metadata <- purrr::map2(
     parts,
@@ -280,6 +286,9 @@ combine_floating_iupac_graphs <- function(
       if (!.validate_brackets(x)) {
         cli::cli_abort("Malformed brackets in IUPAC-condensed string")
       }
+      alditol_result <- parse_alditol_iupac(x)
+      x <- alditol_result$iupac
+      alditol <- alditol_result$alditol
       x <- .infer_reducing_end_anomer(x)
       anomer <- .extract_anomer(x)
       x <- stringr::str_sub(x, 1, -stringr::str_length(anomer) - 3)
@@ -302,6 +311,7 @@ combine_floating_iupac_graphs <- function(
       if (length(tokens) == 1) {
         graph <- igraph::set_edge_attr(graph, "linkage", value = character(0))
         graph$anomer <- anomer
+        graph$alditol <- alditol
         return(graph)
       }
 
@@ -335,6 +345,7 @@ combine_floating_iupac_graphs <- function(
       }
 
       graph$anomer <- anomer
+      graph$alditol <- alditol
       return(graph)
     },
     error = function(e) {
@@ -344,6 +355,28 @@ combine_floating_iupac_graphs <- function(
       ))
     }
   )
+}
+
+
+parse_alditol_iupac <- function(iupac) {
+  annotated_marker <- "-ol(?=\\([ab?][12?]-$)"
+  if (stringr::str_detect(iupac, annotated_marker)) {
+    iupac <- stringr::str_remove(iupac, annotated_marker)
+    alditol <- TRUE
+  } else if (stringr::str_ends(iupac, stringr::fixed("-ol"))) {
+    iupac <- stringr::str_remove(iupac, "-ol$")
+    alditol <- TRUE
+  } else {
+    alditol <- FALSE
+  }
+
+  if (stringr::str_detect(iupac, stringr::fixed("-ol"))) {
+    cli::cli_abort(
+      "The alditol marker {.val -ol} is only allowed on the main reducing-end residue."
+    )
+  }
+
+  list(iupac = iupac, alditol = alditol)
 }
 
 # Validate bracket matching
