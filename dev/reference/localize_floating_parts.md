@@ -2,7 +2,7 @@
 
 `localize_floating_parts()` attaches selected floating parts to
 caller-supplied parent nodes. The assignments are interpreted against
-the canonical node and part identifiers returned by
+the floating-part rows and canonical node identifiers returned by
 [`structure_floating_candidates()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_floating_candidates.md).
 
 Each selected parent must belong to the floating part's declared

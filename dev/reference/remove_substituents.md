@@ -1,7 +1,7 @@
 # Remove All Substituents from a Glycan
 
-This function replaces all substituents in a glycan structure with empty
-strings.
+This function replaces all vertex substituents in a glycan structure
+with empty strings and removes unresolved floating substituents.
 
 ## Usage
 

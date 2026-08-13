@@ -60,9 +60,9 @@ underlying graph with
 glycan <- n_glycan_core()
 graph <- get_structure_graphs(glycan)
 graph
-#> IGRAPH df45f26 DN-- 5 4 -- 
+#> IGRAPH c0054d1 DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from df45f26 (vertex names):
+#> + edges from c0054d1 (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 ```
 
@@ -76,6 +76,8 @@ units) and 4 edges (bonds).
 - `anomer`: the anomeric configuration of the reducing end.
 - `floating_parts`, when present: virtual attachment metadata for
   disconnected floating components.
+- `floating_substituents`, when present: unresolved substituent tokens
+  and their candidate parent residues.
 
 **Vertex attributes:**
 
@@ -232,6 +234,34 @@ because its endpoint is unresolved. Use
 [`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
 when a tabular representation must round-trip this metadata.
 
+### Floating Substituents
+
+Floating substituents use the same candidate-parent convention without
+adding dummy vertices. Each `floating_substituents` entry contains
+`substituent`, such as `"6S"` or `"?S"`, and `parents`. Empty `parents`
+means every feasible main node; otherwise the values are global graph
+vertex indices.
+
+``` r
+
+floating_sub <- as_glycan_structure(
+  "{6S|1,2}Gal(a1-3)Glc(a1-3)Man(a1-"
+)
+floating_sub_graph <- get_structure_graphs(floating_sub)
+igraph::graph_attr(floating_sub_graph, "floating_substituents")
+#> [[1]]
+#> [[1]]$substituent
+#> [1] "6S"
+#> 
+#> [[1]]$parents
+#> [1] 1 2
+structure_floating_substituents(floating_sub)
+#> # A tibble: 1 × 4
+#>   glycan_id substituent_id substituent parents  
+#>       <int>          <int> <chr>       <list>   
+#> 1         1              1 6S          <int [2]>
+```
+
 ## Working with the Graph
 
 ### Using `igraph`
@@ -259,7 +289,7 @@ sum(igraph::degree(graph, mode = "out") > 1)
 
 bfs_result <- igraph::bfs(graph, root = 1, mode = "out")
 bfs_result$order
-#> + 5/5 vertices, named, from df45f26:
+#> + 5/5 vertices, named, from c0054d1:
 #> [1] 1 2 3 4 5
 ```
 

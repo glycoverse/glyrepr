@@ -38,7 +38,8 @@ A `glyrepr_composition` object.
 This function uses the vctrs casting framework for type conversion. When
 converting from glycan structures, both monosaccharides and substituents
 are counted. Substituents are extracted from the `sub` attribute of each
-vertex in the structure. For example, a vertex with `sub = "3Me"`
+vertex and from the `floating_substituents` graph attribute. For
+example, a vertex with `sub = "3Me"` or an unresolved `{?Me}` each
 contributes one "Me" substituent to the composition.
 
 Simple composition strings use one-letter residue codes: "H" for "Hex",

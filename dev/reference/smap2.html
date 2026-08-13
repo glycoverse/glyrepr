@@ -81,8 +81,7 @@ Similar to purrr map2 functions, but optimized for glycan structure vectors.</p>
 <dt id="arg--f">.f<a class="anchor" aria-label="anchor" href="#arg--f"></a></dt>
 <dd><p>A function that takes an igraph object (from <code>.x</code>) and a value (from <code>.y</code>) and returns a result.
 Can be a function, purrr-style lambda (<code>~ .x + .y</code>), or a character string naming a function.
-A structure with floating parts is passed as one annotated, weakly
-disconnected graph.</p></dd>
+A structure with floating metadata is passed as one annotated graph.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -109,7 +108,7 @@ than applying <code>.f</code> to each element pair individually when there are d
 <p><code>smap2_structure()</code> reuses unchanged graphs and validates and canonicalizes
 changed graphs returned by <code>.f</code>. A callback that changes vertex identities
 or components of a floating structure must also update its <code>floating_parts</code>
-metadata.</p>
+and <code>floating_substituents</code> metadata.</p>
 <p><strong>NA Handling:</strong>
 NA elements in <code>.x</code> are preserved in the output - the function is not applied to NA positions,
 and the corresponding results are set to NA.</p>

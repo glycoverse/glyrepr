@@ -77,8 +77,9 @@ Similar to purrr mapping functions, but optimized for glycan structure vectors.<
 <dt id="arg--f">.f<a class="anchor" aria-label="anchor" href="#arg--f"></a></dt>
 <dd><p>A function that takes an igraph object and returns a result.
 Can be a function, purrr-style lambda (<code>~ .x$attr</code>), or a character string naming a function.
-A structure with floating parts is passed as one annotated, weakly
-disconnected graph, including its <code>floating_parts</code> graph attribute.</p></dd>
+A structure with floating metadata is passed as one annotated graph,
+including its <code>floating_parts</code> and/or <code>floating_substituents</code> graph
+attributes.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -105,7 +106,7 @@ than applying <code>.f</code> to each element individually when there are duplic
 <p>Structure-returning variants reuse unchanged graphs and validate and
 canonicalize changed graphs returned by <code>.f</code>. A callback that changes vertex
 identities or components of a floating structure must also update its
-<code>floating_parts</code> metadata.</p>
+<code>floating_parts</code> and <code>floating_substituents</code> metadata.</p>
 <p><strong>Return Types:</strong></p><ul><li><p><code>smap()</code>: Returns a list with the same length as <code>.x</code></p></li>
 <li><p><code>smap_vec()</code>: Returns an atomic vector with the same length as <code>.x</code></p></li>
 <li><p><code>smap_lgl()</code>: Returns a logical vector</p></li>

@@ -39,7 +39,7 @@ guarantee all glycan graph and `glyrepr_structure` invariants. Prefer
 for ordinary construction. Incorrect use of these functions can create
 invalid structure vectors that fail in later operations.
 
-## Floating graph schema
+## Floating graph schemas
 
 A floating structure is one weakly disconnected graph with exactly one
 main outward tree and one outward tree per floating part. Its
@@ -54,6 +54,12 @@ is removed. Otherwise, the virtual attachment linkage is not a graph
 edge. See
 [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
 for the complete contract.
+
+A graph may also have a `floating_substituents` attribute. It is a list
+of entries with character `substituent` and integer `parents` fields. An
+empty parent vector means all feasible main-tree nodes. A singleton
+candidate is moved into the selected vertex's `sub` attribute during
+canonicalization.
 
 ## Name-preserving manual construction
 

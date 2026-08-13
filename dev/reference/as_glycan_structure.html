@@ -88,6 +88,11 @@ is accepted as input but fully localizes the attachment, so
 <code>{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-</code> canonicalizes to the ordinary structure
 <code>Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-</code>. An omitted parent list behaves the same way
 when the main tree contains only one node.</p>
+<p>Floating substituents use the same leading-brace and candidate-parent syntax.
+For example, <code>{6S}&lt;main&gt;</code> leaves the sulfated residue unrestricted,
+<code>{6S|1,2}&lt;main&gt;</code> restricts it to main-tree residues 1 and 2, and <code>{?S}&lt;main&gt;</code>
+also leaves the carbon position unknown. A singleton candidate is normalized
+into the selected residue's ordinary <code>sub</code> attribute.</p>
     </div>
 
     <div class="section level2">

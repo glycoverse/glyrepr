@@ -10,13 +10,13 @@ and all linkages and anomers are completely unknown (&quot;??-?&quot;/&quot;??&q
 &quot;basic&quot;: All monosaccharides are generic (e.g. &quot;Hex&quot;, &quot;HexNAc&quot;).
 
 
-Floating parts do not by themselves affect the structure level. Their
-attachment linkage is evaluated like an ordinary linkage, while
-candidate-parent ambiguity is independent of linkage resolution.
-Consequently, a glycan with floating parts is regarded as &quot;intact&quot; when its
-residues are concrete and every graph-edge and floating-attachment linkage,
-as well as the reducing-end anomer, is fully specified, even though a
-floating part's parent remains unlocalized.
+Floating metadata does not by itself affect the structure level. A floating
+part's attachment linkage is evaluated like an ordinary linkage, while
+candidate-parent ambiguity for floating parts and substituents is independent
+of linkage resolution. Consequently, a glycan with floating metadata is
+regarded as &quot;intact&quot; when its residues are concrete and every graph-edge and
+floating-part attachment linkage, as well as the reducing-end anomer, is
+fully specified, even though a parent residue remains unlocalized.
 Note that in theory you can have a glycan with generic monosaccharides with all linkages determined.
 For example, &quot;Hex(b1-3)HexNAc(a1-&quot; is a valid glycan structure.
 But in reality, this is almost impossible,
@@ -32,13 +32,13 @@ and all linkages and anomers are completely unknown (&quot;??-?&quot;/&quot;??&q
 &quot;basic&quot;: All monosaccharides are generic (e.g. &quot;Hex&quot;, &quot;HexNAc&quot;).
 
 
-Floating parts do not by themselves affect the structure level. Their
-attachment linkage is evaluated like an ordinary linkage, while
-candidate-parent ambiguity is independent of linkage resolution.
-Consequently, a glycan with floating parts is regarded as &quot;intact&quot; when its
-residues are concrete and every graph-edge and floating-attachment linkage,
-as well as the reducing-end anomer, is fully specified, even though a
-floating part's parent remains unlocalized.
+Floating metadata does not by itself affect the structure level. A floating
+part's attachment linkage is evaluated like an ordinary linkage, while
+candidate-parent ambiguity for floating parts and substituents is independent
+of linkage resolution. Consequently, a glycan with floating metadata is
+regarded as &quot;intact&quot; when its residues are concrete and every graph-edge and
+floating-part attachment linkage, as well as the reducing-end anomer, is
+fully specified, even though a parent residue remains unlocalized.
 Note that in theory you can have a glycan with generic monosaccharides with all linkages determined.
 For example, &quot;Hex(b1-3)HexNAc(a1-&quot; is a valid glycan structure.
 But in reality, this is almost impossible,
@@ -92,13 +92,13 @@ and at least one linkage or anomer has a non-"?" annotation.</p></li>
 <li><p>"topological": All monosaccharides are concrete (e.g. "Man", "GlcNAc"),
 and all linkages and anomers are completely unknown ("??-?"/"??").</p></li>
 <li><p>"basic": All monosaccharides are generic (e.g. "Hex", "HexNAc").</p></li>
-</ul><p>Floating parts do not by themselves affect the structure level. Their
-attachment linkage is evaluated like an ordinary linkage, while
-candidate-parent ambiguity is independent of linkage resolution.
-Consequently, a glycan with floating parts is regarded as "intact" when its
-residues are concrete and every graph-edge and floating-attachment linkage,
-as well as the reducing-end anomer, is fully specified, even though a
-floating part's parent remains unlocalized.</p>
+</ul><p>Floating metadata does not by itself affect the structure level. A floating
+part's attachment linkage is evaluated like an ordinary linkage, while
+candidate-parent ambiguity for floating parts and substituents is independent
+of linkage resolution. Consequently, a glycan with floating metadata is
+regarded as "intact" when its residues are concrete and every graph-edge and
+floating-part attachment linkage, as well as the reducing-end anomer, is
+fully specified, even though a parent residue remains unlocalized.</p>
 <p>Note that in theory you can have a glycan with generic monosaccharides with all linkages determined.
 For example, "Hex(b1-3)HexNAc(a1-" is a valid glycan structure.
 But in reality, this is almost impossible,
@@ -127,7 +127,8 @@ returns <code>NA_character_</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="has_linkages.html">has_linkages()</a></code>, <code><a href="has_floating_parts.html">has_floating_parts()</a></code>, <code><a href="get_mono_type.html">get_mono_type()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="has_linkages.html">has_linkages()</a></code>, <code><a href="has_floating_parts.html">has_floating_parts()</a></code>,
+<code><a href="has_floating_substituents.html">has_floating_substituents()</a></code>, <code><a href="get_mono_type.html">get_mono_type()</a></code></p></div>
     </div>
 
     <div class="section level2">

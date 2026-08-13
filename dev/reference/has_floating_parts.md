@@ -66,6 +66,7 @@ returns `FALSE` for the normalized structure.
 ## See also
 
 [`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md),
+[`has_floating_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/has_floating_substituents.md),
 [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
 
 ## Examples

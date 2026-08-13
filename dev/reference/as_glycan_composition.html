@@ -77,8 +77,9 @@ Supported inputs include:</p><ul><li><p>Named integer vectors or lists of named 
     <p>This function uses the vctrs casting framework for type conversion.
 When converting from glycan structures, both monosaccharides and substituents
 are counted. Substituents are extracted from the <code>sub</code> attribute of each
-vertex in the structure. For example, a vertex with <code>sub = "3Me"</code>
-contributes one "Me" substituent to the composition.</p>
+vertex and from the <code>floating_substituents</code> graph attribute. For example, a
+vertex with <code>sub = "3Me"</code> or an unresolved <code>{?Me}</code> each contributes one
+"Me" substituent to the composition.</p>
 <p>Simple composition strings use one-letter residue codes: "H" for "Hex",
 "N" for "HexNAc", "F" for "dHex", "S"/"A" for "NeuAc", and "G" for
 "NeuGc". "E" and "L" are also accepted as linkage-specific Neu5Ac codes;

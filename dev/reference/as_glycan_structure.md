@@ -47,6 +47,13 @@ set is accepted as input but fully localizes the attachment, so
 structure `Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`. An omitted parent list
 behaves the same way when the main tree contains only one node.
 
+Floating substituents use the same leading-brace and candidate-parent
+syntax. For example, `{6S}<main>` leaves the sulfated residue
+unrestricted, `{6S|1,2}<main>` restricts it to main-tree residues 1 and
+2, and `{?S}<main>` also leaves the carbon position unknown. A singleton
+candidate is normalized into the selected residue's ordinary `sub`
+attribute.
+
 ## Examples
 
 ``` r

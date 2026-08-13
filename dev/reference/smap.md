@@ -33,9 +33,9 @@ smap_structure(.x, .f, ...)
 
   A function that takes an igraph object and returns a result. Can be a
   function, purrr-style lambda (`~ .x$attr`), or a character string
-  naming a function. A structure with floating parts is passed as one
-  annotated, weakly disconnected graph, including its `floating_parts`
-  graph attribute.
+  naming a function. A structure with floating metadata is passed as one
+  annotated graph, including its `floating_parts` and/or
+  `floating_substituents` graph attributes.
 
 - ...:
 
@@ -65,7 +65,7 @@ duplicate structures.
 Structure-returning variants reuse unchanged graphs and validate and
 canonicalize changed graphs returned by `.f`. A callback that changes
 vertex identities or components of a floating structure must also update
-its `floating_parts` metadata.
+its `floating_parts` and `floating_substituents` metadata.
 
 **Return Types:**
 

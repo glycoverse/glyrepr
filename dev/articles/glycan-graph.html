@@ -118,9 +118,9 @@ with <code><a href="../reference/get_structure_graphs.html">get_structure_graphs
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span>
 <span><span class="va">graph</span></span>
-<span><span class="co">#&gt; IGRAPH df45f26 DN-- 5 4 -- </span></span>
+<span><span class="co">#&gt; IGRAPH c0054d1 DN-- 5 4 -- </span></span>
 <span><span class="co">#&gt; + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)</span></span>
-<span><span class="co">#&gt; + edges from df45f26 (vertex names):</span></span>
+<span><span class="co">#&gt; + edges from c0054d1 (vertex names):</span></span>
 <span><span class="co">#&gt; [1] 3-&gt;1 3-&gt;2 4-&gt;3 5-&gt;4</span></span></code></pre></div>
 <p>The printed graph contains several pieces of information.</p>
 <p><strong>First line:</strong> Directed Named (“DN”) graph with 5
@@ -133,6 +133,9 @@ end.</li>
 <li>
 <code>floating_parts</code>, when present: virtual attachment
 metadata for disconnected floating components.</li>
+<li>
+<code>floating_substituents</code>, when present: unresolved
+substituent tokens and their candidate parent residues.</li>
 </ul>
 <p><strong>Vertex attributes:</strong></p>
 <ul>
@@ -275,6 +278,33 @@ singleton is normalized to an ordinary edge.</li>
 unresolved. Use <code><a href="../reference/structure_tables.html">structure_floating_parts()</a></code> when a tabular
 representation must round-trip this metadata.</p>
 </div>
+<div class="section level3">
+<h3 id="floating-substituents">Floating Substituents<a class="anchor" aria-label="anchor" href="#floating-substituents"></a>
+</h3>
+<p>Floating substituents use the same candidate-parent convention
+without adding dummy vertices. Each <code>floating_substituents</code>
+entry contains <code>substituent</code>, such as <code>"6S"</code> or
+<code>"?S"</code>, and <code>parents</code>. Empty <code>parents</code>
+means every feasible main node; otherwise the values are global graph
+vertex indices.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">floating_sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span>
+<span>  <span class="st">"{6S|1,2}Gal(a1-3)Glc(a1-3)Man(a1-"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">floating_sub_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">floating_sub</span><span class="op">)</span></span>
+<span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/graph_attr.html" class="external-link">graph_attr</a></span><span class="op">(</span><span class="va">floating_sub_graph</span>, <span class="st">"floating_substituents"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; [[1]]$substituent</span></span>
+<span><span class="co">#&gt; [1] "6S"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[1]]$parents</span></span>
+<span><span class="co">#&gt; [1] 1 2</span></span>
+<span><span class="fu"><a href="../reference/structure_tables.html">structure_floating_substituents</a></span><span class="op">(</span><span class="va">floating_sub</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
+<span><span class="co">#&gt;   glycan_id substituent_id substituent parents  </span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>         1              1 6S          <span style="color: #949494;">&lt;int [2]&gt;</span></span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="working-with-the-graph">Working with the Graph<a class="anchor" aria-label="anchor" href="#working-with-the-graph"></a>
@@ -290,22 +320,22 @@ floating parts: <code><a href="../reference/get_structure_graphs.html">get_struc
 main tree.</p>
 <p><strong>Example 1:</strong> Count branched structures (sugars with
 multiple children):</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/degree.html" class="external-link">degree</a></span><span class="op">(</span><span class="va">graph</span>, mode <span class="op">=</span> <span class="st">"out"</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1</span></span></code></pre></div>
 <p><strong>Example 2:</strong> Explore the structure with breadth-first
 search:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bfs_result</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/bfs.html" class="external-link">bfs</a></span><span class="op">(</span><span class="va">graph</span>, root <span class="op">=</span> <span class="fl">1</span>, mode <span class="op">=</span> <span class="st">"out"</span><span class="op">)</span></span>
 <span><span class="va">bfs_result</span><span class="op">$</span><span class="va">order</span></span>
-<span><span class="co">#&gt; + 5/5 vertices, named, from df45f26:</span></span>
+<span><span class="co">#&gt; + 5/5 vertices, named, from c0054d1:</span></span>
 <span><span class="co">#&gt; [1] 1 2 3 4 5</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="using-smap-functions">Using <code>smap</code> Functions<a class="anchor" aria-label="anchor" href="#using-smap-functions"></a>
 </h3>
 <p>Working with multiple glycans? You could use <code>purrr</code>:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">glycans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="../reference/n_glycan_core.html">o_glycan_core_1</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="../reference/n_glycan_core.html">o_glycan_core_2</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
@@ -314,7 +344,7 @@ search:</p>
 <span><span class="co">#&gt; [1] 5 2 3</span></span></code></pre></div>
 <p>For glycan structure vectors, <code>glyrepr</code>’s
 <code>smap</code> functions are usually a better fit:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/smap.html">smap_int</a></span><span class="op">(</span><span class="va">glycans</span>, <span class="op">~</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Direct analysis, no intermediate step.</span></span>
 <span><span class="co">#&gt; [1] 5 2 3</span></span></code></pre></div>
 <p>The main advantage of <code>smap</code> functions is how they handle

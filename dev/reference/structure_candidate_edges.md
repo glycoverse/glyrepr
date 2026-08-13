@@ -4,9 +4,10 @@
 attachment as an explicit virtual edge. `from_node` is a candidate
 parent in the main tree and `to_node` is the root of the floating part.
 
-The rows correspond one-to-one with
+The rows correspond one-to-one with the floating-part rows from
 [`structure_floating_candidates()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_floating_candidates.md).
-For unrestricted `{<floating>}` parts, every original main-tree node is
+Floating substituents do not create virtual graph edges. For
+unrestricted `{<floating>}` parts, every original main-tree node is
 returned and `scope` is `"all"`. For explicitly restricted parts, only
 the declared parent nodes are returned and `scope` is `"explicit"`.
 

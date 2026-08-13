@@ -9,6 +9,8 @@ Main-tree nodes have `component_type = "main"` and a missing `part_id`.
 Nodes in a floating subtree have `component_type = "floating"` and the
 corresponding `part_id` from
 [`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md).
+Floating substituents do not introduce vertices, so they do not create
+additional component-membership rows.
 
 Node indices refer to `structure_nodes()$node_id` for the same glycan.
 Missing structures contribute no rows. Duplicate structures are expanded

@@ -87,6 +87,7 @@ glycan structure vectors. Supports mixed input of multiple objects.</p></dd>
 root).</p></li>
 <li><p>A structure with floating parts must be one annotated forest containing
 exactly one main outward tree and one outward tree per floating part.</p></li>
+<li><p>Floating substituents add graph metadata but no vertices or edges.</p></li>
 <li><p>Must have a graph attribute <code>anomer</code> in the format "a1" or "b1"</p><ul><li><p>Unknown parts can be represented with "?", e.g., "?1", "a?", "??"</p></li>
 </ul></li>
 </ul></div>
@@ -142,6 +143,21 @@ attachments retain floating metadata, where the virtual attachment is
 metadata rather than an edge and contributes to the canonical structure key.</p>
 </div>
 
+<div class="section">
+<h3 id="floating-substituents">Floating Substituents<a class="anchor" aria-label="anchor" href="#floating-substituents"></a></h3>
+
+
+<p>A floating substituent has known chemistry but an unresolved parent residue.
+It is declared by the <code>floating_substituents</code> graph attribute, a list with
+one entry per substituent. Each entry contains:</p><ul><li><p><code>substituent</code>: one canonical substituent token such as <code>"6S"</code>, <code>"4/6Ac"</code>,
+or <code>"?Me"</code>.</p></li>
+<li><p><code>parents</code>: integer vertex indices in the main tree. An empty integer vector
+means that all feasible main-tree nodes are candidates.</p></li>
+</ul><p>A singleton candidate is normalized into the corresponding vertex's <code>sub</code>
+attribute. Candidate parents must permit a conflict-free assignment of
+occupied carbon positions.</p>
+</div>
+
     </div>
     <div class="section level2">
     <h2 id="node-and-edge-order">Node and Edge Order<a class="anchor" aria-label="anchor" href="#node-and-edge-order"></a></h2>
@@ -154,8 +170,9 @@ and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".</p>
 main tree, exactly as their brace-enclosed components precede the main glycan
 in the complete IUPAC-condensed string. Parent indices written inside braces
 are local to the main tree, while <code>floating_parts$parents</code> stores the
-corresponding global graph vertex indices. A virtual floating attachment is
-not an edge.</p>
+corresponding global graph vertex indices. The same rule applies to
+<code>floating_substituents$parents</code>. A virtual floating attachment is not an
+edge, and a floating substituent is not a vertex.</p>
     </div>
     <div class="section level2">
     <h2 id="na-support">NA Support<a class="anchor" aria-label="anchor" href="#na-support"></a></h2>
@@ -222,7 +239,21 @@ explicitly convert it to IUPAC-condensed strings when needed.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>         1       1         1 <span style="color: #949494;">&lt;int [1]&gt;</span> a2-3    <span style="color: #949494;">&lt;int [2]&gt;</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 5: Check if object is a glycan structure</span></span></span>
+<span class="r-in"><span><span class="co"># Example 5: Parse a substituent with two candidate residues</span></span></span>
+<span class="r-in"><span><span class="va">floating_sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"{6S|1,2}Gal(a1-3)Glc(a1-3)Man(a1-"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">floating_sub</span><span class="op">)</span><span class="op">$</span><span class="va">floating_substituents</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]$substituent</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "6S"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]$parents</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example 6: Check if object is a glycan structure</span></span></span>
 <span class="r-in"><span><span class="fu">is_glycan_structure</span><span class="op">(</span><span class="va">simple_struct</span><span class="op">)</span>  <span class="co"># TRUE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span><span class="fu">is_glycan_structure</span><span class="op">(</span><span class="va">graph</span><span class="op">)</span>          <span class="co"># FALSE</span></span></span>

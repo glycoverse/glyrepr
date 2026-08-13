@@ -81,8 +81,7 @@ Similar to purrr imap functions, but optimized for glycan structure vectors.</p>
 <dd><p>A function that takes an igraph object (from <code>.x</code>) and an index/name,
 returning a result.
 Can be a function, purrr-style lambda (<code>~ paste(.x, .y)</code>), or a character string naming a function.
-A structure with floating parts is passed as one annotated, weakly
-disconnected graph.</p></dd>
+A structure with floating metadata is passed as one annotated graph.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -112,7 +111,7 @@ than applying <code>.f</code> to each element individually when there are duplic
 <p><code>simap_structure()</code> reuses unchanged graphs and validates and canonicalizes
 changed graphs returned by <code>.f</code>. A callback that changes vertex identities
 or components of a floating structure must also update its <code>floating_parts</code>
-metadata.</p>
+and <code>floating_substituents</code> metadata.</p>
 <p><strong>IMPORTANT PERFORMANCE NOTE:</strong>
 Due to the inclusion of position indices, <code>simap</code> functions have <strong>O(total_structures)</strong>
 time complexity because each position creates a unique combination, even with identical structures.</p>

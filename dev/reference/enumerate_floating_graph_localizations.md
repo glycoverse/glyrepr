@@ -1,4 +1,4 @@
-# Enumerate Floating-Part Graph Localizations
+# Enumerate Floating Graph Localizations
 
 `enumerate_floating_graph_localizations()` generates every
 conflict-free, fully localized graph permitted by the candidate-parent
@@ -11,10 +11,12 @@ keeps the same integer ID, name, and attributes as in `graph`.
 Assignment `parent_node` values therefore refer directly to vertex IDs
 in both the input and localized graphs.
 
-Every conflict-free assignment is retained, even when multiple
-assignments would produce the same canonical IUPAC-condensed structure.
-A graph without floating parts produces one identity row with an empty
-assignment table.
+Floating parts are localized as ordinary edges, while floating
+substituents are localized into the selected parent vertex's `sub`
+attribute. Every conflict-free assignment is retained, even when
+multiple assignments would produce the same canonical IUPAC-condensed
+structure. A graph without floating metadata produces one identity row
+with an empty assignment table.
 
 `max_variants` is a conservative safeguard. It limits the raw Cartesian
 product before conflict filtering, so the function may ask for a higher
@@ -31,7 +33,7 @@ enumerate_floating_graph_localizations(graph, max_variants = 256)
 - graph:
 
   A valid glycan `igraph`, optionally containing unresolved floating
-  parts.
+  parts or substituents.
 
 - max_variants:
 
@@ -48,7 +50,9 @@ A tibble with columns:
   vertex IDs are identical to those in `graph`.
 
 - `assignments`: a list-column of tibbles with `glycan_id`, `part_id`,
-  and `parent_node`. `glycan_id` is always `1L`.
+  `parent_node`, and `substituent_id`. Exactly one of `part_id` and
+  `substituent_id` is non-missing in each row. `glycan_id` is always
+  `1L`.
 
 ## Low-level API warning
 
@@ -59,7 +63,7 @@ guarantee all glycan graph and `glyrepr_structure` invariants. Prefer
 for ordinary construction. Incorrect use of these functions can create
 invalid structure vectors that fail in later operations.
 
-## Floating graph schema
+## Floating graph schemas
 
 A floating structure is one weakly disconnected graph with exactly one
 main outward tree and one outward tree per floating part. Its
@@ -74,6 +78,12 @@ is removed. Otherwise, the virtual attachment linkage is not a graph
 edge. See
 [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
 for the complete contract.
+
+A graph may also have a `floating_substituents` attribute. It is a list
+of entries with character `substituent` and integer `parents` fields. An
+empty parent vector means all feasible main-tree nodes. A singleton
+candidate is moved into the selected vertex's `sub` attribute during
+canonicalization.
 
 ## Name-preserving manual construction
 
@@ -113,15 +123,15 @@ graph <- get_structure_graphs(glycan, return_list = FALSE)
 localizations <- enumerate_floating_graph_localizations(graph)
 localizations$graph
 #> [[1]]
-#> IGRAPH 212b73a DN-- 3 2 -- 
+#> IGRAPH ba48c9e DN-- 3 2 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 212b73a (vertex names):
+#> + edges from ba48c9e (vertex names):
 #> [1] 3->2 2->1
 #> 
 #> [[2]]
-#> IGRAPH 884815d DN-- 3 2 -- 
+#> IGRAPH 00a4955 DN-- 3 2 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 884815d (vertex names):
+#> + edges from 00a4955 (vertex names):
 #> [1] 3->2 3->1
 #> 
 ```

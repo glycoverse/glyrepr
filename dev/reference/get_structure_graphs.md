@@ -6,7 +6,9 @@ weakly disconnected `igraph`: its main tree and floating components
 share the graph, and the `floating_parts` graph attribute records each
 component's node indices, virtual attachment, and candidate parents. See
 [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-for the metadata schema.
+for the metadata schema. A structure with floating substituents carries
+a `floating_substituents` graph attribute containing their tokens and
+candidate parent indices.
 
 ## Usage
 
@@ -38,28 +40,28 @@ parameter).
 structures <- c(o_glycan_core_1(), n_glycan_core())
 get_structure_graphs(structures)
 #> [[1]]
-#> IGRAPH 123ddc3 DN-- 2 1 -- 
+#> IGRAPH 7d7f01a DN-- 2 1 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 123ddc3 (vertex names):
+#> + edge from 7d7f01a (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 66cfa74 DN-- 5 4 -- 
+#> IGRAPH ddfaf5f DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 66cfa74 (vertex names):
+#> + edges from ddfaf5f (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 #> 
 get_structure_graphs(structures)
 #> [[1]]
-#> IGRAPH 123ddc3 DN-- 2 1 -- 
+#> IGRAPH 7d7f01a DN-- 2 1 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 123ddc3 (vertex names):
+#> + edge from 7d7f01a (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 66cfa74 DN-- 5 4 -- 
+#> IGRAPH ddfaf5f DN-- 5 4 -- 
 #> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 66cfa74 (vertex names):
+#> + edges from ddfaf5f (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 #> 
 ```

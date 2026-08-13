@@ -6,6 +6,8 @@ attribute.
 Main-tree nodes have component_type = "main" and a missing part_id.
 Nodes in a floating subtree have component_type = "floating" and the
 corresponding part_id from structure_floating_parts().
+Floating substituents do not introduce vertices, so they do not create
+additional component-membership rows.
 Node indices refer to structure_nodes()$node_id for the same glycan.
 Missing structures contribute no rows. Duplicate structures are expanded to
 their original vector positions. For graph input, node indices are current
@@ -17,6 +19,8 @@ attribute.
 Main-tree nodes have component_type = "main" and a missing part_id.
 Nodes in a floating subtree have component_type = "floating" and the
 corresponding part_id from structure_floating_parts().
+Floating substituents do not introduce vertices, so they do not create
+additional component-membership rows.
 Node indices refer to structure_nodes()$node_id for the same glycan.
 Missing structures contribute no rows. Duplicate structures are expanded to
 their original vector positions. For graph input, node indices are current
@@ -68,7 +72,9 @@ normalized alternative to reading the private floating-part graph
 attribute.</p>
 <p>Main-tree nodes have <code>component_type = "main"</code> and a missing <code>part_id</code>.
 Nodes in a floating subtree have <code>component_type = "floating"</code> and the
-corresponding <code>part_id</code> from <code><a href="structure_tables.html">structure_floating_parts()</a></code>.</p>
+corresponding <code>part_id</code> from <code><a href="structure_tables.html">structure_floating_parts()</a></code>.
+Floating substituents do not introduce vertices, so they do not create
+additional component-membership rows.</p>
 <p>Node indices refer to <code>structure_nodes()$node_id</code> for the same glycan.
 Missing structures contribute no rows. Duplicate structures are expanded to
 their original vector positions. For graph input, node indices are current

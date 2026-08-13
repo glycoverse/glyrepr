@@ -120,6 +120,7 @@ count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
 - [`structure_nodes()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_edges()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+  [`structure_floating_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   : Convert Glycan Structures to Graph Tables
 
@@ -135,15 +136,18 @@ count_mono(glycan_composition(c(Man = 3, GlcNAc = 2, Gal = 2)), "Hex")
   : Access Individual Glycan Structures
 - [`has_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/has_floating_parts.md)
   : Detect Floating Glycan Parts
+- [`has_floating_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/has_floating_substituents.md)
+  : Detect Floating Substituents
 - [`has_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/has_linkages.md)
   : Determine if a Glycan Structure has Linkages
 - [`structure_nodes()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_edges()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+  [`structure_floating_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   : Convert Glycan Structures to Graph Tables
 - [`structure_floating_candidates()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_floating_candidates.md)
-  : List Candidate Attachments for Floating Parts
+  : List Candidate Parents for Floating Metadata
 - [`structure_component_membership()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_component_membership.md)
   : Identify Main and Floating Structure Components
 - [`structure_candidate_edges()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_candidate_edges.md)
@@ -166,7 +170,7 @@ structure vectors.
 - [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph_vector.md)
   : Validate Compatibility Across Glycan Graphs
 - [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md)
-  : Enumerate Floating-Part Graph Localizations
+  : Enumerate Floating Graph Localizations
 - [`graph_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/graph_to_iupac.md)
   : Generate IUPAC-Condensed from a Glycan Graph
 - [`new_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/new_glycan_structure.md)
@@ -177,7 +181,7 @@ structure vectors.
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md)
   : Convert Monosaccharides to Generic Type
 - [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md)
-  : Enumerate Floating-Part Localizations
+  : Enumerate Floating Localizations
 - [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md)
   : Fill Anomer Positions
 - [`localize_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/localize_floating_parts.md)

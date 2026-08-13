@@ -12,6 +12,13 @@
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   and
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+  now support floating substituents with unresolved parent residues
+  using `{<substituent>}` and `{<substituent>|<parents>}` syntax,
+  including unknown carbon positions such as `{?S}`.
+  ([\#87](https://github.com/glycoverse/glyrepr/issues/87))
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  and
+  [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
   now support floating glycan substructures with optional
   candidate-parent indices using `{<floating>}` and
   `{<floating>|<parents>}` syntax. Floating structures are validated,
@@ -23,14 +30,15 @@
   become `Hex` and `HexNAc`, respectively.
   ([\#82](https://github.com/glycoverse/glyrepr/issues/82))
 - New
-  [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md),
-  [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md),
+  [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md)
   and
+  [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md)
+  APIs enumerate conflict-free floating-part and floating-substituent
+  assignments with provenance, while
   [`localize_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/localize_floating_parts.md)
-  APIs attach or enumerate conflict-free floating-part assignments with
-  provenance; graph-level results retain original vertex IDs, and
-  `deduplicate = FALSE` retains assignments that canonicalize to the
-  same structure.
+  attaches selected floating parts; graph-level results retain original
+  vertex IDs, and `deduplicate = FALSE` retains assignments that
+  canonicalize to the same structure.
   ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - [`print()`](https://rdrr.io/r/base/print.html) gains an `n` argument
   for `glyrepr_structure` and `glyrepr_composition` vectors.
@@ -40,7 +48,8 @@
   [`structure_component_membership()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_component_membership.md),
   and
   [`structure_floating_candidates()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_floating_candidates.md)
-  helpers expose floating-part membership and candidate attachments for
+  helpers expose floating-part membership and virtual edges plus
+  floating-part and floating-substituent candidate parents for
   inspection, drawing, and constraint-aware graph operations.
   ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - Structure inspection, transformation, graph-table, composition, and
