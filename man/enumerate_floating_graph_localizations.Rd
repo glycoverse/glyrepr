@@ -2,13 +2,13 @@
 % Please edit documentation in R/floating-localization.R
 \name{enumerate_floating_graph_localizations}
 \alias{enumerate_floating_graph_localizations}
-\title{Enumerate Floating-Part Graph Localizations}
+\title{Enumerate Floating Graph Localizations}
 \usage{
 enumerate_floating_graph_localizations(graph, max_variants = 256)
 }
 \arguments{
 \item{graph}{A valid glycan \code{igraph}, optionally containing unresolved
-floating parts.}
+floating parts or substituents.}
 
 \item{max_variants}{A positive integer giving the maximum raw candidate
 combinations allowed.}
@@ -19,8 +19,9 @@ A tibble with columns:
 \item \code{variant_id}: the sequential localization identifier.
 \item \code{graph}: a list-column of fully localized \code{igraph} objects whose vertex
 IDs are identical to those in \code{graph}.
-\item \code{assignments}: a list-column of tibbles with \code{glycan_id}, \code{part_id}, and
-\code{parent_node}. \code{glycan_id} is always \code{1L}.
+\item \code{assignments}: a list-column of tibbles with \code{glycan_id}, \code{part_id},
+\code{parent_node}, and \code{substituent_id}. Exactly one of \code{part_id} and
+\code{substituent_id} is non-missing in each row. \code{glycan_id} is always \code{1L}.
 }
 }
 \description{
@@ -34,9 +35,11 @@ the same integer ID, name, and attributes as in \code{graph}. Assignment
 \code{parent_node} values therefore refer directly to vertex IDs in both the
 input and localized graphs.
 
-Every conflict-free assignment is retained, even when multiple assignments
-would produce the same canonical IUPAC-condensed structure. A graph without
-floating parts produces one identity row with an empty assignment table.
+Floating parts are localized as ordinary edges, while floating substituents
+are localized into the selected parent vertex's \code{sub} attribute. Every
+conflict-free assignment is retained, even when multiple assignments would
+produce the same canonical IUPAC-condensed structure. A graph without
+floating metadata produces one identity row with an empty assignment table.
 
 \code{max_variants} is a conservative safeguard. It limits the raw Cartesian
 product before conflict filtering, so the function may ask for a higher

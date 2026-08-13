@@ -217,21 +217,26 @@ structure_floating_substituents <- function(x) {
 }
 
 
-#' List Candidate Attachments for Floating Parts
+#' List Candidate Parents for Floating Metadata
 #'
 #' @description
-#' `structure_floating_candidates()` expands floating-part attachment metadata
-#' to one row per candidate parent. This provides a uniform representation for
-#' both explicitly restricted floating parts and unrestricted `{<floating>}`
-#' parts.
+#' `structure_floating_candidates()` expands floating-part and
+#' floating-substituent metadata to one row per candidate parent. This provides
+#' a uniform representation for explicitly restricted and unrestricted
+#' floating metadata.
 #'
-#' For an unrestricted floating part, every node in the original main tree is
-#' returned as a candidate and `scope` is `"all"`. For a floating part written
-#' with `{<floating>|<parents>}`, only the declared parent nodes are returned and
-#' `scope` is `"explicit"`.
+#' For unrestricted metadata, every node in the original main tree is returned
+#' as a candidate and `scope` is `"all"`. For metadata written with an explicit
+#' `|<parents>` suffix, only the declared parent nodes are returned and `scope`
+#' is `"explicit"`.
+#'
+#' Floating-part rows have a non-missing `part_id`, `root_node`, and `linkage`.
+#' Floating-substituent rows instead have a non-missing `substituent_id` and
+#' `substituent`. Exactly one of `part_id` and `substituent_id` is non-missing
+#' in each row.
 #'
 #' Node indices refer to `structure_nodes()$node_id` for the same glycan. Missing
-#' structures and structures without floating parts contribute no rows.
+#' structures and structures without floating metadata contribute no rows.
 #' Duplicate structures are expanded to their original vector positions. For
 #' graph input, node indices are current numeric vertex positions and
 #' `glycan_id` is `1L`. If vector input is named, the result also contains a
@@ -240,13 +245,14 @@ structure_floating_substituents <- function(x) {
 #' @param x A glycan structure vector or one glycan `igraph`.
 #'
 #' @returns A tibble with columns `glycan_id`, `part_id`, `root_node`,
-#'   `parent_node`, `linkage`, and `scope`, plus `glycan_name` when `x` is
-#'   named.
+#'   `parent_node`, `linkage`, `scope`, `substituent_id`, and `substituent`,
+#'   plus `glycan_name` when `x` is named.
 #'
 #' @examples
 #' glycans <- as_glycan_structure(c(
 #'   unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-#'   restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#'   restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+#'   substituent = "{6S}Gal(a1-3)Gal(a1-"
 #' ))
 #' structure_floating_candidates(glycans)
 #'
@@ -288,6 +294,8 @@ structure_floating_candidates <- function(x) {
 #' Main-tree nodes have `component_type = "main"` and a missing `part_id`.
 #' Nodes in a floating subtree have `component_type = "floating"` and the
 #' corresponding `part_id` from [structure_floating_parts()].
+#' Floating substituents do not introduce vertices, so they do not create
+#' additional component-membership rows.
 #'
 #' Node indices refer to `structure_nodes()$node_id` for the same glycan.
 #' Missing structures contribute no rows. Duplicate structures are expanded to
@@ -340,10 +348,12 @@ structure_component_membership <- function(x) {
 #' attachment as an explicit virtual edge. `from_node` is a candidate parent in
 #' the main tree and `to_node` is the root of the floating part.
 #'
-#' The rows correspond one-to-one with [structure_floating_candidates()]. For
-#' unrestricted `{<floating>}` parts, every original main-tree node is returned
-#' and `scope` is `"all"`. For explicitly restricted parts, only the declared
-#' parent nodes are returned and `scope` is `"explicit"`.
+#' The rows correspond one-to-one with the floating-part rows from
+#' [structure_floating_candidates()]. Floating substituents do not create
+#' virtual graph edges. For unrestricted `{<floating>}` parts, every original
+#' main-tree node is returned and `scope` is `"all"`. For explicitly restricted
+#' parts, only the declared parent nodes are returned and `scope` is
+#' `"explicit"`.
 #'
 #' Node indices refer to `structure_nodes()$node_id` for the same glycan.
 #' Missing structures and structures without floating parts contribute no
@@ -366,6 +376,7 @@ structure_component_membership <- function(x) {
 #' @export
 structure_candidate_edges <- function(x) {
   candidates <- structure_floating_candidates(x)
+  candidates <- candidates[!is.na(candidates$part_id), , drop = FALSE]
 
   candidates <- dplyr::rename(
     candidates,
@@ -581,7 +592,9 @@ empty_structure_floating_candidates <- function(
     root_node = integer(),
     parent_node = integer(),
     linkage = character(),
-    scope = character()
+    scope = character(),
+    substituent_id = integer(),
+    substituent = character()
   )
 
   if (has_glycan_name) {
@@ -789,12 +802,13 @@ structure_floating_candidates_one <- function(
   }
 
   parts <- normalize_floating_parts(graph)
-  if (length(parts) == 0) {
+  substituents <- normalize_floating_substituents(graph)
+  if (length(parts) == 0 && length(substituents) == 0) {
     return(empty_structure_floating_candidates(!is.null(glycan_name)))
   }
 
-  main_vertices <- floating_main_vertices(graph, parts)
-  out <- purrr::map2_dfr(
+  main_vertices <- floating_metadata_main_vertices(graph, parts)
+  part_tables <- purrr::map2(
     parts,
     seq_along(parts),
     function(part, part_id) {
@@ -814,10 +828,45 @@ structure_floating_candidates_one <- function(
         scope = rep(
           if (unrestricted) "all" else "explicit",
           length(parent_nodes)
+        ),
+        substituent_id = rep(NA_integer_, length(parent_nodes)),
+        substituent = rep(NA_character_, length(parent_nodes))
+      )
+    }
+  )
+  substituent_tables <- purrr::map2(
+    substituents,
+    seq_along(substituents),
+    function(substituent, substituent_id) {
+      unrestricted <- length(substituent$parents) == 0
+      parent_nodes <- if (unrestricted) {
+        main_vertices
+      } else {
+        substituent$parents
+      }
+
+      tibble::tibble(
+        glycan_id = rep(as.integer(glycan_id), length(parent_nodes)),
+        part_id = rep(NA_integer_, length(parent_nodes)),
+        root_node = rep(NA_integer_, length(parent_nodes)),
+        parent_node = as.integer(parent_nodes),
+        linkage = rep(NA_character_, length(parent_nodes)),
+        scope = rep(
+          if (unrestricted) "all" else "explicit",
+          length(parent_nodes)
+        ),
+        substituent_id = rep(
+          as.integer(substituent_id),
+          length(parent_nodes)
+        ),
+        substituent = rep(
+          substituent$substituent,
+          length(parent_nodes)
         )
       )
     }
   )
+  out <- dplyr::bind_rows(c(part_tables, substituent_tables))
 
   if (!is.null(glycan_name)) {
     out <- tibble::add_column(

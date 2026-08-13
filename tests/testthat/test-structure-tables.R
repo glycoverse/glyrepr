@@ -176,7 +176,9 @@ test_that("structure_floating_candidates expands every attachment candidate", {
       "root_node",
       "parent_node",
       "linkage",
-      "scope"
+      "scope",
+      "substituent_id",
+      "substituent"
     )
   )
   expect_equal(candidates$glycan_id, c(1L, 1L, 2L, 2L))
@@ -189,6 +191,54 @@ test_that("structure_floating_candidates expands every attachment candidate", {
   expect_equal(candidates$parent_node, c(2L, 3L, 2L, 3L))
   expect_equal(candidates$linkage, c("a2-3", "a2-3", "a2-6", "a2-6"))
   expect_equal(candidates$scope, c("all", "all", "explicit", "explicit"))
+  expect_true(all(is.na(candidates$substituent_id)))
+  expect_true(all(is.na(candidates$substituent)))
+})
+
+test_that("structure_floating_candidates expands floating substituents", {
+  glycans <- as_glycan_structure(c(
+    unrestricted = "{6S}Gal(a1-3)Gal(a1-",
+    restricted = "{6S|1,2}Gal(a1-3)Glc(a1-3)Man(a1-",
+    unknown_position = "{?S}Gal(a1-3)Glc(a1-3)Man(a1-"
+  ))
+
+  candidates <- structure_floating_candidates(glycans)
+
+  expect_named(
+    candidates,
+    c(
+      "glycan_id",
+      "glycan_name",
+      "part_id",
+      "root_node",
+      "parent_node",
+      "linkage",
+      "scope",
+      "substituent_id",
+      "substituent"
+    )
+  )
+  expect_identical(candidates$glycan_id, c(1L, 1L, 2L, 2L, 3L, 3L, 3L))
+  expect_identical(
+    candidates$glycan_name,
+    c(
+      "unrestricted",
+      "unrestricted",
+      "restricted",
+      "restricted",
+      rep("unknown_position", 3L)
+    )
+  )
+  expect_true(all(is.na(candidates$part_id)))
+  expect_true(all(is.na(candidates$root_node)))
+  expect_identical(candidates$parent_node, c(1L, 2L, 1L, 2L, 1L, 2L, 3L))
+  expect_true(all(is.na(candidates$linkage)))
+  expect_identical(
+    candidates$scope,
+    c("all", "all", "explicit", "explicit", "all", "all", "all")
+  )
+  expect_identical(candidates$substituent_id, rep(1L, 7L))
+  expect_identical(candidates$substituent, c(rep("6S", 4L), rep("?S", 3L)))
 })
 
 test_that("structure_floating_candidates returns typed empty tables", {
@@ -205,7 +255,9 @@ test_that("structure_floating_candidates returns typed empty tables", {
       "root_node",
       "parent_node",
       "linkage",
-      "scope"
+      "scope",
+      "substituent_id",
+      "substituent"
     )
   )
   expect_equal(nrow(unnamed), 0)
@@ -218,7 +270,9 @@ test_that("structure_floating_candidates returns typed empty tables", {
       "root_node",
       "parent_node",
       "linkage",
-      "scope"
+      "scope",
+      "substituent_id",
+      "substituent"
     )
   )
   expect_equal(nrow(named), 0)

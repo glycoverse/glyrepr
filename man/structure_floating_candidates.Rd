@@ -2,7 +2,7 @@
 % Please edit documentation in R/structure-tables.R
 \name{structure_floating_candidates}
 \alias{structure_floating_candidates}
-\title{List Candidate Attachments for Floating Parts}
+\title{List Candidate Parents for Floating Metadata}
 \usage{
 structure_floating_candidates(x)
 }
@@ -11,22 +11,27 @@ structure_floating_candidates(x)
 }
 \value{
 A tibble with columns \code{glycan_id}, \code{part_id}, \code{root_node},
-\code{parent_node}, \code{linkage}, and \code{scope}, plus \code{glycan_name} when \code{x} is
-named.
+\code{parent_node}, \code{linkage}, \code{scope}, \code{substituent_id}, and \code{substituent},
+plus \code{glycan_name} when \code{x} is named.
 }
 \description{
-\code{structure_floating_candidates()} expands floating-part attachment metadata
-to one row per candidate parent. This provides a uniform representation for
-both explicitly restricted floating parts and unrestricted \verb{\{<floating>\}}
-parts.
+\code{structure_floating_candidates()} expands floating-part and
+floating-substituent metadata to one row per candidate parent. This provides
+a uniform representation for explicitly restricted and unrestricted
+floating metadata.
 
-For an unrestricted floating part, every node in the original main tree is
-returned as a candidate and \code{scope} is \code{"all"}. For a floating part written
-with \verb{\{<floating>|<parents>\}}, only the declared parent nodes are returned and
-\code{scope} is \code{"explicit"}.
+For unrestricted metadata, every node in the original main tree is returned
+as a candidate and \code{scope} is \code{"all"}. For metadata written with an explicit
+\verb{|<parents>} suffix, only the declared parent nodes are returned and \code{scope}
+is \code{"explicit"}.
+
+Floating-part rows have a non-missing \code{part_id}, \code{root_node}, and \code{linkage}.
+Floating-substituent rows instead have a non-missing \code{substituent_id} and
+\code{substituent}. Exactly one of \code{part_id} and \code{substituent_id} is non-missing
+in each row.
 
 Node indices refer to \code{structure_nodes()$node_id} for the same glycan. Missing
-structures and structures without floating parts contribute no rows.
+structures and structures without floating metadata contribute no rows.
 Duplicate structures are expanded to their original vector positions. For
 graph input, node indices are current numeric vertex positions and
 \code{glycan_id} is \code{1L}. If vector input is named, the result also contains a
@@ -35,7 +40,8 @@ graph input, node indices are current numeric vertex positions and
 \examples{
 glycans <- as_glycan_structure(c(
   unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-  restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+  substituent = "{6S}Gal(a1-3)Gal(a1-"
 ))
 structure_floating_candidates(glycans)
 

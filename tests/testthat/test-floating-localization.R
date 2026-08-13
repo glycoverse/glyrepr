@@ -400,6 +400,97 @@ test_that("enumerate_floating_localizations can retain assignment provenance", {
   )
 })
 
+test_that("enumerate_floating_localizations localizes substituents", {
+  glycan <- as_glycan_structure(
+    "{6S}Gal(a1-3)Gal(a1-"
+  )
+
+  variants <- enumerate_floating_localizations(
+    glycan,
+    deduplicate = FALSE
+  )
+
+  expect_identical(
+    as.character(variants$structure),
+    c("Gal6S(a1-3)Gal(a1-", "Gal(a1-3)Gal6S(a1-")
+  )
+  expect_false(any(has_floating_substituents(variants$structure)))
+  expect_identical(
+    purrr::map_int(variants$assignments, ~ .x$parent_node),
+    c(1L, 2L)
+  )
+  expect_true(all(
+    purrr::map_lgl(variants$assignments, ~ is.na(.x$part_id))
+  ))
+  expect_identical(
+    purrr::map_int(variants$assignments, ~ .x$substituent_id),
+    c(1L, 1L)
+  )
+})
+
+test_that("enumerate_floating_localizations validates mixed metadata", {
+  glycan <- as_glycan_structure(
+    paste0(
+      "{6S|1,2}",
+      "{Fuc(a1-6)|1,2}",
+      "Gal(a1-3)Glc(a1-"
+    )
+  )
+
+  variants <- enumerate_floating_localizations(
+    glycan,
+    deduplicate = FALSE
+  )
+
+  expect_identical(nrow(variants), 2L)
+  expect_false(any(has_floating_parts(variants$structure)))
+  expect_false(any(has_floating_substituents(variants$structure)))
+  expect_true(all(
+    purrr::map_lgl(
+      variants$assignments,
+      ~ length(unique(.x$parent_node)) == 2L
+    )
+  ))
+  expect_true(all(
+    purrr::map_lgl(
+      variants$assignments,
+      ~ identical(.x$part_id, c(1L, NA_integer_)) &&
+        identical(.x$substituent_id, c(NA_integer_, 1L))
+    )
+  ))
+})
+
+test_that("graph localization materializes floating substituents", {
+  graph <- get_structure_graphs(
+    as_glycan_structure("{?S|1,2}Gal(a1-3)Glc(a1-"),
+    return_list = FALSE
+  )
+
+  variants <- enumerate_floating_graph_localizations(graph)
+
+  expect_identical(variants$variant_id, c(1L, 2L))
+  expect_identical(
+    purrr::map_int(variants$assignments, ~ .x$parent_node),
+    c(1L, 2L)
+  )
+  expect_true(all(
+    purrr::map_lgl(
+      variants$graph,
+      ~ identical(igraph::V(.x)$name, igraph::V(graph)$name)
+    )
+  ))
+  expect_true(all(
+    purrr::map_lgl(
+      variants$graph,
+      ~ !("floating_substituents" %in% igraph::graph_attr_names(.x))
+    )
+  ))
+  expect_identical(
+    purrr::map(variants$graph, ~ igraph::V(.x)$sub),
+    list(c("?S", ""), c("", "?S"))
+  )
+})
+
 test_that("graph localizations preserve original vertex IDs", {
   glycan <- as_glycan_structure(
     paste0(

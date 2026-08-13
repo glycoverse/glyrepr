@@ -20,7 +20,7 @@ vertex IDs and order.
 \description{
 \code{localize_floating_parts()} attaches selected floating parts to
 caller-supplied parent nodes. The assignments are interpreted against the
-canonical node and part identifiers returned by
+floating-part rows and canonical node identifiers returned by
 \code{\link[=structure_floating_candidates]{structure_floating_candidates()}}.
 
 Each selected parent must belong to the floating part's declared candidate

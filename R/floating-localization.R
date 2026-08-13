@@ -3,7 +3,7 @@
 #' @description
 #' `localize_floating_parts()` attaches selected floating parts to
 #' caller-supplied parent nodes. The assignments are interpreted against the
-#' canonical node and part identifiers returned by
+#' floating-part rows and canonical node identifiers returned by
 #' [structure_floating_candidates()].
 #'
 #' Each selected parent must belong to the floating part's declared candidate
@@ -88,7 +88,7 @@ localize_floating_parts <- function(x, assignments) {
 }
 
 
-#' Enumerate Floating-Part Graph Localizations
+#' Enumerate Floating Graph Localizations
 #'
 #' @description
 #' `enumerate_floating_graph_localizations()` generates every conflict-free,
@@ -101,16 +101,18 @@ localize_floating_parts <- function(x, assignments) {
 #' `parent_node` values therefore refer directly to vertex IDs in both the
 #' input and localized graphs.
 #'
-#' Every conflict-free assignment is retained, even when multiple assignments
-#' would produce the same canonical IUPAC-condensed structure. A graph without
-#' floating parts produces one identity row with an empty assignment table.
+#' Floating parts are localized as ordinary edges, while floating substituents
+#' are localized into the selected parent vertex's `sub` attribute. Every
+#' conflict-free assignment is retained, even when multiple assignments would
+#' produce the same canonical IUPAC-condensed structure. A graph without
+#' floating metadata produces one identity row with an empty assignment table.
 #'
 #' `max_variants` is a conservative safeguard. It limits the raw Cartesian
 #' product before conflict filtering, so the function may ask for a higher
 #' bound even when fewer variants would ultimately remain.
 #'
 #' @param graph A valid glycan `igraph`, optionally containing unresolved
-#'   floating parts.
+#'   floating parts or substituents.
 #' @param max_variants A positive integer giving the maximum raw candidate
 #'   combinations allowed.
 #'
@@ -119,8 +121,9 @@ localize_floating_parts <- function(x, assignments) {
 #' - `variant_id`: the sequential localization identifier.
 #' - `graph`: a list-column of fully localized `igraph` objects whose vertex
 #'   IDs are identical to those in `graph`.
-#' - `assignments`: a list-column of tibbles with `glycan_id`, `part_id`, and
-#'   `parent_node`. `glycan_id` is always `1L`.
+#' - `assignments`: a list-column of tibbles with `glycan_id`, `part_id`,
+#'   `parent_node`, and `substituent_id`. Exactly one of `part_id` and
+#'   `substituent_id` is non-missing in each row. `glycan_id` is always `1L`.
 #'
 #' @examples
 #' glycan <- as_glycan_structure(
@@ -155,27 +158,28 @@ enumerate_floating_graph_localizations <- function(
 }
 
 
-#' Enumerate Floating-Part Localizations
+#' Enumerate Floating Localizations
 #'
 #' @description
 #' `enumerate_floating_localizations()` generates every conflict-free,
 #' fully localized structure permitted by the candidate-parent domains in `x`.
 #' Each variant records the complete assignment that produced it.
 #'
-#' Candidate combinations are validated simultaneously, including linkages
-#' with multiple possible acceptor positions such as `"a2-3/6"`. Variants are
-#' canonicalized and, by default, deduplicated by structure. When multiple
-#' assignments produce the same canonical structure, the first assignment in
-#' deterministic candidate order is retained. Set `deduplicate = FALSE` to
-#' retain every valid assignment and its original-node provenance, including
-#' assignments that produce identical canonical structures.
+#' Candidate combinations for floating parts and substituents are validated
+#' simultaneously, including linkages or substituents with multiple possible
+#' carbon positions. Variants are canonicalized and, by default, deduplicated
+#' by structure. When multiple assignments produce the same canonical
+#' structure, the first assignment in deterministic candidate order is
+#' retained. Set `deduplicate = FALSE` to retain every valid assignment and its
+#' original-node provenance, including assignments that produce identical
+#' canonical structures.
 #'
 #' `max_variants` is a conservative per-input safeguard. It limits the raw
 #' Cartesian product before conflict filtering or canonical deduplication, so
 #' the function may ask for a higher bound even when fewer variants would
 #' ultimately remain.
 #'
-#' Missing inputs and structures without floating parts each produce one row
+#' Missing inputs and structures without floating metadata each produce one row
 #' with `variant_id = 1L`, the original structure, and an empty assignment
 #' table. Empty structure vectors produce a zero-row result.
 #'
@@ -193,8 +197,10 @@ enumerate_floating_graph_localizations <- function(
 #'   deduplication.
 #' - `structure`: a `glyrepr_structure` vector column containing fully
 #'   localized variants.
-#' - `assignments`: a list-column of tibbles with `glycan_id`, `part_id`, and
-#'   `parent_node`. Here `glycan_id` equals `input_id`.
+#' - `assignments`: a list-column of tibbles with `glycan_id`, `part_id`,
+#'   `parent_node`, and `substituent_id`. Exactly one of `part_id` and
+#'   `substituent_id` is non-missing in each row. Here `glycan_id` equals
+#'   `input_id`.
 #'
 #' @examples
 #' glycan <- as_glycan_structure(
@@ -244,7 +250,8 @@ empty_floating_assignments <- function() {
   tibble::tibble(
     glycan_id = integer(),
     part_id = integer(),
-    parent_node = integer()
+    parent_node = integer(),
+    substituent_id = integer()
   )
 }
 
@@ -268,8 +275,7 @@ enumerate_floating_localizations_one <- function(
   }
 
   graph <- as.list(x)[[1]]
-  parts <- normalize_floating_parts(graph)
-  if (length(parts) == 0) {
+  if (!has_floating_metadata(graph)) {
     return(single_identity_localization(x, input_id))
   }
 
@@ -342,21 +348,30 @@ enumerate_floating_graph_localizations_one <- function(
   error_call = rlang::caller_call()
 ) {
   parts <- normalize_floating_parts(graph)
-  if (length(parts) == 0) {
+  substituents <- normalize_floating_substituents(graph)
+  if (length(parts) == 0 && length(substituents) == 0) {
     return(list(
       graphs = list(graph),
       assignments = list(empty_floating_assignments())
     ))
   }
 
-  main_vertices <- floating_main_vertices(graph, parts)
-  candidate_domains <- purrr::map(parts, function(part) {
+  main_vertices <- floating_metadata_main_vertices(graph, parts)
+  part_domains <- purrr::map(parts, function(part) {
     if (length(part$parents) == 0) {
       main_vertices
     } else {
       as.integer(part$parents)
     }
   })
+  substituent_domains <- purrr::map(substituents, function(substituent) {
+    if (length(substituent$parents) == 0) {
+      main_vertices
+    } else {
+      as.integer(substituent$parents)
+    }
+  })
+  candidate_domains <- c(part_domains, substituent_domains)
   combination_count <- prod(as.double(lengths(candidate_domains)))
   if (!is.finite(combination_count) || combination_count > max_variants) {
     combination_label <- format(combination_count, scientific = FALSE)
@@ -370,9 +385,17 @@ enumerate_floating_graph_localizations_one <- function(
     )
   }
 
-  names(candidate_domains) <- paste0(
-    "part_",
-    seq_along(candidate_domains)
+  names(candidate_domains) <- c(
+    if (length(part_domains) > 0) {
+      paste0("part_", seq_along(part_domains))
+    } else {
+      character()
+    },
+    if (length(substituent_domains) > 0) {
+      paste0("substituent_", seq_along(substituent_domains))
+    } else {
+      character()
+    }
   )
   combinations <- do.call(
     expand.grid,
@@ -388,19 +411,33 @@ enumerate_floating_graph_localizations_one <- function(
   localized_graphs <- list()
   assignment_tables <- list()
   for (combination_id in seq_len(nrow(combinations))) {
-    assignments <- tibble::tibble(
+    parent_nodes <- as.integer(
+      unlist(combinations[combination_id, , drop = FALSE])
+    )
+    part_assignments <- tibble::tibble(
       glycan_id = rep(as.integer(input_id), length(parts)),
-      part_id = seq_along(parts),
-      parent_node = as.integer(
-        unlist(combinations[combination_id, , drop = FALSE])
-      )
+      part_id = as.integer(seq_along(parts)),
+      parent_node = parent_nodes[seq_along(parts)],
+      substituent_id = rep(NA_integer_, length(parts))
+    )
+    substituent_positions <- length(parts) + seq_along(substituents)
+    substituent_assignments <- tibble::tibble(
+      glycan_id = rep(as.integer(input_id), length(substituents)),
+      part_id = rep(NA_integer_, length(substituents)),
+      parent_node = parent_nodes[substituent_positions],
+      substituent_id = as.integer(seq_along(substituents))
+    )
+    assignments <- dplyr::bind_rows(
+      part_assignments,
+      substituent_assignments
     )
 
     is_valid <- tryCatch(
       {
-        validate_floating_assignment_compatibility(
+        validate_complete_floating_assignment_compatibility(
           graph,
           parts,
+          substituents,
           assignments
         )
         TRUE
@@ -416,6 +453,7 @@ enumerate_floating_graph_localizations_one <- function(
       list(localize_floating_graph_preserve_ids(
         graph,
         parts,
+        substituents,
         assignments
       ))
     )
@@ -440,26 +478,87 @@ enumerate_floating_graph_localizations_one <- function(
 #'
 #' @param graph A validated floating glycan graph.
 #' @param parts Normalized floating-part metadata.
+#' @param substituents Normalized floating-substituent metadata.
 #' @param assignments A complete compatible assignment table.
 #' @returns A validated graph with its original vertex order.
 #' @noRd
 localize_floating_graph_preserve_ids <- function(
   graph,
   parts,
+  substituents,
   assignments
 ) {
-  for (row_id in seq_len(nrow(assignments))) {
-    part_id <- assignments$part_id[[row_id]]
+  part_assignments <- assignments[!is.na(assignments$part_id), , drop = FALSE]
+  for (row_id in seq_len(nrow(part_assignments))) {
+    part_id <- part_assignments$part_id[[row_id]]
     part <- parts[[part_id]]
     graph <- igraph::add_edges(
       graph,
-      c(assignments$parent_node[[row_id]], part$root),
+      c(part_assignments$parent_node[[row_id]], part$root),
       linkage = part$linkage
     )
   }
 
+  substituent_assignments <- assignments[
+    !is.na(assignments$substituent_id),
+    ,
+    drop = FALSE
+  ]
+  for (row_id in seq_len(nrow(substituent_assignments))) {
+    substituent_id <- substituent_assignments$substituent_id[[row_id]]
+    graph <- append_vertex_substituent(
+      graph,
+      substituent_assignments$parent_node[[row_id]],
+      substituents[[substituent_id]]$substituent
+    )
+  }
+
   graph <- delete_floating_parts_attr(graph)
+  graph <- delete_floating_substituents_attr(graph)
   validate_glycan_graph(graph)
+}
+
+
+#' Validate a complete mixed floating assignment
+#'
+#' @param graph A valid floating glycan graph.
+#' @param parts Normalized floating-part metadata.
+#' @param substituents Normalized floating-substituent metadata.
+#' @param assignments A complete assignment table.
+#' @returns `NULL`, invisibly.
+#' @noRd
+validate_complete_floating_assignment_compatibility <- function(
+  graph,
+  parts,
+  substituents,
+  assignments
+) {
+  selected_parts <- parts
+  part_assignments <- assignments[!is.na(assignments$part_id), , drop = FALSE]
+  for (row_id in seq_len(nrow(part_assignments))) {
+    part_id <- part_assignments$part_id[[row_id]]
+    selected_parts[[part_id]]$parents <- part_assignments$parent_node[[row_id]]
+  }
+
+  selected_substituents <- substituents
+  substituent_assignments <- assignments[
+    !is.na(assignments$substituent_id),
+    ,
+    drop = FALSE
+  ]
+  for (row_id in seq_len(nrow(substituent_assignments))) {
+    substituent_id <- substituent_assignments$substituent_id[[row_id]]
+    selected_substituents[[substituent_id]]$parents <-
+      substituent_assignments$parent_node[[row_id]]
+  }
+
+  validation_graph <- set_floating_parts_attr(graph, selected_parts)
+  validation_graph <- set_floating_substituents_attr(
+    validation_graph,
+    selected_substituents
+  )
+  validate_glycan_graph(validation_graph)
+  invisible(NULL)
 }
 
 
