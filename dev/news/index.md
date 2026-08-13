@@ -5,9 +5,10 @@
 ### New features
 
 - Concrete monosaccharides now support explicit unusual absolute
-  configurations using a leading `D` or `L`, such as `DFuc`, `LGul`, and
-  `DFucf`; unprefixed names retain their natural configurations.
-  ([\#85](https://github.com/glycoverse/glyrepr/issues/85))
+  configurations using a leading `D-` or `L-`, such as `D-Fuc`, `L-Gul`,
+  and `D-Fucf`; unprefixed names retain their natural configurations.
+  ([\#85](https://github.com/glycoverse/glyrepr/issues/85),
+  [\#86](https://github.com/glycoverse/glyrepr/issues/86))
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   and
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)

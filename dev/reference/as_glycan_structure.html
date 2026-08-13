@@ -75,8 +75,8 @@ produce an error.</p></dd>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Character input assumes the natural absolute configuration for unprefixed
-monosaccharides. Less common configurations use a leading <code>D</code> or <code>L</code> without
-a separator, such as <code>DFuc</code>, <code>LGul</code>, and <code>DFucf</code>.</p>
+monosaccharides. Less common configurations use a leading <code>D-</code> or <code>L-</code>, such
+as <code>D-Fuc</code>, <code>L-Gul</code>, and <code>D-Fucf</code>.</p>
 <p>Character input supports floating-part blocks before the main
 IUPAC-condensed structure. <code>{Neu5Ac(a2-3)}&lt;main&gt;</code> allows every feasible
 main-tree node as a candidate parent, while
@@ -128,11 +128,11 @@ when the main tree contains only one node.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-2</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 2</span>
-<span class="r-in"><span><span class="fu">as_glycan_structure</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DFuc(a1-"</span>, <span class="st">"LGul(b1-"</span>, <span class="st">"DFucf(a1-"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">as_glycan_structure</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"D-Fuc(a1-"</span>, <span class="st">"L-Gul(b1-"</span>, <span class="st">"D-Fucf(a1-"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[3]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FF0000;">DFuc</span>(<span style="color: #B2B2B2;">a1-</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #FF8700;">LGul</span>(<span style="color: #B2B2B2;">b1-</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] <span style="color: #FF0000;">DFucf</span>(<span style="color: #B2B2B2;">a1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FF0000;">D-Fuc</span>(<span style="color: #B2B2B2;">a1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #FF8700;">L-Gul</span>(<span style="color: #B2B2B2;">b1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] <span style="color: #FF0000;">D-Fucf</span>(<span style="color: #B2B2B2;">a1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 3</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Parse a floating residue with two candidate parents</span></span></span>
