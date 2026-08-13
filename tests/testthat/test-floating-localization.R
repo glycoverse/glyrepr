@@ -154,6 +154,46 @@ test_that("graph localization keeps unrestricted domains on the original main tr
   )
 })
 
+test_that("part localization keeps substituent domains on the original main tree", {
+  structure <- as_glycan_structure(
+    paste0(
+      "{6S}",
+      "{Fuc(a1-2)|1,2}",
+      "Gal(a1-3)Glc(a1-"
+    )
+  )
+  assignments <- tibble::tibble(
+    glycan_id = 1L,
+    part_id = 1L,
+    parent_node = 2L
+  )
+
+  localized <- localize_floating_parts(structure, assignments)
+
+  expect_identical(
+    as.character(localized),
+    "{6S|2,3}Fuc(a1-2)Gal(a1-3)Glc(a1-"
+  )
+  expect_identical(
+    structure_floating_substituents(localized)$parents,
+    list(c(2L, 3L))
+  )
+
+  graph <- get_structure_graphs(structure)
+  names_before <- igraph::V(graph)$name
+  graph_localized <- localize_floating_parts(graph, assignments)
+
+  expect_identical(igraph::V(graph_localized)$name, names_before)
+  expect_identical(
+    graph_localized$floating_substituents,
+    list(list(substituent = "6S", parents = c(2L, 3L)))
+  )
+  expect_identical(
+    structure_floating_candidates(graph_localized)$parent_node,
+    c(2L, 3L)
+  )
+})
+
 test_that("localize_floating_parts returns an unchanged graph for no assignments", {
   graph <- get_structure_graphs(as_glycan_structure(
     "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"

@@ -689,6 +689,13 @@ localize_floating_graph <- function(
     assignments
   )
 
+  # An unrestricted substituent refers only to the original main tree.
+  # Materialize that domain before localized components enlarge the main tree.
+  graph <- materialize_unrestricted_floating_substituents(
+    graph,
+    main_vertices
+  )
+
   for (row_id in seq_len(nrow(assignments))) {
     part_id <- assignments$part_id[[row_id]]
     part <- parts[[part_id]]
