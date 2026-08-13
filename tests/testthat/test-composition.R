@@ -14,16 +14,17 @@ test_that("concrete composition is valid", {
 })
 
 test_that("natural and unusual configurations coexist in compositions", {
-  comp <- glycan_composition(c(Fuc = 1, DFuc = 2, Gul = 3, LGul = 4))
+  comp <- glycan_composition(c(Fuc = 1, `D-Fuc` = 2, Gul = 3, `L-Gul` = 4))
 
   expect_identical(
     as.character(comp),
-    "Gul(3)Fuc(1)LGul(4)DFuc(2)"
+    "Gul(3)Fuc(1)L-Gul(4)D-Fuc(2)"
   )
   expect_identical(
     as.character(convert_to_generic(comp)),
     "Hex(7)dHex(3)"
   )
+  expect_identical(as_glycan_composition(as.character(comp)), comp)
 })
 
 test_that("compositions can contain substituents", {

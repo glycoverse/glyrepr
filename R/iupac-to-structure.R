@@ -382,7 +382,7 @@ combine_floating_iupac_graphs <- function(main, parts) {
   # Allow letters, digits, ?, and / for substituents like "Man?S",
   # "Glc3Me6S", and "Gal4/6S".
   # Substituents are directly concatenated in IUPAC format, no commas
-  mono_pattern <- "([A-Za-z]|[0-9][A-Za-z])[A-Za-z0-9\\?/]*"
+  mono_pattern <- "(?:[DL]-)?(?:[A-Za-z]|[0-9][A-Za-z])[A-Za-z0-9\\?/]*"
   mono_linkage_pattern <- stringr::str_glue(
     "{mono_pattern}(\\({linkage_pattern(anchored = FALSE)}\\))?"
   )
@@ -440,10 +440,10 @@ combine_floating_iupac_graphs <- function(main, parts) {
 
   if (
     !is_known_monosaccharide(result[["mono"]]) &&
-      stringr::str_detect(mono, "^[DL]")
+      stringr::str_detect(mono, "^[DL]-")
   ) {
     configuration <- stringr::str_sub(mono, 1, 1)
-    unconfigured <- stringr::str_sub(mono, 2)
+    unconfigured <- stringr::str_sub(mono, 3)
     configured_result <- .extract_substituent_without_configuration(
       unconfigured,
       single_sub_pattern
@@ -454,7 +454,7 @@ combine_floating_iupac_graphs <- function(main, parts) {
 
     if (
       !is.na(configured_mono) &&
-        stringr::str_starts(configured_mono, configuration)
+        stringr::str_starts(configured_mono, paste0(configuration, "-"))
     ) {
       result <- configured_result
       result[["mono"]] <- configured_mono

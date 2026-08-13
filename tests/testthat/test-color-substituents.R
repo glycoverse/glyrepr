@@ -31,9 +31,9 @@ test_that("unusual configurations use their natural counterparts' colors", {
     purrr::map_chr(unusual, get_mono_color),
     purrr::map_chr(natural, get_mono_color)
   )
-  expect_identical(get_mono_color("DFuc3S"), get_mono_color("Fuc3S"))
+  expect_identical(get_mono_color("D-Fuc3S"), get_mono_color("Fuc3S"))
   expect_identical(
-    get_mono_color("LNeu5Ac9Ac"),
+    get_mono_color("L-Neu5Ac9Ac"),
     get_mono_color("Neu5Ac9Ac")
   )
 })

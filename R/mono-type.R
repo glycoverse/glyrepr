@@ -15,7 +15,7 @@
 #' Concrete furanose forms such as "Galf" and "GlcfNAc" convert to the same
 #' generic names as their ringless forms: "Hex" and "HexNAc", respectively.
 #' Explicit unusual configurations also convert to the same generic names as
-#' their natural counterparts. For example, "DFuc" and "DFucf" both convert
+#' their natural counterparts. For example, "D-Fuc" and "D-Fucf" both convert
 #' to "dHex".
 #'
 #' For the full list of monosaccharides, use [available_monosaccharides()].

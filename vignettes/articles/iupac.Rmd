@@ -93,10 +93,10 @@ see the [SNFG website](https://www.ncbi.nlm.nih.gov/glycans/snfg.html) or run `a
 
 IUPAC-condensed names normally omit absolute configuration and assume the
 natural form, such as L-fucose for `Fuc` and D-gulose for `Gul`.
-`glyrepr` writes a less common configuration by concatenating `D` or `L` before
-the residue name: `DFuc`, `LGul`, or `DFucf` for D-fucofuranose.
-The unprefixed natural names remain canonical; redundant forms such as `LFuc`
-and `DGul` are not accepted.
+`glyrepr` writes a less common configuration with `D-` or `L-` before the
+residue name: `D-Fuc`, `L-Gul`, or `D-Fucf` for D-fucofuranose. The unprefixed
+natural names remain canonical; redundant forms such as `L-Fuc` and `D-Gul`
+are not accepted.
 
 ### Step 2: Substituents
 
