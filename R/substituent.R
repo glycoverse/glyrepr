@@ -250,7 +250,8 @@ collapse_substituent_tokens <- function(subs) {
 
 #' Remove All Substituents from a Glycan
 #'
-#' This function replaces all substituents in a glycan structure with empty strings.
+#' This function replaces all vertex substituents in a glycan structure with
+#' empty strings and removes unresolved floating substituents.
 #'
 #' @param glycan A glyrepr_structure vector or a glycan `igraph`.
 #'
@@ -279,5 +280,6 @@ remove_substituents <- function(glycan) {
 
 # Internal function to remove substituents from a single igraph
 .remove_substituents_single <- function(glycan) {
-  igraph::set_vertex_attr(glycan, "sub", value = "")
+  glycan <- igraph::set_vertex_attr(glycan, "sub", value = "")
+  delete_floating_substituents_attr(glycan)
 }

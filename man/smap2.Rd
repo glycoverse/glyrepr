@@ -31,8 +31,7 @@ smap2_structure(.x, .y, .f, ...)
 
 \item{.f}{A function that takes an igraph object (from \code{.x}) and a value (from \code{.y}) and returns a result.
 Can be a function, purrr-style lambda (\code{~ .x + .y}), or a character string naming a function.
-A structure with floating parts is passed as one annotated, weakly
-disconnected graph.}
+A structure with floating metadata is passed as one annotated graph.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
 
@@ -59,7 +58,7 @@ than applying \code{.f} to each element pair individually when there are duplica
 \code{smap2_structure()} reuses unchanged graphs and validates and canonicalizes
 changed graphs returned by \code{.f}. A callback that changes vertex identities
 or components of a floating structure must also update its \code{floating_parts}
-metadata.
+and \code{floating_substituents} metadata.
 
 \strong{NA Handling:}
 NA elements in \code{.x} are preserved in the output - the function is not applied to NA positions,

@@ -22,6 +22,8 @@ attribute.
 Main-tree nodes have \code{component_type = "main"} and a missing \code{part_id}.
 Nodes in a floating subtree have \code{component_type = "floating"} and the
 corresponding \code{part_id} from \code{\link[=structure_floating_parts]{structure_floating_parts()}}.
+Floating substituents do not introduce vertices, so they do not create
+additional component-membership rows.
 
 Node indices refer to \code{structure_nodes()$node_id} for the same glycan.
 Missing structures contribute no rows. Duplicate structures are expanded to

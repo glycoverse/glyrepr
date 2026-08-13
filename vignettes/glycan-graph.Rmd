@@ -81,6 +81,8 @@ The printed graph contains several pieces of information.
 - `anomer`: the anomeric configuration of the reducing end.
 - `floating_parts`, when present: virtual attachment metadata for disconnected
   floating components.
+- `floating_substituents`, when present: unresolved substituent tokens and
+  their candidate parent residues.
 
 **Vertex attributes:**
 
@@ -208,6 +210,22 @@ Each `floating_parts` entry has four fields:
 The virtual attachment is not stored in `igraph::E(floating_graph)`, because
 its endpoint is unresolved. Use `structure_floating_parts()` when a tabular
 representation must round-trip this metadata.
+
+### Floating Substituents
+
+Floating substituents use the same candidate-parent convention without adding
+dummy vertices. Each `floating_substituents` entry contains `substituent`, such
+as `"6S"` or `"?S"`, and `parents`. Empty `parents` means every feasible main
+node; otherwise the values are global graph vertex indices.
+
+```{r}
+floating_sub <- as_glycan_structure(
+  "{6S|1,2}Gal(a1-3)Glc(a1-3)Man(a1-"
+)
+floating_sub_graph <- get_structure_graphs(floating_sub)
+igraph::graph_attr(floating_sub_graph, "floating_substituents")
+structure_floating_substituents(floating_sub)
+```
 
 ## Working with the Graph
 

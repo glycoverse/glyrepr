@@ -47,12 +47,34 @@
   })
   main <- igraph::delete_vertex_attr(main, "source_index")
 
-  parsed_parts <- purrr::map(
+  is_substituent <- purrr::map_lgl(
     floating$parts,
+    ~ stringr::str_detect(
+      .x$sequence,
+      substituent_token_pattern(anchored = TRUE)
+    )
+  )
+
+  parsed_substituents <- purrr::map(
+    floating$parts[is_substituent],
+    function(substituent) {
+      list(
+        substituent = normalize_substituent_token(substituent$sequence),
+        parents = sort(substituent$parents)
+      )
+    }
+  )
+
+  parsed_parts <- purrr::map(
+    floating$parts[!is_substituent],
     parse_floating_iupac_part,
     main_size = igraph::vcount(main)
   )
-  combine_floating_iupac_graphs(main, parsed_parts)
+  combine_floating_iupac_graphs(
+    main,
+    parsed_parts,
+    parsed_substituents
+  )
 }
 
 split_floating_iupac <- function(x) {
@@ -177,7 +199,11 @@ parse_floating_iupac_part <- function(part, main_size) {
   )
 }
 
-combine_floating_iupac_graphs <- function(main, parts) {
+combine_floating_iupac_graphs <- function(
+  main,
+  parts,
+  substituents = list()
+) {
   graphs <- c(list(main), purrr::map(parts, "graph"))
   sizes <- purrr::map_int(graphs, igraph::vcount)
   offsets <- cumsum(c(0L, sizes[-length(sizes)]))
@@ -227,7 +253,8 @@ combine_floating_iupac_graphs <- function(main, parts) {
       )
     }
   )
-  set_floating_parts_attr(graph, metadata)
+  graph <- set_floating_parts_attr(graph, metadata)
+  set_floating_substituents_attr(graph, substituents)
 }
 
 .parse_iupac_tree_single <- function(x) {

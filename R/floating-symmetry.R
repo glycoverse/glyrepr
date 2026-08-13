@@ -1,4 +1,4 @@
-# Canonicalize main-tree ties using explicit floating-part parent sets.
+# Canonicalize main-tree ties using explicit floating parent sets.
 
 #' Order a Main Glycan Tree with Floating-Parent Symmetry
 #'
@@ -14,16 +14,19 @@
 #'   `component_sequence_order()`.
 #' @noRd
 floating_symmetry_main_order <- function(graph, info) {
-  has_explicit_parents <- purrr::some(
-    info$parts,
-    ~ length(.x$parents) > 0
-  )
+  substituents <- info$substituents
+  if (is.null(substituents)) {
+    substituents <- list()
+  }
+  has_explicit_parents <- purrr::some(info$parts, ~ length(.x$parents) > 0) ||
+    purrr::some(substituents, ~ length(.x$parents) > 0)
   if (!has_explicit_parents) {
     return(component_sequence_order(graph, info$main_vertices))
   }
 
   main <- igraph::induced_subgraph(graph, info$main_vertices)
   main <- delete_floating_parts_attr(main)
+  main <- delete_floating_substituents_attr(main)
   symmetry_labels <- floating_augmented_main_labels(graph, main, info)
 
   cache <- build_seq_cache(main)
@@ -70,12 +73,19 @@ floating_augmented_main_labels <- function(graph, main, info) {
   explicit <- which(
     purrr::map_lgl(info$parts, ~ length(.x$parents) > 0)
   )
-  part_count <- length(explicit)
+  substituents <- info$substituents
+  if (is.null(substituents)) {
+    substituents <- list()
+  }
+  explicit_substituents <- which(
+    purrr::map_lgl(substituents, ~ length(.x$parents) > 0)
+  )
+  constraint_count <- length(explicit) + length(explicit_substituents)
 
   edge_nodes <- main_count + seq_len(edge_count)
-  part_nodes <- main_count + edge_count + seq_len(part_count)
+  part_nodes <- main_count + edge_count + seq_len(constraint_count)
   augmented <- igraph::make_empty_graph(
-    main_count + edge_count + part_count,
+    main_count + edge_count + constraint_count,
     directed = FALSE
   )
 
@@ -101,6 +111,17 @@ floating_augmented_main_labels <- function(graph, main, info) {
     augmented_edges <- c(
       augmented_edges,
       as.integer(rbind(rep(part_nodes[[i]], length(parents)), parents))
+    )
+  }
+  offset <- length(explicit)
+  for (i in seq_along(explicit_substituents)) {
+    substituent <- substituents[[explicit_substituents[[i]]]]
+    parent_names <- graph_names[substituent$parents]
+    parents <- match(parent_names, main_names)
+    constraint_node <- part_nodes[[offset + i]]
+    augmented_edges <- c(
+      augmented_edges,
+      as.integer(rbind(rep(constraint_node, length(parents)), parents))
     )
   }
   if (length(augmented_edges) > 0) {
@@ -140,7 +161,15 @@ floating_augmented_main_labels <- function(graph, main, info) {
       )
     }
   )
-  color_keys <- c(main_keys, edge_keys, part_keys)
+  substituent_keys <- purrr::map_chr(
+    explicit_substituents,
+    ~ paste(
+      "floating-substituent-parent-set",
+      substituents[[.x]]$substituent,
+      sep = "\r"
+    )
+  )
+  color_keys <- c(main_keys, edge_keys, part_keys, substituent_keys)
   colors <- match(
     color_keys,
     sort(unique(color_keys), method = "radix")

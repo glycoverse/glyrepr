@@ -25,13 +25,19 @@ reorder_graphs_with_indices <- function(graphs) {
 }
 
 .reorder_one_graph <- function(graph) {
-  has_parts_attr <- "floating_parts" %in% igraph::graph_attr_names(graph)
-  if (has_parts_attr) {
-    parts <- igraph::graph_attr(graph, "floating_parts")
-    if (length(parts) > 0) {
+  has_metadata_attr <- any(
+    c(
+      "floating_parts",
+      "floating_substituents"
+    ) %in%
+      igraph::graph_attr_names(graph)
+  )
+  if (has_metadata_attr) {
+    if (has_floating_metadata(graph)) {
       return(canonicalize_floating_graph(graph))
     }
     graph <- delete_floating_parts_attr(graph)
+    graph <- delete_floating_substituents_attr(graph)
   }
 
   seq_cache <- build_seq_cache(graph)
@@ -53,7 +59,15 @@ is_canonical_sequence_order <- function(sequence_order) {
 }
 
 canonicalize_graph_with_iupac <- function(graph) {
-  if ("floating_parts" %in% igraph::graph_attr_names(graph)) {
+  if (
+    any(
+      c(
+        "floating_parts",
+        "floating_substituents"
+      ) %in%
+        igraph::graph_attr_names(graph)
+    )
+  ) {
     graph <- canonicalize_glycan_graph(graph)
     return(list(graph = graph, iupac = graph_to_iupac(graph)))
   }

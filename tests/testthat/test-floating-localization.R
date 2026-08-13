@@ -154,6 +154,46 @@ test_that("graph localization keeps unrestricted domains on the original main tr
   )
 })
 
+test_that("part localization keeps substituent domains on the original main tree", {
+  structure <- as_glycan_structure(
+    paste0(
+      "{6S}",
+      "{Fuc(a1-2)|1,2}",
+      "Gal(a1-3)Glc(a1-"
+    )
+  )
+  assignments <- tibble::tibble(
+    glycan_id = 1L,
+    part_id = 1L,
+    parent_node = 2L
+  )
+
+  localized <- localize_floating_parts(structure, assignments)
+
+  expect_identical(
+    as.character(localized),
+    "{6S|2,3}Fuc(a1-2)Gal(a1-3)Glc(a1-"
+  )
+  expect_identical(
+    structure_floating_substituents(localized)$parents,
+    list(c(2L, 3L))
+  )
+
+  graph <- get_structure_graphs(structure)
+  names_before <- igraph::V(graph)$name
+  graph_localized <- localize_floating_parts(graph, assignments)
+
+  expect_identical(igraph::V(graph_localized)$name, names_before)
+  expect_identical(
+    graph_localized$floating_substituents,
+    list(list(substituent = "6S", parents = c(2L, 3L)))
+  )
+  expect_identical(
+    structure_floating_candidates(graph_localized)$parent_node,
+    c(2L, 3L)
+  )
+})
+
 test_that("localize_floating_parts returns an unchanged graph for no assignments", {
   graph <- get_structure_graphs(as_glycan_structure(
     "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
@@ -397,6 +437,97 @@ test_that("enumerate_floating_localizations can retain assignment provenance", {
   expect_identical(
     purrr::map_int(variants$assignments, ~ .x$parent_node),
     c(2L, 3L)
+  )
+})
+
+test_that("enumerate_floating_localizations localizes substituents", {
+  glycan <- as_glycan_structure(
+    "{6S}Gal(a1-3)Gal(a1-"
+  )
+
+  variants <- enumerate_floating_localizations(
+    glycan,
+    deduplicate = FALSE
+  )
+
+  expect_identical(
+    as.character(variants$structure),
+    c("Gal6S(a1-3)Gal(a1-", "Gal(a1-3)Gal6S(a1-")
+  )
+  expect_false(any(has_floating_substituents(variants$structure)))
+  expect_identical(
+    purrr::map_int(variants$assignments, ~ .x$parent_node),
+    c(1L, 2L)
+  )
+  expect_true(all(
+    purrr::map_lgl(variants$assignments, ~ is.na(.x$part_id))
+  ))
+  expect_identical(
+    purrr::map_int(variants$assignments, ~ .x$substituent_id),
+    c(1L, 1L)
+  )
+})
+
+test_that("enumerate_floating_localizations validates mixed metadata", {
+  glycan <- as_glycan_structure(
+    paste0(
+      "{6S|1,2}",
+      "{Fuc(a1-6)|1,2}",
+      "Gal(a1-3)Glc(a1-"
+    )
+  )
+
+  variants <- enumerate_floating_localizations(
+    glycan,
+    deduplicate = FALSE
+  )
+
+  expect_identical(nrow(variants), 2L)
+  expect_false(any(has_floating_parts(variants$structure)))
+  expect_false(any(has_floating_substituents(variants$structure)))
+  expect_true(all(
+    purrr::map_lgl(
+      variants$assignments,
+      ~ length(unique(.x$parent_node)) == 2L
+    )
+  ))
+  expect_true(all(
+    purrr::map_lgl(
+      variants$assignments,
+      ~ identical(.x$part_id, c(1L, NA_integer_)) &&
+        identical(.x$substituent_id, c(NA_integer_, 1L))
+    )
+  ))
+})
+
+test_that("graph localization materializes floating substituents", {
+  graph <- get_structure_graphs(
+    as_glycan_structure("{?S|1,2}Gal(a1-3)Glc(a1-"),
+    return_list = FALSE
+  )
+
+  variants <- enumerate_floating_graph_localizations(graph)
+
+  expect_identical(variants$variant_id, c(1L, 2L))
+  expect_identical(
+    purrr::map_int(variants$assignments, ~ .x$parent_node),
+    c(1L, 2L)
+  )
+  expect_true(all(
+    purrr::map_lgl(
+      variants$graph,
+      ~ identical(igraph::V(.x)$name, igraph::V(graph)$name)
+    )
+  ))
+  expect_true(all(
+    purrr::map_lgl(
+      variants$graph,
+      ~ !("floating_substituents" %in% igraph::graph_attr_names(.x))
+    )
+  ))
+  expect_identical(
+    purrr::map(variants$graph, ~ igraph::V(.x)$sub),
+    list(c("?S", ""), c("", "?S"))
   )
 })
 

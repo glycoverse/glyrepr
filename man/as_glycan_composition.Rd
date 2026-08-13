@@ -29,8 +29,9 @@ to \code{\link[=glycan_composition]{glycan_composition()}}.
 This function uses the vctrs casting framework for type conversion.
 When converting from glycan structures, both monosaccharides and substituents
 are counted. Substituents are extracted from the \code{sub} attribute of each
-vertex in the structure. For example, a vertex with \code{sub = "3Me"}
-contributes one "Me" substituent to the composition.
+vertex and from the \code{floating_substituents} graph attribute. For example, a
+vertex with \code{sub = "3Me"} or an unresolved \code{{?Me}} each contributes one
+"Me" substituent to the composition.
 
 Simple composition strings use one-letter residue codes: "H" for "Hex",
 "N" for "HexNAc", "F" for "dHex", "S"/"A" for "NeuAc", and "G" for

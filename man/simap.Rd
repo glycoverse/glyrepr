@@ -30,8 +30,7 @@ simap_structure(.x, .f, ...)
 \item{.f}{A function that takes an igraph object (from \code{.x}) and an index/name,
 returning a result.
 Can be a function, purrr-style lambda (\code{~ paste(.x, .y)}), or a character string naming a function.
-A structure with floating parts is passed as one annotated, weakly
-disconnected graph.}
+A structure with floating metadata is passed as one annotated graph.}
 
 \item{...}{Additional arguments passed to \code{.f}.}
 
@@ -62,7 +61,7 @@ than applying \code{.f} to each element individually when there are duplicate st
 \code{simap_structure()} reuses unchanged graphs and validates and canonicalizes
 changed graphs returned by \code{.f}. A callback that changes vertex identities
 or components of a floating structure must also update its \code{floating_parts}
-metadata.
+and \code{floating_substituents} metadata.
 
 \strong{IMPORTANT PERFORMANCE NOTE:}
 Due to the inclusion of position indices, \code{simap} functions have \strong{O(total_structures)}

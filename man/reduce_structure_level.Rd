@@ -36,8 +36,8 @@ The logic is as follows:
 and \code{\link[=convert_to_generic]{convert_to_generic()}} to convert all monosaccharides to generic.
 }
 
-Both reductions preserve floating components and their candidate-parent
-metadata.
+Both reductions preserve floating parts, floating substituents, and their
+candidate-parent metadata.
 }
 \examples{
 glycan <- as_glycan_structure("Gal(b1-3)GalNAc(a1-")

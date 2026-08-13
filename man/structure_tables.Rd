@@ -5,6 +5,7 @@
 \alias{structure_nodes}
 \alias{structure_edges}
 \alias{structure_floating_parts}
+\alias{structure_floating_substituents}
 \alias{structure_from_tibbles}
 \title{Convert Glycan Structures to Graph Tables}
 \usage{
@@ -14,7 +15,15 @@ structure_edges(x)
 
 structure_floating_parts(x)
 
-structure_from_tibbles(nodes, edges, anomers, floating_parts = NULL)
+structure_floating_substituents(x)
+
+structure_from_tibbles(
+  nodes,
+  edges,
+  anomers,
+  floating_parts = NULL,
+  floating_substituents = NULL
+)
 }
 \arguments{
 \item{x}{A glycan structure vector or one glycan \code{igraph}.}
@@ -29,6 +38,10 @@ structure_from_tibbles(nodes, edges, anomers, floating_parts = NULL)
 
 \item{floating_parts}{A data frame returned by
 \code{structure_floating_parts()}, or \code{NULL} when no floating parts are present.}
+
+\item{floating_substituents}{A data frame returned by
+\code{structure_floating_substituents()}, or \code{NULL} when no floating
+substituents are present.}
 }
 \value{
 \itemize{
@@ -39,21 +52,24 @@ structure_from_tibbles(nodes, edges, anomers, floating_parts = NULL)
 \item \code{structure_floating_parts()} returns a tibble with columns \code{glycan_id},
 \code{part_id}, \code{root_node}, the list-column \code{nodes}, \code{linkage}, and the
 list-column \code{parents}.
+\item \code{structure_floating_substituents()} returns a tibble with columns
+\code{glycan_id}, \code{substituent_id}, \code{substituent}, and the list-column
+\code{parents}.
 \item \code{structure_from_tibbles()} returns a \code{glyrepr_structure} vector.
 }
 }
 \description{
-\code{structure_nodes()}, \code{structure_edges()}, and
-\code{structure_floating_parts()} convert a glycan structure vector or one glycan
-\code{igraph} to normalized graph tables. \code{structure_from_tibbles()} rebuilds a
-\code{glyrepr_structure} vector from those tables and a vector of reducing-end
-anomers.
+\code{structure_nodes()}, \code{structure_edges()}, \code{structure_floating_parts()}, and
+\code{structure_floating_substituents()} convert
+a glycan structure vector or one glycan \code{igraph} to normalized graph tables.
+\code{structure_from_tibbles()} rebuilds a \code{glyrepr_structure} vector from those
+tables and a vector of reducing-end anomers.
 
 The \code{glycan_id} column is the integer position of each glycan in the input
 vector. Duplicate structures are expanded to their original vector positions.
 Missing structures have no node or edge rows and are reconstructed from
 missing values in \code{anomers}.
-If \code{x} is named, all three tibbles also contain a \code{glycan_name} column.
+If \code{x} is named, all four tibbles also contain a \code{glycan_name} column.
 \code{structure_from_tibbles()} uses \code{glycan_name} as output names when that
 column is present.
 
@@ -78,6 +94,13 @@ local to the main tree. \code{structure_floating_parts()} translates those value
 to global \code{structure_nodes()$node_id} values, so they can differ when
 floating nodes precede the main tree. \code{structure_from_tibbles()} expects
 these global node IDs and translates them back during serialization.
+
+In \code{structure_floating_substituents()}, each row describes one unresolved
+substituent. \code{substituent} is its canonical position-and-name token, and the
+\code{parents} list-column contains candidate global node IDs. An empty vector
+means all feasible main-tree nodes are candidates. A singleton candidate is
+normalized into \code{structure_nodes()$sub}, so it does not remain in the
+floating-substituent table.
 }
 \examples{
 glycans <- c(o_glycan_core_1(), o_glycan_core_1())
@@ -86,14 +109,16 @@ edges <- structure_edges(glycans)
 structure_from_tibbles(nodes, edges, get_anomer(glycans))
 
 floating <- as_glycan_structure(
-  "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
+  "{8S|1,2}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
 )
 floating_parts <- structure_floating_parts(floating)
+floating_substituents <- structure_floating_substituents(floating)
 structure_from_tibbles(
   structure_nodes(floating),
   structure_edges(floating),
   get_anomer(floating),
-  floating_parts
+  floating_parts,
+  floating_substituents
 )
 
 }

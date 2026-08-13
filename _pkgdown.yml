@@ -22,10 +22,12 @@ reference:
   - get_mono_type
   - get_structure_graphs
   - has_floating_parts
+  - has_floating_substituents
   - has_linkages
   - structure_nodes
   - structure_edges
   - structure_floating_parts
+  - structure_floating_substituents
   - structure_floating_candidates
   - structure_component_membership
   - structure_candidate_edges

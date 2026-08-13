@@ -11,13 +11,13 @@
 #'   and all linkages and anomers are completely unknown ("??-?"/"??").
 #' - "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc").
 #'
-#' Floating parts do not by themselves affect the structure level. Their
-#' attachment linkage is evaluated like an ordinary linkage, while
-#' candidate-parent ambiguity is independent of linkage resolution.
-#' Consequently, a glycan with floating parts is regarded as "intact" when its
-#' residues are concrete and every graph-edge and floating-attachment linkage,
-#' as well as the reducing-end anomer, is fully specified, even though a
-#' floating part's parent remains unlocalized.
+#' Floating metadata does not by itself affect the structure level. A floating
+#' part's attachment linkage is evaluated like an ordinary linkage, while
+#' candidate-parent ambiguity for floating parts and substituents is independent
+#' of linkage resolution. Consequently, a glycan with floating metadata is
+#' regarded as "intact" when its residues are concrete and every graph-edge and
+#' floating-part attachment linkage, as well as the reducing-end anomer, is
+#' fully specified, even though a parent residue remains unlocalized.
 #'
 #' Note that in theory you can have a glycan with generic monosaccharides with all linkages determined.
 #' For example, "Hex(b1-3)HexNAc(a1-" is a valid glycan structure.
@@ -40,7 +40,8 @@
 #' )
 #' get_structure_level(floating)
 #'
-#' @seealso [has_linkages()], [has_floating_parts()], [get_mono_type()]
+#' @seealso [has_linkages()], [has_floating_parts()],
+#'   [has_floating_substituents()], [get_mono_type()]
 #' @export
 get_structure_level <- function(x) {
   if (inherits(x, "igraph")) {
@@ -135,8 +136,8 @@ get_graph_structure_level <- function(graph) {
 #' - If `to_level` is "basic", this function calls [remove_linkages()] to remove all linkages,
 #'   and [convert_to_generic()] to convert all monosaccharides to generic.
 #'
-#' Both reductions preserve floating components and their candidate-parent
-#' metadata.
+#' Both reductions preserve floating parts, floating substituents, and their
+#' candidate-parent metadata.
 #'
 #' @param x A [glycan_structure()] vector or a glycan `igraph`.
 #' @param to_level The resolution level to reduce to. Can be "basic" or "topological".

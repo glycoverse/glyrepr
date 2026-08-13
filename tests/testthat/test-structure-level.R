@@ -88,6 +88,18 @@ test_that("get_structure_level is independent of floating topology", {
   expect_identical(get_structure_level(partial), "partial")
 })
 
+test_that("get_structure_level is independent of floating substituents", {
+  intact <- as_glycan_structure(
+    "{6S|1,2}Gal(b1-3)GalNAc(a1-"
+  )
+  topological <- as_glycan_structure(
+    "{?S|1,2}Gal(??-?)GalNAc(??-"
+  )
+
+  expect_identical(get_structure_level(intact), "intact")
+  expect_identical(get_structure_level(topological), "topological")
+})
+
 test_that("get_structure_level treats floating generic parts as basic", {
   glycan <- as_glycan_structure(
     "{NeuAc(??-?)|1,2}Hex(??-?)HexNAc(??-"
@@ -210,6 +222,24 @@ test_that("reduce_structure_level works with graphs without reordering", {
   expect_identical(igraph::E(result)$linkage, "??-?")
   expect_identical(result$anomer, "??")
   expect_identical(result$floating_parts[[1]]$linkage, "??-?")
+})
+
+test_that("reduce_structure_level preserves floating substituents", {
+  glycan <- as_glycan_structure(
+    "{6S|1,2}Gal(b1-3)Glc(a1-"
+  )
+
+  result <- reduce_structure_level(glycan, to_level = "basic")
+
+  expect_true(has_floating_substituents(result))
+  expect_identical(
+    structure_floating_substituents(result)$substituent,
+    "6S"
+  )
+  expect_identical(
+    structure_floating_substituents(result)$parents,
+    list(c(1L, 2L))
+  )
 })
 
 test_that("reduce_structure_level rejects higher level", {

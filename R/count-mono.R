@@ -10,6 +10,8 @@
 #' For example, "Hex" will count all Glc, Man, Gal, etc.
 #' When `mono` is "concrete" (e.g. "Gal", "GalNAc"),
 #' NA is returned when the composition is "generic".
+#' Floating substituents are counted like substituents attached to known
+#' residues.
 #'
 #' @param x A glycan composition (`glyrepr_composition`), a glycan structure
 #'   (`glyrepr_structure`) vector, or a glycan `igraph`.

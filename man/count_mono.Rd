@@ -42,6 +42,8 @@ it counts all "concrete" monosaccharides that match.
 For example, "Hex" will count all Glc, Man, Gal, etc.
 When \code{mono} is "concrete" (e.g. "Gal", "GalNAc"),
 NA is returned when the composition is "generic".
+Floating substituents are counted like substituents attached to known
+residues.
 }
 \examples{
 comp <- glycan_composition(c(Gal = 1, Man = 1, GalNAc = 1))

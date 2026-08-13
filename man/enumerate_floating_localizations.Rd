@@ -2,7 +2,7 @@
 % Please edit documentation in R/floating-localization.R
 \name{enumerate_floating_localizations}
 \alias{enumerate_floating_localizations}
-\title{Enumerate Floating-Part Localizations}
+\title{Enumerate Floating Localizations}
 \usage{
 enumerate_floating_localizations(x, max_variants = 256, deduplicate = TRUE)
 }
@@ -24,8 +24,10 @@ A tibble with columns:
 deduplication.
 \item \code{structure}: a \code{glyrepr_structure} vector column containing fully
 localized variants.
-\item \code{assignments}: a list-column of tibbles with \code{glycan_id}, \code{part_id}, and
-\code{parent_node}. Here \code{glycan_id} equals \code{input_id}.
+\item \code{assignments}: a list-column of tibbles with \code{glycan_id}, \code{part_id},
+\code{parent_node}, and \code{substituent_id}. Exactly one of \code{part_id} and
+\code{substituent_id} is non-missing in each row. Here \code{glycan_id} equals
+\code{input_id}.
 }
 }
 \description{
@@ -33,20 +35,21 @@ localized variants.
 fully localized structure permitted by the candidate-parent domains in \code{x}.
 Each variant records the complete assignment that produced it.
 
-Candidate combinations are validated simultaneously, including linkages
-with multiple possible acceptor positions such as \code{"a2-3/6"}. Variants are
-canonicalized and, by default, deduplicated by structure. When multiple
-assignments produce the same canonical structure, the first assignment in
-deterministic candidate order is retained. Set \code{deduplicate = FALSE} to
-retain every valid assignment and its original-node provenance, including
-assignments that produce identical canonical structures.
+Candidate combinations for floating parts and substituents are validated
+simultaneously, including linkages or substituents with multiple possible
+carbon positions. Variants are canonicalized and, by default, deduplicated
+by structure. When multiple assignments produce the same canonical
+structure, the first assignment in deterministic candidate order is
+retained. Set \code{deduplicate = FALSE} to retain every valid assignment and its
+original-node provenance, including assignments that produce identical
+canonical structures.
 
 \code{max_variants} is a conservative per-input safeguard. It limits the raw
 Cartesian product before conflict filtering or canonical deduplication, so
 the function may ask for a higher bound even when fewer variants would
 ultimately remain.
 
-Missing inputs and structures without floating parts each produce one row
+Missing inputs and structures without floating metadata each produce one row
 with \code{variant_id = 1L}, the original structure, and an empty assignment
 table. Empty structure vectors produce a zero-row result.
 }

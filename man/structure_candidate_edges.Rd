@@ -18,10 +18,12 @@ A tibble with columns \code{glycan_id}, \code{part_id}, \code{from_node},
 attachment as an explicit virtual edge. \code{from_node} is a candidate parent in
 the main tree and \code{to_node} is the root of the floating part.
 
-The rows correspond one-to-one with \code{\link[=structure_floating_candidates]{structure_floating_candidates()}}. For
-unrestricted \verb{\{<floating>\}} parts, every original main-tree node is returned
-and \code{scope} is \code{"all"}. For explicitly restricted parts, only the declared
-parent nodes are returned and \code{scope} is \code{"explicit"}.
+The rows correspond one-to-one with the floating-part rows from
+\code{\link[=structure_floating_candidates]{structure_floating_candidates()}}. Floating substituents do not create
+virtual graph edges. For unrestricted \verb{\{<floating>\}} parts, every original
+main-tree node is returned and \code{scope} is \code{"all"}. For explicitly restricted
+parts, only the declared parent nodes are returned and \code{scope} is
+\code{"explicit"}.
 
 Node indices refer to \code{structure_nodes()$node_id} for the same glycan.
 Missing structures and structures without floating parts contribute no
