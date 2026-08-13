@@ -229,6 +229,10 @@ The root monosaccharide (rightmost) doesn't connect to anything further,
 so its anomeric carbon is "free." 
 The format `(xy-` tells us about its anomeric state without a target.
 
+An alditol is marked by adding `-ol` to the reducing-end residue while
+retaining the reducing-end annotation used by `glyrepr`, for example
+`Gal(b1-4)GlcNAc-ol(a1-`.
+
 ## Floating Parts
 
 Sometimes a substructure is known but its parent in the main glycan is not.

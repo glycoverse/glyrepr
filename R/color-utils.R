@@ -118,12 +118,12 @@ replace_monos_with_colored <- function(text, mono_names) {
     # For example, "Neu5Ac" should match in "Neu5Ac9Ac"
     if (mono %in% c("Neu5Ac", "Neu5Gc", "Neu")) {
       # For sialic acids, match the base name followed by optional substituents
-      pattern <- paste0("\\b", mono, "(?=[0-9]|\\(|$)")
+      pattern <- paste0("\\b", mono, "(?=[0-9]|-ol|\\(|$)")
       result <- stringr::str_replace_all(result, pattern, colored_mono)
     } else {
       # For other monosaccharides, use more flexible matching
       # Match the mono name followed by optional substituents (digits + letters)
-      pattern <- paste0("\\b", mono, "(?=[0-9]|\\(|$)")
+      pattern <- paste0("\\b", mono, "(?=[0-9]|-ol|\\(|$)")
       result <- stringr::str_replace_all(result, pattern, colored_mono)
     }
   }

@@ -433,6 +433,63 @@ test_that("structure_from_tibbles recreates structure vectors", {
   expect_equal(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
 })
 
+test_that("structure tables round-trip alditol status", {
+  glycans <- as_glycan_structure(c(
+    reduced = "Gal(b1-4)GlcNAc-ol(a1-",
+    missing = NA,
+    ordinary = "Gal(b1-4)GlcNAc(a1-"
+  ))
+
+  rebuilt <- structure_from_tibbles(
+    structure_nodes(glycans),
+    structure_edges(glycans),
+    get_anomer(glycans),
+    alditols = get_alditol(glycans)
+  )
+
+  expect_identical(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
+  expect_identical(get_alditol(rebuilt), get_alditol(glycans))
+  expect_identical(names(rebuilt), names(glycans))
+
+  ordinary <- structure_from_tibbles(
+    structure_nodes(glycans),
+    structure_edges(glycans),
+    get_anomer(glycans)
+  )
+  expect_identical(
+    unname(get_alditol(ordinary)),
+    c(FALSE, NA, FALSE)
+  )
+
+  without_missing <- glycans[c(1, 3)]
+  all_reduced <- structure_from_tibbles(
+    structure_nodes(without_missing),
+    structure_edges(without_missing),
+    get_anomer(without_missing),
+    alditols = TRUE
+  )
+  expect_identical(unname(get_alditol(all_reduced)), c(TRUE, TRUE))
+})
+
+test_that("structure_from_tibbles validates alditol status", {
+  glycan <- o_glycan_core_1()
+  nodes <- structure_nodes(glycan)
+  edges <- structure_edges(glycan)
+
+  expect_snapshot(
+    structure_from_tibbles(nodes, edges, "a1", alditols = logical()),
+    error = TRUE
+  )
+  expect_snapshot(
+    structure_from_tibbles(nodes, edges, "a1", alditols = NA),
+    error = TRUE
+  )
+  expect_snapshot(
+    structure_from_tibbles(nodes, edges, "a1", alditols = "FALSE"),
+    error = TRUE
+  )
+})
+
 test_that("structure tables round-trip floating parts", {
   glycans <- as_glycan_structure(c(
     unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",

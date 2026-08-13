@@ -22,6 +22,8 @@
 #' - Floating substituents add graph metadata but no vertices or edges.
 #' - Must have a graph attribute `anomer` in the format "a1" or "b1"
 #'   - Unknown parts can be represented with "?", e.g., "?1", "a?", "??"
+#' - May have a graph attribute `alditol`, containing one logical value.
+#'   Missing attributes are treated as `FALSE` and canonicalized explicitly.
 #'
 #' ## Node Attributes
 #' - `mono`: Monosaccharide names, must be known monosaccharide types
@@ -729,6 +731,9 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #' Character input assumes the natural absolute configuration for unprefixed
 #' monosaccharides. Less common configurations use a leading `D-` or `L-`, such
 #' as `D-Fuc`, `L-Gul`, and `D-Fucf`.
+#' Alditols use `-ol` on the main reducing-end residue, for example
+#' `Gal(b1-4)GlcNAc-ol(a1-`. The reducing-end anomer annotation remains part of
+#' the canonical representation.
 #'
 #' Character input supports floating-part blocks before the main
 #' IUPAC-condensed structure. `{Neu5Ac(a2-3)}<main>` allows every feasible
@@ -780,6 +785,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #' # Convert a character vector of IUPAC-condensed strings
 #' as_glycan_structure(c("GlcNAc(b1-4)GlcNAc(b1-", "Man(a1-2)GlcNAc(b1-"))
 #' as_glycan_structure(c("D-Fuc(a1-", "L-Gul(b1-", "D-Fucf(a1-"))
+#' as_glycan_structure("Gal(b1-4)GlcNAc-ol(a1-")
 #'
 #' # Parse a floating residue with two candidate parents
 #' floating_iupac <- paste0(

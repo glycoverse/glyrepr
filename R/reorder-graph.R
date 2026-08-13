@@ -59,6 +59,7 @@ is_canonical_sequence_order <- function(sequence_order) {
 }
 
 canonicalize_graph_with_iupac <- function(graph) {
+  graph <- normalize_alditol_attr(graph)
   if (
     any(
       c(
@@ -81,12 +82,7 @@ canonicalize_graph_with_iupac <- function(graph) {
   seq_cache <- build_seq_cache(graph)
   root <- seq_cache$root
   sequence <- seq_glycan_order_iupac(root, seq_cache)
-  iupac <- paste0(
-    sequence$iupac,
-    "(",
-    graph$anomer,
-    "-"
-  )
+  iupac <- format_reducing_end_iupac(sequence$iupac, graph)
   if (!is_canonical_sequence_order(sequence)) {
     graph <- .reorder_by_sequence_order(graph, sequence)
   }
