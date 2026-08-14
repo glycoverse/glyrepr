@@ -94,7 +94,7 @@ validate_glycan_graph <- function(graph) {
     cli::cli_abort("Duplicated linkage positions.")
   }
 
-  validate_floating_substituent_slots(graph)
+  validate_floating_metadata_assignments(graph)
 
   if (is.null(graph$anomer)) {
     cli::cli_abort("Glycan structure must have a graph attribute 'anomer'.")
@@ -265,15 +265,13 @@ graph_to_iupac <- function(graph) {
   floating_iupac <- purrr::map_chr(
     parts,
     floating_part_iupac,
-    graph = graph,
-    main_vertices = main_vertices
+    graph = graph
   )
   floating_sub_iupac <- purrr::map_chr(
     substituents,
-    floating_substituent_iupac,
-    main_vertices = main_vertices
+    floating_substituent_iupac
   )
-  floating_iupac <- sort(c(floating_iupac, floating_sub_iupac))
+  floating_iupac <- c(floating_sub_iupac, floating_iupac)
 
   paste0(paste0(floating_iupac, collapse = ""), main_iupac)
 }

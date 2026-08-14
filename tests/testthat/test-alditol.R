@@ -4,7 +4,7 @@ test_that("alditol IUPAC syntax round-trips", {
     branched = "Gal(a1-3)[Fuc(a1-4)]GlcNAc-ol(b1-",
     substituted = "Gal(b1-4)GlcNAc6S-ol(a1-",
     inferred = "Glc-ol",
-    floating = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc-ol(a1-"
+    floating = "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc-ol(a1-"
   )
 
   glycans <- as_glycan_structure(iupacs)
@@ -104,7 +104,7 @@ test_that("alditol status survives structure transformations", {
   )
 
   floating <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc-ol(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc-ol(a1-"
   )
   variants <- enumerate_floating_localizations(floating)
   expect_identical(
@@ -133,7 +133,7 @@ test_that("alditol markers are restricted to the main reducing end", {
     error = TRUE
   )
   expect_snapshot(
-    as_glycan_structure("{Gal-ol(b1-4)|1}Glc(a1-"),
+    as_glycan_structure("{Gal-ol(b1-4)|2}Glc(a1-"),
     error = TRUE
   )
 })

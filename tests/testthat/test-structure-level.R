@@ -74,13 +74,13 @@ test_that("get_structure_level treats ambiguous linkage positions as partial", {
 
 test_that("get_structure_level is independent of floating topology", {
   intact <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
   topological <- as_glycan_structure(
-    "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-"
+    "{Neu5Ac(??-?)|2,3}Gal(??-?)GalNAc(??-"
   )
   partial <- as_glycan_structure(
-    "{Neu5Ac(a2-?)|1,2}Gal(??-?)GalNAc(??-"
+    "{Neu5Ac(a2-?)|2,3}Gal(??-?)GalNAc(??-"
   )
 
   expect_identical(get_structure_level(intact), "intact")
@@ -102,7 +102,7 @@ test_that("get_structure_level is independent of floating substituents", {
 
 test_that("get_structure_level treats floating generic parts as basic", {
   glycan <- as_glycan_structure(
-    "{NeuAc(??-?)|1,2}Hex(??-?)HexNAc(??-"
+    "{NeuAc(??-?)|2,3}Hex(??-?)HexNAc(??-"
   )
 
   expect_identical(get_structure_level(glycan), "basic")
@@ -207,7 +207,7 @@ test_that("reduce_structure_level works for each glycan separately", {
 
 test_that("reduce_structure_level works with graphs without reordering", {
   structure <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
   graph <- get_structure_graphs(structure)
   names_before <- igraph::V(graph)$name
@@ -264,13 +264,13 @@ test_that("reduce_structure_level works for multiple glycans", {
 
 test_that("reduce_structure_level preserves floating topology", {
   glycan <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
 
   topological <- reduce_structure_level(glycan, to_level = "topological")
   expect_identical(
     as.character(topological),
-    "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-"
+    "{Neu5Ac(??-?)|2,3}Gal(??-?)GalNAc(??-"
   )
   expect_identical(
     structure_floating_parts(topological)$parents[[1]],
@@ -281,7 +281,7 @@ test_that("reduce_structure_level preserves floating topology", {
   basic <- reduce_structure_level(glycan, to_level = "basic")
   expect_identical(
     as.character(basic),
-    "{NeuAc(??-?)|1,2}Hex(??-?)HexNAc(??-"
+    "{NeuAc(??-?)|2,3}Hex(??-?)HexNAc(??-"
   )
   expect_identical(
     structure_floating_parts(basic)$parents[[1]],

@@ -24,29 +24,6 @@
 
   floating <- split_floating_iupac(x)
 
-  main <- .parse_iupac_tree_single(floating$main)
-  igraph::V(main)$source_index <- rev(seq_len(igraph::vcount(main)))
-  main <- validate_glycan_graph(main)
-  main <- canonicalize_glycan_graph(main)
-  source_to_canonical <- match(
-    seq_len(igraph::vcount(main)),
-    igraph::V(main)$source_index
-  )
-  floating$parts <- purrr::map(floating$parts, function(part) {
-    if (
-      length(part$parents) > 0 &&
-        any(part$parents > length(source_to_canonical))
-    ) {
-      cli::cli_abort(c(
-        "Floating part parent index is outside the main glycan.",
-        "i" = "The main glycan has {length(source_to_canonical)} node{?s}."
-      ))
-    }
-    part$parents <- source_to_canonical[part$parents]
-    part
-  })
-  main <- igraph::delete_vertex_attr(main, "source_index")
-
   is_substituent <- purrr::map_lgl(
     floating$parts,
     ~ stringr::str_detect(
@@ -55,26 +32,115 @@
     )
   )
 
+  parsed_parts <- purrr::map(
+    floating$parts[!is_substituent],
+    parse_floating_iupac_part
+  )
+  parsed_parts <- purrr::map(
+    parsed_parts,
+    function(part) {
+      parsed <- canonicalize_parsed_iupac_component(part$graph)
+      part$graph <- parsed$graph
+      part$source_to_canonical <- parsed$source_to_canonical
+      part
+    }
+  )
+  main <- canonicalize_parsed_iupac_component(
+    .parse_iupac_tree_single(floating$main)
+  )
+
+  part_sizes <- purrr::map_int(parsed_parts, ~ igraph::vcount(.x$graph))
+  part_offsets <- cumsum(c(0L, part_sizes))
+  main_offset <- sum(part_sizes)
+  source_to_graph <- c(
+    unlist(
+      purrr::map2(
+        parsed_parts,
+        part_offsets[-length(part_offsets)],
+        ~ as.integer(.y + .x$source_to_canonical)
+      ),
+      use.names = FALSE
+    ),
+    as.integer(main_offset + main$source_to_canonical)
+  )
+  structure_size <- length(source_to_graph)
+
+  parsed_parts <- purrr::map2(
+    parsed_parts,
+    seq_along(parsed_parts),
+    function(part, part_id) {
+      source_nodes <- part_offsets[[part_id]] + seq_len(part_sizes[[part_id]])
+      validate_floating_source_parents(
+        part$parents,
+        structure_size,
+        own_nodes = source_nodes
+      )
+      part$parents <- sort(source_to_graph[part$parents])
+      part$source_to_canonical <- NULL
+      part
+    }
+  )
+
   parsed_substituents <- purrr::map(
     floating$parts[is_substituent],
     function(substituent) {
+      validate_floating_source_parents(
+        substituent$parents,
+        structure_size
+      )
       list(
         substituent = normalize_substituent_token(substituent$sequence),
-        parents = sort(substituent$parents)
+        parents = sort(source_to_graph[substituent$parents])
       )
     }
   )
 
-  parsed_parts <- purrr::map(
-    floating$parts[!is_substituent],
-    parse_floating_iupac_part,
-    main_size = igraph::vcount(main)
-  )
   combine_floating_iupac_graphs(
-    main,
+    main$graph,
     parsed_parts,
     parsed_substituents
   )
+}
+
+canonicalize_parsed_iupac_component <- function(graph) {
+  igraph::V(graph)$source_index <- rev(seq_len(igraph::vcount(graph)))
+  graph <- validate_glycan_graph(graph)
+  graph <- canonicalize_glycan_graph(graph)
+  source_to_canonical <- match(
+    seq_len(igraph::vcount(graph)),
+    igraph::V(graph)$source_index
+  )
+  graph <- igraph::delete_vertex_attr(graph, "source_index")
+
+  list(
+    graph = graph,
+    source_to_canonical = as.integer(source_to_canonical)
+  )
+}
+
+validate_floating_source_parents <- function(
+  parents,
+  structure_size,
+  own_nodes = integer()
+) {
+  if (length(parents) == 0) {
+    return(invisible(NULL))
+  }
+  if (any(parents > structure_size)) {
+    cli::cli_abort(c(
+      "Floating parent index is outside the complete glycan structure.",
+      "i" = "The complete structure has {structure_size} node{?s}."
+    ))
+  }
+  self_parents <- intersect(parents, own_nodes)
+  if (length(self_parents) > 0) {
+    cli::cli_abort(c(
+      "Floating part parent indices cannot refer to its own component.",
+      "x" = "Self-parent node index{?es}: {.val {self_parents}}."
+    ))
+  }
+
+  invisible(NULL)
 }
 
 split_floating_iupac <- function(x) {
@@ -167,7 +233,7 @@ split_floating_iupac_part <- function(content) {
   list(sequence = sequence, parents = parents)
 }
 
-parse_floating_iupac_part <- function(part, main_size) {
+parse_floating_iupac_part <- function(part) {
   linkage_match <- stringr::str_match(
     part$sequence,
     paste0("\\((", linkage_pattern(anchored = FALSE), ")\\)$")
@@ -175,16 +241,9 @@ parse_floating_iupac_part <- function(part, main_size) {
   linkage <- linkage_match[[1, 2]]
   if (is.na(linkage)) {
     cli::cli_abort(
-      "A floating part must end with its linkage to the main glycan."
+      "A floating part must end with its linkage to its unresolved parent."
     )
   }
-  if (length(part$parents) > 0 && any(part$parents > main_size)) {
-    cli::cli_abort(c(
-      "Floating part parent index is outside the main glycan.",
-      "i" = "The main glycan has {main_size} node{?s}."
-    ))
-  }
-
   sequence <- stringr::str_remove(
     part$sequence,
     paste0("\\(", linkage_pattern(anchored = FALSE), "\\)$")
@@ -209,7 +268,7 @@ combine_floating_iupac_graphs <- function(
   parts,
   substituents = list()
 ) {
-  graphs <- c(list(main), purrr::map(parts, "graph"))
+  graphs <- c(purrr::map(parts, "graph"), list(main))
   sizes <- purrr::map_int(graphs, igraph::vcount)
   offsets <- cumsum(c(0L, sizes[-length(sizes)]))
 
@@ -248,7 +307,7 @@ combine_floating_iupac_graphs <- function(
 
   metadata <- purrr::map2(
     parts,
-    offsets[-1],
+    offsets[seq_along(parts)],
     function(part, offset) {
       cache <- build_seq_cache(part$graph)
       list(

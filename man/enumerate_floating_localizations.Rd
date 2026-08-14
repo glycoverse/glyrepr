@@ -37,8 +37,9 @@ Each variant records the complete assignment that produced it.
 
 Candidate combinations for floating parts and substituents are validated
 simultaneously, including linkages or substituents with multiple possible
-carbon positions. Variants are canonicalized and, by default, deduplicated
-by structure. When multiple assignments produce the same canonical
+carbon positions. Floating-component dependencies must be acyclic and
+ultimately connect to the main tree. Variants are canonicalized and, by
+default, deduplicated by structure. When multiple assignments produce the same canonical
 structure, the first assignment in deterministic candidate order is
 retained. Set \code{deduplicate = FALSE} to retain every valid assignment and its
 original-node provenance, including assignments that produce identical
@@ -55,7 +56,7 @@ table. Empty structure vectors produce a zero-row result.
 }
 \examples{
 glycan <- as_glycan_structure(
-  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 enumerate_floating_localizations(glycan)
 

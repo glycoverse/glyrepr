@@ -8,13 +8,17 @@
 #'
 #' Each selected parent must belong to the floating part's declared candidate
 #' domain. For an unrestricted `{<floating>}` part, that domain contains every
-#' node in the original main tree. Assignments must also be simultaneously
-#' compatible with occupied and potential acceptor linkage positions.
+#' feasible node outside its own component, including nodes in other floating
+#' components. Assignments must also be simultaneously compatible with occupied
+#' and potential acceptor linkage positions, acyclic, and ultimately connected
+#' to the main tree.
 #'
 #' Selected virtual attachments become ordinary graph edges. Unassigned
 #' floating parts remain floating. The resulting structures are canonicalized,
 #' and candidate-parent indices for remaining parts are remapped to the new
-#' canonical main-tree order.
+#' canonical complete-sequence order. Attaching one floating component to
+#' another merges their component metadata and can iteratively resolve newly
+#' singleton domains.
 #'
 #' Missing values, vector positions, and names in structure-vector input are
 #' preserved. For graph input, `glycan_id` must be `1L`, and selected edges are
@@ -30,7 +34,7 @@
 #'
 #' @examples
 #' glycan <- as_glycan_structure(
-#'   "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#'   "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 #' )
 #' assignments <- tibble::tibble(
 #'   glycan_id = 1L,
@@ -103,9 +107,10 @@ localize_floating_parts <- function(x, assignments) {
 #'
 #' Floating parts are localized as ordinary edges, while floating substituents
 #' are localized into the selected parent vertex's `sub` attribute. Every
-#' conflict-free assignment is retained, even when multiple assignments would
-#' produce the same canonical IUPAC-condensed structure. A graph without
-#' floating metadata produces one identity row with an empty assignment table.
+#' conflict-free acyclic assignment that connects all components to the main
+#' tree is retained, even when multiple assignments would produce the same
+#' canonical IUPAC-condensed structure. A graph without floating metadata
+#' produces one identity row with an empty assignment table.
 #'
 #' `max_variants` is a conservative safeguard. It limits the raw Cartesian
 #' product before conflict filtering, so the function may ask for a higher
@@ -127,7 +132,7 @@ localize_floating_parts <- function(x, assignments) {
 #'
 #' @examples
 #' glycan <- as_glycan_structure(
-#'   "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#'   "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 #' )
 #' graph <- get_structure_graphs(glycan, return_list = FALSE)
 #' localizations <- enumerate_floating_graph_localizations(graph)
@@ -167,8 +172,9 @@ enumerate_floating_graph_localizations <- function(
 #'
 #' Candidate combinations for floating parts and substituents are validated
 #' simultaneously, including linkages or substituents with multiple possible
-#' carbon positions. Variants are canonicalized and, by default, deduplicated
-#' by structure. When multiple assignments produce the same canonical
+#' carbon positions. Floating-component dependencies must be acyclic and
+#' ultimately connect to the main tree. Variants are canonicalized and, by
+#' default, deduplicated by structure. When multiple assignments produce the same canonical
 #' structure, the first assignment in deterministic candidate order is
 #' retained. Set `deduplicate = FALSE` to retain every valid assignment and its
 #' original-node provenance, including assignments that produce identical
@@ -204,7 +210,7 @@ enumerate_floating_graph_localizations <- function(
 #'
 #' @examples
 #' glycan <- as_glycan_structure(
-#'   "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#'   "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 #' )
 #' enumerate_floating_localizations(glycan)
 #'
@@ -356,21 +362,14 @@ enumerate_floating_graph_localizations_one <- function(
     ))
   }
 
-  main_vertices <- floating_metadata_main_vertices(graph, parts)
-  part_domains <- purrr::map(parts, function(part) {
-    if (length(part$parents) == 0) {
-      main_vertices
-    } else {
-      as.integer(part$parents)
-    }
-  })
-  substituent_domains <- purrr::map(substituents, function(substituent) {
-    if (length(substituent$parents) == 0) {
-      main_vertices
-    } else {
-      as.integer(substituent$parents)
-    }
-  })
+  part_domains <- purrr::map(
+    parts,
+    ~ floating_part_candidate_parents(graph, .x)
+  )
+  substituent_domains <- purrr::map(
+    substituents,
+    ~ floating_substituent_candidate_parents(graph, .x)
+  )
   candidate_domains <- c(part_domains, substituent_domains)
   combination_count <- prod(as.double(lengths(candidate_domains)))
   if (!is.finite(combination_count) || combination_count > max_variants) {
@@ -653,7 +652,6 @@ localize_floating_graph <- function(
   canonicalize = TRUE
 ) {
   parts <- normalize_floating_parts(graph)
-  main_vertices <- floating_main_vertices(graph, parts)
 
   nonexistent <- assignments$part_id > length(parts)
   if (any(nonexistent)) {
@@ -668,11 +666,7 @@ localize_floating_graph <- function(
     part_id <- assignments$part_id[[row_id]]
     parent_node <- assignments$parent_node[[row_id]]
     part <- parts[[part_id]]
-    candidate_parents <- if (length(part$parents) == 0) {
-      main_vertices
-    } else {
-      part$parents
-    }
+    candidate_parents <- floating_part_candidate_parents(graph, part)
 
     if (!parent_node %in% candidate_parents) {
       cli::cli_abort(c(
@@ -689,31 +683,12 @@ localize_floating_graph <- function(
     assignments
   )
 
-  # An unrestricted substituent refers only to the original main tree.
-  # Materialize that domain before localized components enlarge the main tree.
-  graph <- materialize_unrestricted_floating_substituents(
+  graph <- attach_floating_parts(
     graph,
-    main_vertices
+    parts,
+    assignments$part_id,
+    assignments$parent_node
   )
-
-  for (row_id in seq_len(nrow(assignments))) {
-    part_id <- assignments$part_id[[row_id]]
-    part <- parts[[part_id]]
-    graph <- igraph::add_edges(
-      graph,
-      c(assignments$parent_node[[row_id]], part$root),
-      linkage = part$linkage
-    )
-  }
-
-  remaining <- parts[-assignments$part_id]
-  remaining <- purrr::map(remaining, function(part) {
-    if (length(part$parents) == 0) {
-      part$parents <- main_vertices
-    }
-    part
-  })
-  graph <- set_floating_parts_attr(graph, remaining)
   graph <- validate_glycan_graph(graph)
   if (canonicalize) {
     graph <- canonicalize_glycan_graph(graph)

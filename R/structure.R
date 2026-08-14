@@ -57,19 +57,21 @@
 #' - `root`: the integer vertex index of the floating component root.
 #' - `nodes`: all integer vertex indices in the floating component, ordered as
 #'   the component appears in the complete IUPAC-condensed sequence.
-#' - `linkage`: the virtual linkage from that root to the main tree.
-#' - `parents`: integer vertex indices in the main tree. An empty integer vector
-#'   means that all feasible main-tree nodes are candidates.
+#' - `linkage`: the virtual linkage from that root to its unresolved parent.
+#' - `parents`: integer vertex indices outside the floating component. An empty
+#'   integer vector means that all feasible nodes outside the component are
+#'   candidates.
 #'
 #' Canonical graphs always contain `nodes`. For backward compatibility, input
 #' graphs may omit it; [glycan_structure()] derives the component membership
 #' before validation and stores `nodes` in the canonical result.
 #'
-#' During canonicalization, a floating part with exactly one candidate parent
-#' is attached to that parent as an ordinary graph edge. This includes an empty
-#' `parents` vector when the main tree has only one node. Only unresolved
-#' attachments retain floating metadata, where the virtual attachment is
-#' metadata rather than an edge and contributes to the canonical structure key.
+#' During canonicalization, a floating part with exactly one effective
+#' candidate parent is attached to that parent as an ordinary graph edge.
+#' Attachments between floating components merge their `nodes` metadata and
+#' can resolve further singleton domains. Only unresolved attachments retain
+#' floating metadata, where the virtual attachment is metadata rather than an
+#' edge and contributes to the canonical structure key.
 #'
 #' ## Floating Substituents
 #'
@@ -79,12 +81,13 @@
 #'
 #' - `substituent`: one canonical substituent token such as `"6S"`, `"4/6Ac"`,
 #'   or `"?Me"`.
-#' - `parents`: integer vertex indices in the main tree. An empty integer vector
-#'   means that all feasible main-tree nodes are candidates.
+#' - `parents`: integer residue vertex indices in the complete structure. An
+#'   empty integer vector means that all feasible residue nodes are candidates.
 #'
 #' A singleton candidate is normalized into the corresponding vertex's `sub`
 #' attribute. Candidate parents must permit a conflict-free assignment of
-#' occupied carbon positions.
+#' occupied carbon positions. Floating-part assignments must also be acyclic
+#' and connect every floating component to the main tree.
 #'
 #' # Node and Edge Order
 #'
@@ -97,10 +100,10 @@
 #' For a floating structure, floating-component vertices and edges precede the
 #' main tree, exactly as their brace-enclosed components precede the main glycan
 #' in the complete IUPAC-condensed string. Parent indices written inside braces
-#' are local to the main tree, while `floating_parts$parents` stores the
-#' corresponding global graph vertex indices. The same rule applies to
-#' `floating_substituents$parents`. A virtual floating attachment is not an
-#' edge, and a floating substituent is not a vertex.
+#' and stored in `floating_parts$parents` or `floating_substituents$parents`
+#' use this same global order. Substituent blocks contribute no vertex indices.
+#' A virtual floating attachment is not an edge, and a floating substituent is
+#' not a vertex.
 #'
 #' # NA Support
 #'
@@ -159,7 +162,7 @@
 #'
 #' # Example 4: Parse a floating part with explicit candidate parents
 #' floating <- as_glycan_structure(
-#'   "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
+#'   "{Neu5Ac(a2-3)|2,3}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
 #' )
 #' structure_floating_parts(floating)
 #'
@@ -737,21 +740,23 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #'
 #' Character input supports floating-part blocks before the main
 #' IUPAC-condensed structure. `{Neu5Ac(a2-3)}<main>` allows every feasible
-#' main-tree node as a candidate parent, while
-#' `{Neu5Ac(a2-3)|1,4}<main>` restricts the candidates to main-tree nodes 1 and
-#' 4. Parent indices follow residue order in the supplied main sequence and are
-#' remapped to canonical IUPAC order in the result. The `|<parents>` suffix is a
-#' `glyrepr` extension to curly-brace IUPAC notation. A singleton candidate set
-#' is accepted as input but fully localizes the attachment, so
-#' `{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-` canonicalizes to the ordinary structure
-#' `Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`. An omitted parent list behaves the same way
-#' when the main tree contains only one node.
+#' node outside its own component as a candidate parent, while an explicit
+#' `|<parents>` suffix restricts that domain. Parent indices follow residue
+#' order in the complete supplied sequence: residues in floating blocks are
+#' counted left to right before the main glycan, and substituent blocks add no
+#' indices. A floating part may target another floating component or the main
+#' tree, but cannot target itself. Indices are remapped to canonical complete
+#' sequence order in the result. The suffix is a `glyrepr` extension to
+#' curly-brace IUPAC notation. A singleton candidate set is accepted as input
+#' but fully localizes the attachment, so
+#' `{Neu5Ac(a2-3)|2}Gal(b1-4)GlcNAc(b1-` canonicalizes to the ordinary structure
+#' `Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`.
 #'
 #' Floating substituents use the same leading-brace and candidate-parent syntax.
-#' For example, `{6S}<main>` leaves the sulfated residue unrestricted,
-#' `{6S|1,2}<main>` restricts it to main-tree residues 1 and 2, and `{?S}<main>`
-#' also leaves the carbon position unknown. A singleton candidate is normalized
-#' into the selected residue's ordinary `sub` attribute.
+#' For example, `{6S}<main>` leaves the sulfated residue unrestricted across all
+#' residue nodes, `{6S|1,2}<main>` restricts it to complete-sequence nodes 1 and
+#' 2, and `{?S}<main>` also leaves the carbon position unknown. A singleton
+#' candidate is normalized into the selected residue's ordinary `sub` attribute.
 #'
 #' @param x An object to convert to a glycan structure vector.
 #'   Can be an igraph object, a list of igraph objects,
@@ -789,7 +794,7 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #'
 #' # Parse a floating residue with two candidate parents
 #' floating_iupac <- paste0(
-#'   "{Neu5Ac(a2-3)|1,4}",
+#'   "{Neu5Ac(a2-3)|2,5}",
 #'   "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)",
 #'   "[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]",
 #'   "Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"

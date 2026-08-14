@@ -16,14 +16,15 @@ A tibble with columns \code{glycan_id}, \code{part_id}, \code{from_node},
 \description{
 \code{structure_candidate_edges()} represents every potential floating-part
 attachment as an explicit virtual edge. \code{from_node} is a candidate parent in
-the main tree and \code{to_node} is the root of the floating part.
+another floating component or the main tree, and \code{to_node} is the root of
+the floating part.
 
 The rows correspond one-to-one with the floating-part rows from
 \code{\link[=structure_floating_candidates]{structure_floating_candidates()}}. Floating substituents do not create
-virtual graph edges. For unrestricted \verb{\{<floating>\}} parts, every original
-main-tree node is returned and \code{scope} is \code{"all"}. For explicitly restricted
-parts, only the declared parent nodes are returned and \code{scope} is
-\code{"explicit"}.
+virtual graph edges. For unrestricted \verb{\{<floating>\}} parts, every feasible
+node outside the part's own component is returned and \code{scope} is \code{"all"}.
+For explicitly restricted parts, only the declared parent nodes are returned
+and \code{scope} is \code{"explicit"}.
 
 Node indices refer to \code{structure_nodes()$node_id} for the same glycan.
 Missing structures and structures without floating parts contribute no
@@ -34,7 +35,7 @@ For graph input, node indices are current numeric vertex positions and
 }
 \examples{
 glycan <- as_glycan_structure(
-  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 structure_candidate_edges(glycan)
 

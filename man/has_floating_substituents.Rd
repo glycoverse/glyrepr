@@ -19,19 +19,21 @@ parent residue is unresolved.
 }
 \details{
 In the \code{glyrepr} IUPAC extension, floating substituents appear in braces
-before the main glycan. \verb{\{6S\}<main>} allows every feasible main-tree residue
-to carry the substituent, \verb{\{6S|1,2\}<main>} restricts it to main-tree residues
-1 and 2, and \verb{\{?S\}<main>} also leaves the carbon position unknown.
+before the main glycan. \verb{\{6S\}<main>} allows every feasible residue in the
+complete structure to carry the substituent, \verb{\{6S|1,2\}<main>} restricts it
+to complete-sequence nodes 1 and 2, and \verb{\{?S\}<main>} also leaves the carbon
+position unknown. Residue nodes in floating blocks are counted before the
+main glycan; substituent blocks contribute no node indices.
 
 Internally, unresolved substituents are stored in the
 \code{floating_substituents} graph attribute. It is a list with one entry per
 substituent. Each entry contains a canonical \code{substituent} token and an
-integer \code{parents} vector of candidate main-tree vertex indices. An empty
-vector means every feasible main-tree vertex is a candidate.
+integer \code{parents} vector of candidate graph vertex indices. An empty vector
+means every feasible residue vertex is a candidate.
 
 A singleton candidate set is normalized into that vertex's ordinary \code{sub}
-attribute. This also happens for an unrestricted floating substituent when
-the main tree has only one residue.
+attribute. This also happens whenever chemistry leaves only one feasible
+residue in the complete structure.
 \code{\link[=structure_floating_substituents]{structure_floating_substituents()}} exposes the metadata as a normalized
 table.
 }

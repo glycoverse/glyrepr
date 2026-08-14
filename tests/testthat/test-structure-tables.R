@@ -76,7 +76,7 @@ test_that("structure_edges includes glycan_name for named structures", {
 test_that("structure_floating_parts returns normalized attachment metadata", {
   glycans <- as_glycan_structure(c(
     unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-    restricted = "{Fuc(a1-2)|1,2}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Fuc(a1-2)|3,4}{Neu5Ac(a2-6)|3,4}Gal(b1-3)GalNAc(a1-",
     ordinary = "Gal(a1-",
     missing = NA
   ))
@@ -160,7 +160,7 @@ test_that("structure_floating_substituents returns normalized metadata", {
 test_that("structure_floating_candidates expands every attachment candidate", {
   glycans <- as_glycan_structure(c(
     unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-    restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-",
     ordinary = "Gal(a1-",
     missing = NA
   ))
@@ -281,8 +281,8 @@ test_that("structure_floating_candidates returns typed empty tables", {
 test_that("structure_component_membership identifies every graph component", {
   glycans <- as_glycan_structure(c(
     floating = paste0(
-      "{Fuc(a1-2)|1,2}",
-      "{Neu5Ac(a2-6)|1,2}",
+      "{Fuc(a1-2)|3,4}",
+      "{Neu5Ac(a2-6)|3,4}",
       "Gal(b1-3)GalNAc(a1-"
     ),
     ordinary = "Gal(a1-",
@@ -341,7 +341,7 @@ test_that("structure_component_membership returns typed empty tables", {
 test_that("structure_candidate_edges exposes potential virtual edges", {
   glycans <- as_glycan_structure(c(
     unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-    restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-",
     ordinary = "Gal(a1-",
     missing = NA
   ))
@@ -387,7 +387,7 @@ test_that("structure_candidate_edges returns a typed empty table", {
 
 test_that("structure table accessors accept one glycan graph", {
   structure <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
   graph <- get_structure_graphs(structure)
   accessors <- list(
@@ -431,6 +431,29 @@ test_that("structure_from_tibbles recreates structure vectors", {
 
   expect_s3_class(rebuilt, "glyrepr_structure")
   expect_equal(structure_to_iupac(rebuilt), structure_to_iupac(glycans))
+})
+
+test_that("structure tables preserve cross-component parent IDs", {
+  glycan <- as_glycan_structure(
+    "{Fuc(a1-2)|2,3}{Man(a1-3)|1,3}Glc(a1-"
+  )
+  parts <- structure_floating_parts(glycan)
+
+  expect_identical(parts$parents, list(c(2L, 3L), c(1L, 3L)))
+  expect_identical(
+    structure_candidate_edges(glycan)$from_node,
+    c(2L, 3L, 1L, 3L)
+  )
+
+  rebuilt <- structure_from_tibbles(
+    structure_nodes(glycan),
+    structure_edges(glycan),
+    get_anomer(glycan),
+    parts
+  )
+
+  expect_identical(as.character(rebuilt), as.character(glycan))
+  expect_true(unname(rebuilt == glycan))
 })
 
 test_that("structure tables round-trip alditol status", {
@@ -494,7 +517,7 @@ test_that("structure tables round-trip floating parts", {
   glycans <- as_glycan_structure(c(
     unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
     missing = NA,
-    restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-",
     duplicate = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-"
   ))
 

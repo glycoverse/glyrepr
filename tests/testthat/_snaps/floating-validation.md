@@ -90,9 +90,20 @@
     Condition
       Error in `purrr::map()`:
       i In index: 1.
-      Caused by error in `validate_floating_attachment_slots()`:
+      Caused by error in `validate_floating_metadata_assignments()`:
       ! Floating parts cannot be attached simultaneously.
-      x No conflict-free assignment exists for the declared parent and acceptor positions.
+      x No conflict-free acyclic assignment connects every floating component to the main tree.
+
+# floating component cycles require an acyclic alternative
+
+    Code
+      as_glycan_structure("{Fuc(a1-2)|2}{Man(a1-3)|1}Glc(a1-")
+    Condition
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `validate_floating_metadata_assignments()`:
+      ! Floating parts cannot be attached simultaneously.
+      x No conflict-free acyclic assignment connects every floating component to the main tree.
 
 # ambiguous main edges participate in slot matching
 
@@ -101,18 +112,7 @@
     Condition
       Error in `purrr::map()`:
       i In index: 1.
-      Caused by error in `validate_floating_attachment_slots()`:
+      Caused by error in `validate_floating_metadata_assignments()`:
       ! Floating parts cannot be attached simultaneously.
-      x No conflict-free assignment exists for the declared parent and acceptor positions.
-
-# unrestricted parents use all available main-tree slots
-
-    Code
-      glycan_structure(conflict)
-    Condition
-      Error in `purrr::map()`:
-      i In index: 1.
-      Caused by error in `validate_floating_attachment_slots()`:
-      ! Floating parts cannot be attached simultaneously.
-      x No conflict-free assignment exists for the declared parent and acceptor positions.
+      x No conflict-free acyclic assignment connects every floating component to the main tree.
 

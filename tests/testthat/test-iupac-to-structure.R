@@ -57,9 +57,9 @@ test_that("as_glycan_structure.character parses branched structures", {
 test_that("as_glycan_structure.character parses floating parts", {
   iupacs <- c(
     "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
-    "{Neu5Ac(a2-3)|1,4}Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
-    "{Neu5Ac(a2-3)Gal(b1-4)|1,2}Glc(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-",
+    "{Neu5Ac(a2-3)|2,5}Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
+    "{Neu5Ac(a2-3)Gal(b1-4)|3,4}Glc(b1-3)GalNAc(a1-"
   )
 
   glycans <- as_glycan_structure(iupacs)
@@ -87,7 +87,7 @@ test_that("as_glycan_structure.character parses floating parts", {
 test_that("floating parent indices follow canonicalized main-tree order", {
   glycan <- as_glycan_structure(
     paste0(
-      "{Neu5Ac(a2-4)|1,3}",
+      "{Neu5Ac(a2-4)|2,4}",
       "Man(a1-6)[Man(a1-3)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
     )
   )
@@ -95,7 +95,7 @@ test_that("floating parent indices follow canonicalized main-tree order", {
   expect_identical(
     unname(structure_to_iupac(glycan)),
     paste0(
-      "{Neu5Ac(a2-4)|2,3}",
+      "{Neu5Ac(a2-4)|3,4}",
       "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
     )
   )

@@ -64,9 +64,9 @@
       localize_floating_parts(glycan, tibble::tibble(glycan_id = c(1L, 1L), part_id = c(
         1L, 2L), parent_node = c(3L, 3L)))
     Condition
-      Error in `validate_floating_attachment_slots()`:
+      Error in `validate_floating_metadata_assignments()`:
       ! Floating parts cannot be attached simultaneously.
-      x No conflict-free assignment exists for the declared parent and acceptor positions.
+      x No conflict-free acyclic assignment connects every floating component to the main tree.
 
 # localize_floating_parts checks occupied main-tree slots
 

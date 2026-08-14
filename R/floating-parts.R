@@ -8,7 +8,7 @@
 #'
 #' @details
 #' A floating part is a known glycan residue or substructure whose parent
-#' residue on the main glycan tree is not fully localized. For example, a
+#' residue in the complete glycan structure is not fully localized. For example, a
 #' bi-antennary N-glycan may contain one sialic acid while the available
 #' evidence cannot determine which of its two terminal galactoses carries that
 #' residue. The sialic acid can then be represented as a floating part with
@@ -17,15 +17,18 @@
 #' In the `glyrepr` IUPAC extension, floating parts appear in braces before the
 #' main glycan:
 #'
-#' - `{<floating>}<main>` means every feasible main-tree node is a candidate
-#'   parent.
+#' - `{<floating>}<main>` means every feasible node outside that floating
+#'   component is a candidate parent.
 #' - `{<floating>|<parents>}<main>` restricts the candidates to the
-#'   comma-separated main-tree node indices in `<parents>`.
+#'   comma-separated complete-sequence node indices in `<parents>`.
 #'
-#' Main-tree indices follow residue order within the main IUPAC-condensed tree
-#' and are numbered from 1 independently of preceding floating parts. A
-#' floating part may contain one residue or an entire subtree, and its virtual
-#' attachment linkage may be fully known, partially known, or unknown.
+#' Node indices follow residue order in the complete IUPAC-condensed sequence:
+#' residue nodes in floating blocks are counted from left to right before the
+#' main glycan, while substituent blocks contribute no node indices. A floating
+#' part may target a node in another floating component or the main tree, but
+#' not a node in its own component. It may contain one residue or an entire
+#' subtree, and its virtual attachment linkage may be fully known, partially
+#' known, or unknown.
 #'
 #' Internally, an unresolved structure is an annotated forest containing one
 #' main tree and one disconnected tree per floating part. The virtual linkage
@@ -36,10 +39,11 @@
 #' [structure_floating_parts()] exposes attachment metadata in tabular form, and
 #' [structure_component_membership()] exposes component membership.
 #'
-#' An explicit singleton parent list fully localizes the attachment, as does an
-#' omitted parent list when the main tree has only one node. Such a part is
-#' normalized to an ordinary graph edge, so `has_floating_parts()` returns
-#' `FALSE` for the normalized structure.
+#' An effective singleton parent domain fully localizes the attachment. When
+#' one floating component attaches to another, their component metadata is
+#' merged and newly singleton domains are resolved iteratively. Such parts are
+#' normalized to ordinary graph edges, so `has_floating_parts()` returns
+#' `FALSE` once every attachment is localized.
 #'
 #' @param x A [glycan_structure()] vector or a glycan `igraph`.
 #'
@@ -53,14 +57,14 @@
 #'   "Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 #' )
 #' ambiguous <- as_glycan_structure(
-#'   paste0("{Neu5Ac(a2-3)|1,4}", main)
+#'   paste0("{Neu5Ac(a2-3)|2,5}", main)
 #' )
 #' glycans <- c(ambiguous = ambiguous, ordinary = as_glycan_structure(main))
 #' has_floating_parts(glycans)
 #' structure_floating_parts(ambiguous)
 #'
 #' localized <- as_glycan_structure(
-#'   "{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-"
+#'   "{Neu5Ac(a2-3)|2}Gal(b1-4)GlcNAc(b1-"
 #' )
 #' has_floating_parts(localized)
 #'
@@ -266,6 +270,22 @@ floating_main_vertices <- function(
   ))
 }
 
+floating_part_candidate_parents <- function(graph, part) {
+  if (length(part$parents) > 0) {
+    return(as.integer(part$parents))
+  }
+
+  as.integer(setdiff(seq_len(igraph::vcount(graph)), part$nodes))
+}
+
+floating_part_membership <- function(graph, parts) {
+  membership <- rep(NA_integer_, igraph::vcount(graph))
+  for (part_id in seq_along(parts)) {
+    membership[parts[[part_id]]$nodes] <- as.integer(part_id)
+  }
+  membership
+}
+
 floating_graph_info <- function(
   graph,
   parts = normalize_floating_parts(graph)
@@ -358,15 +378,13 @@ validate_floating_graph_shape <- function(graph) {
   for (part in parts) {
     if (
       length(part$parents) > 0 &&
-        any(!part$parents %in% info$main_vertices)
+        any(part$parents %in% part$nodes)
     ) {
       cli::cli_abort(
-        "Floating part parent indices must refer to vertices in the main tree."
+        "Floating part parent indices cannot refer to its own component."
       )
     }
   }
-
-  validate_floating_attachment_slots(graph, info)
 
   invisible(NULL)
 }
@@ -380,18 +398,19 @@ floating_linkage_acceptor_positions <- function(linkage) {
   unique(as.integer(strsplit(acceptor, "/", fixed = TRUE)[[1]]))
 }
 
-main_attachment_domains <- function(graph, main_vertices) {
+main_attachment_domains <- function(
+  graph,
+  vertices = seq_len(igraph::vcount(graph))
+) {
   if (igraph::ecount(graph) == 0) {
     return(list())
   }
 
   endpoints <- igraph::as_edgelist(graph, names = FALSE)
   linkages <- igraph::edge_attr(graph, "linkage")
-  is_main_edge <- endpoints[, 1] %in%
-    main_vertices &
-    endpoints[, 2] %in% main_vertices
+  included <- endpoints[, 1] %in% vertices & endpoints[, 2] %in% vertices
 
-  lapply(which(is_main_edge), function(edge_id) {
+  lapply(which(included), function(edge_id) {
     positions <- floating_linkage_acceptor_positions(linkages[[edge_id]])
     list(
       known = length(positions) > 0,
@@ -408,7 +427,7 @@ definitely_occupied_main_slots <- function(domains) {
 floating_attachment_domain <- function(
   part,
   part_id,
-  main_vertices,
+  candidate_parents,
   occupied_slots
 ) {
   positions <- floating_linkage_acceptor_positions(part$linkage)
@@ -417,7 +436,7 @@ floating_attachment_domain <- function(
   }
 
   explicit <- length(part$parents) > 0
-  parents <- if (explicit) part$parents else main_vertices
+  parents <- candidate_parents
   slots_by_parent <- lapply(parents, function(parent) {
     candidate_slots <- paste(parent, positions, sep = "\r")
     setdiff(candidate_slots, occupied_slots)
@@ -462,16 +481,14 @@ validate_floating_attachment_slots <- function(graph, info) {
     return(invisible(NULL))
   }
 
-  main_domains <- main_attachment_domains(
-    graph,
-    info$main_vertices
-  )
+  main_domains <- main_attachment_domains(graph)
   occupied_slots <- definitely_occupied_main_slots(main_domains)
   floating_domains <- lapply(seq_along(info$parts), function(part_id) {
+    part <- info$parts[[part_id]]
     floating_attachment_domain(
-      info$parts[[part_id]],
+      part,
       part_id,
-      info$main_vertices,
+      floating_part_candidate_parents(graph, part),
       occupied_slots
     )
   })
@@ -487,12 +504,210 @@ validate_floating_attachment_slots <- function(graph, info) {
   invisible(NULL)
 }
 
-component_sequence_order <- function(graph, vertices) {
+selected_floating_attachment_domain <- function(
+  part,
+  parent,
+  occupied_slots
+) {
+  positions <- floating_linkage_acceptor_positions(part$linkage)
+  if (length(positions) == 0) {
+    return(list(known = FALSE, slots = character()))
+  }
+
+  list(
+    known = TRUE,
+    slots = setdiff(paste(parent, positions, sep = "\r"), occupied_slots)
+  )
+}
+
+selected_floating_substituent_domain <- function(
+  substituent,
+  parent,
+  occupied_slots
+) {
+  position <- substituent_position_tokens(substituent$substituent)
+  if (identical(position, "?")) {
+    return(list(known = FALSE, slots = character()))
+  }
+  positions <- stringr::str_split(position, stringr::fixed("/"))[[1]]
+
+  list(
+    known = TRUE,
+    slots = setdiff(paste(parent, positions, sep = "\r"), occupied_slots)
+  )
+}
+
+floating_part_assignment_is_acyclic <- function(
+  parent_nodes,
+  membership
+) {
+  parent_parts <- membership[parent_nodes]
+  parent_parts[is.na(parent_parts)] <- 0L
+
+  for (part_id in seq_along(parent_parts)) {
+    current <- as.integer(part_id)
+    visited <- integer()
+    while (current != 0L) {
+      if (current %in% visited) {
+        return(FALSE)
+      }
+      visited <- c(visited, current)
+      current <- parent_parts[[current]]
+    }
+  }
+
+  TRUE
+}
+
+has_valid_floating_assignment <- function(
+  graph,
+  parts,
+  substituents
+) {
+  edge_domains <- main_attachment_domains(graph)
+  substituent_domains <- main_substituent_domains(graph)
+  fixed_domains <- c(edge_domains, substituent_domains)
+  occupied_slots <- definitely_occupied_main_slots(fixed_domains)
+
+  part_domains <- purrr::map(
+    parts,
+    ~ floating_part_candidate_parents(graph, .x)
+  )
+  floating_sub_domains <- purrr::map(
+    substituents,
+    ~ floating_substituent_candidate_parents(graph, .x)
+  )
+
+  for (part_id in seq_along(parts)) {
+    floating_attachment_domain(
+      parts[[part_id]],
+      part_id,
+      part_domains[[part_id]],
+      occupied_slots
+    )
+  }
+  for (substituent_id in seq_along(substituents)) {
+    floating_substituent_domain(
+      substituents[[substituent_id]],
+      substituent_id,
+      floating_sub_domains[[substituent_id]],
+      occupied_slots
+    )
+  }
+
+  membership <- floating_part_membership(graph, parts)
+  selected_parts <- integer(length(parts))
+  selected_substituents <- integer(length(substituents))
+
+  assignment_has_free_slots <- function() {
+    part_slot_domains <- purrr::map2(
+      parts,
+      selected_parts,
+      ~ selected_floating_attachment_domain(.x, .y, occupied_slots)
+    )
+    substituent_slot_domains <- purrr::map2(
+      substituents,
+      selected_substituents,
+      ~ selected_floating_substituent_domain(.x, .y, occupied_slots)
+    )
+
+    has_conflict_free_attachment_assignment(c(
+      fixed_domains,
+      part_slot_domains,
+      substituent_slot_domains
+    ))
+  }
+
+  assign_substituent <- function(substituent_id) {
+    if (substituent_id > length(floating_sub_domains)) {
+      return(assignment_has_free_slots())
+    }
+    for (parent in floating_sub_domains[[substituent_id]]) {
+      selected_substituents[[substituent_id]] <<- parent
+      if (assign_substituent(substituent_id + 1L)) {
+        return(TRUE)
+      }
+    }
+    FALSE
+  }
+
+  assign_part <- function(part_id) {
+    if (part_id > length(part_domains)) {
+      if (!floating_part_assignment_is_acyclic(selected_parts, membership)) {
+        return(FALSE)
+      }
+      return(assign_substituent(1L))
+    }
+    for (parent in part_domains[[part_id]]) {
+      selected_parts[[part_id]] <<- parent
+      if (assign_part(part_id + 1L)) {
+        return(TRUE)
+      }
+    }
+    FALSE
+  }
+
+  assign_part(1L)
+}
+
+validate_floating_metadata_assignments <- function(graph) {
+  if (
+    !any(
+      c("floating_parts", "floating_substituents") %in%
+        igraph::graph_attr_names(graph)
+    )
+  ) {
+    return(invisible(NULL))
+  }
+
+  parts <- normalize_floating_parts(graph)
+  substituents <- normalize_floating_substituents(graph)
+  if (length(parts) == 0 && length(substituents) == 0) {
+    return(invisible(NULL))
+  }
+
+  if (!has_valid_floating_assignment(graph, parts, substituents)) {
+    if (length(parts) > 0 && length(substituents) == 0) {
+      cli::cli_abort(c(
+        "Floating parts cannot be attached simultaneously.",
+        "x" = "No conflict-free acyclic assignment connects every floating component to the main tree."
+      ))
+    }
+    if (length(parts) == 0) {
+      cli::cli_abort(c(
+        "Floating substituents cannot be localized simultaneously.",
+        "x" = "No conflict-free assignment exists for the declared parent residues and carbon positions."
+      ))
+    }
+    cli::cli_abort(c(
+      "Floating parts and substituents cannot be localized simultaneously.",
+      "x" = "No conflict-free acyclic assignment exists for the declared parent domains."
+    ))
+  }
+
+  invisible(NULL)
+}
+
+component_sequence_order <- function(
+  graph,
+  vertices,
+  symmetry_labels = NULL
+) {
   subgraph <- igraph::induced_subgraph(graph, vertices)
   subgraph <- delete_floating_parts_attr(subgraph)
   subgraph <- delete_floating_substituents_attr(subgraph)
   cache <- build_seq_cache(subgraph)
-  order <- seq_glycan_order(cache$root, cache)
+  order <- if (is.null(symmetry_labels)) {
+    seq_glycan_order(cache$root, cache)
+  } else {
+    graph_names <- igraph::V(graph)$name
+    subgraph_vertices <- match(igraph::V(subgraph)$name, graph_names)
+    seq_glycan_order_with_floating_symmetry(
+      cache$root,
+      cache,
+      symmetry_labels[subgraph_vertices]
+    )
+  }
 
   vertex_names <- igraph::V(subgraph)$name[order$vertices]
   edge_table <- igraph::as_data_frame(subgraph, what = "edges")
@@ -510,53 +725,77 @@ component_sequence_order <- function(graph, vertices) {
   )
 }
 
-resolve_single_parent_floating_parts <- function(graph) {
-  parts <- normalize_floating_parts(graph)
-  if (length(parts) == 0) {
-    return(graph)
-  }
-
-  main_vertices <- floating_main_vertices(graph, parts)
-  candidate_parents <- purrr::map(parts, function(part) {
-    if (length(part$parents) > 0) {
-      part$parents
-    } else {
-      main_vertices
-    }
-  })
-  resolved <- lengths(candidate_parents) == 1
-  if (!any(resolved)) {
-    return(graph)
-  }
-
-  graph <- materialize_unrestricted_floating_substituents(
-    graph,
-    main_vertices
-  )
-
-  for (part_id in which(resolved)) {
+attach_floating_parts <- function(
+  graph,
+  parts,
+  part_ids,
+  parent_nodes
+) {
+  for (selection_id in seq_along(part_ids)) {
+    part_id <- part_ids[[selection_id]]
     part <- parts[[part_id]]
     graph <- igraph::add_edges(
       graph,
-      c(candidate_parents[[part_id]][[1]], part$root),
+      c(parent_nodes[[selection_id]], part$root),
       linkage = part$linkage
     )
   }
 
-  remaining <- parts[!resolved]
+  remaining <- parts[-part_ids]
   if (length(remaining) == 0) {
     return(delete_floating_parts_attr(graph))
   }
 
-  # An unrestricted part refers to every node in the original main tree.
-  # Materialize that domain before resolved components enlarge the main tree.
-  remaining <- purrr::map(remaining, function(part) {
-    if (length(part$parents) == 0) {
-      part$parents <- main_vertices
+  membership <- igraph::components(graph, mode = "weak")$membership
+  remaining_components <- membership[purrr::map_int(remaining, "root")]
+  if (anyDuplicated(remaining_components) > 0) {
+    cli::cli_abort(
+      "Selected floating-part assignments merge unresolved component roots."
+    )
+  }
+
+  remaining <- purrr::map2(
+    remaining,
+    remaining_components,
+    function(part, component) {
+      part$nodes <- as.integer(which(membership == component))
+      if (length(part$parents) > 0) {
+        part$parents <- setdiff(part$parents, part$nodes)
+        if (length(part$parents) == 0) {
+          cli::cli_abort(
+            "Selected floating-part assignments leave an explicit parent domain empty."
+          )
+        }
+      }
+      part
     }
-    part
-  })
+  )
   set_floating_parts_attr(graph, remaining)
+}
+
+resolve_single_parent_floating_parts <- function(graph) {
+  repeat {
+    parts <- normalize_floating_parts(graph)
+    if (length(parts) == 0) {
+      return(graph)
+    }
+
+    candidate_parents <- purrr::map(
+      parts,
+      ~ floating_part_candidate_parents(graph, .x)
+    )
+    resolved <- which(lengths(candidate_parents) == 1)
+    if (length(resolved) == 0) {
+      return(graph)
+    }
+
+    graph <- attach_floating_parts(
+      graph,
+      parts,
+      resolved,
+      purrr::map_int(candidate_parents[resolved], 1L)
+    )
+  }
 }
 
 canonicalize_floating_graph <- function(graph) {
@@ -570,73 +809,84 @@ canonicalize_floating_graph <- function(graph) {
 
   parts <- normalize_floating_parts(graph)
   substituents <- normalize_floating_substituents(graph)
-  info <- list(
-    main_vertices = floating_metadata_main_vertices(graph, parts),
-    parts = parts,
-    substituents = substituents
+  main_vertices <- floating_metadata_main_vertices(graph, parts)
+  labels <- floating_augmented_structure_labels(
+    graph,
+    parts,
+    substituents,
+    main_vertices
   )
   original_names <- igraph::V(graph)$name
 
-  main_order <- floating_symmetry_main_order(graph, info)
-  main_names <- original_names[main_order$vertices]
-  main_index <- stats::setNames(seq_along(main_names), main_names)
+  main_order <- component_sequence_order(
+    graph,
+    main_vertices,
+    labels$vertices
+  )
 
-  floating_orders <- purrr::map(
+  floating_orders <- purrr::map2(
     parts,
-    function(part) {
+    seq_along(parts),
+    function(part, part_id) {
       order <- component_sequence_order(
         graph,
-        part$nodes
+        part$nodes,
+        labels$vertices
       )
-      parent_names <- original_names[part$parents]
-      parents <- unname(main_index[parent_names])
-      parents <- sort(as.integer(parents))
-      suffix <- if (length(parents) == 0) {
-        ""
-      } else {
-        paste0("|", paste(parents, collapse = ","))
-      }
 
       list(
+        part_id = as.integer(part_id),
         order = order,
         linkage = part$linkage,
-        parents = parents,
-        key = paste0(
-          "{",
+        parents = part$parents,
+        key = paste(
           order$iupac,
-          "(",
           part$linkage,
-          ")",
-          suffix,
-          "}"
-        )
+          if (length(part$parents) == 0) "all" else "explicit",
+          paste(
+            sort(labels$vertices[
+              floating_part_candidate_parents(graph, part)
+            ]),
+            collapse = ","
+          ),
+          sep = "\r"
+        ),
+        label = labels$parts[[part_id]]
       )
     }
   )
 
-  floating_order <- order(purrr::map_chr(floating_orders, "key"))
+  floating_order <- order(
+    purrr::map_chr(floating_orders, "key"),
+    purrr::map_int(floating_orders, "label")
+  )
   floating_orders <- floating_orders[floating_order]
 
-  floating_substituent_orders <- purrr::map(
+  floating_substituent_orders <- purrr::map2(
     substituents,
-    function(substituent) {
-      parent_names <- original_names[substituent$parents]
-      parents <- unname(main_index[parent_names])
-      parents <- sort(as.integer(parents))
-      suffix <- if (length(parents) == 0) {
-        ""
-      } else {
-        paste0("|", paste(parents, collapse = ","))
-      }
+    seq_along(substituents),
+    function(substituent, substituent_id) {
       list(
         substituent = substituent$substituent,
-        parents = parents,
-        key = paste0("{", substituent$substituent, suffix, "}")
+        parents = substituent$parents,
+        key = paste(
+          substituent$substituent,
+          if (length(substituent$parents) == 0) "all" else "explicit",
+          paste(
+            sort(labels$vertices[
+              floating_substituent_candidate_parents(graph, substituent)
+            ]),
+            collapse = ","
+          ),
+          sep = "\r"
+        ),
+        label = labels$substituents[[substituent_id]]
       )
     }
   )
   floating_substituent_order <- order(
-    purrr::map_chr(floating_substituent_orders, "key")
+    purrr::map_chr(floating_substituent_orders, "key"),
+    purrr::map_int(floating_substituent_orders, "label")
   )
   floating_substituent_orders <- floating_substituent_orders[
     floating_substituent_order
@@ -653,6 +903,9 @@ canonicalize_floating_graph <- function(graph) {
   vertex_order <- c(floating_vertices, main_order$vertices)
   edge_order <- c(floating_edges, main_order$edges)
 
+  ordered_names <- original_names[vertex_order]
+  canonical_index <- stats::setNames(seq_along(ordered_names), ordered_names)
+
   graph <- delete_floating_parts_attr(graph)
   graph <- delete_floating_substituents_attr(graph)
   graph <- .reorder_by_sequence_order(
@@ -660,23 +913,17 @@ canonicalize_floating_graph <- function(graph) {
     list(vertices = vertex_order, edges = edge_order)
   )
 
-  floating_size <- length(floating_vertices)
-  offset <- 0L
   canonical_parts <- vector("list", length(floating_orders))
   for (i in seq_along(floating_orders)) {
     floating <- floating_orders[[i]]
-    component_size <- length(floating$order$vertices)
-    root_position <- match(
-      floating$order$root_name,
-      original_names[floating$order$vertices]
-    )
+    node_names <- original_names[floating$order$vertices]
+    parent_names <- original_names[floating$parents]
     canonical_parts[[i]] <- list(
-      root = as.integer(offset + root_position),
-      nodes = as.integer(offset + seq_len(component_size)),
+      root = as.integer(canonical_index[[floating$order$root_name]]),
+      nodes = as.integer(unname(canonical_index[node_names])),
       linkage = floating$linkage,
-      parents = as.integer(floating_size + floating$parents)
+      parents = sort(as.integer(unname(canonical_index[parent_names])))
     )
-    offset <- offset + component_size
   }
 
   graph <- set_floating_parts_attr(graph, canonical_parts)
@@ -685,7 +932,9 @@ canonicalize_floating_graph <- function(graph) {
     function(substituent) {
       list(
         substituent = substituent$substituent,
-        parents = as.integer(floating_size + substituent$parents)
+        parents = sort(as.integer(unname(canonical_index[
+          original_names[substituent$parents]
+        ])))
       )
     }
   )
@@ -694,8 +943,7 @@ canonicalize_floating_graph <- function(graph) {
 
 floating_part_iupac <- function(
   graph,
-  part,
-  main_vertices
+  part
 ) {
   subgraph <- igraph::induced_subgraph(graph, part$nodes)
   subgraph <- delete_floating_parts_attr(subgraph)
@@ -704,8 +952,7 @@ floating_part_iupac <- function(
   parents <- if (length(part$parents) == 0) {
     ""
   } else {
-    main_parent_indices <- match(part$parents, main_vertices)
-    paste0("|", paste(main_parent_indices, collapse = ","))
+    paste0("|", paste(part$parents, collapse = ","))
   }
 
   paste0(

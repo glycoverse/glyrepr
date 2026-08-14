@@ -1,14 +1,14 @@
-# Canonicalize main-tree ties using explicit floating parent sets.
+# Canonicalize complete floating forests and their parent constraints.
 
 #' Order a Main Glycan Tree with Floating-Parent Symmetry
 #'
-#' Resolve otherwise indistinguishable main-tree branch orderings using all
-#' explicit floating-part parent sets jointly. This keeps parent indices stable
-#' across vertex and edge permutations without collapsing relationships between
-#' multiple floating parts.
+#' Resolve otherwise indistinguishable main-tree branch orderings using every
+#' component, floating-part parent relation, and floating substituent jointly.
+#' This keeps complete-sequence parent indices stable across vertex, edge,
+#' component, and metadata permutations.
 #'
 #' @param graph A validated glycan forest with vertex names.
-#' @param info Floating-part metadata and main-tree vertex indices.
+#' @param info Complete floating metadata and main-tree vertex indices.
 #'
 #' @returns A sequence-order list in the same form as
 #'   `component_sequence_order()`.
@@ -18,37 +18,151 @@ floating_symmetry_main_order <- function(graph, info) {
   if (is.null(substituents)) {
     substituents <- list()
   }
-  has_explicit_parents <- purrr::some(info$parts, ~ length(.x$parents) > 0) ||
-    purrr::some(substituents, ~ length(.x$parents) > 0)
-  if (!has_explicit_parents) {
-    return(component_sequence_order(graph, info$main_vertices))
-  }
+  labels <- floating_augmented_structure_labels(
+    graph,
+    info$parts,
+    substituents,
+    info$main_vertices
+  )
+  component_sequence_order(
+    graph,
+    info$main_vertices,
+    labels$vertices
+  )
+}
 
-  main <- igraph::induced_subgraph(graph, info$main_vertices)
-  main <- delete_floating_parts_attr(main)
-  main <- delete_floating_substituents_attr(main)
-  symmetry_labels <- floating_augmented_main_labels(graph, main, info)
+floating_augmented_structure_labels <- function(
+  graph,
+  parts,
+  substituents,
+  main_vertices
+) {
+  vertex_count <- igraph::vcount(graph)
+  edge_count <- igraph::ecount(graph)
+  part_count <- length(parts)
+  substituent_count <- length(substituents)
 
-  cache <- build_seq_cache(main)
-  order <- seq_glycan_order_with_floating_symmetry(
-    cache$root,
-    cache,
-    symmetry_labels
+  membership <- floating_part_membership(graph, parts)
+  indegree <- igraph::degree(graph, mode = "in")
+  part_roots <- purrr::map_int(parts, "root")
+  roles <- rep("floating-node", vertex_count)
+  roles[main_vertices] <- "main-node"
+  roles[intersect(which(indegree == 0), main_vertices)] <- "main-root"
+  roles[part_roots] <- "floating-root"
+  color_keys <- paste(
+    "residue",
+    roles,
+    igraph::V(graph)$mono,
+    igraph::V(graph)$sub,
+    sep = "\r"
   )
 
-  vertex_names <- igraph::V(main)$name[order$vertices]
-  edge_table <- igraph::as_data_frame(main, what = "edges")
-  edge_keys <- paste(edge_table$from, edge_table$to, sep = "\r")
-  ordered_edge_keys <- edge_keys[order$edges]
+  edge_nodes <- vertex_count + seq_len(edge_count)
+  if (edge_count > 0) {
+    color_keys <- c(
+      color_keys,
+      paste("glycan-edge", igraph::E(graph)$linkage, sep = "\r")
+    )
+  }
+  part_nodes <- vertex_count + edge_count + seq_len(part_count)
+  if (part_count > 0) {
+    color_keys <- c(
+      color_keys,
+      paste(
+        "floating-part",
+        purrr::map_chr(parts, "linkage"),
+        sep = "\r"
+      )
+    )
+  }
+  substituent_nodes <-
+    vertex_count + edge_count + part_count + seq_len(substituent_count)
+  if (substituent_count > 0) {
+    color_keys <- c(
+      color_keys,
+      paste(
+        "floating-substituent",
+        purrr::map_chr(substituents, "substituent"),
+        sep = "\r"
+      )
+    )
+  }
 
-  graph_edges <- igraph::as_data_frame(graph, what = "edges")
-  graph_edge_keys <- paste(graph_edges$from, graph_edges$to, sep = "\r")
+  augmented_edges <- integer()
+  if (edge_count > 0) {
+    endpoints <- igraph::as_edgelist(graph, names = FALSE)
+    augmented_edges <- c(
+      augmented_edges,
+      as.integer(rbind(
+        endpoints[, 1],
+        edge_nodes,
+        edge_nodes,
+        endpoints[, 2]
+      ))
+    )
+  }
+
+  add_relation <- function(constraint, target, relation) {
+    relation_node <- length(color_keys) + 1L
+    color_keys <<- c(color_keys, relation)
+    augmented_edges <<- c(
+      augmented_edges,
+      constraint,
+      relation_node,
+      relation_node,
+      target
+    )
+  }
+
+  for (part_id in seq_along(parts)) {
+    part <- parts[[part_id]]
+    add_relation(
+      part_nodes[[part_id]],
+      part$root,
+      "floating-part-root"
+    )
+    candidates <- floating_part_candidate_parents(graph, part)
+    for (parent in candidates) {
+      add_relation(
+        part_nodes[[part_id]],
+        parent,
+        "floating-part-parent"
+      )
+    }
+  }
+  for (substituent_id in seq_along(substituents)) {
+    substituent <- substituents[[substituent_id]]
+    candidates <- floating_substituent_candidate_parents(graph, substituent)
+    for (parent in candidates) {
+      add_relation(
+        substituent_nodes[[substituent_id]],
+        parent,
+        "floating-substituent-parent"
+      )
+    }
+  }
+
+  augmented <- igraph::make_empty_graph(
+    length(color_keys),
+    directed = FALSE
+  )
+  if (length(augmented_edges) > 0) {
+    augmented <- igraph::add_edges(augmented, augmented_edges)
+  }
+  colors <- match(
+    color_keys,
+    sort(unique(color_keys), method = "radix")
+  )
+  labels <- igraph::canonical_permutation(
+    augmented,
+    colors = colors
+  )$labeling
 
   list(
-    vertices = match(vertex_names, igraph::V(graph)$name),
-    edges = match(ordered_edge_keys, graph_edge_keys),
-    iupac = seq_glycan_iupac(cache$root, cache),
-    root_name = igraph::V(main)$name[cache$root]
+    vertices = as.integer(labels[seq_len(vertex_count)]),
+    parts = as.integer(labels[part_nodes]),
+    substituents = as.integer(labels[substituent_nodes]),
+    membership = membership
   )
 }
 
@@ -154,8 +268,7 @@ floating_augmented_main_labels <- function(graph, main, info) {
         "floating-parent-set",
         floating_part_iupac(
           graph,
-          part,
-          info$main_vertices
+          part
         ),
         sep = "\r"
       )

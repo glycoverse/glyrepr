@@ -89,20 +89,22 @@ attribute, a list with one entry per floating component. Each entry contains:
 \item \code{root}: the integer vertex index of the floating component root.
 \item \code{nodes}: all integer vertex indices in the floating component, ordered as
 the component appears in the complete IUPAC-condensed sequence.
-\item \code{linkage}: the virtual linkage from that root to the main tree.
-\item \code{parents}: integer vertex indices in the main tree. An empty integer vector
-means that all feasible main-tree nodes are candidates.
+\item \code{linkage}: the virtual linkage from that root to its unresolved parent.
+\item \code{parents}: integer vertex indices outside the floating component. An empty
+integer vector means that all feasible nodes outside the component are
+candidates.
 }
 
 Canonical graphs always contain \code{nodes}. For backward compatibility, input
 graphs may omit it; \code{\link[=glycan_structure]{glycan_structure()}} derives the component membership
 before validation and stores \code{nodes} in the canonical result.
 
-During canonicalization, a floating part with exactly one candidate parent
-is attached to that parent as an ordinary graph edge. This includes an empty
-\code{parents} vector when the main tree has only one node. Only unresolved
-attachments retain floating metadata, where the virtual attachment is
-metadata rather than an edge and contributes to the canonical structure key.
+During canonicalization, a floating part with exactly one effective
+candidate parent is attached to that parent as an ordinary graph edge.
+Attachments between floating components merge their \code{nodes} metadata and
+can resolve further singleton domains. Only unresolved attachments retain
+floating metadata, where the virtual attachment is metadata rather than an
+edge and contributes to the canonical structure key.
 }
 
 \subsection{Floating Substituents}{
@@ -113,13 +115,14 @@ one entry per substituent. Each entry contains:
 \itemize{
 \item \code{substituent}: one canonical substituent token such as \code{"6S"}, \code{"4/6Ac"},
 or \code{"?Me"}.
-\item \code{parents}: integer vertex indices in the main tree. An empty integer vector
-means that all feasible main-tree nodes are candidates.
+\item \code{parents}: integer residue vertex indices in the complete structure. An
+empty integer vector means that all feasible residue nodes are candidates.
 }
 
 A singleton candidate is normalized into the corresponding vertex's \code{sub}
 attribute. Candidate parents must permit a conflict-free assignment of
-occupied carbon positions.
+occupied carbon positions. Floating-part assignments must also be acyclic
+and connect every floating component to the main tree.
 }
 }
 
@@ -133,10 +136,10 @@ and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".
 For a floating structure, floating-component vertices and edges precede the
 main tree, exactly as their brace-enclosed components precede the main glycan
 in the complete IUPAC-condensed string. Parent indices written inside braces
-are local to the main tree, while \code{floating_parts$parents} stores the
-corresponding global graph vertex indices. The same rule applies to
-\code{floating_substituents$parents}. A virtual floating attachment is not an
-edge, and a floating substituent is not a vertex.
+and stored in \code{floating_parts$parents} or \code{floating_substituents$parents}
+use this same global order. Substituent blocks contribute no vertex indices.
+A virtual floating attachment is not an edge, and a floating substituent is
+not a vertex.
 }
 
 \section{NA Support}{
@@ -191,7 +194,7 @@ print(complex_struct)
 
 # Example 4: Parse a floating part with explicit candidate parents
 floating <- as_glycan_structure(
-  "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
+  "{Neu5Ac(a2-3)|2,3}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
 )
 structure_floating_parts(floating)
 
