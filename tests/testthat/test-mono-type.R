@@ -93,7 +93,7 @@ test_that("convert_to_generic works with glycan structures", {
 
 test_that("convert_to_generic works with glycan graphs without reordering", {
   structure <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
   graph <- get_structure_graphs(structure)
   names_before <- igraph::V(graph)$name

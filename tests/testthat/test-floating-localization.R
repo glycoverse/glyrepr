@@ -1,8 +1,8 @@
 test_that("localize_floating_parts attaches selected parts", {
   glycans <- as_glycan_structure(c(
     floating = paste0(
-      "{Fuc(a1-2)|1,2}",
-      "{Neu5Ac(a2-6)|1,2}",
+      "{Fuc(a1-2)|3,4}",
+      "{Neu5Ac(a2-6)|3,4}",
       "Gal(b1-3)GalNAc(a1-"
     ),
     missing = NA,
@@ -54,8 +54,8 @@ test_that("localize_floating_parts localizes unrestricted parts", {
 test_that("localize_floating_parts remaps remaining parent indices", {
   glycan <- as_glycan_structure(
     paste0(
-      "{Fuc(a1-2)|1,2}",
-      "{Neu5Ac(a2-6)|1,2}",
+      "{Fuc(a1-2)|3,4}",
+      "{Neu5Ac(a2-6)|3,4}",
       "Gal(b1-3)GalNAc(a1-"
     )
   )
@@ -71,7 +71,7 @@ test_that("localize_floating_parts remaps remaining parent indices", {
 
   expect_identical(
     as.character(localized),
-    "{Fuc(a1-2)|2,3}Neu5Ac(a2-6)Gal(b1-3)GalNAc(a1-"
+    "{Fuc(a1-2)|3,4}Neu5Ac(a2-6)Gal(b1-3)GalNAc(a1-"
   )
   expect_identical(
     structure_floating_parts(localized)$parents,
@@ -82,8 +82,8 @@ test_that("localize_floating_parts remaps remaining parent indices", {
 test_that("localize_floating_parts preserves graph vertex IDs", {
   structure <- as_glycan_structure(
     paste0(
-      "{Fuc(a1-2)|1,2}",
-      "{Neu5Ac(a2-6)|1,2}",
+      "{Fuc(a1-2)|3,4}",
+      "{Neu5Ac(a2-6)|3,4}",
       "Gal(b1-3)GalNAc(a1-"
     )
   )
@@ -117,10 +117,10 @@ test_that("localize_floating_parts preserves graph vertex IDs", {
   )
 })
 
-test_that("graph localization keeps unrestricted domains on the original main tree", {
+test_that("graph localization keeps unrestricted whole-graph domains", {
   structure <- as_glycan_structure(
     paste0(
-      "{Fuc(a1-2)|1,2}",
+      "{Fuc(a1-2)|2,3}",
       "{Neu5Ac(a2-6)}",
       "Gal(b1-3)GalNAc(a1-"
     )
@@ -149,16 +149,16 @@ test_that("graph localization keeps unrestricted domains on the original main tr
       root = 2L,
       nodes = 2L,
       linkage = "a2-6",
-      parents = c(3L, 4L)
+      parents = integer()
     ))
   )
 })
 
-test_that("part localization keeps substituent domains on the original main tree", {
+test_that("part localization keeps unrestricted substituent domains", {
   structure <- as_glycan_structure(
     paste0(
       "{6S}",
-      "{Fuc(a1-2)|1,2}",
+      "{Fuc(a1-2)|2,3}",
       "Gal(a1-3)Glc(a1-"
     )
   )
@@ -172,11 +172,11 @@ test_that("part localization keeps substituent domains on the original main tree
 
   expect_identical(
     as.character(localized),
-    "{6S|2,3}Fuc(a1-2)Gal(a1-3)Glc(a1-"
+    "{6S}Fuc(a1-2)Gal(a1-3)Glc(a1-"
   )
   expect_identical(
     structure_floating_substituents(localized)$parents,
-    list(c(2L, 3L))
+    list(integer())
   )
 
   graph <- get_structure_graphs(structure)
@@ -186,17 +186,17 @@ test_that("part localization keeps substituent domains on the original main tree
   expect_identical(igraph::V(graph_localized)$name, names_before)
   expect_identical(
     graph_localized$floating_substituents,
-    list(list(substituent = "6S", parents = c(2L, 3L)))
+    list(list(substituent = "6S", parents = integer()))
   )
   expect_identical(
     structure_floating_candidates(graph_localized)$parent_node,
-    c(2L, 3L)
+    c(1L, 2L, 3L)
   )
 })
 
 test_that("localize_floating_parts returns an unchanged graph for no assignments", {
   graph <- get_structure_graphs(as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   ))
   assignments <- tibble::tibble(
     glycan_id = integer(),
@@ -209,7 +209,7 @@ test_that("localize_floating_parts returns an unchanged graph for no assignments
 
 test_that("localize_floating_parts returns x for no assignments", {
   glycan <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
   assignments <- tibble::tibble(
     glycan_id = integer(),
@@ -225,7 +225,7 @@ test_that("localize_floating_parts returns x for no assignments", {
 
 test_that("localize_floating_parts validates assignment tables", {
   glycan <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
 
   expect_snapshot(
@@ -258,7 +258,7 @@ test_that("localize_floating_parts validates assignment tables", {
 
 test_that("localize_floating_parts rejects invalid targets", {
   glycans <- as_glycan_structure(c(
-    restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+    restricted = "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-",
     missing = NA,
     ordinary = "Gal(a1-"
   ))
@@ -301,8 +301,8 @@ test_that("localize_floating_parts rejects invalid targets", {
 test_that("localize_floating_parts validates simultaneous slot conflicts", {
   glycan <- as_glycan_structure(
     paste0(
-      "{Fuc(a1-3)|1,2}",
-      "{Neu5Ac(a2-3)|1,2}",
+      "{Fuc(a1-3)|3,4}",
+      "{Neu5Ac(a2-3)|3,4}",
       "Gal(b1-4)GalNAc(a1-"
     )
   )
@@ -341,8 +341,8 @@ test_that("localize_floating_parts checks occupied main-tree slots", {
 test_that("enumerate_floating_localizations returns every valid variant", {
   glycan <- as_glycan_structure(
     paste0(
-      "{Fuc(a1-3)|1,2}",
-      "{Neu5Ac(a2-3)|1,2}",
+      "{Fuc(a1-3)|3,4}",
+      "{Neu5Ac(a2-3)|3,4}",
       "Gal(b1-4)GalNAc(a1-"
     )
   )
@@ -370,9 +370,71 @@ test_that("enumerate_floating_localizations returns every valid variant", {
   ))
 })
 
+test_that("enumeration permits parents on other floating parts", {
+  glycan <- as_glycan_structure(
+    "{Man(a1-?)}{Man(a1-?)}Man(a1-"
+  )
+  graph <- get_structure_graphs(glycan)
+
+  graph_variants <- enumerate_floating_graph_localizations(graph)
+  all_variants <- enumerate_floating_localizations(
+    glycan,
+    deduplicate = FALSE
+  )
+  unique_variants <- enumerate_floating_localizations(glycan)
+
+  expect_identical(nrow(graph_variants), 3L)
+  expect_identical(nrow(all_variants), 3L)
+  expect_identical(
+    sort(purrr::map_chr(
+      graph_variants$assignments,
+      ~ paste(.x$parent_node, collapse = ",")
+    )),
+    c("2,3", "3,1", "3,3")
+  )
+  expect_identical(
+    as.character(unique_variants$structure),
+    c(
+      "Man(a1-?)Man(a1-?)Man(a1-",
+      "Man(a1-?)[Man(a1-?)]Man(a1-"
+    )
+  )
+})
+
+test_that("partial localization merges floating components", {
+  glycan <- as_glycan_structure(
+    "{Man(a1-?)}{Man(a1-?)}Man(a1-"
+  )
+  assignments <- tibble::tibble(
+    glycan_id = 1L,
+    part_id = 1L,
+    parent_node = 2L
+  )
+
+  localized <- localize_floating_parts(glycan, assignments)
+  graph <- localize_floating_parts(
+    get_structure_graphs(glycan),
+    assignments
+  )
+
+  expect_identical(
+    as.character(localized),
+    "Man(a1-?)Man(a1-?)Man(a1-"
+  )
+  expect_identical(
+    graph$floating_parts,
+    list(list(
+      root = 2L,
+      nodes = c(1L, 2L),
+      linkage = "a1-?",
+      parents = integer()
+    ))
+  )
+})
+
 test_that("enumerate_floating_localizations handles ambiguous linkages", {
   glycan <- as_glycan_structure(
-    "{Neu5Ac(a2-3/6)|1,2}Gal(b1-4)GalNAc(a1-"
+    "{Neu5Ac(a2-3/6)|2,3}Gal(b1-4)GalNAc(a1-"
   )
 
   variants <- enumerate_floating_localizations(glycan)
@@ -404,7 +466,7 @@ test_that("enumerate_floating_localizations filters occupied slots", {
 test_that("enumerate_floating_localizations deduplicates canonical variants", {
   glycan <- as_glycan_structure(
     paste0(
-      "{Neu5Ac(a2-3)|1,2}",
+      "{Neu5Ac(a2-3)|2,3}",
       "Gal(??-?)[Gal(??-?)]GlcNAc(??-"
     )
   )
@@ -419,7 +481,7 @@ test_that("enumerate_floating_localizations deduplicates canonical variants", {
 test_that("enumerate_floating_localizations can retain assignment provenance", {
   glycan <- as_glycan_structure(
     paste0(
-      "{Neu5Ac(a2-3)|1,2}",
+      "{Neu5Ac(a2-3)|2,3}",
       "Gal(??-?)[Gal(??-?)]GlcNAc(??-"
     )
   )
@@ -471,8 +533,8 @@ test_that("enumerate_floating_localizations localizes substituents", {
 test_that("enumerate_floating_localizations validates mixed metadata", {
   glycan <- as_glycan_structure(
     paste0(
-      "{6S|1,2}",
-      "{Fuc(a1-6)|1,2}",
+      "{6S|2,3}",
+      "{Fuc(a1-6)|2,3}",
       "Gal(a1-3)Glc(a1-"
     )
   )
@@ -534,7 +596,7 @@ test_that("graph localization materializes floating substituents", {
 test_that("graph localizations preserve original vertex IDs", {
   glycan <- as_glycan_structure(
     paste0(
-      "{Neu5Ac(a2-3)|1,2}",
+      "{Neu5Ac(a2-3)|2,3}",
       "Gal(??-?)[Gal(??-?)]GlcNAc(??-"
     )
   )
@@ -626,8 +688,8 @@ test_that("graph localization validates inputs and its conservative bound", {
   graph <- get_structure_graphs(
     as_glycan_structure(
       paste0(
-        "{Fuc(a1-3)|1,2}",
-        "{Neu5Ac(a2-3)|1,2}",
+        "{Fuc(a1-3)|3,4}",
+        "{Neu5Ac(a2-3)|3,4}",
         "Gal(b1-4)GalNAc(a1-"
       )
     ),
@@ -648,7 +710,7 @@ test_that("enumerate_floating_localizations retains every input position", {
   glycans <- as_glycan_structure(c(
     missing = NA,
     ordinary = "Gal(a1-",
-    floating = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    floating = "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   ))
 
   variants <- enumerate_floating_localizations(glycans)
@@ -683,8 +745,8 @@ test_that("enumerate_floating_localizations handles empty vectors", {
 test_that("enumerate_floating_localizations enforces a conservative bound", {
   glycan <- as_glycan_structure(
     paste0(
-      "{Fuc(a1-3)|1,2}",
-      "{Neu5Ac(a2-3)|1,2}",
+      "{Fuc(a1-3)|3,4}",
+      "{Neu5Ac(a2-3)|3,4}",
       "Gal(b1-4)GalNAc(a1-"
     )
   )

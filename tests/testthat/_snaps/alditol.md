@@ -47,7 +47,7 @@
 ---
 
     Code
-      as_glycan_structure("{Gal-ol(b1-4)|1}Glc(a1-")
+      as_glycan_structure("{Gal-ol(b1-4)|2}Glc(a1-")
     Condition
       Error in `purrr::map()`:
       i In index: 1.

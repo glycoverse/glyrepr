@@ -200,7 +200,7 @@ test_that("low-level graph pipeline supports annotated floating parts", {
   )
   expect_identical(
     graph_to_iupac(result),
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
 })
 

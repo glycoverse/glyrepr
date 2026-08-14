@@ -6,19 +6,21 @@
 #' parent residue is unresolved.
 #'
 #' In the `glyrepr` IUPAC extension, floating substituents appear in braces
-#' before the main glycan. `{6S}<main>` allows every feasible main-tree residue
-#' to carry the substituent, `{6S|1,2}<main>` restricts it to main-tree residues
-#' 1 and 2, and `{?S}<main>` also leaves the carbon position unknown.
+#' before the main glycan. `{6S}<main>` allows every feasible residue in the
+#' complete structure to carry the substituent, `{6S|1,2}<main>` restricts it
+#' to complete-sequence nodes 1 and 2, and `{?S}<main>` also leaves the carbon
+#' position unknown. Residue nodes in floating blocks are counted before the
+#' main glycan; substituent blocks contribute no node indices.
 #'
 #' Internally, unresolved substituents are stored in the
 #' `floating_substituents` graph attribute. It is a list with one entry per
 #' substituent. Each entry contains a canonical `substituent` token and an
-#' integer `parents` vector of candidate main-tree vertex indices. An empty
-#' vector means every feasible main-tree vertex is a candidate.
+#' integer `parents` vector of candidate graph vertex indices. An empty vector
+#' means every feasible residue vertex is a candidate.
 #'
 #' A singleton candidate set is normalized into that vertex's ordinary `sub`
-#' attribute. This also happens for an unrestricted floating substituent when
-#' the main tree has only one residue.
+#' attribute. This also happens whenever chemistry leaves only one feasible
+#' residue in the complete structure.
 #' [structure_floating_substituents()] exposes the metadata as a normalized
 #' table.
 #'
@@ -194,24 +196,23 @@ validate_floating_substituent_parents <- function(graph) {
     return(invisible(NULL))
   }
 
-  main_vertices <- floating_metadata_main_vertices(graph)
-  for (substituent in substituents) {
-    if (
-      length(substituent$parents) > 0 &&
-        any(!substituent$parents %in% main_vertices)
-    ) {
-      cli::cli_abort(
-        "Floating substituent parent indices must refer to vertices in the main tree."
-      )
-    }
-  }
-
   invisible(NULL)
 }
 
-main_substituent_domains <- function(graph, main_vertices) {
+floating_substituent_candidate_parents <- function(graph, substituent) {
+  if (length(substituent$parents) > 0) {
+    return(as.integer(substituent$parents))
+  }
+
+  as.integer(seq_len(igraph::vcount(graph)))
+}
+
+main_substituent_domains <- function(
+  graph,
+  vertices = seq_len(igraph::vcount(graph))
+) {
   domains <- list()
-  for (vertex in main_vertices) {
+  for (vertex in vertices) {
     sub <- igraph::vertex_attr(graph, "sub", index = vertex)
     if (identical(sub, "")) {
       next
@@ -235,7 +236,7 @@ main_substituent_domains <- function(graph, main_vertices) {
 floating_substituent_domain <- function(
   substituent,
   substituent_id,
-  main_vertices,
+  candidate_parents,
   occupied_slots
 ) {
   position <- substituent_position_tokens(substituent$substituent)
@@ -245,7 +246,7 @@ floating_substituent_domain <- function(
 
   positions <- stringr::str_split(position, stringr::fixed("/"))[[1]]
   explicit <- length(substituent$parents) > 0
-  parents <- if (explicit) substituent$parents else main_vertices
+  parents <- candidate_parents
   slots_by_parent <- lapply(parents, function(parent) {
     candidate_slots <- paste(parent, positions, sep = "\r")
     setdiff(candidate_slots, occupied_slots)
@@ -274,28 +275,29 @@ validate_floating_substituent_slots <- function(graph) {
   }
 
   parts <- normalize_floating_parts(graph)
-  main_vertices <- floating_metadata_main_vertices(graph, parts)
-  main_edge_domains <- main_attachment_domains(graph, main_vertices)
-  main_sub_domains <- main_substituent_domains(graph, main_vertices)
+  main_edge_domains <- main_attachment_domains(graph)
+  main_sub_domains <- main_substituent_domains(graph)
   occupied_slots <- definitely_occupied_main_slots(c(
     main_edge_domains,
     main_sub_domains
   ))
   floating_part_domains <- lapply(seq_along(parts), function(part_id) {
+    part <- parts[[part_id]]
     floating_attachment_domain(
-      parts[[part_id]],
+      part,
       part_id,
-      main_vertices,
+      floating_part_candidate_parents(graph, part),
       occupied_slots
     )
   })
   floating_sub_domains <- lapply(
     seq_along(substituents),
     function(substituent_id) {
+      substituent <- substituents[[substituent_id]]
       floating_substituent_domain(
-        substituents[[substituent_id]],
+        substituent,
         substituent_id,
-        main_vertices,
+        floating_substituent_candidate_parents(graph, substituent),
         occupied_slots
       )
     }
@@ -338,14 +340,10 @@ resolve_single_parent_floating_substituents <- function(graph) {
     return(graph)
   }
 
-  main_vertices <- floating_metadata_main_vertices(graph)
-  candidate_parents <- purrr::map(substituents, function(substituent) {
-    if (length(substituent$parents) > 0) {
-      substituent$parents
-    } else {
-      main_vertices
-    }
-  })
+  candidate_parents <- purrr::map(
+    substituents,
+    ~ floating_substituent_candidate_parents(graph, .x)
+  )
   resolved <- lengths(candidate_parents) == 1
   if (!any(resolved)) {
     return(graph)
@@ -365,12 +363,12 @@ resolve_single_parent_floating_substituents <- function(graph) {
 
 materialize_unrestricted_floating_substituents <- function(
   graph,
-  main_vertices
+  vertices = seq_len(igraph::vcount(graph))
 ) {
   substituents <- normalize_floating_substituents(graph)
   substituents <- purrr::map(substituents, function(substituent) {
     if (length(substituent$parents) == 0) {
-      substituent$parents <- as.integer(main_vertices)
+      substituent$parents <- as.integer(vertices)
     }
     substituent
   })
@@ -378,14 +376,12 @@ materialize_unrestricted_floating_substituents <- function(
 }
 
 floating_substituent_iupac <- function(
-  substituent,
-  main_vertices
+  substituent
 ) {
   parents <- if (length(substituent$parents) == 0) {
     ""
   } else {
-    main_parent_indices <- match(substituent$parents, main_vertices)
-    paste0("|", paste(main_parent_indices, collapse = ","))
+    paste0("|", paste(substituent$parents, collapse = ","))
   }
   paste0("{", substituent$substituent, parents, "}")
 }

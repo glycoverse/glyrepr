@@ -24,23 +24,24 @@
 #' In `structure_floating_parts()`, `root_node` and every integer in the `nodes`
 #' and `parents` list-columns refer to `structure_nodes()$node_id` for the same
 #' glycan. `nodes` contains every node in the floating component. An empty
-#' `parents` vector means all feasible main-tree nodes are candidates. The
-#' `linkage` column describes the virtual attachment to the main tree; this
-#' attachment is intentionally absent from `structure_edges()`. During
+#' `parents` vector means all feasible nodes outside that component are
+#' candidates. The `linkage` column describes the virtual attachment to an
+#' unresolved parent; this attachment is intentionally absent from
+#' `structure_edges()`. During
 #' reconstruction, a row with exactly one effective candidate parent is
 #' normalized to an ordinary edge and is therefore absent from the resulting
 #' `structure_floating_parts()` table.
 #'
 #' Parent indices written after `|` in an IUPAC-condensed floating part are
-#' local to the main tree. `structure_floating_parts()` translates those values
-#' to global `structure_nodes()$node_id` values, so they can differ when
-#' floating nodes precede the main tree. `structure_from_tibbles()` expects
-#' these global node IDs and translates them back during serialization.
+#' complete-sequence node IDs, identical to `structure_nodes()$node_id` for a
+#' canonical structure. Residues in floating blocks precede the main tree, and
+#' substituent blocks contribute no nodes. `structure_from_tibbles()` expects
+#' these same global node IDs and preserves cross-component domains.
 #'
 #' In `structure_floating_substituents()`, each row describes one unresolved
 #' substituent. `substituent` is its canonical position-and-name token, and the
 #' `parents` list-column contains candidate global node IDs. An empty vector
-#' means all feasible main-tree nodes are candidates. A singleton candidate is
+#' means all feasible residue nodes are candidates. A singleton candidate is
 #' normalized into `structure_nodes()$sub`, so it does not remain in the
 #' floating-substituent table.
 #'
@@ -79,7 +80,7 @@
 #' structure_from_tibbles(nodes, edges, get_anomer(glycans))
 #'
 #' floating <- as_glycan_structure(
-#'   "{8S|1,2}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#'   "{6S|1,2}{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 #' )
 #' floating_parts <- structure_floating_parts(floating)
 #' floating_substituents <- structure_floating_substituents(floating)
@@ -228,10 +229,11 @@ structure_floating_substituents <- function(x) {
 #' a uniform representation for explicitly restricted and unrestricted
 #' floating metadata.
 #'
-#' For unrestricted metadata, every node in the original main tree is returned
-#' as a candidate and `scope` is `"all"`. For metadata written with an explicit
-#' `|<parents>` suffix, only the declared parent nodes are returned and `scope`
-#' is `"explicit"`.
+#' For an unrestricted floating part, every feasible node outside its own
+#' component is returned; for an unrestricted floating substituent, every
+#' feasible residue node in the complete structure is returned. These rows use
+#' `scope = "all"`. For metadata written with an explicit `|<parents>` suffix,
+#' only the declared parent nodes are returned and `scope` is `"explicit"`.
 #'
 #' Floating-part rows have a non-missing `part_id`, `root_node`, and `linkage`.
 #' Floating-substituent rows instead have a non-missing `substituent_id` and
@@ -254,7 +256,7 @@ structure_floating_substituents <- function(x) {
 #' @examples
 #' glycans <- as_glycan_structure(c(
 #'   unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-#'   restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+#'   restricted = "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-",
 #'   substituent = "{6S}Gal(a1-3)Gal(a1-"
 #' ))
 #' structure_floating_candidates(glycans)
@@ -313,7 +315,7 @@ structure_floating_candidates <- function(x) {
 #'
 #' @examples
 #' glycan <- as_glycan_structure(
-#'   "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#'   "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 #' )
 #' structure_component_membership(glycan)
 #'
@@ -349,14 +351,15 @@ structure_component_membership <- function(x) {
 #' @description
 #' `structure_candidate_edges()` represents every potential floating-part
 #' attachment as an explicit virtual edge. `from_node` is a candidate parent in
-#' the main tree and `to_node` is the root of the floating part.
+#' another floating component or the main tree, and `to_node` is the root of
+#' the floating part.
 #'
 #' The rows correspond one-to-one with the floating-part rows from
 #' [structure_floating_candidates()]. Floating substituents do not create
-#' virtual graph edges. For unrestricted `{<floating>}` parts, every original
-#' main-tree node is returned and `scope` is `"all"`. For explicitly restricted
-#' parts, only the declared parent nodes are returned and `scope` is
-#' `"explicit"`.
+#' virtual graph edges. For unrestricted `{<floating>}` parts, every feasible
+#' node outside the part's own component is returned and `scope` is `"all"`.
+#' For explicitly restricted parts, only the declared parent nodes are returned
+#' and `scope` is `"explicit"`.
 #'
 #' Node indices refer to `structure_nodes()$node_id` for the same glycan.
 #' Missing structures and structures without floating parts contribute no
@@ -372,7 +375,7 @@ structure_component_membership <- function(x) {
 #'
 #' @examples
 #' glycan <- as_glycan_structure(
-#'   "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+#'   "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 #' )
 #' structure_candidate_edges(glycan)
 #'
@@ -813,14 +816,13 @@ structure_floating_candidates_one <- function(
     return(empty_structure_floating_candidates(!is.null(glycan_name)))
   }
 
-  main_vertices <- floating_metadata_main_vertices(graph, parts)
   part_tables <- purrr::map2(
     parts,
     seq_along(parts),
     function(part, part_id) {
       unrestricted <- length(part$parents) == 0
       parent_nodes <- if (unrestricted) {
-        main_vertices
+        floating_part_candidate_parents(graph, part)
       } else {
         part$parents
       }
@@ -846,7 +848,7 @@ structure_floating_candidates_one <- function(
     function(substituent, substituent_id) {
       unrestricted <- length(substituent$parents) == 0
       parent_nodes <- if (unrestricted) {
-        main_vertices
+        floating_substituent_candidate_parents(graph, substituent)
       } else {
         substituent$parents
       }

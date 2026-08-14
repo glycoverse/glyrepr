@@ -199,15 +199,6 @@ test_that("invalid floating substituent graph metadata is rejected", {
   cases$invalid_parent <- graph
   cases$invalid_parent$floating_substituents[[1]]$parents <- 3L
 
-  cases$floating_component_parent <- get_structure_graphs(
-    as_glycan_structure(paste0(
-      "{8S|1,2}",
-      "{Neu5Ac(a2-6)|1,2}",
-      "Gal(a1-3)Glc(a1-"
-    ))
-  )
-  cases$floating_component_parent$floating_substituents[[1]]$parents <- 1L
-
   errors <- purrr::map(cases, function(case) {
     tryCatch(
       {
@@ -237,8 +228,8 @@ test_that("invalid floating substituent graph metadata is rejected", {
 
 test_that("floating substituents and floating parts coexist", {
   glycan <- as_glycan_structure(paste0(
-    "{Neu5Ac(a2-6)|1,2}",
-    "{8S|1,2}",
+    "{Neu5Ac(a2-6)|2,3}",
+    "{8S|2,3}",
     "Gal(a1-3)Glc(a1-"
   ))
   graph <- get_structure_graphs(glycan)
@@ -246,8 +237,8 @@ test_that("floating substituents and floating parts coexist", {
   expect_identical(
     as.character(glycan),
     paste0(
-      "{8S|1,2}",
-      "{Neu5Ac(a2-6)|1,2}",
+      "{8S|2,3}",
+      "{Neu5Ac(a2-6)|2,3}",
       "Gal(a1-3)Glc(a1-"
     )
   )
@@ -265,14 +256,28 @@ test_that("floating substituents and floating parts coexist", {
 test_that("resolving a floating part preserves substituent candidates", {
   glycan <- as_glycan_structure(paste0(
     "{6S}",
-    "{Fuc(a1-2)|1}",
+    "{Fuc(a1-2)|2}",
     "Gal(a1-3)Glc(a1-"
   ))
 
   expect_identical(
     as.character(glycan),
-    "{6S|2,3}Fuc(a1-2)Gal(a1-3)Glc(a1-"
+    "{6S}Fuc(a1-2)Gal(a1-3)Glc(a1-"
   )
+})
+
+test_that("floating substituents can target floating-part nodes", {
+  glycan <- as_glycan_structure(paste0(
+    "{6S|1}",
+    "{Gal(b1-4)|2,3}",
+    "Glc(a1-3)Man(a1-"
+  ))
+
+  expect_identical(
+    as.character(glycan),
+    "{Gal6S(b1-4)|2,3}Glc(a1-3)Man(a1-"
+  )
+  expect_null(get_structure_graphs(glycan)$floating_substituents)
 })
 
 

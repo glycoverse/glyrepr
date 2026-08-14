@@ -18,7 +18,7 @@
       Caused by error in `purrr::map()`:
       i In index: 1.
       Caused by error in `.f()`:
-      ! A floating part must end with its linkage to the main glycan.
+      ! A floating part must end with its linkage to its unresolved parent.
       
       {Neu5Ac(a2-3)|}Gal(b1-3)GalNAc(a1-
       i In index: 1.
@@ -35,13 +35,13 @@
       Caused by error in `split_floating_iupac_part()`:
       ! Floating part parent indices must be unique.
       
-      {Neu5Ac(a2-3)|3}Gal(b1-3)GalNAc(a1-
+      {Neu5Ac(a2-3)|4}Gal(b1-3)GalNAc(a1-
       i In index: 1.
-      Caused by error in `purrr::map()`:
+      Caused by error in `purrr::map2()`:
       i In index: 1.
-      Caused by error in `.f()`:
-      ! Floating part parent index is outside the main glycan.
-      i The main glycan has 2 nodes.
+      Caused by error in `validate_floating_source_parents()`:
+      ! Floating parent index is outside the complete glycan structure.
+      i The complete structure has 3 nodes.
       
       {Neu5Ac(a2-3)|1|2}Gal(b1-3)GalNAc(a1-
       i In index: 1.
@@ -83,7 +83,7 @@
       floating_parent
       i In index: 1.
       Caused by error in `validate_floating_graph_shape()`:
-      ! Floating part parent indices must refer to vertices in the main tree.
+      ! Floating part parent indices cannot refer to its own component.
       
       duplicate_parents
       i In index: 1.

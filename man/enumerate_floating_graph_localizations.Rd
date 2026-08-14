@@ -37,9 +37,10 @@ input and localized graphs.
 
 Floating parts are localized as ordinary edges, while floating substituents
 are localized into the selected parent vertex's \code{sub} attribute. Every
-conflict-free assignment is retained, even when multiple assignments would
-produce the same canonical IUPAC-condensed structure. A graph without
-floating metadata produces one identity row with an empty assignment table.
+conflict-free acyclic assignment that connects all components to the main
+tree is retained, even when multiple assignments would produce the same
+canonical IUPAC-condensed structure. A graph without floating metadata
+produces one identity row with an empty assignment table.
 
 \code{max_variants} is a conservative safeguard. It limits the raw Cartesian
 product before conflict filtering, so the function may ask for a higher
@@ -101,7 +102,7 @@ pipeline stops at the first invalid graph.
 
 \examples{
 glycan <- as_glycan_structure(
-  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 graph <- get_structure_graphs(glycan, return_list = FALSE)
 localizations <- enumerate_floating_graph_localizations(graph)

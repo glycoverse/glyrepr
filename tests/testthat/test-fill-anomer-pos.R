@@ -79,8 +79,8 @@ test_that("fill_anomer_pos accepts generic monosaccharides", {
 
 test_that("fill_anomer_pos fills floating attachment positions", {
   strucs <- as_glycan_structure(c(
-    "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-",
-    "{Gal(??-?)Neu5Ac(??-?)|1,2}GlcNAc(??-?)GalNAc(??-"
+    "{Neu5Ac(??-?)|2,3}Gal(??-?)GalNAc(??-",
+    "{Gal(??-?)Neu5Ac(??-?)|3,4}GlcNAc(??-?)GalNAc(??-"
   ))
 
   result <- fill_anomer_pos(strucs)
@@ -88,15 +88,15 @@ test_that("fill_anomer_pos fills floating attachment positions", {
   expect_identical(
     as.character(result),
     c(
-      "{Neu5Ac(?2-?)|1,2}Gal(?1-?)GalNAc(?1-",
-      "{Gal(?1-?)Neu5Ac(?2-?)|1,2}GlcNAc(?1-?)GalNAc(?1-"
+      "{Neu5Ac(?2-?)|2,3}Gal(?1-?)GalNAc(?1-",
+      "{Gal(?1-?)Neu5Ac(?2-?)|3,4}GlcNAc(?1-?)GalNAc(?1-"
     )
   )
 })
 
 test_that("fill_anomer_pos works with glycan graphs without reordering", {
   structure <- as_glycan_structure(
-    "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-"
+    "{Neu5Ac(??-?)|2,3}Gal(??-?)GalNAc(??-"
   )
   graph <- get_structure_graphs(structure)
   names_before <- igraph::V(graph)$name
@@ -114,13 +114,13 @@ test_that("fill_anomer_pos works with glycan graphs without reordering", {
 
 test_that("fill_anomer_pos preserves known floating attachment positions", {
   struc <- as_glycan_structure(
-    "{Neu5Ac(a2-3)|1,2}Gal(??-4)GalNAc(??-"
+    "{Neu5Ac(a2-3)|2,3}Gal(??-4)GalNAc(??-"
   )
 
   result <- fill_anomer_pos(struc)
 
   expect_identical(
     as.character(result),
-    "{Neu5Ac(a2-3)|1,2}Gal(?1-4)GalNAc(?1-"
+    "{Neu5Ac(a2-3)|2,3}Gal(?1-4)GalNAc(?1-"
   )
 })

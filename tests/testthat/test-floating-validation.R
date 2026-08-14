@@ -156,6 +156,49 @@ test_that("floating parts require a simultaneous attachment assignment", {
   )
 })
 
+test_that("floating component cycles require an acyclic alternative", {
+  expect_snapshot(
+    as_glycan_structure(
+      "{Fuc(a1-2)|2}{Man(a1-3)|1}Glc(a1-"
+    ),
+    error = TRUE
+  )
+
+  glycan <- as_glycan_structure(
+    "{Fuc(a1-2)|2,3}{Man(a1-3)|1,3}Glc(a1-"
+  )
+  variants <- enumerate_floating_graph_localizations(
+    get_structure_graphs(glycan)
+  )
+
+  expect_identical(nrow(variants), 3L)
+})
+
+test_that("large unrestricted parent domains validate without enumeration", {
+  make_unrestricted_forest <- function(part_count, linkage) {
+    graph <- igraph::make_empty_graph(part_count + 1L, directed = TRUE)
+    igraph::V(graph)$mono <- rep("Man", part_count + 1L)
+    igraph::V(graph)$sub <- ""
+    igraph::E(graph)$linkage <- character()
+    graph$anomer <- "a1"
+    graph$floating_parts <- lapply(seq_len(part_count), function(part_id) {
+      list(
+        root = as.integer(part_id),
+        nodes = as.integer(part_id),
+        linkage = linkage,
+        parents = integer()
+      )
+    })
+    graph
+  }
+
+  topology_only <- make_unrestricted_forest(12L, "a1-?")
+  constrained <- make_unrestricted_forest(9L, "a1-3")
+
+  expect_s3_class(validate_glycan_graph(topology_only), "igraph")
+  expect_s3_class(validate_glycan_graph(constrained), "igraph")
+})
+
 
 test_that("ambiguous main edges participate in slot matching", {
   one_floating <- make_floating_validation_graph(
@@ -184,7 +227,7 @@ test_that("ambiguous main edges participate in slot matching", {
 })
 
 
-test_that("unrestricted parents use all available main-tree slots", {
+test_that("unrestricted parents use all available whole-graph slots", {
   graph <- make_floating_validation_graph(
     main_count = 2,
     main_edges = c(1, 2),
@@ -198,14 +241,14 @@ test_that("unrestricted parents use all available main-tree slots", {
     "glyrepr_structure"
   )
 
-  conflict <- make_floating_validation_graph(
+  chained <- make_floating_validation_graph(
     main_count = 1,
     floating_linkages = c("a2-3", "a2-3"),
     floating_parents = list(integer(), integer())
   )
-  expect_snapshot(
-    error = TRUE,
-    glycan_structure(conflict)
+  expect_s3_class(
+    glycan_structure(chained),
+    "glyrepr_structure"
   )
 })
 

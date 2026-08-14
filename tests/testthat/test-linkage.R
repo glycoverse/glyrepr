@@ -194,14 +194,14 @@ test_that("remove_linkages keeps ordinary branch order canonical", {
 
 test_that("remove_linkages() removes floating attachment linkages", {
   glycan <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
 
   result <- remove_linkages(glycan)
 
   expect_identical(
     as.character(result),
-    "{Neu5Ac(??-?)|1,2}Gal(??-?)GalNAc(??-"
+    "{Neu5Ac(??-?)|2,3}Gal(??-?)GalNAc(??-"
   )
   parts <- structure_floating_parts(result)
   expect_identical(parts$linkage, "??-?")
@@ -210,7 +210,7 @@ test_that("remove_linkages() removes floating attachment linkages", {
 
 test_that("remove_linkages works with glycan graphs without reordering", {
   structure <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
   graph <- get_structure_graphs(structure)
   names_before <- igraph::V(graph)$name

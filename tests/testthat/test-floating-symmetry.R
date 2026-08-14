@@ -50,7 +50,7 @@ test_that("symmetric edge permutations normalize explicit parents", {
 
   glycan_a <- glycan_structure(graph_a)
   glycan_b <- glycan_structure(graph_b)
-  expected <- "{Neu5Ac(a2-3)|1,3}Gal(a1-?)[Gal(a1-?)]Glc(a1-"
+  expected <- "{Neu5Ac(a2-3)|2,4}Gal(a1-?)[Gal(a1-?)]Glc(a1-"
 
   expect_identical(structure_to_iupac(glycan_a), expected)
   expect_identical(structure_to_iupac(glycan_b), expected)
@@ -93,7 +93,7 @@ test_that("floating canonicalization does not depend on input vertex names", {
 
   expect_identical(
     structure_to_iupac(glycan),
-    "{Neu5Ac(a2-3)|1,3}Gal(a1-?)[Gal(a1-?)]Glc(a1-"
+    "{Neu5Ac(a2-3)|2,4}Gal(a1-?)[Gal(a1-?)]Glc(a1-"
   )
 })
 
@@ -192,4 +192,41 @@ test_that("multiple parent sets are canonicalized jointly", {
   expect_true(unname(same_glycan_a == same_glycan_b))
   expect_true(unname(split_glycan_a == split_glycan_b))
   expect_false(unname(same_glycan_a == split_glycan_a))
+})
+
+
+test_that("cross-component domains ignore component and metadata order", {
+  graph_a <- igraph::make_empty_graph(3, directed = TRUE)
+  igraph::V(graph_a)$name <- c("fuc", "man", "glc")
+  igraph::V(graph_a)$mono <- c("Fuc", "Man", "Glc")
+  igraph::V(graph_a)$sub <- ""
+  igraph::E(graph_a)$linkage <- character()
+  graph_a$anomer <- "a1"
+  graph_a$floating_parts <- list(
+    list(root = 1L, linkage = "a1-2", parents = c(2L, 3L)),
+    list(root = 2L, linkage = "a1-3", parents = c(1L, 3L))
+  )
+  graph_a$floating_substituents <- list(
+    list(substituent = "6S", parents = c(1L, 3L))
+  )
+
+  graph_b <- igraph::make_empty_graph(3, directed = TRUE)
+  igraph::V(graph_b)$name <- c("glc", "man", "fuc")
+  igraph::V(graph_b)$mono <- c("Glc", "Man", "Fuc")
+  igraph::V(graph_b)$sub <- ""
+  igraph::E(graph_b)$linkage <- character()
+  graph_b$anomer <- "a1"
+  graph_b$floating_parts <- list(
+    list(root = 2L, linkage = "a1-3", parents = c(3L, 1L)),
+    list(root = 3L, linkage = "a1-2", parents = c(2L, 1L))
+  )
+  graph_b$floating_substituents <- list(
+    list(substituent = "6S", parents = c(3L, 1L))
+  )
+
+  glycan_a <- glycan_structure(graph_a)
+  glycan_b <- glycan_structure(graph_b)
+
+  expect_identical(structure_to_iupac(glycan_a), structure_to_iupac(glycan_b))
+  expect_true(unname(glycan_a == glycan_b))
 })

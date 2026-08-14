@@ -962,7 +962,7 @@ test_that("spmap_structure correctly updates unique structures count when modifi
 
 test_that("structure mappers recanonicalize floating candidate indices", {
   glycan <- as_glycan_structure(
-    "{Neu5Ac(a2-4)|2,3}Fuc(a1-2)[Gal(a1-3)]Man(a1-"
+    "{Neu5Ac(a2-4)|3,4}Fuc(a1-2)[Gal(a1-3)]Man(a1-"
   )
   strip_tree_linkages <- function(graph, ...) {
     graph <- igraph::set_edge_attr(graph, "linkage", value = "??-?")
@@ -979,7 +979,7 @@ test_that("structure mappers recanonicalize floating candidate indices", {
   purrr::walk(results, function(result) {
     expect_identical(
       as.character(result),
-      "{Neu5Ac(a2-4)|1,3}Gal(??-?)[Fuc(??-?)]Man(??-"
+      "{Neu5Ac(a2-4)|2,4}Gal(??-?)[Fuc(??-?)]Man(??-"
     )
     expect_identical(
       structure_floating_parts(result)$parents[[1]],
@@ -988,9 +988,59 @@ test_that("structure mappers recanonicalize floating candidate indices", {
   })
 })
 
+test_that("structure mappers preserve cross-component parent relations", {
+  glycan <- as_glycan_structure(
+    paste0(
+      "{?S|1,3}",
+      "{Fuc(a1-2)|2,3}",
+      "{Man(a1-3)|1,3}",
+      "Glc(a1-"
+    )
+  )
+  permute_forest <- function(graph, ...) {
+    igraph::V(graph)$source_id <- seq_len(igraph::vcount(graph))
+    graph <- igraph::permute(graph, rev(seq_len(igraph::vcount(graph))))
+    old_to_new <- match(
+      seq_len(igraph::vcount(graph)),
+      igraph::V(graph)$source_id
+    )
+    parts <- purrr::map(graph$floating_parts, function(part) {
+      part$root <- as.integer(old_to_new[part$root])
+      part$nodes <- sort(as.integer(old_to_new[part$nodes]))
+      part$parents <- sort(as.integer(old_to_new[part$parents]))
+      part
+    })
+    substituents <- purrr::map(
+      graph$floating_substituents,
+      function(substituent) {
+        substituent$parents <- sort(as.integer(
+          old_to_new[substituent$parents]
+        ))
+        substituent
+      }
+    )
+    graph <- set_floating_parts_attr(graph, parts)
+    graph <- set_floating_substituents_attr(graph, substituents)
+    igraph::delete_vertex_attr(graph, "source_id")
+  }
+
+  transformed <- smap_structure(glycan, permute_forest)
+
+  expect_identical(as.character(transformed), as.character(glycan))
+  expect_true(unname(transformed == glycan))
+  expect_identical(
+    structure_floating_parts(transformed)$parents,
+    list(c(2L, 3L), c(1L, 3L))
+  )
+  expect_identical(
+    structure_floating_substituents(transformed)$parents,
+    list(c(1L, 3L))
+  )
+})
+
 test_that("structure mappers validate floating metadata returned by callbacks", {
   glycan <- as_glycan_structure(
-    "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+    "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
   )
 
   expect_snapshot(

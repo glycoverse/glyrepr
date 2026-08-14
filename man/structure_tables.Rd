@@ -87,23 +87,24 @@ renumbering them. A graph is represented with \code{glycan_id = 1L} and no
 In \code{structure_floating_parts()}, \code{root_node} and every integer in the \code{nodes}
 and \code{parents} list-columns refer to \code{structure_nodes()$node_id} for the same
 glycan. \code{nodes} contains every node in the floating component. An empty
-\code{parents} vector means all feasible main-tree nodes are candidates. The
-\code{linkage} column describes the virtual attachment to the main tree; this
-attachment is intentionally absent from \code{structure_edges()}. During
+\code{parents} vector means all feasible nodes outside that component are
+candidates. The \code{linkage} column describes the virtual attachment to an
+unresolved parent; this attachment is intentionally absent from
+\code{structure_edges()}. During
 reconstruction, a row with exactly one effective candidate parent is
 normalized to an ordinary edge and is therefore absent from the resulting
 \code{structure_floating_parts()} table.
 
 Parent indices written after \code{|} in an IUPAC-condensed floating part are
-local to the main tree. \code{structure_floating_parts()} translates those values
-to global \code{structure_nodes()$node_id} values, so they can differ when
-floating nodes precede the main tree. \code{structure_from_tibbles()} expects
-these global node IDs and translates them back during serialization.
+complete-sequence node IDs, identical to \code{structure_nodes()$node_id} for a
+canonical structure. Residues in floating blocks precede the main tree, and
+substituent blocks contribute no nodes. \code{structure_from_tibbles()} expects
+these same global node IDs and preserves cross-component domains.
 
 In \code{structure_floating_substituents()}, each row describes one unresolved
 substituent. \code{substituent} is its canonical position-and-name token, and the
 \code{parents} list-column contains candidate global node IDs. An empty vector
-means all feasible main-tree nodes are candidates. A singleton candidate is
+means all feasible residue nodes are candidates. A singleton candidate is
 normalized into \code{structure_nodes()$sub}, so it does not remain in the
 floating-substituent table.
 }
@@ -114,7 +115,7 @@ edges <- structure_edges(glycans)
 structure_from_tibbles(nodes, edges, get_anomer(glycans))
 
 floating <- as_glycan_structure(
-  "{8S|1,2}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{6S|1,2}{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 floating_parts <- structure_floating_parts(floating)
 floating_substituents <- structure_floating_substituents(floating)

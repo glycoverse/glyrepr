@@ -21,7 +21,7 @@ test_that("structure_to_iupac works with ordinary and floating glycan graphs", {
   structures <- list(
     n_glycan_core(),
     as_glycan_structure(
-      "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+      "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
     )
   )
 
