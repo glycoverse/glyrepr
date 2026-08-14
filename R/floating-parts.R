@@ -559,6 +559,62 @@ floating_part_assignment_is_acyclic <- function(
   TRUE
 }
 
+floating_parent_component_domains <- function(
+  part_domains,
+  membership
+) {
+  purrr::map(part_domains, function(parents) {
+    components <- membership[parents]
+    components[is.na(components)] <- 0L
+    as.integer(components)
+  })
+}
+
+floating_components_reach_main <- function(parent_component_domains) {
+  if (length(parent_component_domains) == 0) {
+    return(TRUE)
+  }
+
+  reaches_main <- rep(FALSE, length(parent_component_domains))
+  repeat {
+    newly_reachable <- vapply(
+      seq_along(parent_component_domains),
+      function(part_id) {
+        if (reaches_main[[part_id]]) {
+          return(FALSE)
+        }
+        parents <- parent_component_domains[[part_id]]
+        floating_parents <- parents[parents > 0L]
+        any(parents == 0L) || any(reaches_main[floating_parents])
+      },
+      logical(1)
+    )
+    if (!any(newly_reachable)) {
+      break
+    }
+    reaches_main[newly_reachable] <- TRUE
+  }
+
+  all(reaches_main)
+}
+
+floating_part_assignment_closes_cycle <- function(
+  part_id,
+  selected_parent_components
+) {
+  visited <- rep(FALSE, length(selected_parent_components))
+  current <- as.integer(part_id)
+  while (current != 0L && !is.na(selected_parent_components[[current]])) {
+    if (visited[[current]]) {
+      return(TRUE)
+    }
+    visited[[current]] <- TRUE
+    current <- selected_parent_components[[current]]
+  }
+
+  FALSE
+}
+
 has_valid_floating_assignment <- function(
   graph,
   parts,
@@ -596,7 +652,28 @@ has_valid_floating_assignment <- function(
   }
 
   membership <- floating_part_membership(graph, parts)
+  parent_component_domains <- floating_parent_component_domains(
+    part_domains,
+    membership
+  )
+  if (!floating_components_reach_main(parent_component_domains)) {
+    return(FALSE)
+  }
+
+  part_slot_constraints <- purrr::map_lgl(
+    parts,
+    ~ length(floating_linkage_acceptor_positions(.x$linkage)) > 0
+  )
+  substituent_slot_constraints <- purrr::map_lgl(
+    substituents,
+    ~ substituent_position_tokens(.x$substituent) != "?"
+  )
+  if (!any(part_slot_constraints) && !any(substituent_slot_constraints)) {
+    return(has_conflict_free_attachment_assignment(fixed_domains))
+  }
+
   selected_parts <- integer(length(parts))
+  selected_parent_components <- rep(NA_integer_, length(parts))
   selected_substituents <- integer(length(substituents))
 
   assignment_has_free_slots <- function() {
@@ -638,12 +715,23 @@ has_valid_floating_assignment <- function(
       }
       return(assign_substituent(1L))
     }
-    for (parent in part_domains[[part_id]]) {
+    for (candidate_id in seq_along(part_domains[[part_id]])) {
+      parent <- part_domains[[part_id]][[candidate_id]]
       selected_parts[[part_id]] <<- parent
-      if (assign_part(part_id + 1L)) {
+      selected_parent_components[[part_id]] <<-
+        parent_component_domains[[part_id]][[candidate_id]]
+      if (
+        !floating_part_assignment_closes_cycle(
+          part_id,
+          selected_parent_components
+        ) &&
+          assign_part(part_id + 1L)
+      ) {
         return(TRUE)
       }
     }
+    selected_parts[[part_id]] <<- 0L
+    selected_parent_components[[part_id]] <<- NA_integer_
     FALSE
   }
 

@@ -174,6 +174,31 @@ test_that("floating component cycles require an acyclic alternative", {
   expect_identical(nrow(variants), 3L)
 })
 
+test_that("large unrestricted parent domains validate without enumeration", {
+  make_unrestricted_forest <- function(part_count, linkage) {
+    graph <- igraph::make_empty_graph(part_count + 1L, directed = TRUE)
+    igraph::V(graph)$mono <- rep("Man", part_count + 1L)
+    igraph::V(graph)$sub <- ""
+    igraph::E(graph)$linkage <- character()
+    graph$anomer <- "a1"
+    graph$floating_parts <- lapply(seq_len(part_count), function(part_id) {
+      list(
+        root = as.integer(part_id),
+        nodes = as.integer(part_id),
+        linkage = linkage,
+        parents = integer()
+      )
+    })
+    graph
+  }
+
+  topology_only <- make_unrestricted_forest(12L, "a1-?")
+  constrained <- make_unrestricted_forest(9L, "a1-3")
+
+  expect_s3_class(validate_glycan_graph(topology_only), "igraph")
+  expect_s3_class(validate_glycan_graph(constrained), "igraph")
+})
+
 
 test_that("ambiguous main edges participate in slot matching", {
   one_floating <- make_floating_validation_graph(
