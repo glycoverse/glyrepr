@@ -5,10 +5,12 @@ floating-substituent metadata to one row per candidate parent. This
 provides a uniform representation for explicitly restricted and
 unrestricted floating metadata.
 
-For unrestricted metadata, every node in the original main tree is
-returned as a candidate and `scope` is `"all"`. For metadata written
-with an explicit `|<parents>` suffix, only the declared parent nodes are
-returned and `scope` is `"explicit"`.
+For an unrestricted floating part, every feasible node outside its own
+component is returned; for an unrestricted floating substituent, every
+feasible residue node in the complete structure is returned. These rows
+use `scope = "all"`. For metadata written with an explicit `|<parents>`
+suffix, only the declared parent nodes are returned and `scope` is
+`"explicit"`.
 
 Floating-part rows have a non-missing `part_id`, `root_node`, and
 `linkage`. Floating-substituent rows instead have a non-missing
@@ -45,7 +47,7 @@ plus `glycan_name` when `x` is named.
 ``` r
 glycans <- as_glycan_structure(c(
   unrestricted = "{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-",
-  restricted = "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-",
+  restricted = "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-",
   substituent = "{6S}Gal(a1-3)Gal(a1-"
 ))
 structure_floating_candidates(glycans)

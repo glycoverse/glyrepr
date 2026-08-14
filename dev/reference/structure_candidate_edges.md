@@ -2,14 +2,16 @@
 
 `structure_candidate_edges()` represents every potential floating-part
 attachment as an explicit virtual edge. `from_node` is a candidate
-parent in the main tree and `to_node` is the root of the floating part.
+parent in another floating component or the main tree, and `to_node` is
+the root of the floating part.
 
 The rows correspond one-to-one with the floating-part rows from
 [`structure_floating_candidates()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_floating_candidates.md).
 Floating substituents do not create virtual graph edges. For
-unrestricted `{<floating>}` parts, every original main-tree node is
-returned and `scope` is `"all"`. For explicitly restricted parts, only
-the declared parent nodes are returned and `scope` is `"explicit"`.
+unrestricted `{<floating>}` parts, every feasible node outside the
+part's own component is returned and `scope` is `"all"`. For explicitly
+restricted parts, only the declared parent nodes are returned and
+`scope` is `"explicit"`.
 
 Node indices refer to `structure_nodes()$node_id` for the same glycan.
 Missing structures and structures without floating parts contribute no
@@ -39,7 +41,7 @@ A tibble with columns `glycan_id`, `part_id`, `from_node`, `to_node`,
 
 ``` r
 glycan <- as_glycan_structure(
-  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 structure_candidate_edges(glycan)
 #> # A tibble: 2 × 6

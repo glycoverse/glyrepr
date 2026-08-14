@@ -19,21 +19,22 @@ glycan_name column.
 In structure_floating_parts(), root_node and every integer in the nodes
 and parents list-columns refer to structure_nodes()$node_id for the same
 glycan. nodes contains every node in the floating component. An empty
-parents vector means all feasible main-tree nodes are candidates. The
-linkage column describes the virtual attachment to the main tree; this
-attachment is intentionally absent from structure_edges(). During
+parents vector means all feasible nodes outside that component are
+candidates. The linkage column describes the virtual attachment to an
+unresolved parent; this attachment is intentionally absent from
+structure_edges(). During
 reconstruction, a row with exactly one effective candidate parent is
 normalized to an ordinary edge and is therefore absent from the resulting
 structure_floating_parts() table.
 Parent indices written after | in an IUPAC-condensed floating part are
-local to the main tree. structure_floating_parts() translates those values
-to global structure_nodes()$node_id values, so they can differ when
-floating nodes precede the main tree. structure_from_tibbles() expects
-these global node IDs and translates them back during serialization.
+complete-sequence node IDs, identical to structure_nodes()$node_id for a
+canonical structure. Residues in floating blocks precede the main tree, and
+substituent blocks contribute no nodes. structure_from_tibbles() expects
+these same global node IDs and preserves cross-component domains.
 In structure_floating_substituents(), each row describes one unresolved
 substituent. substituent is its canonical position-and-name token, and the
 parents list-column contains candidate global node IDs. An empty vector
-means all feasible main-tree nodes are candidates. A singleton candidate is
+means all feasible residue nodes are candidates. A singleton candidate is
 normalized into structure_nodes()$sub, so it does not remain in the
 floating-substituent table."><meta property="og:description" content="structure_nodes(), structure_edges(), structure_floating_parts(), and
 structure_floating_substituents() convert
@@ -55,21 +56,22 @@ glycan_name column.
 In structure_floating_parts(), root_node and every integer in the nodes
 and parents list-columns refer to structure_nodes()$node_id for the same
 glycan. nodes contains every node in the floating component. An empty
-parents vector means all feasible main-tree nodes are candidates. The
-linkage column describes the virtual attachment to the main tree; this
-attachment is intentionally absent from structure_edges(). During
+parents vector means all feasible nodes outside that component are
+candidates. The linkage column describes the virtual attachment to an
+unresolved parent; this attachment is intentionally absent from
+structure_edges(). During
 reconstruction, a row with exactly one effective candidate parent is
 normalized to an ordinary edge and is therefore absent from the resulting
 structure_floating_parts() table.
 Parent indices written after | in an IUPAC-condensed floating part are
-local to the main tree. structure_floating_parts() translates those values
-to global structure_nodes()$node_id values, so they can differ when
-floating nodes precede the main tree. structure_from_tibbles() expects
-these global node IDs and translates them back during serialization.
+complete-sequence node IDs, identical to structure_nodes()$node_id for a
+canonical structure. Residues in floating blocks precede the main tree, and
+substituent blocks contribute no nodes. structure_from_tibbles() expects
+these same global node IDs and preserves cross-component domains.
 In structure_floating_substituents(), each row describes one unresolved
 substituent. substituent is its canonical position-and-name token, and the
 parents list-column contains candidate global node IDs. An empty vector
-means all feasible main-tree nodes are candidates. A singleton candidate is
+means all feasible residue nodes are candidates. A singleton candidate is
 normalized into structure_nodes()$sub, so it does not remain in the
 floating-substituent table."><meta property="og:image" content="https://glycoverse.github.io/glyrepr/logo.png"><meta name="robots" content="noindex"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -132,21 +134,22 @@ renumbering them. A graph is represented with <code>glycan_id = 1L</code> and no
 <p>In <code>structure_floating_parts()</code>, <code>root_node</code> and every integer in the <code>nodes</code>
 and <code>parents</code> list-columns refer to <code>structure_nodes()$node_id</code> for the same
 glycan. <code>nodes</code> contains every node in the floating component. An empty
-<code>parents</code> vector means all feasible main-tree nodes are candidates. The
-<code>linkage</code> column describes the virtual attachment to the main tree; this
-attachment is intentionally absent from <code>structure_edges()</code>. During
+<code>parents</code> vector means all feasible nodes outside that component are
+candidates. The <code>linkage</code> column describes the virtual attachment to an
+unresolved parent; this attachment is intentionally absent from
+<code>structure_edges()</code>. During
 reconstruction, a row with exactly one effective candidate parent is
 normalized to an ordinary edge and is therefore absent from the resulting
 <code>structure_floating_parts()</code> table.</p>
 <p>Parent indices written after <code>|</code> in an IUPAC-condensed floating part are
-local to the main tree. <code>structure_floating_parts()</code> translates those values
-to global <code>structure_nodes()$node_id</code> values, so they can differ when
-floating nodes precede the main tree. <code>structure_from_tibbles()</code> expects
-these global node IDs and translates them back during serialization.</p>
+complete-sequence node IDs, identical to <code>structure_nodes()$node_id</code> for a
+canonical structure. Residues in floating blocks precede the main tree, and
+substituent blocks contribute no nodes. <code>structure_from_tibbles()</code> expects
+these same global node IDs and preserves cross-component domains.</p>
 <p>In <code>structure_floating_substituents()</code>, each row describes one unresolved
 substituent. <code>substituent</code> is its canonical position-and-name token, and the
 <code>parents</code> list-column contains candidate global node IDs. An empty vector
-means all feasible main-tree nodes are candidates. A singleton candidate is
+means all feasible residue nodes are candidates. A singleton candidate is
 normalized into <code>structure_nodes()$sub</code>, so it does not remain in the
 floating-substituent table.</p>
     </div>
@@ -238,7 +241,7 @@ list-column <code>parents</code>.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">floating</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="st">"{8S|1,2}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"</span></span></span>
+<span class="r-in"><span>  <span class="st">"{6S|1,2}{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">floating_parts</span> <span class="op">&lt;-</span> <span class="fu">structure_floating_parts</span><span class="op">(</span><span class="va">floating</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">floating_substituents</span> <span class="op">&lt;-</span> <span class="fu">structure_floating_substituents</span><span class="op">(</span><span class="va">floating</span><span class="op">)</span></span></span>
@@ -250,7 +253,7 @@ list-column <code>parents</code>.</p></li>
 <span class="r-in"><span>  <span class="va">floating_substituents</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[1]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] {8S|1,2}{<span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">a2-6</span>)|1,2}<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] {6S|1,2}{<span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">a2-6</span>)|2,3}<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -60,10 +60,10 @@ underlying graph with
 glycan <- n_glycan_core()
 graph <- get_structure_graphs(glycan)
 graph
-#> IGRAPH dd8353d DN-- 5 4 -- 
+#> IGRAPH 7bafb52 DN-- 5 4 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from dd8353d (vertex names):
+#> + edges from 7bafb52 (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 ```
 
@@ -210,7 +210,7 @@ canonical order.
 ``` r
 
 floating <- as_glycan_structure(
-  "{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
+  "{Neu5Ac(a2-3)|2,3}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
 )
 floating_graph <- get_structure_graphs(floating)
 
@@ -240,11 +240,18 @@ Each `floating_parts` entry has four fields:
 
 - `root`: the vertex index at the root of the floating component.
 - `nodes`: every vertex index in the floating component.
-- `linkage`: the virtual linkage from that root to the main tree.
-- `parents`: candidate vertex indices in the main tree.
+- `linkage`: the virtual linkage from that root to its unresolved
+  parent.
+- `parents`: candidate vertex indices outside the component.
   [`integer()`](https://rdrr.io/r/base/integer.html) means all feasible
-  main-tree nodes. In a canonical structure, an explicit vector has at
-  least two entries; a singleton is normalized to an ordinary edge.
+  nodes outside that component, including nodes in other floating parts.
+  In a canonical structure, an explicit vector has at least two entries;
+  a singleton is normalized to an ordinary edge.
+
+These IDs follow complete IUPAC-condensed residue order: floating blocks
+are counted from left to right before the main glycan, and substituent
+blocks add no vertices. Component assignments must be acyclic and
+ultimately connect to the main tree.
 
 The virtual attachment is not stored in `igraph::E(floating_graph)`,
 because its endpoint is unresolved. Use
@@ -256,8 +263,9 @@ when a tabular representation must round-trip this metadata.
 Floating substituents use the same candidate-parent convention without
 adding dummy vertices. Each `floating_substituents` entry contains
 `substituent`, such as `"6S"` or `"?S"`, and `parents`. Empty `parents`
-means every feasible main node; otherwise the values are global graph
-vertex indices.
+means every feasible residue node in the complete structure, including
+floating-part nodes; otherwise the values are global graph vertex
+indices.
 
 ``` r
 
@@ -306,7 +314,7 @@ sum(igraph::degree(graph, mode = "out") > 1)
 
 bfs_result <- igraph::bfs(graph, root = 1, mode = "out")
 bfs_result$order
-#> + 5/5 vertices, named, from dd8353d:
+#> + 5/5 vertices, named, from 7bafb52:
 #> [1] 1 2 3 4 5
 ```
 

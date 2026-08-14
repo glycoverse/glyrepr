@@ -6,12 +6,13 @@ fully localized structure permitted by the candidate-parent domains in
 
 Candidate combinations for floating parts and substituents are validated
 simultaneously, including linkages or substituents with multiple
-possible carbon positions. Variants are canonicalized and, by default,
-deduplicated by structure. When multiple assignments produce the same
-canonical structure, the first assignment in deterministic candidate
-order is retained. Set `deduplicate = FALSE` to retain every valid
-assignment and its original-node provenance, including assignments that
-produce identical canonical structures.
+possible carbon positions. Floating-component dependencies must be
+acyclic and ultimately connect to the main tree. Variants are
+canonicalized and, by default, deduplicated by structure. When multiple
+assignments produce the same canonical structure, the first assignment
+in deterministic candidate order is retained. Set `deduplicate = FALSE`
+to retain every valid assignment and its original-node provenance,
+including assignments that produce identical canonical structures.
 
 `max_variants` is a conservative per-input safeguard. It limits the raw
 Cartesian product before conflict filtering or canonical deduplication,
@@ -66,7 +67,7 @@ A tibble with columns:
 
 ``` r
 glycan <- as_glycan_structure(
-  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 enumerate_floating_localizations(glycan)
 #> # A tibble: 2 × 4

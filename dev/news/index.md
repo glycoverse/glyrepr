@@ -17,6 +17,12 @@
   and `D-Fucf`; unprefixed names retain their natural configurations.
   ([\#85](https://github.com/glycoverse/glyrepr/issues/85),
   [\#86](https://github.com/glycoverse/glyrepr/issues/86))
+- Floating parent indices now follow complete IUPAC-condensed residue
+  order. Floating parts may attach to any other floating component or
+  the main tree, floating substituents may target any residue node, and
+  localization and enumeration retain only conflict-free acyclic
+  assignments that connect every component to the main tree.
+  ([\#89](https://github.com/glycoverse/glyrepr/issues/89))
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   and
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)

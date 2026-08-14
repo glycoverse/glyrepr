@@ -24,24 +24,25 @@ canonicalizing or renumbering them. A graph is represented with
 In `structure_floating_parts()`, `root_node` and every integer in the
 `nodes` and `parents` list-columns refer to `structure_nodes()$node_id`
 for the same glycan. `nodes` contains every node in the floating
-component. An empty `parents` vector means all feasible main-tree nodes
-are candidates. The `linkage` column describes the virtual attachment to
-the main tree; this attachment is intentionally absent from
-`structure_edges()`. During reconstruction, a row with exactly one
-effective candidate parent is normalized to an ordinary edge and is
-therefore absent from the resulting `structure_floating_parts()` table.
+component. An empty `parents` vector means all feasible nodes outside
+that component are candidates. The `linkage` column describes the
+virtual attachment to an unresolved parent; this attachment is
+intentionally absent from `structure_edges()`. During reconstruction, a
+row with exactly one effective candidate parent is normalized to an
+ordinary edge and is therefore absent from the resulting
+`structure_floating_parts()` table.
 
 Parent indices written after `|` in an IUPAC-condensed floating part are
-local to the main tree. `structure_floating_parts()` translates those
-values to global `structure_nodes()$node_id` values, so they can differ
-when floating nodes precede the main tree. `structure_from_tibbles()`
-expects these global node IDs and translates them back during
-serialization.
+complete-sequence node IDs, identical to `structure_nodes()$node_id` for
+a canonical structure. Residues in floating blocks precede the main
+tree, and substituent blocks contribute no nodes.
+`structure_from_tibbles()` expects these same global node IDs and
+preserves cross-component domains.
 
 In `structure_floating_substituents()`, each row describes one
 unresolved substituent. `substituent` is its canonical position-and-name
 token, and the `parents` list-column contains candidate global node IDs.
-An empty vector means all feasible main-tree nodes are candidates. A
+An empty vector means all feasible residue nodes are candidates. A
 singleton candidate is normalized into `structure_nodes()$sub`, so it
 does not remain in the floating-substituent table.
 
@@ -133,7 +134,7 @@ structure_from_tibbles(nodes, edges, get_anomer(glycans))
 #> # Unique structures: 1
 
 floating <- as_glycan_structure(
-  "{8S|1,2}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{6S|1,2}{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 floating_parts <- structure_floating_parts(floating)
 floating_substituents <- structure_floating_substituents(floating)
@@ -145,6 +146,6 @@ structure_from_tibbles(
   floating_substituents
 )
 #> <glycan_structure[1]>
-#> [1] {8S|1,2}{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-
+#> [1] {6S|1,2}{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-
 #> # Unique structures: 1
 ```

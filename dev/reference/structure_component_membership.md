@@ -39,7 +39,7 @@ A tibble with columns `glycan_id`, `node_id`, `component_type`, and
 
 ``` r
 glycan <- as_glycan_structure(
-  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 structure_component_membership(glycan)
 #> # A tibble: 3 × 4

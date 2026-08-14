@@ -3,10 +3,11 @@
 floating-substituent metadata to one row per candidate parent. This provides
 a uniform representation for explicitly restricted and unrestricted
 floating metadata.
-For unrestricted metadata, every node in the original main tree is returned
-as a candidate and scope is "all". For metadata written with an explicit
-|&amp;lt;parents&amp;gt; suffix, only the declared parent nodes are returned and scope
-is "explicit".
+For an unrestricted floating part, every feasible node outside its own
+component is returned; for an unrestricted floating substituent, every
+feasible residue node in the complete structure is returned. These rows use
+scope = "all". For metadata written with an explicit |&amp;lt;parents&amp;gt; suffix,
+only the declared parent nodes are returned and scope is "explicit".
 Floating-part rows have a non-missing part_id, root_node, and linkage.
 Floating-substituent rows instead have a non-missing substituent_id and
 substituent. Exactly one of part_id and substituent_id is non-missing
@@ -20,10 +21,11 @@ glycan_name column.'><meta property="og:description" content='structure_floating
 floating-substituent metadata to one row per candidate parent. This provides
 a uniform representation for explicitly restricted and unrestricted
 floating metadata.
-For unrestricted metadata, every node in the original main tree is returned
-as a candidate and scope is "all". For metadata written with an explicit
-|&amp;lt;parents&amp;gt; suffix, only the declared parent nodes are returned and scope
-is "explicit".
+For an unrestricted floating part, every feasible node outside its own
+component is returned; for an unrestricted floating substituent, every
+feasible residue node in the complete structure is returned. These rows use
+scope = "all". For metadata written with an explicit |&amp;lt;parents&amp;gt; suffix,
+only the declared parent nodes are returned and scope is "explicit".
 Floating-part rows have a non-missing part_id, root_node, and linkage.
 Floating-substituent rows instead have a non-missing substituent_id and
 substituent. Exactly one of part_id and substituent_id is non-missing
@@ -78,10 +80,11 @@ glycan_name column.'><meta property="og:image" content="https://glycoverse.githu
 floating-substituent metadata to one row per candidate parent. This provides
 a uniform representation for explicitly restricted and unrestricted
 floating metadata.</p>
-<p>For unrestricted metadata, every node in the original main tree is returned
-as a candidate and <code>scope</code> is <code>"all"</code>. For metadata written with an explicit
-<code>|&lt;parents&gt;</code> suffix, only the declared parent nodes are returned and <code>scope</code>
-is <code>"explicit"</code>.</p>
+<p>For an unrestricted floating part, every feasible node outside its own
+component is returned; for an unrestricted floating substituent, every
+feasible residue node in the complete structure is returned. These rows use
+<code>scope = "all"</code>. For metadata written with an explicit <code>|&lt;parents&gt;</code> suffix,
+only the declared parent nodes are returned and <code>scope</code> is <code>"explicit"</code>.</p>
 <p>Floating-part rows have a non-missing <code>part_id</code>, <code>root_node</code>, and <code>linkage</code>.
 Floating-substituent rows instead have a non-missing <code>substituent_id</code> and
 <code>substituent</code>. Exactly one of <code>part_id</code> and <code>substituent_id</code> is non-missing
@@ -118,7 +121,7 @@ plus <code>glycan_name</code> when <code>x</code> is named.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">glycans</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  unrestricted <span class="op">=</span> <span class="st">"{Neu5Ac(a2-3)}Gal(b1-3)GalNAc(a1-"</span>,</span></span>
-<span class="r-in"><span>  restricted <span class="op">=</span> <span class="st">"{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"</span>,</span></span>
+<span class="r-in"><span>  restricted <span class="op">=</span> <span class="st">"{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"</span>,</span></span>
 <span class="r-in"><span>  substituent <span class="op">=</span> <span class="st">"{6S}Gal(a1-3)Gal(a1-"</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">structure_floating_candidates</span><span class="op">(</span><span class="va">glycans</span><span class="op">)</span></span></span>

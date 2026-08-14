@@ -9,9 +9,10 @@ parent_node values therefore refer directly to vertex IDs in both the
 input and localized graphs.
 Floating parts are localized as ordinary edges, while floating substituents
 are localized into the selected parent vertex's sub attribute. Every
-conflict-free assignment is retained, even when multiple assignments would
-produce the same canonical IUPAC-condensed structure. A graph without
-floating metadata produces one identity row with an empty assignment table.
+conflict-free acyclic assignment that connects all components to the main
+tree is retained, even when multiple assignments would produce the same
+canonical IUPAC-condensed structure. A graph without floating metadata
+produces one identity row with an empty assignment table.
 max_variants is a conservative safeguard. It limits the raw Cartesian
 product before conflict filtering, so the function may ask for a higher
 bound even when fewer variants would ultimately remain."><meta property="og:description" content="enumerate_floating_graph_localizations() generates every conflict-free,
@@ -24,9 +25,10 @@ parent_node values therefore refer directly to vertex IDs in both the
 input and localized graphs.
 Floating parts are localized as ordinary edges, while floating substituents
 are localized into the selected parent vertex's sub attribute. Every
-conflict-free assignment is retained, even when multiple assignments would
-produce the same canonical IUPAC-condensed structure. A graph without
-floating metadata produces one identity row with an empty assignment table.
+conflict-free acyclic assignment that connects all components to the main
+tree is retained, even when multiple assignments would produce the same
+canonical IUPAC-condensed structure. A graph without floating metadata
+produces one identity row with an empty assignment table.
 max_variants is a conservative safeguard. It limits the raw Cartesian
 product before conflict filtering, so the function may ask for a higher
 bound even when fewer variants would ultimately remain."><meta property="og:image" content="https://glycoverse.github.io/glyrepr/logo.png"><meta name="robots" content="noindex"></head><body>
@@ -80,9 +82,10 @@ the same integer ID, name, and attributes as in <code>graph</code>. Assignment
 input and localized graphs.</p>
 <p>Floating parts are localized as ordinary edges, while floating substituents
 are localized into the selected parent vertex's <code>sub</code> attribute. Every
-conflict-free assignment is retained, even when multiple assignments would
-produce the same canonical IUPAC-condensed structure. A graph without
-floating metadata produces one identity row with an empty assignment table.</p>
+conflict-free acyclic assignment that connects all components to the main
+tree is retained, even when multiple assignments would produce the same
+canonical IUPAC-condensed structure. A graph without floating metadata
+produces one identity row with an empty assignment table.</p>
 <p><code>max_variants</code> is a conservative safeguard. It limits the raw Cartesian
 product before conflict filtering, so the function may ask for a higher
 bound even when fewer variants would ultimately remain.</p>
@@ -177,23 +180,23 @@ pipeline stops at the first invalid graph.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="st">"{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"</span></span></span>
+<span class="r-in"><span>  <span class="st">"{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">glycan</span>, return_list <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">localizations</span> <span class="op">&lt;-</span> <span class="fu">enumerate_floating_graph_localizations</span><span class="op">(</span><span class="va">graph</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">localizations</span><span class="op">$</span><span class="va">graph</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 0bdce4e DN-- 3 2 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 03b8f28 DN-- 3 2 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 0bdce4e (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 03b8f28 (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3-&gt;2 2-&gt;1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH eb772e2 DN-- 3 2 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 5cde116 DN-- 3 2 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from eb772e2 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 5cde116 (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3-&gt;2 3-&gt;1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>

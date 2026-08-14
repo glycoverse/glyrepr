@@ -13,10 +13,11 @@ in both the input and localized graphs.
 
 Floating parts are localized as ordinary edges, while floating
 substituents are localized into the selected parent vertex's `sub`
-attribute. Every conflict-free assignment is retained, even when
-multiple assignments would produce the same canonical IUPAC-condensed
-structure. A graph without floating metadata produces one identity row
-with an empty assignment table.
+attribute. Every conflict-free acyclic assignment that connects all
+components to the main tree is retained, even when multiple assignments
+would produce the same canonical IUPAC-condensed structure. A graph
+without floating metadata produces one identity row with an empty
+assignment table.
 
 `max_variants` is a conservative safeguard. It limits the raw Cartesian
 product before conflict filtering, so the function may ask for a higher
@@ -117,23 +118,23 @@ pipeline stops at the first invalid graph.
 
 ``` r
 glycan <- as_glycan_structure(
-  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 graph <- get_structure_graphs(glycan, return_list = FALSE)
 localizations <- enumerate_floating_graph_localizations(graph)
 localizations$graph
 #> [[1]]
-#> IGRAPH 0bdce4e DN-- 3 2 -- 
+#> IGRAPH 03b8f28 DN-- 3 2 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from 0bdce4e (vertex names):
+#> + edges from 03b8f28 (vertex names):
 #> [1] 3->2 2->1
 #> 
 #> [[2]]
-#> IGRAPH eb772e2 DN-- 3 2 -- 
+#> IGRAPH 5cde116 DN-- 3 2 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from eb772e2 (vertex names):
+#> + edges from 5cde116 (vertex names):
 #> [1] 3->2 3->1
 #> 
 ```

@@ -132,17 +132,19 @@ tree is not fully localized. They are declared by the <code>floating_parts</code
 attribute, a list with one entry per floating component. Each entry contains:</p><ul><li><p><code>root</code>: the integer vertex index of the floating component root.</p></li>
 <li><p><code>nodes</code>: all integer vertex indices in the floating component, ordered as
 the component appears in the complete IUPAC-condensed sequence.</p></li>
-<li><p><code>linkage</code>: the virtual linkage from that root to the main tree.</p></li>
-<li><p><code>parents</code>: integer vertex indices in the main tree. An empty integer vector
-means that all feasible main-tree nodes are candidates.</p></li>
+<li><p><code>linkage</code>: the virtual linkage from that root to its unresolved parent.</p></li>
+<li><p><code>parents</code>: integer vertex indices outside the floating component. An empty
+integer vector means that all feasible nodes outside the component are
+candidates.</p></li>
 </ul><p>Canonical graphs always contain <code>nodes</code>. For backward compatibility, input
 graphs may omit it; <code>glycan_structure()</code> derives the component membership
 before validation and stores <code>nodes</code> in the canonical result.</p>
-<p>During canonicalization, a floating part with exactly one candidate parent
-is attached to that parent as an ordinary graph edge. This includes an empty
-<code>parents</code> vector when the main tree has only one node. Only unresolved
-attachments retain floating metadata, where the virtual attachment is
-metadata rather than an edge and contributes to the canonical structure key.</p>
+<p>During canonicalization, a floating part with exactly one effective
+candidate parent is attached to that parent as an ordinary graph edge.
+Attachments between floating components merge their <code>nodes</code> metadata and
+can resolve further singleton domains. Only unresolved attachments retain
+floating metadata, where the virtual attachment is metadata rather than an
+edge and contributes to the canonical structure key.</p>
 </div>
 
 <div class="section">
@@ -153,11 +155,12 @@ metadata rather than an edge and contributes to the canonical structure key.</p>
 It is declared by the <code>floating_substituents</code> graph attribute, a list with
 one entry per substituent. Each entry contains:</p><ul><li><p><code>substituent</code>: one canonical substituent token such as <code>"6S"</code>, <code>"4/6Ac"</code>,
 or <code>"?Me"</code>.</p></li>
-<li><p><code>parents</code>: integer vertex indices in the main tree. An empty integer vector
-means that all feasible main-tree nodes are candidates.</p></li>
+<li><p><code>parents</code>: integer residue vertex indices in the complete structure. An
+empty integer vector means that all feasible residue nodes are candidates.</p></li>
 </ul><p>A singleton candidate is normalized into the corresponding vertex's <code>sub</code>
 attribute. Candidate parents must permit a conflict-free assignment of
-occupied carbon positions.</p>
+occupied carbon positions. Floating-part assignments must also be acyclic
+and connect every floating component to the main tree.</p>
 </div>
 
     </div>
@@ -171,10 +174,10 @@ and the linkages are "a1-3", "a1-6", "b1-4", "b1-4".</p>
 <p>For a floating structure, floating-component vertices and edges precede the
 main tree, exactly as their brace-enclosed components precede the main glycan
 in the complete IUPAC-condensed string. Parent indices written inside braces
-are local to the main tree, while <code>floating_parts$parents</code> stores the
-corresponding global graph vertex indices. The same rule applies to
-<code>floating_substituents$parents</code>. A virtual floating attachment is not an
-edge, and a floating substituent is not a vertex.</p>
+and stored in <code>floating_parts$parents</code> or <code>floating_substituents$parents</code>
+use this same global order. Substituent blocks contribute no vertex indices.
+A virtual floating attachment is not an edge, and a floating substituent is
+not a vertex.</p>
     </div>
     <div class="section level2">
     <h2 id="na-support">NA Support<a class="anchor" aria-label="anchor" href="#na-support"></a></h2>
@@ -233,7 +236,7 @@ explicitly convert it to IUPAC-condensed strings when needed.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Parse a floating part with explicit candidate parents</span></span></span>
 <span class="r-in"><span><span class="va">floating</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="st">"{Neu5Ac(a2-3)|1,2}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"</span></span></span>
+<span class="r-in"><span>  <span class="st">"{Neu5Ac(a2-3)|2,3}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="structure_tables.html">structure_floating_parts</a></span><span class="op">(</span><span class="va">floating</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 6</span></span>

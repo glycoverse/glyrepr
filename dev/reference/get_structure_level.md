@@ -66,7 +66,7 @@ get_structure_level(glycan)
 #> [1] "intact"
 
 floating <- as_glycan_structure(
-  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 get_structure_level(floating)
 #> [1] "intact"

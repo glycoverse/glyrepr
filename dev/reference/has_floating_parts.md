@@ -25,26 +25,28 @@ logical scalar for graph input. Missing structures produce `NA`.
 ## Details
 
 A floating part is a known glycan residue or substructure whose parent
-residue on the main glycan tree is not fully localized. For example, a
-bi-antennary N-glycan may contain one sialic acid while the available
-evidence cannot determine which of its two terminal galactoses carries
-that residue. The sialic acid can then be represented as a floating part
-with both galactoses as candidate parents.
+residue in the complete glycan structure is not fully localized. For
+example, a bi-antennary N-glycan may contain one sialic acid while the
+available evidence cannot determine which of its two terminal galactoses
+carries that residue. The sialic acid can then be represented as a
+floating part with both galactoses as candidate parents.
 
 In the `glyrepr` IUPAC extension, floating parts appear in braces before
 the main glycan:
 
-- `{<floating>}<main>` means every feasible main-tree node is a
-  candidate parent.
+- `{<floating>}<main>` means every feasible node outside that floating
+  component is a candidate parent.
 
 - `{<floating>|<parents>}<main>` restricts the candidates to the
-  comma-separated main-tree node indices in `<parents>`.
+  comma-separated complete-sequence node indices in `<parents>`.
 
-Main-tree indices follow residue order within the main IUPAC-condensed
-tree and are numbered from 1 independently of preceding floating parts.
-A floating part may contain one residue or an entire subtree, and its
-virtual attachment linkage may be fully known, partially known, or
-unknown.
+Node indices follow residue order in the complete IUPAC-condensed
+sequence: residue nodes in floating blocks are counted from left to
+right before the main glycan, while substituent blocks contribute no
+node indices. A floating part may target a node in another floating
+component or the main tree, but not a node in its own component. It may
+contain one residue or an entire subtree, and its virtual attachment
+linkage may be fully known, partially known, or unknown.
 
 Internally, an unresolved structure is an annotated forest containing
 one main tree and one disconnected tree per floating part. The virtual
@@ -58,10 +60,12 @@ exposes attachment metadata in tabular form, and
 [`structure_component_membership()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_component_membership.md)
 exposes component membership.
 
-An explicit singleton parent list fully localizes the attachment, as
-does an omitted parent list when the main tree has only one node. Such a
-part is normalized to an ordinary graph edge, so `has_floating_parts()`
-returns `FALSE` for the normalized structure.
+An effective singleton parent domain fully localizes the attachment.
+When one floating component attaches to another, their component
+metadata is merged and newly singleton domains are resolved iteratively.
+Such parts are normalized to ordinary graph edges, so
+`has_floating_parts()` returns `FALSE` once every attachment is
+localized.
 
 ## See also
 
@@ -78,7 +82,7 @@ main <- paste0(
   "Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 )
 ambiguous <- as_glycan_structure(
-  paste0("{Neu5Ac(a2-3)|1,4}", main)
+  paste0("{Neu5Ac(a2-3)|2,5}", main)
 )
 glycans <- c(ambiguous = ambiguous, ordinary = as_glycan_structure(main))
 has_floating_parts(glycans)
@@ -91,7 +95,7 @@ structure_floating_parts(ambiguous)
 #> 1         1       1         1 <int [1]> a2-3    <int [2]>
 
 localized <- as_glycan_structure(
-  "{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-"
+  "{Neu5Ac(a2-3)|2}Gal(b1-4)GlcNAc(b1-"
 )
 has_floating_parts(localized)
 #> [1] FALSE

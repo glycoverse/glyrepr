@@ -67,17 +67,19 @@ a logical scalar for graph input. Missing structures produce <code>NA</code>.</p
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>In the <code>glyrepr</code> IUPAC extension, floating substituents appear in braces
-before the main glycan. <code>{6S}&lt;main&gt;</code> allows every feasible main-tree residue
-to carry the substituent, <code>{6S|1,2}&lt;main&gt;</code> restricts it to main-tree residues
-1 and 2, and <code>{?S}&lt;main&gt;</code> also leaves the carbon position unknown.</p>
+before the main glycan. <code>{6S}&lt;main&gt;</code> allows every feasible residue in the
+complete structure to carry the substituent, <code>{6S|1,2}&lt;main&gt;</code> restricts it
+to complete-sequence nodes 1 and 2, and <code>{?S}&lt;main&gt;</code> also leaves the carbon
+position unknown. Residue nodes in floating blocks are counted before the
+main glycan; substituent blocks contribute no node indices.</p>
 <p>Internally, unresolved substituents are stored in the
 <code>floating_substituents</code> graph attribute. It is a list with one entry per
 substituent. Each entry contains a canonical <code>substituent</code> token and an
-integer <code>parents</code> vector of candidate main-tree vertex indices. An empty
-vector means every feasible main-tree vertex is a candidate.</p>
+integer <code>parents</code> vector of candidate graph vertex indices. An empty vector
+means every feasible residue vertex is a candidate.</p>
 <p>A singleton candidate set is normalized into that vertex's ordinary <code>sub</code>
-attribute. This also happens for an unrestricted floating substituent when
-the main tree has only one residue.
+attribute. This also happens whenever chemistry leaves only one feasible
+residue in the complete structure.
 <code><a href="structure_tables.html">structure_floating_substituents()</a></code> exposes the metadata as a normalized
 table.</p>
     </div>

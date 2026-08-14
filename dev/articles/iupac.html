@@ -327,34 +327,41 @@ residue while retaining the reducing-end annotation used by
 <div class="section level2">
 <h2 id="floating-parts">Floating Parts<a class="anchor" aria-label="anchor" href="#floating-parts"></a>
 </h2>
-<p>Sometimes a substructure is known but its parent in the main glycan
-is not. For example, a bi-antennary N-glycan may contain one sialic acid
-without enough evidence to determine which terminal galactose carries
-it.</p>
+<p>Sometimes a substructure is known but its parent in the complete
+glycan is not. For example, a bi-antennary N-glycan may contain one
+sialic acid without enough evidence to determine which terminal
+galactose carries it.</p>
 <p><code>glyrepr</code> represents such a floating part in braces before
 the main IUPAC-condensed structure:</p>
 <pre><code>{Neu5Ac(a2-3)}&lt;main glycan&gt;</code></pre>
-<p>Omitting a parent list means that every feasible node of the main
-tree is a candidate. To retain a known candidate set, add a pipe
-followed by comma-separated main-tree node indices:</p>
-<pre><code>{Neu5Ac(a2-3)|1,4}&lt;main glycan&gt;</code></pre>
-<p>This means that the virtual <code>a2-3</code> attachment can use node
-1 or node 4. The indices follow the left-to-right residue order of the
-main IUPAC-condensed sequence; residues inside floating blocks are not
-counted. The <code>|1,4</code> suffix is a <code>glyrepr</code>
-extension to curly-brace IUPAC notation. An explicit candidate set needs
-at least two nodes to remain floating. Singleton syntax is still
-accepted, but it fully localizes the attachment and is serialized as an
-ordinary linkage. For example,
-<code>{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-</code> becomes
-<code>Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-</code>. The same normalization
-occurs when the parent list is omitted and the main glycan has only one
-node.</p>
+<p>Omitting a parent list means that every feasible node outside the
+floating part’s own component is a candidate. To retain a known
+candidate set, add a pipe followed by comma-separated complete-sequence
+node indices:</p>
+<pre><code>{Neu5Ac(a2-3)|2,5}&lt;main glycan&gt;</code></pre>
+<p>The indices follow the left-to-right residue order of the complete
+IUPAC-condensed sequence: residues inside floating blocks are counted
+before the main glycan, while substituent blocks contribute no nodes.
+Thus the floating Neu5Ac above is node 1 and its candidate main-tree
+residues are nodes 2 and 5. The <code>|2,5</code> suffix is a
+<code>glyrepr</code> extension to curly-brace IUPAC notation. A floating
+part may target a residue in another floating component, but not one in
+its own component. All selected component attachments must be acyclic
+and ultimately connect to the main tree.</p>
+<p>For example, in <code>{Gal(b1-4)|2,3}Glc(a1-3)Man(a1-</code>, Gal is
+node 1 and may attach to Glc (node 2) or Man (node 3).</p>
+<p>An explicit candidate set needs at least two nodes to remain
+floating. Singleton syntax is still accepted, but it fully localizes the
+attachment and is serialized as an ordinary linkage. For example,
+<code>{Neu5Ac(a2-3)|2}Gal(b1-4)GlcNAc(b1-</code> becomes
+<code>Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-</code>. Singleton localization is
+iterative, so attaching one floating component to another can resolve
+further domains.</p>
 <p>Here is the complete bi-antennary example:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">floating_n_glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>    <span class="st">"{Neu5Ac(a2-3)|1,4}"</span>,</span>
+<span>    <span class="st">"{Neu5Ac(a2-3)|2,5}"</span>,</span>
 <span>    <span class="st">"Gal(b1-4)GlcNAc(b1-2)Man(a1-3)"</span>,</span>
 <span>    <span class="st">"[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]"</span>,</span>
 <span>    <span class="st">"Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span></span>
@@ -362,7 +369,7 @@ node.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">floating_n_glycan</span></span>
 <span><span class="co">#&gt; &lt;glycan_structure[1]&gt;</span></span>
-<span><span class="co">#&gt; [1] {<span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">a2-3</span>)|1,4}<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
+<span><span class="co">#&gt; [1] {<span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">a2-3</span>)|2,5}<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span></span>
 <span><span class="co">#&gt; # Unique structures: 1</span></span>
 <span><span class="fu"><a href="../reference/structure_tables.html">structure_floating_parts</a></span><span class="op">(</span><span class="va">floating_n_glycan</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
@@ -372,7 +379,9 @@ node.</p>
 <p>Floating blocks may contain more than one residue, and multiple
 blocks may precede the same main glycan. <code>glyrepr</code>
 canonicalizes their order while preserving duplicate floating parts and
-each candidate-parent set.</p>
+remapping every candidate-parent set to the resulting complete-sequence
+order. Floating substituents use the same global node domain and may
+therefore target residues in floating parts.</p>
 </div>
 <div class="section level2">
 <h2 id="practice">Practice<a class="anchor" aria-label="anchor" href="#practice"></a>

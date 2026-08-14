@@ -7,14 +7,17 @@ the floating-part rows and canonical node identifiers returned by
 
 Each selected parent must belong to the floating part's declared
 candidate domain. For an unrestricted `{<floating>}` part, that domain
-contains every node in the original main tree. Assignments must also be
-simultaneously compatible with occupied and potential acceptor linkage
-positions.
+contains every feasible node outside its own component, including nodes
+in other floating components. Assignments must also be simultaneously
+compatible with occupied and potential acceptor linkage positions,
+acyclic, and ultimately connected to the main tree.
 
 Selected virtual attachments become ordinary graph edges. Unassigned
 floating parts remain floating. The resulting structures are
 canonicalized, and candidate-parent indices for remaining parts are
-remapped to the new canonical main-tree order.
+remapped to the new canonical complete-sequence order. Attaching one
+floating component to another merges their component metadata and can
+iteratively resolve newly singleton domains.
 
 Missing values, vector positions, and names in structure-vector input
 are preserved. For graph input, `glycan_id` must be `1L`, and selected
@@ -48,7 +51,7 @@ and order.
 
 ``` r
 glycan <- as_glycan_structure(
-  "{Neu5Ac(a2-6)|1,2}Gal(b1-3)GalNAc(a1-"
+  "{Neu5Ac(a2-6)|2,3}Gal(b1-3)GalNAc(a1-"
 )
 assignments <- tibble::tibble(
   glycan_id = 1L,

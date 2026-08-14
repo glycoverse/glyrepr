@@ -67,20 +67,23 @@ a logical scalar for graph input. Missing structures produce <code>NA</code>.</p
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>A floating part is a known glycan residue or substructure whose parent
-residue on the main glycan tree is not fully localized. For example, a
+residue in the complete glycan structure is not fully localized. For example, a
 bi-antennary N-glycan may contain one sialic acid while the available
 evidence cannot determine which of its two terminal galactoses carries that
 residue. The sialic acid can then be represented as a floating part with
 both galactoses as candidate parents.</p>
 <p>In the <code>glyrepr</code> IUPAC extension, floating parts appear in braces before the
-main glycan:</p><ul><li><p><code>{&lt;floating&gt;}&lt;main&gt;</code> means every feasible main-tree node is a candidate
-parent.</p></li>
+main glycan:</p><ul><li><p><code>{&lt;floating&gt;}&lt;main&gt;</code> means every feasible node outside that floating
+component is a candidate parent.</p></li>
 <li><p><code>{&lt;floating&gt;|&lt;parents&gt;}&lt;main&gt;</code> restricts the candidates to the
-comma-separated main-tree node indices in <code>&lt;parents&gt;</code>.</p></li>
-</ul><p>Main-tree indices follow residue order within the main IUPAC-condensed tree
-and are numbered from 1 independently of preceding floating parts. A
-floating part may contain one residue or an entire subtree, and its virtual
-attachment linkage may be fully known, partially known, or unknown.</p>
+comma-separated complete-sequence node indices in <code>&lt;parents&gt;</code>.</p></li>
+</ul><p>Node indices follow residue order in the complete IUPAC-condensed sequence:
+residue nodes in floating blocks are counted from left to right before the
+main glycan, while substituent blocks contribute no node indices. A floating
+part may target a node in another floating component or the main tree, but
+not a node in its own component. It may contain one residue or an entire
+subtree, and its virtual attachment linkage may be fully known, partially
+known, or unknown.</p>
 <p>Internally, an unresolved structure is an annotated forest containing one
 main tree and one disconnected tree per floating part. The virtual linkage
 and candidate parents are stored as graph metadata rather than as an edge.
@@ -89,10 +92,11 @@ vertex indices in that floating component, so downstream graph operations do
 not need to rediscover its membership by traversal.
 <code><a href="structure_tables.html">structure_floating_parts()</a></code> exposes attachment metadata in tabular form, and
 <code><a href="structure_component_membership.html">structure_component_membership()</a></code> exposes component membership.</p>
-<p>An explicit singleton parent list fully localizes the attachment, as does an
-omitted parent list when the main tree has only one node. Such a part is
-normalized to an ordinary graph edge, so <code>has_floating_parts()</code> returns
-<code>FALSE</code> for the normalized structure.</p>
+<p>An effective singleton parent domain fully localizes the attachment. When
+one floating component attaches to another, their component metadata is
+merged and newly singleton domains are resolved iteratively. Such parts are
+normalized to ordinary graph edges, so <code>has_floating_parts()</code> returns
+<code>FALSE</code> once every attachment is localized.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -108,7 +112,7 @@ normalized to an ordinary graph edge, so <code>has_floating_parts()</code> retur
 <span class="r-in"><span>  <span class="st">"Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ambiguous</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"{Neu5Ac(a2-3)|1,4}"</span>, <span class="va">main</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"{Neu5Ac(a2-3)|2,5}"</span>, <span class="va">main</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">glycans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ambiguous <span class="op">=</span> <span class="va">ambiguous</span>, ordinary <span class="op">=</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="va">main</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">has_floating_parts</span><span class="op">(</span><span class="va">glycans</span><span class="op">)</span></span></span>
@@ -121,7 +125,7 @@ normalized to an ordinary graph edge, so <code>has_floating_parts()</code> retur
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>         1       1         1 <span style="color: #949494;">&lt;int [1]&gt;</span> a2-3    <span style="color: #949494;">&lt;int [2]&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">localized</span> <span class="op">&lt;-</span> <span class="fu"><a href="as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="st">"{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-"</span></span></span>
+<span class="r-in"><span>  <span class="st">"{Neu5Ac(a2-3)|2}Gal(b1-4)GlcNAc(b1-"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">has_floating_parts</span><span class="op">(</span><span class="va">localized</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>

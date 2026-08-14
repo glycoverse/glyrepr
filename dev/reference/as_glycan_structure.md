@@ -40,22 +40,24 @@ representation.
 
 Character input supports floating-part blocks before the main
 IUPAC-condensed structure. `{Neu5Ac(a2-3)}<main>` allows every feasible
-main-tree node as a candidate parent, while `{Neu5Ac(a2-3)|1,4}<main>`
-restricts the candidates to main-tree nodes 1 and 4. Parent indices
-follow residue order in the supplied main sequence and are remapped to
-canonical IUPAC order in the result. The `|<parents>` suffix is a
-`glyrepr` extension to curly-brace IUPAC notation. A singleton candidate
-set is accepted as input but fully localizes the attachment, so
-`{Neu5Ac(a2-3)|1}Gal(b1-4)GlcNAc(b1-` canonicalizes to the ordinary
-structure `Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`. An omitted parent list
-behaves the same way when the main tree contains only one node.
+node outside its own component as a candidate parent, while an explicit
+`|<parents>` suffix restricts that domain. Parent indices follow residue
+order in the complete supplied sequence: residues in floating blocks are
+counted left to right before the main glycan, and substituent blocks add
+no indices. A floating part may target another floating component or the
+main tree, but cannot target itself. Indices are remapped to canonical
+complete sequence order in the result. The suffix is a `glyrepr`
+extension to curly-brace IUPAC notation. A singleton candidate set is
+accepted as input but fully localizes the attachment, so
+`{Neu5Ac(a2-3)|2}Gal(b1-4)GlcNAc(b1-` canonicalizes to the ordinary
+structure `Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-`.
 
 Floating substituents use the same leading-brace and candidate-parent
 syntax. For example, `{6S}<main>` leaves the sulfated residue
-unrestricted, `{6S|1,2}<main>` restricts it to main-tree residues 1 and
-2, and `{?S}<main>` also leaves the carbon position unknown. A singleton
-candidate is normalized into the selected residue's ordinary `sub`
-attribute.
+unrestricted across all residue nodes, `{6S|1,2}<main>` restricts it to
+complete-sequence nodes 1 and 2, and `{?S}<main>` also leaves the carbon
+position unknown. A singleton candidate is normalized into the selected
+residue's ordinary `sub` attribute.
 
 ## Examples
 
@@ -109,14 +111,14 @@ as_glycan_structure("Gal(b1-4)GlcNAc-ol(a1-")
 
 # Parse a floating residue with two candidate parents
 floating_iupac <- paste0(
-  "{Neu5Ac(a2-3)|1,4}",
+  "{Neu5Ac(a2-3)|2,5}",
   "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)",
   "[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]",
   "Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 )
 as_glycan_structure(floating_iupac)
 #> <glycan_structure[1]>
-#> [1] {Neu5Ac(a2-3)|1,4}Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
+#> [1] {Neu5Ac(a2-3)|2,5}Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-
 #> # Unique structures: 1
 
 # Preserve valid elements while replacing an invalid element with NA
