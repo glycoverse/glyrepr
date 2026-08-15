@@ -447,12 +447,13 @@ test_that("as_glycan_structure.character handles mixed valid/invalid in vectors"
   expect_error(as_glycan_structure(all_invalid), "Could not parse")
 })
 
-test_that("as_glycan_structure.character rejects mixed mono types with NA", {
+test_that("as_glycan_structure.character accepts mixed mono types with NA", {
   mixed_vector <- c("Glc(a1-", NA, "Hex(a1-")
 
-  expect_error(
-    as_glycan_structure(mixed_vector),
-    "All structures must have the same monosaccharide type"
+  result <- as_glycan_structure(mixed_vector)
+  expect_identical(
+    get_mono_type(result),
+    c("concrete", NA_character_, "generic")
   )
 })
 

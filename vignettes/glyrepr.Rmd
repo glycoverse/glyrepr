@@ -340,24 +340,24 @@ get_structure_level(strucs)
 ### Structure Levels
 
 The structures we have seen so far are "intact" structures.
-They contain specific monosaccharides and complete linkage information.
+They contain complete linkage information.
 In real datasets, though, glycan structures often have missing information.
 For example, we might know the topology but not the linkages,
 or we might only know generic monosaccharide classes.
 
-To accommodate these scenarios, `glyrepr` defines four levels of glycan structures:
+To accommodate these scenarios, `glyrepr` defines three levels of glycan structures.
+These levels depend only on linkage and anomer information:
 
-- **Intact**: specific monosaccharides and complete linkage information.
-- **Partial**: specific monosaccharides, with at least one missing linkage annotation.
-- **Topological**: specific monosaccharides, but all linkage information is missing.
-- **Basic**: generic monosaccharides, with linkage information treated as missing.
+- **Intact**: all linkage and anomer information is complete and unambiguous.
+- **Partial**: some linkage or anomer information is present, but it is not complete.
+- **Topological**: all linkage and anomer information is missing.
 
 Floating parts do not change these definitions. Their attachment linkage is
 assessed like any other linkage, while uncertainty about the candidate parent
 is independent of the structure level.
 
-Structure levels are defined at the vector level,
-so one glycan structure vector has one level.
+Structure levels are defined per glycan and do not depend on whether residues
+are generic, concrete, or mixed.
 
 Let's see some examples.
 
@@ -388,7 +388,8 @@ as_glycan_structure(c(
 )) |> get_structure_level()
 ```
 
-**Basic structures**:
+Generic structures use the same linkage-based levels. For example, these are
+topological structures:
 
 ```{r}
 as_glycan_structure(c(
@@ -397,12 +398,7 @@ as_glycan_structure(c(
 )) |> get_structure_level()
 ```
 
-In theory, you can have something like `"Hex(b1-3)HexNAc(a1-"`,
-with generic monosaccharides but all linkages intact.
-In practice, linkage information is usually harder to obtain than monosaccharide identities,
-so this situation is rare.
-
-If you create such a vector, `glyrepr` classifies it as `"basic"` and warns you.
+Generic structures with complete linkages are intact:
 
 ```{r}
 as_glycan_structure(c(
@@ -414,19 +410,19 @@ as_glycan_structure(c(
 ### Manipulating Glycan Structure Vectors
 
 Glycan structure vectors also support vectorized operations like subsetting and concatenation.
-They also have structure-specific helpers for reducing resolution,
-removing linkages, and removing substituents.
+They also have structure-specific helpers for removing linkages and
+substituents.
 
 ```{r}
 strucs
 ```
 
 ```{r}
-reduce_structure_level(strucs, to_level = "basic")
+remove_linkages(strucs)
 ```
 
 ```{r}
-remove_linkages(strucs)  # same as reduce_structure_level(strucs, to_level = "topological")
+convert_to_generic(remove_linkages(strucs))
 ```
 
 ```{r}

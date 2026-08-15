@@ -2,23 +2,22 @@
 % Please edit documentation in R/structure-graph-low-level.R
 \name{validate_glycan_graph_vector}
 \alias{validate_glycan_graph_vector}
-\title{Validate Compatibility Across Glycan Graphs}
+\title{Validate a List of Glycan Graphs}
 \usage{
 validate_glycan_graph_vector(graphs, label = NULL)
 }
 \arguments{
 \item{graphs}{A list of individually valid \code{igraph} glycan graphs.}
 
-\item{label}{An optional label used in error messages.}
+\item{label}{An optional label retained for backward compatibility.}
 }
 \value{
-\code{NULL}, invisibly. An error is thrown when the graphs are
-incompatible.
+\code{NULL}, invisibly.
 }
 \description{
-Check that a list of individually valid glycan graphs can coexist in one
-glycan structure vector. All graphs must use the same monosaccharide type:
-either concrete or generic.
+Check the container used to store individually valid glycan graphs in one
+glycan structure vector. Generic and concrete residues may coexist within a
+graph and across graphs.
 }
 \details{
 This function assumes that every element has already passed

@@ -145,17 +145,14 @@ test_that("combined ordinary traversal matches separate order and IUPAC paths", 
 })
 
 
-test_that("validate_glycan_graph_vector rejects mixed monosaccharide types", {
+test_that("validate_glycan_graph_vector accepts mixed monosaccharide types", {
   concrete <- get_structure_graphs(o_glycan_core_1(), return_list = FALSE)
   generic <- get_structure_graphs(
     convert_to_generic(o_glycan_core_1()),
     return_list = FALSE
   )
 
-  expect_snapshot(
-    error = TRUE,
-    validate_glycan_graph_vector(list(concrete, generic))
-  )
+  expect_no_error(validate_glycan_graph_vector(list(concrete, generic)))
 })
 
 

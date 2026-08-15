@@ -1361,15 +1361,28 @@ test_that("smap_unique documents behavior with named input", {
   expect_true(is.null(names(result)) || startsWith(names(result), "Gal"))
 })
 
-test_that("get_structure_level returns one unnamed level for a named vector", {
+test_that("get_structure_level preserves names", {
   core1 <- o_glycan_core_1()
   core2 <- n_glycan_core()
   structures <- c(core1, core2, core1)
   names(structures) <- c("A", "B", "C")
 
   result <- get_structure_level(structures)
-  expect_equal(result, "intact")
-  expect_null(names(result))
+  expect_identical(result, c(A = "intact", B = "intact", C = "intact"))
+})
+
+test_that("smap_structure can create mixed residue types", {
+  structures <- c(
+    o_glycan_core_1(),
+    n_glycan_core(mono_type = "generic")
+  )
+
+  result <- smap_structure(structures, function(graph) {
+    replacement <- if (get_mono_type(graph) == "concrete") "Hex" else "Gal"
+    igraph::set_vertex_attr(graph, "mono", index = 1, value = replacement)
+  })
+
+  expect_identical(get_mono_type(result), c("mixed", "mixed"))
 })
 
 # Tests for NA handling in smap functions -----------------------------------

@@ -10,8 +10,8 @@ new_glycan_structure(iupac = character(), graphs = list())
 \item{iupac}{A character vector of canonical IUPAC-condensed strings. Missing
 values are allowed, and names are preserved exactly.}
 
-\item{graphs}{A named list of valid, canonical, mutually compatible \code{igraph}
-glycan graphs keyed by IUPAC-condensed strings.}
+\item{graphs}{A named list of valid, canonical \code{igraph} glycan graphs keyed
+by IUPAC-condensed strings.}
 }
 \value{
 A \code{glyrepr_structure} vector.

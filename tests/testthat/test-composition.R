@@ -47,18 +47,20 @@ test_that("substituents are located after monosaccharides", {
   expect_equal(as.character(comp), "Glc(1)Gal(1)Ac(1)S(1)")
 })
 
-test_that("mixed types within one composition throws error", {
-  expect_error(
-    glycan_composition(c(Hex = 1, Glc = 1)),
-    "Must have only one type of monosaccharide"
-  )
+test_that("mixed types within one composition are supported", {
+  comp <- glycan_composition(c(Hex = 1, Glc = 1))
+
+  expect_s3_class(comp, "glyrepr_composition")
+  expect_identical(get_mono_type(comp), "mixed")
 })
 
-test_that("mixed types within one composition vector throws error", {
-  expect_error(
-    glycan_composition(c(Hex = 1, HexNAc = 1), c(Glc = 1, Gal = 1)),
-    "Must have only one type of monosaccharide"
+test_that("mixed types within one composition vector are supported", {
+  comp <- glycan_composition(
+    c(Hex = 1, HexNAc = 1),
+    c(Glc = 1, Gal = 1)
   )
+
+  expect_identical(get_mono_type(comp), c("generic", "concrete"))
 })
 
 test_that("unknown monosaccharides throw error", {
@@ -267,20 +269,20 @@ test_that("c() works with empty composition vectors", {
   expect_equal(format(combined2), "Hex(2)HexNAc(1)")
 })
 
-test_that("c() throws error for different monosaccharide types", {
-  # Test that combining generic and concrete compositions throws an error
+test_that("c() combines different monosaccharide types", {
   generic_comp <- glycan_composition(c(Hex = 1, HexNAc = 1))
   concrete_comp <- glycan_composition(c(Glc = 1, Gal = 1))
 
-  expect_error(c(generic_comp, concrete_comp), "Can't combine")
+  combined <- c(generic_comp, concrete_comp)
+  expect_identical(get_mono_type(combined), c("generic", "concrete"))
 })
 
-test_that("c() throws error for different monosaccharide types with substituents", {
-  # Test that combining generic and concrete compositions throws an error
+test_that("c() combines different monosaccharide types with substituents", {
   generic_comp <- glycan_composition(c(Hex = 1, HexNAc = 1, Me = 1))
   concrete_comp <- glycan_composition(c(Glc = 1, Gal = 1, S = 1))
 
-  expect_error(c(generic_comp, concrete_comp), "Can't combine")
+  combined <- c(generic_comp, concrete_comp)
+  expect_identical(get_mono_type(combined), c("generic", "concrete"))
 })
 
 test_that("c() maintains proper ordering within compositions", {

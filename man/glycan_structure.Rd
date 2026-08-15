@@ -51,7 +51,7 @@ Missing attributes are treated as \code{FALSE} and canonicalized explicitly.
 \itemize{
 \item Generic names: Hex, HexNAc, dHex, NeuAc, etc.
 \item Concrete names: Glc, Gal, Man, GlcNAc, etc.
-\item Cannot mix generic and concrete names
+\item Generic and concrete names may be mixed
 \item NA values are not allowed
 }
 \item \code{sub}: Substituent information

@@ -82,7 +82,7 @@ convert_to_generic.glyrepr_structure <- function(x) {
 
   # Get current mono types
   from <- get_mono_type(x)
-  if (is.na(from) || from == "generic") {
+  if (!any(from %in% c("concrete", "mixed"))) {
     return(x)
   }
 
@@ -121,10 +121,7 @@ convert_to_generic.glyrepr_composition <- function(x) {
 
   # Get current mono types
   current_type <- get_mono_type.glyrepr_composition(x)
-  if (is.na(current_type)) {
-    return(x)
-  }
-  if (current_type == "generic") {
+  if (!any(current_type %in% c("concrete", "mixed"))) {
     return(x)
   }
 
@@ -157,7 +154,8 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #'
 #' This function determines the type of monosaccharides in character vectors,
 #' glycan compositions, or glycan structures.
-#' Supported types: "concrete" and "generic" (see details below).
+#' Supported types are "concrete", "generic", and "mixed" (see details
+#' below).
 #'
 #' @details
 #'
@@ -186,8 +184,10 @@ convert_to_generic.glyrepr_composition <- function(x) {
 #'
 #' @returns
 #'   - For character input, returns a character vector of the same length as `x`.
-#'   - For `glyrepr_structure`, `glyrepr_composition`, and `igraph` input,
-#'     returns a character scalar.
+#'   - For `glyrepr_structure` and `glyrepr_composition` input, returns one
+#'     value per element. Missing elements return `NA_character_`.
+#'   - For `igraph` input, returns a character scalar.
+#'   Character and structure-vector outputs preserve input names.
 #'
 #' @examples
 #' # Character vector
@@ -221,6 +221,7 @@ get_mono_type.character <- function(x) {
   }
   result[is_concrete] <- "concrete"
   result[is_generic] <- "generic"
+  names(result) <- names(x)
   result
 }
 
@@ -238,16 +239,7 @@ get_mono_type.glyrepr_structure <- function(x) {
     return(character())
   }
 
-  graphs <- attr(x, "graphs")
-
-  # Handle all-NA vectors (empty graphs list)
-  if (length(graphs) == 0) {
-    return(NA_character_)
-  }
-
-  graphs1 <- graphs[[1]]
-  monos1 <- igraph::V(graphs1)$mono
-  get_mono_type_impl(monos1)
+  smap_chr(x, get_graph_mono_type)
 }
 
 #' @export
@@ -270,18 +262,17 @@ get_mono_type.glyrepr_composition <- function(x) {
     return(character())
   }
 
-  # All non-missing compositions in a composition vector must be of the same type.
-  # Therefore, we just need to check the first non-missing composition.
-  # Filter out substituents before determining monosaccharide type.
   compositions <- vctrs::field(x, "data")
-  compositions <- purrr::discard(compositions, .is_na_composition_elem)
-  if (length(compositions) == 0) {
-    return(NA_character_)
-  }
+  result <- purrr::map_chr(compositions, function(comp) {
+    if (.is_na_composition_elem(comp)) {
+      return(NA_character_)
+    }
 
-  comp_names <- names(compositions[[1]])
-  mono_names <- comp_names[!comp_names %in% available_substituents()]
-  get_mono_type_impl(mono_names)
+    mono_names <- names(comp)[!names(comp) %in% available_substituents()]
+    get_mono_type_impl(mono_names)
+  })
+  names(result) <- names(x)
+  result
 }
 
 #' Decide mono type from a vector of monosaccharide names
@@ -319,41 +310,28 @@ get_graph_mono_type <- function(graph) {
 #'
 #' This function converts concrete monosaccharide names to generic type.
 #' Generic monosaccharides are returned as is.
-#' It assumes that all monosaccharides are of the same type.
 #' Substituents are not converted.
 #'
 #' @param monos A character vector of monosaccharide names.
 #' @returns A character vector of monosaccharide names in generic type.
 #' @noRd
 convert_mono_type_impl <- function(monos) {
-  mono_type <- get_mono_type_impl(monos)
-  if (mono_type == "generic") {
-    return(monos)
-  }
-  if (mono_type == "mixed") {
-    cli::cli_abort("Mixed monosaccharide types are not supported.")
-  }
   from_ <- monosaccharides[["concrete"]]
   to_ <- monosaccharides[["generic"]]
 
-  # Handle NA values - preserve them
+  # Preserve missing values and substituents.
   is_na <- is.na(monos)
-  if (any(is_na)) {
-    # If all values are NA, return as-is
-    if (all(is_na)) {
-      return(monos)
-    }
-    result <- monos
-    # Convert non-NA values
-    non_na <- !is_na
-    result[non_na] <- convert_mono_type_impl(monos[non_na])
+  is_substituent <- monos %in% available_substituents()
+  is_residue <- !is_na & !is_substituent
+
+  result <- monos
+  if (!any(is_residue)) {
     return(result)
   }
 
-  # Non-NA case: convert using base R vectorized operations
-  is_substituent <- monos %in% available_substituents()
-  result <- to_[match(monos, from_)]
-  result[is_substituent] <- monos[is_substituent]
+  residue_types <- get_mono_type(monos[is_residue])
+  concrete <- which(is_residue)[residue_types == "concrete"]
+  result[concrete] <- to_[match(monos[concrete], from_)]
   result
 }
 

@@ -29,7 +29,7 @@
 #' - `mono`: Monosaccharide names, must be known monosaccharide types
 #'   - Generic names: Hex, HexNAc, dHex, NeuAc, etc.
 #'   - Concrete names: Glc, Gal, Man, GlcNAc, etc.
-#'   - Cannot mix generic and concrete names
+#'   - Generic and concrete names may be mixed
 #'   - NA values are not allowed
 #' - `sub`: Substituent information
 #'   - Single substituent format: "xY" (x = position, Y = substituent name),
@@ -228,7 +228,7 @@ glycan_structure <- function(...) {
       canonicalize_glycan_graph()
   })
 
-  # Validate that all structures have the same mono_type
+  # Validate the graph-list container.
   validate_glycan_graph_vector(processed_graphs)
 
   # Use IUPAC codes directly as data for the glycan_structure vctrs vector
@@ -519,35 +519,9 @@ vec_ptype2.glyrepr_structure.glyrepr_structure <- function(x, y, ...) {
   graphs_x <- attr(x, "graphs")
   graphs_y <- attr(y, "graphs")
 
-  # Validate each vector separately
+  # Validate each graph-list container separately.
   validate_glycan_graph_vector(graphs_x, label = "Vector 1")
   validate_glycan_graph_vector(graphs_y, label = "Vector 2")
-
-  # Check that both vectors have the same mono_type
-  if (length(graphs_x) > 0 && length(graphs_y) > 0) {
-    mono_types_x <- purrr::map_chr(graphs_x, get_graph_mono_type)
-    mono_types_y <- purrr::map_chr(graphs_y, get_graph_mono_type)
-    unique_types_x <- unique(mono_types_x)
-    unique_types_y <- unique(mono_types_y)
-
-    if (
-      length(unique_types_x) > 0 &&
-        length(unique_types_y) > 0 &&
-        unique_types_x[[1]] != unique_types_y[[1]]
-    ) {
-      concrete_count_x <- sum(mono_types_x == "concrete")
-      generic_count_x <- sum(mono_types_x == "generic")
-      concrete_count_y <- sum(mono_types_y == "concrete")
-      generic_count_y <- sum(mono_types_y == "generic")
-
-      cli::cli_abort(c(
-        "All structures must have the same monosaccharide type.",
-        "x" = "Vector 1 has {.val {concrete_count_x}} concrete and {.val {generic_count_x}} generic structure(s).",
-        "x" = "Vector 2 has {.val {concrete_count_y}} concrete and {.val {generic_count_y}} generic structure(s).",
-        "i" = "Use {.fn convert_to_generic} to convert concrete structures to generic type."
-      ))
-    }
-  }
 
   # Combine graphs from both vectors (union by IUPAC name as key)
   combined_graphs <- c(graphs_x, graphs_y)
@@ -625,8 +599,8 @@ glycan_structure_from_iupac_character <- function(x) {
 #' Canonicalize and validate parsed IUPAC-condensed graphs
 #'
 #' Validates each parsed graph, reorders vertices and edges to the canonical
-#' IUPAC-condensed order, validates vector-level monosaccharide-type
-#' consistency, and deduplicates graph storage by canonical IUPAC string.
+#' IUPAC-condensed order and deduplicates graph storage by canonical IUPAC
+#' string.
 #'
 #' @param graphs A list of parsed igraph graph objects.
 #' @returns A list with canonical `iupacs` and unique named `graphs`.

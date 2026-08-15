@@ -9,7 +9,7 @@
 #' it counts all "concrete" monosaccharides that match.
 #' For example, "Hex" will count all Glc, Man, Gal, etc.
 #' When `mono` is "concrete" (e.g. "Gal", "GalNAc"),
-#' NA is returned when the composition is "generic".
+#' NA is returned when the composition contains generic residues.
 #' Floating substituents are counted like substituents attached to known
 #' residues.
 #'
@@ -107,7 +107,7 @@ count_mono.glyrepr_composition <- function(
   res <- purrr::map_int(data, count_one, mono = mono)
   if (mono_type == "concrete") {
     x_mono_type <- get_mono_type(x)
-    res[x_mono_type == "generic"] <- NA_integer_
+    res[x_mono_type %in% c("generic", "mixed")] <- NA_integer_
   }
   res
 }
