@@ -170,7 +170,7 @@ structure vectors.
 - [`canonicalize_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graph.md)
   : Canonicalize a Glycan Graph
 - [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph_vector.md)
-  : Validate Compatibility Across Glycan Graphs
+  : Validate a List of Glycan Graphs
 - [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md)
   : Enumerate Floating Graph Localizations
 - [`graph_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/graph_to_iupac.md)
@@ -192,8 +192,6 @@ structure vectors.
   : Remove All Linkages from a Glycan
 - [`remove_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_substituents.md)
   : Remove All Substituents from a Glycan
-- [`reduce_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/reduce_structure_level.md)
-  : Reduce a Glycan Structure to a Lower Resolution Level
 - [`simap()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md)
   [`simap_vec()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md)
   [`simap_lgl()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md)

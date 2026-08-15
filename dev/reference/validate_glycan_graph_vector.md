@@ -1,8 +1,8 @@
-# Validate Compatibility Across Glycan Graphs
+# Validate a List of Glycan Graphs
 
-Check that a list of individually valid glycan graphs can coexist in one
-glycan structure vector. All graphs must use the same monosaccharide
-type: either concrete or generic.
+Check the container used to store individually valid glycan graphs in
+one glycan structure vector. Generic and concrete residues may coexist
+within a graph and across graphs.
 
 ## Usage
 
@@ -18,11 +18,11 @@ validate_glycan_graph_vector(graphs, label = NULL)
 
 - label:
 
-  An optional label used in error messages.
+  An optional label retained for backward compatibility.
 
 ## Value
 
-`NULL`, invisibly. An error is thrown when the graphs are incompatible.
+`NULL`, invisibly.
 
 ## Details
 

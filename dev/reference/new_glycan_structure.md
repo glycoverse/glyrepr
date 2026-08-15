@@ -19,8 +19,8 @@ new_glycan_structure(iupac = character(), graphs = list())
 
 - graphs:
 
-  A named list of valid, canonical, mutually compatible `igraph` glycan
-  graphs keyed by IUPAC-condensed strings.
+  A named list of valid, canonical `igraph` glycan graphs keyed by
+  IUPAC-condensed strings.
 
 ## Value
 

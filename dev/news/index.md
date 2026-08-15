@@ -2,6 +2,24 @@
 
 ## glyrepr (development version)
 
+### Breaking changes
+
+- Generic and concrete residues can now coexist within glycan structures
+  and compositions and across their vectors.
+  [`get_mono_type()`](https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.md)
+  now returns one value per element and reports mixed elements as
+  `"mixed"`. ([\#90](https://github.com/glycoverse/glyrepr/issues/90))
+- Structure levels now depend only on linkage and anomer information.
+  [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md)
+  returns one `"intact"`, `"partial"`, or `"topological"` value per
+  structure; the former `"basic"` level and `reduce_structure_level()`
+  have been removed. Use
+  [`remove_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_linkages.md)
+  to remove linkage information and
+  [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md)
+  to convert residue identities.
+  ([\#90](https://github.com/glycoverse/glyrepr/issues/90))
+
 ### New features
 
 - Glycan structures now support alditols through reducing-end `-ol`
@@ -88,11 +106,8 @@
   while legacy graph inputs without this metadata remain supported.
   ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md)
-  and
-  [`reduce_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/reduce_structure_level.md)
-  now treat floating candidate-parent ambiguity independently from
-  linkage resolution; fully specified floating structures can be intact
-  and reduced to topological resolution.
+  treats floating candidate-parent ambiguity independently from linkage
+  resolution; fully specified floating structures can be intact.
   ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - IUPAC-condensed sequence generation from glycan graphs is faster by
   reducing repeated `igraph` extraction.
@@ -265,8 +280,7 @@ CRAN release: 2026-04-26
   now ignores missing structures when determining the vector-wide level,
   and returns `NA_character_` for empty or all-missing structure
   vectors.
-- [`reduce_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/reduce_structure_level.md)
-  preserves missing structures in output.
+- `reduce_structure_level()` preserves missing structures in output.
 - [`simap()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md)
   and
   \`[`simap_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md)
@@ -356,9 +370,8 @@ CRAN release: 2025-11-23
 - [`count_mono()`](https://glycoverse.github.io/glyrepr/dev/reference/count_mono.md)
   now supports counting substituents, with a new argument
   `include_subs`.
-- Add
-  [`reduce_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/reduce_structure_level.md)
-  to reduce a glycan structure to a lower resolution level.
+- Add `reduce_structure_level()` to reduce a glycan structure to a lower
+  resolution level.
 
 ### Minor improvements and bug fixes
 

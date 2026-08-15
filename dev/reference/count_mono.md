@@ -50,8 +50,8 @@ graph input.
 When `mono` is "generic" (e.g. "Hex", "HexNAc"), it counts all
 "concrete" monosaccharides that match. For example, "Hex" will count all
 Glc, Man, Gal, etc. When `mono` is "concrete" (e.g. "Gal", "GalNAc"), NA
-is returned when the composition is "generic". Floating substituents are
-counted like substituents attached to known residues.
+is returned when the composition contains generic residues. Floating
+substituents are counted like substituents attached to known residues.
 
 ## Examples
 

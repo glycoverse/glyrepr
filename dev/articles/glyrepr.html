@@ -183,7 +183,10 @@ databases and literature.</p>
 them in the same vector.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># This raises an error because the monosaccharide names are mixed.</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hex(5)HexNAc(2)"</span>, <span class="st">"Man(5)GlcNAc(2)"</span><span class="op">)</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hex(5)HexNAc(2)"</span>, <span class="st">"Man(5)GlcNAc(2)"</span><span class="op">)</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span></code></pre></div>
 <p>The same rule applies to glycan structure vectors.</p>
 </div>
 <div class="section level3">
@@ -403,17 +406,17 @@ but under the hood the glycan structures are stored as
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; IGRAPH b5a51c6 DN-- 2 1 -- </span></span>
+<span><span class="co">#&gt; IGRAPH c4d0c12 DN-- 2 1 -- </span></span>
 <span><span class="co">#&gt; + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),</span></span>
 <span><span class="co">#&gt; | linkage (e/c)</span></span>
-<span><span class="co">#&gt; + edge from b5a51c6 (vertex names):</span></span>
+<span><span class="co">#&gt; + edge from c4d0c12 (vertex names):</span></span>
 <span><span class="co">#&gt; [1] 2-&gt;1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; IGRAPH 8aa16ae DN-- 3 2 -- </span></span>
+<span><span class="co">#&gt; IGRAPH 31a49fc DN-- 3 2 -- </span></span>
 <span><span class="co">#&gt; + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),</span></span>
 <span><span class="co">#&gt; | linkage (e/c)</span></span>
-<span><span class="co">#&gt; + edges from 8aa16ae (vertex names):</span></span>
+<span><span class="co">#&gt; + edges from 31a49fc (vertex names):</span></span>
 <span><span class="co">#&gt; [1] 3-&gt;1 3-&gt;2</span></span></code></pre></div>
 <p>Details of how a glycan structure is modeled as a graph are covered
 in the <a href="https://glycoverse.github.io/glyrepr/articles/glycan-graph.html">glycan
@@ -434,40 +437,38 @@ inspect specific aspects of the structures.</p>
 <span><span class="co">#&gt; [1] TRUE TRUE</span></span></code></pre></div>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_mono_type.html">get_mono_type</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "concrete"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "concrete" "concrete"</span></span></code></pre></div>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "intact"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "intact" "intact"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="structure-levels">Structure Levels<a class="anchor" aria-label="anchor" href="#structure-levels"></a>
 </h3>
 <p>The structures we have seen so far are “intact” structures. They
-contain specific monosaccharides and complete linkage information. In
-real datasets, though, glycan structures often have missing information.
-For example, we might know the topology but not the linkages, or we
-might only know generic monosaccharide classes.</p>
-<p>To accommodate these scenarios, <code>glyrepr</code> defines four
-levels of glycan structures:</p>
+contain complete linkage information. In real datasets, though, glycan
+structures often have missing information. For example, we might know
+the topology but not the linkages, or we might only know generic
+monosaccharide classes.</p>
+<p>To accommodate these scenarios, <code>glyrepr</code> defines three
+levels of glycan structures. These levels depend only on linkage and
+anomer information:</p>
 <ul>
 <li>
-<strong>Intact</strong>: specific monosaccharides and complete
-linkage information.</li>
+<strong>Intact</strong>: all linkage and anomer information is
+complete and unambiguous.</li>
 <li>
-<strong>Partial</strong>: specific monosaccharides, with at least
-one missing linkage annotation.</li>
+<strong>Partial</strong>: some linkage or anomer information is
+present, but it is not complete.</li>
 <li>
-<strong>Topological</strong>: specific monosaccharides, but all
-linkage information is missing.</li>
-<li>
-<strong>Basic</strong>: generic monosaccharides, with linkage
-information treated as missing.</li>
+<strong>Topological</strong>: all linkage and anomer information is
+missing.</li>
 </ul>
 <p>Floating parts do not change these definitions. Their attachment
 linkage is assessed like any other linkage, while uncertainty about the
 candidate parent is independent of the structure level.</p>
-<p>Structure levels are defined at the vector level, so one glycan
-structure vector has one level.</p>
+<p>Structure levels are defined per glycan and do not depend on whether
+residues are generic, concrete, or mixed.</p>
 <p>Let’s see some examples.</p>
 <p><strong>Intact structures</strong>:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
@@ -475,50 +476,43 @@ structure vector has one level.</p>
 <span>  <span class="st">"Gal(b1-3)GalNAc(a1-"</span>,</span>
 <span>  <span class="st">"Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"</span></span>
 <span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "intact"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "intact" "intact"</span></span></code></pre></div>
 <p><strong>Partial structures</strong>:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Gal(b1-?)GalNAc(a1-"</span>,</span>
 <span>  <span class="st">"Gal(b1-?)[GlcNAc(b1-6)]GalNAc(a1-"</span></span>
 <span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "partial"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "partial" "partial"</span></span></code></pre></div>
 <p><strong>Topological structures</strong>:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Gal(??-?)GalNAc(??-"</span>,</span>
 <span>  <span class="st">"Gal(??-?)[GlcNAc(??-?)]GalNAc(??-"</span></span>
 <span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "topological"</span></span></code></pre></div>
-<p><strong>Basic structures</strong>:</p>
+<span><span class="co">#&gt; [1] "topological" "topological"</span></span></code></pre></div>
+<p>Generic structures use the same linkage-based levels. For example,
+these are topological structures:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Hex(??-?)HexNAc(??-"</span>,</span>
 <span>  <span class="st">"Hex(??-?)[HexNAc(??-?)]HexNAc(??-"</span></span>
 <span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "basic"</span></span></code></pre></div>
-<p>In theory, you can have something like
-<code>"Hex(b1-3)HexNAc(a1-"</code>, with generic monosaccharides but all
-linkages intact. In practice, linkage information is usually harder to
-obtain than monosaccharide identities, so this situation is rare.</p>
-<p>If you create such a vector, <code>glyrepr</code> classifies it as
-<code>"basic"</code> and warns you.</p>
+<span><span class="co">#&gt; [1] "topological" "topological"</span></span></code></pre></div>
+<p>Generic structures with complete linkages are intact:</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Hex(a1-3)HexNAc(a1-"</span>,</span>
 <span>  <span class="st">"Hex(a1-3)[HexNAc(b1-6)]HexNAc(a1-"</span></span>
 <span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/get_structure_level.html">get_structure_level</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Generic glycan structures with linkage annotations are treated as <span style="color: #0000BB;">"basic"</span>.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Linkage information is ignored when residues are generic.</span></span>
-<span><span class="co">#&gt; [1] "basic"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "intact" "intact"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="manipulating-glycan-structure-vectors">Manipulating Glycan Structure Vectors<a class="anchor" aria-label="anchor" href="#manipulating-glycan-structure-vectors"></a>
 </h3>
 <p>Glycan structure vectors also support vectorized operations like
 subsetting and concatenation. They also have structure-specific helpers
-for reducing resolution, removing linkages, and removing
-substituents.</p>
+for removing linkages and substituents.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">strucs</span></span>
 <span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
@@ -526,16 +520,16 @@ substituents.</p>
 <span><span class="co">#&gt; [2] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-3</span>)[<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-6</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">a1-</span></span></span>
 <span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/reduce_structure_level.html">reduce_structure_level</a></span><span class="op">(</span><span class="va">strucs</span>, to_level <span class="op">=</span> <span class="st">"basic"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
-<span><span class="co">#&gt; [1] <span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">??-?</span>)<span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">??-</span></span></span>
-<span><span class="co">#&gt; [2] <span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">??-?</span>)[<span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">??-?</span>)]<span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">??-</span></span></span>
-<span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_linkages.html">remove_linkages</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span>  <span class="co"># same as reduce_structure_level(strucs, to_level = "topological")</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_linkages.html">remove_linkages</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
 <span><span class="co">#&gt; [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">??-?</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">??-</span></span></span>
 <span><span class="co">#&gt; [2] <span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">??-?</span>)[<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">??-?</span>)]<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">??-</span></span></span>
+<span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/convert_to_generic.html">convert_to_generic</a></span><span class="op">(</span><span class="fu"><a href="../reference/remove_linkages.html">remove_linkages</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_structure[2]&gt;</span></span>
+<span><span class="co">#&gt; [1] <span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">??-?</span>)<span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">??-</span></span></span>
+<span><span class="co">#&gt; [2] <span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">??-?</span>)[<span style="color: #000000;">Hex</span>(<span style="color: #B2B2B2;">??-?</span>)]<span style="color: #000000;">HexNAc</span>(<span style="color: #B2B2B2;">??-</span></span></span>
 <span><span class="co">#&gt; # Unique structures: 2</span></span></code></pre></div>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">strucs_with_subs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_glycan_structure.html">as_glycan_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>

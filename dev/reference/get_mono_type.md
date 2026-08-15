@@ -1,8 +1,8 @@
 # Get Monosaccharide Types
 
 This function determines the type of monosaccharides in character
-vectors, glycan compositions, or glycan structures. Supported types:
-"concrete" and "generic" (see details below).
+vectors, glycan compositions, or glycan structures. Supported types are
+"concrete", "generic", and "mixed" (see details below).
 
 ## Usage
 
@@ -41,8 +41,11 @@ get_mono_type(x)
 - For character input, returns a character vector of the same length as
   `x`.
 
-- For `glyrepr_structure`, `glyrepr_composition`, and `igraph` input,
-  returns a character scalar.
+- For `glyrepr_structure` and `glyrepr_composition` input, returns one
+  value per element. Missing elements return `NA_character_`.
+
+- For `igraph` input, returns a character scalar. Character and
+  structure-vector outputs preserve input names.
 
 ## Two types of monosaccharides
 

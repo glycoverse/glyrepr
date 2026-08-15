@@ -41,6 +41,11 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
 <div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>Generic and concrete residues can now coexist within glycan structures and compositions and across their vectors. <code><a href="../reference/get_mono_type.html">get_mono_type()</a></code> now returns one value per element and reports mixed elements as <code>"mixed"</code>. (<a href="https://github.com/glycoverse/glyrepr/issues/90" class="external-link">#90</a>)</li>
+<li>Structure levels now depend only on linkage and anomer information. <code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> returns one <code>"intact"</code>, <code>"partial"</code>, or <code>"topological"</code> value per structure; the former <code>"basic"</code> level and <code>reduce_structure_level()</code> have been removed. Use <code><a href="../reference/remove_linkages.html">remove_linkages()</a></code> to remove linkage information and <code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code> to convert residue identities. (<a href="https://github.com/glycoverse/glyrepr/issues/90" class="external-link">#90</a>)</li>
+</ul></div>
+<div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>Glycan structures now support alditols through reducing-end <code>-ol</code> IUPAC syntax, such as <code>Gal(b1-4)GlcNAc-ol(a1-</code>. New <code><a href="../reference/get_alditol.html">get_alditol()</a></code> inspects the graph-level status, and <code><a href="../reference/structure_tables.html">structure_from_tibbles()</a></code> gains an <code>alditols</code> argument for lossless table round-trips; legacy graphs without the attribute remain non-alditols. (<a href="https://github.com/glycoverse/glyrepr/issues/88" class="external-link">#88</a>)</li>
 <li>Concrete monosaccharides now support explicit unusual absolute configurations using a leading <code>D-</code> or <code>L-</code>, such as <code>D-Fuc</code>, <code>L-Gul</code>, and <code>D-Fucf</code>; unprefixed names retain their natural configurations. (<a href="https://github.com/glycoverse/glyrepr/issues/85" class="external-link">#85</a>, <a href="https://github.com/glycoverse/glyrepr/issues/86" class="external-link">#86</a>)</li>
@@ -64,7 +69,7 @@
 <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> now accepts omitted reducing-end annotations by inferring the anomer position, normalizes <code>(?-?)</code> to <code>(??-?)</code>, and collapses linkage-position choices containing <code>?</code> to a single unknown position. (<a href="https://github.com/glycoverse/glyrepr/issues/83" class="external-link">#83</a>)</li>
 <li>Floating-part graph metadata now records the nodes in each component, while legacy graph inputs without this metadata remain supported. (<a href="https://github.com/glycoverse/glyrepr/issues/80" class="external-link">#80</a>)</li>
 <li>
-<code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> and <code><a href="../reference/reduce_structure_level.html">reduce_structure_level()</a></code> now treat floating candidate-parent ambiguity independently from linkage resolution; fully specified floating structures can be intact and reduced to topological resolution. (<a href="https://github.com/glycoverse/glyrepr/issues/80" class="external-link">#80</a>)</li>
+<code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> treats floating candidate-parent ambiguity independently from linkage resolution; fully specified floating structures can be intact. (<a href="https://github.com/glycoverse/glyrepr/issues/80" class="external-link">#80</a>)</li>
 <li>IUPAC-condensed sequence generation from glycan graphs is faster by reducing repeated <code>igraph</code> extraction. (<a href="https://github.com/glycoverse/glyrepr/issues/78" class="external-link">#78</a>)</li>
 <li>
 <code><a href="../reference/validate_glycan_graph.html">validate_glycan_graph()</a></code> and <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> are faster through bulk linkage-position validation. (<a href="https://github.com/glycoverse/glyrepr/issues/79" class="external-link">#79</a>)</li>
@@ -147,7 +152,7 @@
 <li>
 <code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> now ignores missing structures when determining the vector-wide level, and returns <code>NA_character_</code> for empty or all-missing structure vectors.</li>
 <li>
-<code><a href="../reference/reduce_structure_level.html">reduce_structure_level()</a></code> preserves missing structures in output.</li>
+<code>reduce_structure_level()</code> preserves missing structures in output.</li>
 <li>
 <code><a href="../reference/simap.html">simap()</a></code> and `<code><a href="../reference/simap.html">simap_structure()</a></code> now skip missing structures like the other smap variants.</li>
 <li>
@@ -202,7 +207,7 @@
 </ul></li>
 <li>
 <code><a href="../reference/count_mono.html">count_mono()</a></code> now supports counting substituents, with a new argument <code>include_subs</code>.</li>
-<li>Add <code><a href="../reference/reduce_structure_level.html">reduce_structure_level()</a></code> to reduce a glycan structure to a lower resolution level.</li>
+<li>Add <code>reduce_structure_level()</code> to reduce a glycan structure to a lower resolution level.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-0-9-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-9-0"></a></h3>

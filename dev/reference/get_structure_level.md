@@ -1,35 +1,24 @@
 # Get the Structure Resolution Levels
 
-Glycan structures can have four possible levels of resolution:
+Glycan structures can have three possible levels of resolution,
+determined only by linkage and anomer information:
 
-- "intact": All monosaccharides are concrete (e.g. "Man", "GlcNAc"), and
-  no linkage or anomer is unknown or ambiguous.
+- "intact": No linkage or anomer is unknown or ambiguous.
 
-- "partial": All monosaccharides are concrete (e.g. "Man", "GlcNAc"), at
-  least one linkage or anomer is unknown or ambiguous, and at least one
-  linkage or anomer has a non-"?" annotation.
+- "partial": At least one linkage or anomer is unknown or ambiguous, and
+  at least one linkage or anomer contains known information.
 
-- "topological": All monosaccharides are concrete (e.g. "Man",
-  "GlcNAc"), and all linkages and anomers are completely unknown
+- "topological": All linkages and anomers are completely unknown
   ("??-?"/"??").
-
-- "basic": All monosaccharides are generic (e.g. "Hex", "HexNAc").
 
 Floating metadata does not by itself affect the structure level. A
 floating part's attachment linkage is evaluated like an ordinary
 linkage, while candidate-parent ambiguity for floating parts and
 substituents is independent of linkage resolution. Consequently, a
-glycan with floating metadata is regarded as "intact" when its residues
-are concrete and every graph-edge and floating-part attachment linkage,
-as well as the reducing-end anomer, is fully specified, even though a
-parent residue remains unlocalized.
-
-Note that in theory you can have a glycan with generic monosaccharides
-with all linkages determined. For example, "Hex(b1-3)HexNAc(a1-" is a
-valid glycan structure. But in reality, this is almost impossible,
-because linkage information is far more difficult to acquire than
-monosaccharide information. This kind of glycan structure is also
-assigned to "basic" level.
+glycan with floating metadata is regarded as "intact" when every
+graph-edge and floating-part attachment linkage, as well as the
+reducing-end anomer, is fully specified, even though a parent residue
+remains unlocalized.
 
 ## Usage
 
@@ -47,9 +36,10 @@ get_structure_level(x)
 
 ## Value
 
-A character scalar containing the structure level for `x`. For vector
-input, if `x` is empty or all structures in `x` are `NA`, returns
-`NA_character_`.
+For vector input, a character vector containing one structure level per
+element. Missing elements return `NA_character_`, and an empty input
+returns [`character()`](https://rdrr.io/r/base/character.html). For
+graph input, a character scalar.
 
 ## See also
 

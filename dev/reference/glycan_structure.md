@@ -63,7 +63,7 @@ Each glycan structure must satisfy the following constraints:
 
   - Concrete names: Glc, Gal, Man, GlcNAc, etc.
 
-  - Cannot mix generic and concrete names
+  - Generic and concrete names may be mixed
 
   - NA values are not allowed
 
