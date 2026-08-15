@@ -45,14 +45,6 @@ is_known_mono <- function(monos) {
 }
 
 
-# Are generic and concrete monosaccharides mixed?
-mix_generic_concrete <- function(monos) {
-  has_generic <- any(monos %in% .unique_no_na(monosaccharides$generic))
-  has_concrete <- any(monos %in% monosaccharides$concrete)
-  sum(as.integer(c(has_generic, has_concrete))) > 1
-}
-
-
 # Is a valid subtituent?
 valid_substituent <- function(sub) {
   # Apply to each element if input is a vector

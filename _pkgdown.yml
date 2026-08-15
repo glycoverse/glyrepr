@@ -53,7 +53,6 @@ reference:
   - localize_floating_parts
   - remove_linkages
   - remove_substituents
-  - reduce_structure_level
   - matches("^s.*map.*$")
   - ssome
   - severy

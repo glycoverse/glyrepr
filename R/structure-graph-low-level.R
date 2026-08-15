@@ -46,12 +46,6 @@ validate_glycan_graph <- function(graph) {
     cli::cli_abort(msg, monos = unknown_monos)
   }
 
-  if (mix_generic_concrete(mono_names)) {
-    cli::cli_abort(
-      "Monosaccharides must be either all generic or all concrete."
-    )
-  }
-
   if (!has_vertex_attrs(graph, "sub")) {
     cli::cli_abort("Glycan structure must have a vertex attribute 'sub'.")
   }
@@ -153,20 +147,19 @@ canonicalize_glycan_graph <- function(graph) {
 }
 
 
-#' Validate Compatibility Across Glycan Graphs
+#' Validate a List of Glycan Graphs
 #'
-#' Check that a list of individually valid glycan graphs can coexist in one
-#' glycan structure vector. All graphs must use the same monosaccharide type:
-#' either concrete or generic.
+#' Check the container used to store individually valid glycan graphs in one
+#' glycan structure vector. Generic and concrete residues may coexist within a
+#' graph and across graphs.
 #'
 #' This function assumes that every element has already passed
 #' [validate_glycan_graph()]. It does not repeat scalar graph validation.
 #'
 #' @param graphs A list of individually valid `igraph` glycan graphs.
-#' @param label An optional label used in error messages.
+#' @param label An optional label retained for backward compatibility.
 #'
-#' @returns `NULL`, invisibly. An error is thrown when the graphs are
-#'   incompatible.
+#' @returns `NULL`, invisibly.
 #'
 #' @template low-level-structure-pipeline
 #'
@@ -175,39 +168,6 @@ canonicalize_glycan_graph <- function(graph) {
 validate_glycan_graph_vector <- function(graphs, label = NULL) {
   checkmate::assert_list(graphs, types = "igraph")
   checkmate::assert_string(label, null.ok = TRUE)
-
-  if (length(graphs) <= 1) {
-    return(invisible(NULL))
-  }
-
-  mono_types <- purrr::map_chr(graphs, get_graph_mono_type)
-
-  if (any(mono_types == "mixed")) {
-    cli::cli_abort(c(
-      "All structures must have a single monosaccharide type.",
-      "x" = "{.val {label}} contains structures with mixed generic and concrete monosaccharides."
-    ))
-  }
-
-  unique_types <- unique(mono_types)
-  if (length(unique_types) > 1) {
-    concrete_count <- sum(mono_types == "concrete")
-    generic_count <- sum(mono_types == "generic")
-
-    if (is.null(label)) {
-      cli::cli_abort(c(
-        "All structures must have the same monosaccharide type.",
-        "x" = "Found {.val {concrete_count}} concrete and {.val {generic_count}} generic structure(s) in the same vector.",
-        "i" = "Use {.fn convert_to_generic} to convert concrete structures to generic type."
-      ))
-    } else {
-      cli::cli_abort(c(
-        "All structures must have the same monosaccharide type.",
-        "x" = "{.val {label}} has mixed types: {.val {concrete_count}} concrete and {.val {generic_count}} generic structure(s)."
-      ))
-    }
-  }
-
   invisible(NULL)
 }
 
@@ -291,8 +251,8 @@ graph_to_iupac <- function(graph) {
 #'
 #' @param iupac A character vector of canonical IUPAC-condensed strings. Missing
 #'   values are allowed, and names are preserved exactly.
-#' @param graphs A named list of valid, canonical, mutually compatible `igraph`
-#'   glycan graphs keyed by IUPAC-condensed strings.
+#' @param graphs A named list of valid, canonical `igraph` glycan graphs keyed
+#'   by IUPAC-condensed strings.
 #'
 #' @returns A `glyrepr_structure` vector.
 #'

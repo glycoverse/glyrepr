@@ -14,16 +14,6 @@
       Error in `validate_glycan_graph()`:
       ! Glycan structure must be directed.
 
-# validate_glycan_graph_vector rejects mixed monosaccharide types
-
-    Code
-      validate_glycan_graph_vector(list(concrete, generic))
-    Condition
-      Error in `validate_glycan_graph_vector()`:
-      ! All structures must have the same monosaccharide type.
-      x Found 1 concrete and 1 generic structure(s) in the same vector.
-      i Use `convert_to_generic()` to convert concrete structures to generic type.
-
 # graph_to_iupac generates one string from one graph
 
     Code

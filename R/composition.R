@@ -13,8 +13,8 @@
 #' @details
 #' Compositions can contain:
 #'
-#' - Monosaccharides: either generic (e.g., "Hex", "HexNAc") or concrete (e.g., "Glc", "Gal").
-#'   All monosaccharides in a composition vector must be of the same type.
+#' - Monosaccharides: generic (e.g., "Hex", "HexNAc") or concrete
+#'   (e.g., "Glc", "Gal"). Generic and concrete residues may be mixed.
 #' - Substituents: e.g., "Me", "Ac", "S". These can be mixed with either
 #'   generic or concrete monosaccharides.
 #'
@@ -372,29 +372,6 @@ vec_cast.logical.glyrepr_composition <- function(x, to, ...) {
 #' @export
 vec_restore.glyrepr_composition <- function(x, to, ...) {
   data <- vctrs::field(x, "data")
-
-  # Skip NA elements (NULL) when checking types
-  na_mask <- purrr::map_lgl(data, .is_na_composition_elem)
-  non_na_data <- data[!na_mask]
-
-  if (length(non_na_data) == 0) {
-    return(new_glycan_composition(data))
-  }
-
-  monos_list <- purrr::map(
-    non_na_data,
-    ~ names(.x)[!names(.x) %in% available_substituents()]
-  )
-  mono_types <- purrr::map_chr(monos_list, get_mono_type_impl)
-
-  if (length(unique(mono_types)) > 1) {
-    cli::cli_abort(c(
-      "Can't combine `glyrepr_composition`s with different monosaccharide types.",
-      "x" = "Found compositions with types: {.val {unique(mono_types)}}.",
-      "i" = "Use {.fn convert_to_generic} to convert concrete to generic, or ensure both compositions use the same type."
-    ))
-  }
-
   new_glycan_composition(data)
 }
 
@@ -528,20 +505,8 @@ new_glycan_composition <- function(x = list()) {
     ))
   }
 
-  # 5. Mono type check (skip NA elements)
-  mono_types <- .get_comp_mono_types(x_valid)
-  if (any(mono_types == "mixed")) {
-    cli::cli_abort(c(
-      "Must have only one type of monosaccharide.",
-      "x" = "Some compositions have mixed monosaccharide types (both generic and concrete)."
-    ))
-  }
-  if (!all(mono_types == mono_types[[1]])) {
-    cli::cli_abort(c(
-      "Must have only one type of monosaccharide.",
-      "x" = "Both generic and concrete compositions exist."
-    ))
-  }
+  # 5. Every composition must contain at least one monosaccharide.
+  .get_comp_mono_types(x_valid)
 
   # 6. Positive number check (skip NA elements)
   if (!purrr::every(x_valid, ~ all(.x > 0))) {

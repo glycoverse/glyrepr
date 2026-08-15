@@ -105,6 +105,21 @@ test_that("count_mono returns NA when counting concrete in generic compositions"
   expect_equal(count_mono(comp, "GalNAc"), NA_integer_)
 })
 
+test_that("count_mono is conservative for mixed compositions", {
+  comp <- glycan_composition(c(Hex = 2, Gal = 1, HexNAc = 1))
+
+  expect_identical(count_mono(comp, "Gal"), NA_integer_)
+  expect_identical(count_mono(comp, "Hex"), 3L)
+  expect_identical(count_mono(comp), 4L)
+})
+
+test_that("count_mono is conservative for mixed structures", {
+  structure <- as_glycan_structure("Hex(b1-3)Gal(a1-")
+
+  expect_identical(count_mono(structure, "Gal"), NA_integer_)
+  expect_identical(count_mono(structure, "Hex"), 2L)
+})
+
 test_that("count_mono works with multiple compositions", {
   # Test with multiple compositions in a vector
   comp_vec <- glycan_composition(
