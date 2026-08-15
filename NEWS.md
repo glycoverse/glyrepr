@@ -2,15 +2,8 @@
 
 ## Breaking changes
 
-* Generic and concrete residues can now coexist within glycan structures and
-  compositions and across their vectors. `get_mono_type()` now returns one
-  value per element and reports mixed elements as `"mixed"`. (#90)
-* Structure levels now depend only on linkage and anomer information.
-  `get_structure_level()` returns one `"intact"`, `"partial"`, or
-  `"topological"` value per structure; the former `"basic"` level and
-  `reduce_structure_level()` have been removed. Use `remove_linkages()` to
-  remove linkage information and `convert_to_generic()` to convert residue
-  identities. (#90)
+* Generic and concrete residues can now coexist within glycan structures and compositions and across their vectors. `get_mono_type()` now returns one value per element and reports mixed elements as `"mixed"`. (#90)
+* Structure levels now depend only on linkage and anomer information. `get_structure_level()` returns one `"intact"`, `"partial"`, or `"topological"` value per structure; the former `"basic"` level and `reduce_structure_level()` have been removed. Use `remove_linkages()` to remove linkage information and `convert_to_generic()` to convert residue identities. (#90)
 
 ## New features
 
@@ -30,9 +23,7 @@
 * `as_glycan_structure()` and `glycan_structure()` now support ambiguous substituent positions such as `Gal4/6S(a1-` and preserve them during graph and IUPAC conversion. (#84)
 * `as_glycan_structure()` now accepts omitted reducing-end annotations by inferring the anomer position, normalizes `(?-?)` to `(??-?)`, and collapses linkage-position choices containing `?` to a single unknown position. (#83)
 * Floating-part graph metadata now records the nodes in each component, while legacy graph inputs without this metadata remain supported. (#80)
-* `get_structure_level()` treats floating candidate-parent ambiguity
-  independently from linkage resolution; fully specified floating structures
-  can be intact. (#80)
+* `get_structure_level()` treats floating candidate-parent ambiguity independently from linkage resolution; fully specified floating structures can be intact. (#80)
 * IUPAC-condensed sequence generation from glycan graphs is faster by reducing repeated `igraph` extraction. (#78)
 * `validate_glycan_graph()` and `as_glycan_structure()` are faster through bulk linkage-position validation. (#79)
 
