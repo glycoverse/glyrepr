@@ -4,13 +4,13 @@
 
 * Generic and concrete residues can now coexist within glycan structures and
   compositions and across their vectors. `get_mono_type()` now returns one
-  value per element and reports mixed elements as `"mixed"`.
+  value per element and reports mixed elements as `"mixed"`. (#90)
 * Structure levels now depend only on linkage and anomer information.
   `get_structure_level()` returns one `"intact"`, `"partial"`, or
   `"topological"` value per structure; the former `"basic"` level and
   `reduce_structure_level()` have been removed. Use `remove_linkages()` to
   remove linkage information and `convert_to_generic()` to convert residue
-  identities.
+  identities. (#90)
 
 ## New features
 
