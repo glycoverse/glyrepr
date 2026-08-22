@@ -4,11 +4,13 @@
 
 ### Breaking changes
 
-- Generic and concrete residues can now coexist within glycan structures
-  and compositions and across their vectors.
-  [`get_mono_type()`](https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.md)
-  now returns one value per element and reports mixed elements as
-  `"mixed"`. ([\#90](https://github.com/glycoverse/glyrepr/issues/90))
+- [`get_mono_type()`](https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.md)
+  now returns one value per structure or composition instead of one
+  scalar for the whole vector and may return `"mixed"`; callers that
+  assume a scalar result must handle aligned per-element values. Generic
+  and concrete residues can now coexist within structures, compositions,
+  and their vectors.
+  ([\#90](https://github.com/glycoverse/glyrepr/issues/90))
 - Structure levels now depend only on linkage and anomer information.
   [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md)
   returns one `"intact"`, `"partial"`, or `"topological"` value per
@@ -22,6 +24,11 @@
 
 ### New features
 
+- Generic and concrete residues can now coexist within structures,
+  compositions, and their vectors; use aligned
+  [`get_mono_type()`](https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.md)
+  results to inspect each element.
+  ([\#90](https://github.com/glycoverse/glyrepr/issues/90))
 - Glycan structures now support alditols through reducing-end `-ol`
   IUPAC syntax, such as `Gal(b1-4)GlcNAc-ol(a1-`. New
   [`get_alditol()`](https://glycoverse.github.io/glyrepr/dev/reference/get_alditol.md)
@@ -35,12 +42,19 @@
   and `D-Fucf`; unprefixed names retain their natural configurations.
   ([\#85](https://github.com/glycoverse/glyrepr/issues/85),
   [\#86](https://github.com/glycoverse/glyrepr/issues/86))
-- Floating parent indices now follow complete IUPAC-condensed residue
-  order. Floating parts may attach to any other floating component or
-  the main tree, floating substituents may target any residue node, and
-  localization and enumeration retain only conflict-free acyclic
-  assignments that connect every component to the main tree.
-  ([\#89](https://github.com/glycoverse/glyrepr/issues/89))
+- Concrete monosaccharides now support explicit furanose forms such as
+  `Galf` and `GlcfNAc`; generic conversion remains unchanged, so these
+  become `Hex` and `HexNAc`, respectively.
+  ([\#82](https://github.com/glycoverse/glyrepr/issues/82))
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  and
+  [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+  now support floating glycan substructures with optional
+  candidate-parent indices using `{<floating>}` and
+  `{<floating>|<parents>}` syntax. Floating structures retain
+  component-node and candidate-parent metadata through validation,
+  canonicalization, transformations, and graph-table round-trips.
+  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   and
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
@@ -48,24 +62,17 @@
   using `{<substituent>}` and `{<substituent>|<parents>}` syntax,
   including unknown carbon positions such as `{?S}`.
   ([\#87](https://github.com/glycoverse/glyrepr/issues/87))
-- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
-  and
-  [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-  now support floating glycan substructures with optional
-  candidate-parent indices using `{<floating>}` and
-  `{<floating>|<parents>}` syntax. Floating structures are validated,
-  canonicalized, transformed, and converted to graph tables while
-  preserving parent-index semantics.
-  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
-- Concrete monosaccharides now support explicit furanose forms such as
-  `Galf` and `GlcfNAc`; generic conversion remains unchanged, so these
-  become `Hex` and `HexNAc`, respectively.
-  ([\#82](https://github.com/glycoverse/glyrepr/issues/82))
+- Floating candidate-parent indices follow complete IUPAC-condensed
+  residue order. Floating parts may attach to other floating components
+  or the main tree, floating substituents may target any residue node,
+  and localization retains only conflict-free acyclic assignments that
+  connect every component to the main tree.
+  ([\#89](https://github.com/glycoverse/glyrepr/issues/89))
 - New
   [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md)
   and
   [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md)
-  APIs enumerate conflict-free floating-part and floating-substituent
+  return conflict-free floating-part and floating-substituent
   assignments with provenance, while
   [`localize_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/localize_floating_parts.md)
   attaches selected floating parts; graph-level results retain original
@@ -102,15 +109,11 @@
   position, normalizes `(?-?)` to `(??-?)`, and collapses
   linkage-position choices containing `?` to a single unknown position.
   ([\#83](https://github.com/glycoverse/glyrepr/issues/83))
-- Floating-part graph metadata now records the nodes in each component,
-  while legacy graph inputs without this metadata remain supported.
-  ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
 - [`get_structure_level()`](https://glycoverse.github.io/glyrepr/dev/reference/get_structure_level.md)
   treats floating candidate-parent ambiguity independently from linkage
   resolution; fully specified floating structures can be intact.
   ([\#80](https://github.com/glycoverse/glyrepr/issues/80))
-- IUPAC-condensed sequence generation from glycan graphs is faster by
-  reducing repeated `igraph` extraction.
+- IUPAC-condensed sequence generation from glycan graphs is now faster.
   ([\#78](https://github.com/glycoverse/glyrepr/issues/78))
 - [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph.md)
   and
