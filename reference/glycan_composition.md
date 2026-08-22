@@ -31,9 +31,8 @@ A glyrepr_composition object.
 
 Compositions can contain:
 
-- Monosaccharides: either generic (e.g., "Hex", "HexNAc") or concrete
-  (e.g., "Glc", "Gal"). All monosaccharides in a composition vector must
-  be of the same type.
+- Monosaccharides: generic (e.g., "Hex", "HexNAc") or concrete (e.g.,
+  "Glc", "Gal"). Generic and concrete residues may be mixed.
 
 - Substituents: e.g., "Me", "Ac", "S". These can be mixed with either
   generic or concrete monosaccharides.

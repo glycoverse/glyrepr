@@ -9,7 +9,7 @@ of one glycan graph to match its IUPAC-condensed sequence."><meta property="og:i
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.14.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,6 +77,25 @@ is usually not a good idea unless you understand and can guarantee all glycan
 graph and <code>glyrepr_structure</code> invariants. Prefer <code><a href="as_glycan_structure.html">as_glycan_structure()</a></code> for
 ordinary construction. Incorrect use of these functions can create invalid
 structure vectors that fail in later operations.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="floating-graph-schemas">Floating graph schemas<a class="anchor" aria-label="anchor" href="#floating-graph-schemas"></a></h2>
+
+
+<p>A floating structure is one weakly disconnected graph with exactly one main
+outward tree and one outward tree per floating part. Its <code>floating_parts</code>
+graph attribute is a list of entries with integer <code>root</code>, integer <code>nodes</code>,
+character <code>linkage</code>, and integer <code>parents</code> fields. <code>nodes</code> contains every
+vertex in that floating component. <code>parents = integer()</code> means all feasible
+main-tree nodes. Legacy input graphs may omit <code>nodes</code>; canonical output
+graphs always contain it. During canonicalization, a part with exactly one
+effective candidate parent is converted to an ordinary graph edge and its
+floating metadata is removed. Otherwise, the virtual attachment linkage is
+not a graph edge. See <code><a href="glycan_structure.html">glycan_structure()</a></code> for the complete contract.</p>
+<p>A graph may also have a <code>floating_substituents</code> attribute. It is a list of
+entries with character <code>substituent</code> and integer <code>parents</code> fields. An empty
+parent vector means all feasible main-tree nodes. A singleton candidate is
+moved into the selected vertex's <code>sub</code> attribute during canonicalization.</p>
     </div>
     <div class="section level2">
     <h2 id="name-preserving-manual-construction">Name-preserving manual construction<a class="anchor" aria-label="anchor" href="#name-preserving-manual-construction"></a></h2>

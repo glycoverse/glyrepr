@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.14.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +77,7 @@
 
         <dt>
 
-          <code><a href="structure_tables.html">structure_nodes()</a></code> <code><a href="structure_tables.html">structure_edges()</a></code> <code><a href="structure_tables.html">structure_from_tibbles()</a></code>
+          <code><a href="structure_tables.html">structure_nodes()</a></code> <code><a href="structure_tables.html">structure_edges()</a></code> <code><a href="structure_tables.html">structure_floating_parts()</a></code> <code><a href="structure_tables.html">structure_floating_substituents()</a></code> <code><a href="structure_tables.html">structure_from_tibbles()</a></code>
 
         </dt>
         <dd>Convert Glycan Structures to Graph Tables</dd>
@@ -97,6 +97,13 @@
 
         </dt>
         <dd>Get the Number of Monosaccharides</dd>
+
+        <dt>
+
+          <code><a href="get_alditol.html">get_alditol()</a></code>
+
+        </dt>
+        <dd>Get Alditol Status</dd>
 
         <dt>
 
@@ -121,6 +128,20 @@
 
         <dt>
 
+          <code><a href="has_floating_parts.html">has_floating_parts()</a></code>
+
+        </dt>
+        <dd>Detect Floating Glycan Parts</dd>
+
+        <dt>
+
+          <code><a href="has_floating_substituents.html">has_floating_substituents()</a></code>
+
+        </dt>
+        <dd>Detect Floating Substituents</dd>
+
+        <dt>
+
           <code><a href="has_linkages.html">has_linkages()</a></code>
 
         </dt>
@@ -128,10 +149,31 @@
 
         <dt>
 
-          <code><a href="structure_tables.html">structure_nodes()</a></code> <code><a href="structure_tables.html">structure_edges()</a></code> <code><a href="structure_tables.html">structure_from_tibbles()</a></code>
+          <code><a href="structure_tables.html">structure_nodes()</a></code> <code><a href="structure_tables.html">structure_edges()</a></code> <code><a href="structure_tables.html">structure_floating_parts()</a></code> <code><a href="structure_tables.html">structure_floating_substituents()</a></code> <code><a href="structure_tables.html">structure_from_tibbles()</a></code>
 
         </dt>
         <dd>Convert Glycan Structures to Graph Tables</dd>
+
+        <dt>
+
+          <code><a href="structure_floating_candidates.html">structure_floating_candidates()</a></code>
+
+        </dt>
+        <dd>List Candidate Parents for Floating Metadata</dd>
+
+        <dt>
+
+          <code><a href="structure_component_membership.html">structure_component_membership()</a></code>
+
+        </dt>
+        <dd>Identify Main and Floating Structure Components</dd>
+
+        <dt>
+
+          <code><a href="structure_candidate_edges.html">structure_candidate_edges()</a></code>
+
+        </dt>
+        <dd>List Potential Virtual Edges for Floating Parts</dd>
 
         <dt>
 
@@ -175,7 +217,14 @@
           <code><a href="validate_glycan_graph_vector.html">validate_glycan_graph_vector()</a></code>
 
         </dt>
-        <dd>Validate Compatibility Across Glycan Graphs</dd>
+        <dd>Validate a List of Glycan Graphs</dd>
+
+        <dt>
+
+          <code><a href="enumerate_floating_graph_localizations.html">enumerate_floating_graph_localizations()</a></code>
+
+        </dt>
+        <dd>Enumerate Floating Graph Localizations</dd>
 
         <dt>
 
@@ -209,10 +258,24 @@
 
         <dt>
 
+          <code><a href="enumerate_floating_localizations.html">enumerate_floating_localizations()</a></code>
+
+        </dt>
+        <dd>Enumerate Floating Localizations</dd>
+
+        <dt>
+
           <code><a href="fill_anomer_pos.html">fill_anomer_pos()</a></code>
 
         </dt>
         <dd>Fill Anomer Positions</dd>
+
+        <dt>
+
+          <code><a href="localize_floating_parts.html">localize_floating_parts()</a></code>
+
+        </dt>
+        <dd>Localize Floating Glycan Parts</dd>
 
         <dt>
 
@@ -227,13 +290,6 @@
 
         </dt>
         <dd>Remove All Substituents from a Glycan</dd>
-
-        <dt>
-
-          <code><a href="reduce_structure_level.html">reduce_structure_level()</a></code>
-
-        </dt>
-        <dd>Reduce a Glycan Structure to a Lower Resolution Level</dd>
 
         <dt>
 

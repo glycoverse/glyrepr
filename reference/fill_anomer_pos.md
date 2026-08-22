@@ -16,18 +16,22 @@ fill_anomer_pos(strucs)
 
   A
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.md)
-  vector with concrete or generic monosaccharides.
+  vector or glycan `igraph` with concrete or generic monosaccharides.
 
 ## Value
 
-A
-[`glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.md)
-vector with anomer positions added where missing.
+An object of the same representation as `strucs` with anomer positions
+added where missing. Graph input retains its vertex IDs and order.
 
 ## Details
 
 For anomer positions that are already specified in the input structures,
 this function does not modify them.
+
+For a structure with floating parts, the reducing-end position is
+inferred from the root of the main tree. Positions in virtual
+floating-part attachment linkages are inferred from each floating part's
+root residue.
 
 ## Examples
 

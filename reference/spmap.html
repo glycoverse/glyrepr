@@ -13,7 +13,7 @@ Similar to purrr pmap functions, but optimized for glycan structure vectors."><m
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.14.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,8 @@ and the remaining elements are vectors of the same length or length 1 (will be r
 <dt id="arg--f">.f<a class="anchor" aria-label="anchor" href="#arg--f"></a></dt>
 <dd><p>A function that takes an igraph object (from first element of <code>.l</code>) and
 values from other elements, returning a result.
-Can be a function, purrr-style lambda (<code>~ .x + .y + .z</code>), or a character string naming a function.</p></dd>
+Can be a function, purrr-style lambda (<code>~ .x + .y + .z</code>), or a character string naming a function.
+A structure with floating metadata is passed as one annotated graph.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -104,6 +105,10 @@ Can be a function, purrr-style lambda (<code>~ .x + .y + .z</code>), or a charac
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>These functions only compute <code>.f</code> once for each unique combination of structure and corresponding
 values from other vectors, then map the results back to the original vector positions.</p>
+<p><code>spmap_structure()</code> reuses unchanged graphs and validates and canonicalizes
+changed graphs returned by <code>.f</code>. A callback that changes vertex identities
+or components of a floating structure must also update its <code>floating_parts</code>
+and <code>floating_substituents</code> metadata.</p>
 <p><strong>NA Handling:</strong>
 NA elements in the first argument (glycan structure vector) are preserved in the output.</p>
 <p><strong>Time Complexity Performance:</strong></p>

@@ -15,7 +15,7 @@ A string, returns the number of the specified monosaccharide or substituent.
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.14.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +60,9 @@ A string, returns the number of the specified monosaccharide or substituent.
 <span><span class="fu">count_mono</span><span class="op">(</span><span class="va">x</span>, mono <span class="op">=</span> <span class="cn">NULL</span>, include_subs <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'glyrepr_structure'</span></span>
+<span><span class="fu">count_mono</span><span class="op">(</span><span class="va">x</span>, mono <span class="op">=</span> <span class="cn">NULL</span>, include_subs <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'igraph'</span></span>
 <span><span class="fu">count_mono</span><span class="op">(</span><span class="va">x</span>, mono <span class="op">=</span> <span class="cn">NULL</span>, include_subs <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -68,8 +71,8 @@ A string, returns the number of the specified monosaccharide or substituent.
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A glycan composition (<code>glyrepr_composition</code>) or
-a glycan structure (<code>glyrepr_structure</code>) vector.</p></dd>
+<dd><p>A glycan composition (<code>glyrepr_composition</code>), a glycan structure
+(<code>glyrepr_structure</code>) vector, or a glycan <code>igraph</code>.</p></dd>
 
 
 <dt id="arg-mono">mono<a class="anchor" aria-label="anchor" href="#arg-mono"></a></dt>
@@ -84,7 +87,8 @@ Default is <code>FALSE</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A numeric vector of the same length as <code>x</code>.</p>
+    <p>A numeric vector of the same length as <code>x</code>, or a numeric scalar for
+graph input.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -92,7 +96,9 @@ Default is <code>FALSE</code>.</p></dd>
 it counts all "concrete" monosaccharides that match.
 For example, "Hex" will count all Glc, Man, Gal, etc.
 When <code>mono</code> is "concrete" (e.g. "Gal", "GalNAc"),
-NA is returned when the composition is "generic".</p>
+NA is returned when the composition contains generic residues.
+Floating substituents are counted like substituents attached to known
+residues.</p>
     </div>
 
     <div class="section level2">

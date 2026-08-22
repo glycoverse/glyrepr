@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.14.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -146,7 +146,7 @@ has 5,000 elements, but only 5 unique graphs are stored internally.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lobstr.r-lib.org/" class="external-link">lobstr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://lobstr.r-lib.org/reference/obj_size.html" class="external-link">obj_sizes</a></span><span class="op">(</span><span class="va">struc</span>, <span class="va">large_struc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; *  15.54 kB</span></span>
+<span><span class="co">#&gt; *  15.95 kB</span></span>
 <span><span class="co">#&gt; * 320.69 kB</span></span></code></pre></div>
 <p>The memory difference can be substantial. For repeated structures,
 the optimized representation can be much smaller than storing every
@@ -337,10 +337,10 @@ from automatic deduplication:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Dataset size:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">huge_struc</span><span class="op">)</span>, <span class="st">"structures\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Dataset size: 25000 structures</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Unique structures:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">huge_struc</span>, <span class="st">"structures"</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Unique structures: 0</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Redundancy factor:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">huge_struc</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">huge_struc</span>, <span class="st">"structures"</span><span class="op">)</span><span class="op">)</span>, <span class="st">"x\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Redundancy factor: Inf x</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Unique structures:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">huge_struc</span>, <span class="st">"graphs"</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Unique structures: 5</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Redundancy factor:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">huge_struc</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">huge_struc</span>, <span class="st">"graphs"</span><span class="op">)</span><span class="op">)</span>, <span class="st">"x\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Redundancy factor: 5000 x</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jabiru/tictoc" class="external-link">tictoc</a></span><span class="op">)</span></span>
 <span></span>
@@ -355,7 +355,7 @@ from automatic deduplication:</p>
 <span><span class="va">all_graphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">huge_struc</span><span class="op">)</span>  <span class="co"># Extracts all 25,000 graphs</span></span>
 <span><span class="va">vertex_counts_naive</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">all_graphs</span>, <span class="fu">igraph</span><span class="fu">::</span><span class="va"><a href="https://r.igraph.org/reference/gorder.html" class="external-link">vcount</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Naive approach (all graphs): 0.243 sec elapsed</span></span>
+<span><span class="co">#&gt; Naive approach (all graphs): 0.233 sec elapsed</span></span>
 <span></span>
 <span><span class="co"># Verify results are equivalent (though data types may differ)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">vertex_counts_optimized</span>, <span class="va">vertex_counts_naive</span><span class="op">)</span></span>
@@ -379,6 +379,15 @@ purrr-style lambda notation:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">clustering_coeffs</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs </span></span>
 <span><span class="co">#&gt;       0       0       0       0       0       0    2000</span></span></code></pre></div>
+<p>For a structure with floating parts, the callback receives one
+annotated, weakly disconnected graph containing the main tree and every
+floating component. Use <code><a href="../reference/has_floating_parts.html">has_floating_parts()</a></code> before
+applying code that assumes a single tree. Structure-returning variants
+such as <code><a href="../reference/smap.html">smap_structure()</a></code> validate and canonicalize changed
+graphs while reusing unchanged graphs that are already valid and
+canonical; a callback that changes vertex identities or components must
+also update the graph’s <code>floating_parts</code> and
+<code>floating_substituents</code> metadata.</p>
 </div>
 <div class="section level3">
 <h3 id="combining-multiple-metrics">Combining Multiple Metrics<a class="anchor" aria-label="anchor" href="#combining-multiple-metrics"></a>
@@ -512,15 +521,15 @@ structures.</li>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] tictoc_1.2.1   lobstr_1.2.1   glyrepr_0.14.0</span></span>
+<span><span class="co">#&gt; [1] tictoc_1.2.1  lobstr_1.2.1  glyrepr_1.0.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.1    tidyselect_1.2.1 </span></span>
 <span><span class="co">#&gt;  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5</span></span>
 <span><span class="co">#&gt;  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   </span></span>
 <span><span class="co">#&gt; [13] igraph_2.3.3      knitr_1.51        backports_1.5.1   checkmate_2.3.4  </span></span>
-<span><span class="co">#&gt; [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.11.0     </span></span>
-<span><span class="co">#&gt; [21] pillar_1.11.1     rlang_1.3.0       cachem_1.1.0      stringi_1.8.7    </span></span>
+<span><span class="co">#&gt; [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.12.0     </span></span>
+<span><span class="co">#&gt; [21] pillar_1.11.1     rlang_1.3.0       cachem_1.1.0      stringi_1.8.9    </span></span>
 <span><span class="co">#&gt; [25] xfun_0.60         fs_2.1.0          sass_0.4.10       otel_0.2.0       </span></span>
 <span><span class="co">#&gt; [29] cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5    digest_0.6.39    </span></span>
 <span><span class="co">#&gt; [33] lifecycle_1.0.5   prettyunits_1.2.0 vctrs_0.7.3       evaluate_1.0.5   </span></span>

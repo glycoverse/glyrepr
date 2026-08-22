@@ -88,7 +88,7 @@ length(large_struc)
 
 library(lobstr)
 obj_sizes(struc, large_struc)
-#> *  15.54 kB
+#> *  15.95 kB
 #> * 320.69 kB
 ```
 
@@ -255,10 +255,10 @@ huge_struc <- rep(struc, 5000)  # 25,000 structures, only 5 unique
 
 cat("Dataset size:", length(huge_struc), "structures\n")
 #> Dataset size: 25000 structures
-cat("Unique structures:", length(attr(huge_struc, "structures")), "\n")
-#> Unique structures: 0
-cat("Redundancy factor:", length(huge_struc) / length(attr(huge_struc, "structures")), "x\n")
-#> Redundancy factor: Inf x
+cat("Unique structures:", length(attr(huge_struc, "graphs")), "\n")
+#> Unique structures: 5
+cat("Redundancy factor:", length(huge_struc) / length(attr(huge_struc, "graphs")), "x\n")
+#> Redundancy factor: 5000 x
 
 library(tictoc)
 
@@ -273,7 +273,7 @@ tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.243 sec elapsed
+#> Naive approach (all graphs): 0.233 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -299,6 +299,18 @@ summary(clustering_coeffs)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
 #>       0       0       0       0       0       0    2000
 ```
+
+For a structure with floating parts, the callback receives one
+annotated, weakly disconnected graph containing the main tree and every
+floating component. Use
+[`has_floating_parts()`](https://glycoverse.github.io/glyrepr/reference/has_floating_parts.md)
+before applying code that assumes a single tree. Structure-returning
+variants such as
+[`smap_structure()`](https://glycoverse.github.io/glyrepr/reference/smap.md)
+validate and canonicalize changed graphs while reusing unchanged graphs
+that are already valid and canonical; a callback that changes vertex
+identities or components must also update the graph’s `floating_parts`
+and `floating_substituents` metadata.
 
 ### Combining Multiple Metrics
 
@@ -429,15 +441,15 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] tictoc_1.2.1   lobstr_1.2.1   glyrepr_0.14.0
+#> [1] tictoc_1.2.1  lobstr_1.2.1  glyrepr_1.0.0
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.1    tidyselect_1.2.1 
 #>  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5
 #>  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   
 #> [13] igraph_2.3.3      knitr_1.51        backports_1.5.1   checkmate_2.3.4  
-#> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.11.0     
-#> [21] pillar_1.11.1     rlang_1.3.0       cachem_1.1.0      stringi_1.8.7    
+#> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.12.0     
+#> [21] pillar_1.11.1     rlang_1.3.0       cachem_1.1.0      stringi_1.8.9    
 #> [25] xfun_0.60         fs_2.1.0          sass_0.4.10       otel_0.2.0       
 #> [29] cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5    digest_0.6.39    
 #> [33] lifecycle_1.0.5   prettyunits_1.2.0 vctrs_0.7.3       evaluate_1.0.5   

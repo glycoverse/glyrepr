@@ -37,7 +37,8 @@ smap2_structure(.x, .y, .f, ...)
 
   A function that takes an igraph object (from `.x`) and a value (from
   `.y`) and returns a result. Can be a function, purrr-style lambda
-  (`~ .x + .y`), or a character string naming a function.
+  (`~ .x + .y`), or a character string naming a function. A structure
+  with floating metadata is passed as one annotated graph.
 
 - ...:
 
@@ -64,6 +65,11 @@ structure and corresponding `.y` value, then map the results back to the
 original vector positions. This is much more efficient than applying
 `.f` to each element pair individually when there are duplicate
 structure-value combinations.
+
+`smap2_structure()` reuses unchanged graphs and validates and
+canonicalizes changed graphs returned by `.f`. A callback that changes
+vertex identities or components of a floating structure must also update
+its `floating_parts` and `floating_substituents` metadata.
 
 **NA Handling:** NA elements in `.x` are preserved in the output - the
 function is not applied to NA positions, and the corresponding results

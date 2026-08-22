@@ -11,7 +11,7 @@ to glycan_composition()."><meta property="og:image" content="https://glycoverse.
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.14.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +63,7 @@ to <code><a href="glycan_composition.html">glycan_composition()</a></code>.</p>
 Supported inputs include:</p><ul><li><p>Named integer vectors or lists of named integer vectors</p></li>
 <li><p>Character vectors with composition strings (e.g., "Hex(5)HexNAc(2)")</p></li>
 <li><p><code>glyrepr_structure</code> objects (counts both monosaccharides and substituents)</p></li>
+<li><p>Glycan <code>igraph</code> objects (returns a length-one composition vector)</p></li>
 <li><p>Existing <code>glyrepr_composition</code> objects (returned as-is)</p></li>
 </ul></dd>
 
@@ -76,8 +77,9 @@ Supported inputs include:</p><ul><li><p>Named integer vectors or lists of named 
     <p>This function uses the vctrs casting framework for type conversion.
 When converting from glycan structures, both monosaccharides and substituents
 are counted. Substituents are extracted from the <code>sub</code> attribute of each
-vertex in the structure. For example, a vertex with <code>sub = "3Me"</code>
-contributes one "Me" substituent to the composition.</p>
+vertex and from the <code>floating_substituents</code> graph attribute. For example, a
+vertex with <code>sub = "3Me"</code> or an unresolved <code>{?Me}</code> each contributes one
+"Me" substituent to the composition.</p>
 <p>Simple composition strings use one-letter residue codes: "H" for "Hex",
 "N" for "HexNAc", "F" for "dHex", "S"/"A" for "NeuAc", and "G" for
 "NeuGc". "E" and "L" are also accepted as linkage-specific Neu5Ac codes;
@@ -116,12 +118,16 @@ not preserve linkage information.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[1]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># From a glycan structure vector</span></span></span>
+<span class="r-in"><span><span class="co"># From a glycan structure vector or graph</span></span></span>
 <span class="r-in"><span><span class="va">strucs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="n_glycan_core.html">n_glycan_core</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="n_glycan_core.html">o_glycan_core_1</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[2]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #0087D7;">GlcNAc</span>(2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #FFD700;">Gal</span>(1)<span style="color: #FFD700;">GalNAc</span>(1)</span>
+<span class="r-in"><span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">as_glycan_composition</span><span class="op">(</span><span class="va">graph</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_composition[1]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #00AF5F;">Man</span>(3)<span style="color: #0087D7;">GlcNAc</span>(2)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

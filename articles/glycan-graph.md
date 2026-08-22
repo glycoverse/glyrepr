@@ -8,10 +8,12 @@ reference.
 
 ## Glycans as Graphs
 
-Glycans are naturally represented as directed graphs. In `glyrepr`, a
-glycan structure is stored as an outward-directed tree, where each
-vertex represents a monosaccharide and each edge represents a glycosidic
-linkage.
+Glycans are naturally represented as directed graphs. In `glyrepr`, an
+ordinary glycan structure is stored as an outward-directed tree, where
+each vertex represents a monosaccharide and each edge represents a
+glycosidic linkage. A structure with floating parts is stored as an
+annotated forest: one main tree plus one disconnected tree for each
+floating part.
 
 Behind the scenes, each
 [`glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.md)
@@ -58,9 +60,10 @@ underlying graph with
 glycan <- n_glycan_core()
 graph <- get_structure_graphs(glycan)
 graph
-#> IGRAPH 1816bff DN-- 5 4 -- 
-#> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 1816bff (vertex names):
+#> IGRAPH acb65aa DN-- 5 4 -- 
+#> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
+#> | linkage (e/c)
+#> + edges from acb65aa (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 ```
 
@@ -72,6 +75,11 @@ units) and 4 edges (bonds).
 **Graph-level attributes:**
 
 - `anomer`: the anomeric configuration of the reducing end.
+- `alditol`: whether the reducing-end residue is an alditol.
+- `floating_parts`, when present: virtual attachment metadata for
+  disconnected floating components.
+- `floating_substituents`, when present: unresolved substituent tokens
+  and their candidate parent residues.
 
 **Vertex attributes:**
 
@@ -177,12 +185,118 @@ graph$anomer
 #> [1] "b1"
 ```
 
+**Alditol:** Whether the reducing-end residue has been reduced. The
+attribute is always explicit on canonical graphs; legacy inputs without
+it are treated as `FALSE`. In IUPAC-condensed strings, `-ol` follows the
+reducing-end residue.
+
+``` r
+
+alditol <- as_glycan_structure("Gal(b1-4)GlcNAc-ol(a1-")
+alditol_graph <- get_structure_graphs(alditol)
+alditol_graph$alditol
+#> [1] TRUE
+get_alditol(alditol)
+#> [1] TRUE
+```
+
+### Floating Parts
+
+A floating structure remains one `igraph`, but it is weakly
+disconnected. The floating-component vertices come first in complete
+IUPAC-condensed order, followed by the main-tree vertices in their
+canonical order.
+
+``` r
+
+floating <- as_glycan_structure(
+  "{Neu5Ac(a2-3)|2,3}Gal(b1-3)[Gal(b1-4)]GlcNAc(a1-"
+)
+floating_graph <- get_structure_graphs(floating)
+
+igraph::components(floating_graph, mode = "weak")$no
+#> [1] 2
+igraph::graph_attr(floating_graph, "floating_parts")
+#> [[1]]
+#> [[1]]$root
+#> [1] 1
+#> 
+#> [[1]]$nodes
+#> [1] 1
+#> 
+#> [[1]]$linkage
+#> [1] "a2-3"
+#> 
+#> [[1]]$parents
+#> [1] 2 3
+structure_floating_parts(floating)
+#> # A tibble: 1 × 6
+#>   glycan_id part_id root_node nodes     linkage parents  
+#>       <int>   <int>     <int> <list>    <chr>   <list>   
+#> 1         1       1         1 <int [1]> a2-3    <int [2]>
+```
+
+Each `floating_parts` entry has four fields:
+
+- `root`: the vertex index at the root of the floating component.
+- `nodes`: every vertex index in the floating component.
+- `linkage`: the virtual linkage from that root to its unresolved
+  parent.
+- `parents`: candidate vertex indices outside the component.
+  [`integer()`](https://rdrr.io/r/base/integer.html) means all feasible
+  nodes outside that component, including nodes in other floating parts.
+  In a canonical structure, an explicit vector has at least two entries;
+  a singleton is normalized to an ordinary edge.
+
+These IDs follow complete IUPAC-condensed residue order: floating blocks
+are counted from left to right before the main glycan, and substituent
+blocks add no vertices. Component assignments must be acyclic and
+ultimately connect to the main tree.
+
+The virtual attachment is not stored in `igraph::E(floating_graph)`,
+because its endpoint is unresolved. Use
+[`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md)
+when a tabular representation must round-trip this metadata.
+
+### Floating Substituents
+
+Floating substituents use the same candidate-parent convention without
+adding dummy vertices. Each `floating_substituents` entry contains
+`substituent`, such as `"6S"` or `"?S"`, and `parents`. Empty `parents`
+means every feasible residue node in the complete structure, including
+floating-part nodes; otherwise the values are global graph vertex
+indices.
+
+``` r
+
+floating_sub <- as_glycan_structure(
+  "{6S|1,2}Gal(a1-3)Glc(a1-3)Man(a1-"
+)
+floating_sub_graph <- get_structure_graphs(floating_sub)
+igraph::graph_attr(floating_sub_graph, "floating_substituents")
+#> [[1]]
+#> [[1]]$substituent
+#> [1] "6S"
+#> 
+#> [[1]]$parents
+#> [1] 1 2
+structure_floating_substituents(floating_sub)
+#> # A tibble: 1 × 4
+#>   glycan_id substituent_id substituent parents  
+#>       <int>          <int> <chr>       <list>   
+#> 1         1              1 6S          <int [2]>
+```
+
 ## Working with the Graph
 
 ### Using `igraph`
 
 Once you understand the graph structure, you can use `igraph` functions
-for custom structure analysis.
+for custom structure analysis. Remember that tree-specific functions
+need special handling for a structure with floating parts:
+[`get_structure_graphs()`](https://glycoverse.github.io/glyrepr/reference/get_structure_graphs.md)
+and [`smap()`](https://glycoverse.github.io/glyrepr/reference/smap.md)
+pass the complete annotated forest, not only the main tree.
 
 **Example 1:** Count branched structures (sugars with multiple
 children):
@@ -199,7 +313,7 @@ sum(igraph::degree(graph, mode = "out") > 1)
 
 bfs_result <- igraph::bfs(graph, root = 1, mode = "out")
 bfs_result$order
-#> + 5/5 vertices, named, from 1816bff:
+#> + 5/5 vertices, named, from acb65aa:
 #> [1] 1 2 3 4 5
 ```
 

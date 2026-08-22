@@ -1,7 +1,7 @@
 # Remove All Substituents from a Glycan
 
-This function replaces all substituents in a glycan structure with empty
-strings.
+This function replaces all vertex substituents in a glycan structure
+with empty strings and removes unresolved floating substituents.
 
 ## Usage
 
@@ -13,11 +13,12 @@ remove_substituents(glycan)
 
 - glycan:
 
-  A glyrepr_structure vector.
+  A glyrepr_structure vector or a glycan `igraph`.
 
 ## Value
 
-A glyrepr_structure vector with all substituents removed.
+An object of the same representation as `glycan` with all substituents
+removed. Graph input retains its vertex IDs and order.
 
 ## Examples
 

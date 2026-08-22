@@ -18,14 +18,17 @@ count_mono(x, mono = NULL, include_subs = FALSE)
 
 # S3 method for class 'glyrepr_structure'
 count_mono(x, mono = NULL, include_subs = FALSE)
+
+# S3 method for class 'igraph'
+count_mono(x, mono = NULL, include_subs = FALSE)
 ```
 
 ## Arguments
 
 - x:
 
-  A glycan composition (`glyrepr_composition`) or a glycan structure
-  (`glyrepr_structure`) vector.
+  A glycan composition (`glyrepr_composition`), a glycan structure
+  (`glyrepr_structure`) vector, or a glycan `igraph`.
 
 - mono:
 
@@ -39,14 +42,16 @@ count_mono(x, mono = NULL, include_subs = FALSE)
 
 ## Value
 
-A numeric vector of the same length as `x`.
+A numeric vector of the same length as `x`, or a numeric scalar for
+graph input.
 
 ## Details
 
 When `mono` is "generic" (e.g. "Hex", "HexNAc"), it counts all
 "concrete" monosaccharides that match. For example, "Hex" will count all
 Glc, Man, Gal, etc. When `mono` is "concrete" (e.g. "Gal", "GalNAc"), NA
-is returned when the composition is "generic".
+is returned when the composition contains generic residues. Floating
+substituents are counted like substituents attached to known residues.
 
 ## Examples
 

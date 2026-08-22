@@ -141,13 +141,16 @@ one `Hex` residue could be Man, Gal, Glc, or another hexose. Specific
 names carry more biological detail and are common in glycan databases
 and literature.
 
-`glyrepr` supports both types of names, but you cannot mix them in the
-same vector.
+`glyrepr` supports both types of names, and you can mix them in the same
+vector or even in the same glycan.
 
 ``` r
 
-# This raises an error because the monosaccharide names are mixed.
-try(as_glycan_composition(c("Hex(5)HexNAc(2)", "Man(5)GlcNAc(2)")), silent = TRUE)
+as_glycan_composition(c("Hex(5)HexNAc(2)", "Man(5)GlcNAc(2)", "Hex(5)GlcNAc(2)"))
+#> <glycan_composition[3]>
+#> [1] Hex(5)HexNAc(2)
+#> [2] Man(5)GlcNAc(2)
+#> [3] Hex(5)GlcNAc(2)
 ```
 
 The same rule applies to glycan structure vectors.
@@ -441,15 +444,17 @@ access the underlying `igraph` objects using
 
 get_structure_graphs(strucs)
 #> [[1]]
-#> IGRAPH 30d65b7 DN-- 2 1 -- 
-#> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edge from 30d65b7 (vertex names):
+#> IGRAPH f06fc27 DN-- 2 1 -- 
+#> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
+#> | linkage (e/c)
+#> + edge from f06fc27 (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 3e832d3 DN-- 3 2 -- 
-#> + attr: anomer (g/c), name (v/c), mono (v/c), sub (v/c), linkage (e/c)
-#> + edges from 3e832d3 (vertex names):
+#> IGRAPH ca35fa1 DN-- 3 2 -- 
+#> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
+#> | linkage (e/c)
+#> + edges from ca35fa1 (vertex names):
 #> [1] 3->1 3->2
 ```
 
@@ -486,36 +491,37 @@ has_linkages(strucs)
 ``` r
 
 get_mono_type(strucs)
-#> [1] "concrete"
+#> [1] "concrete" "concrete"
 ```
 
 ``` r
 
 get_structure_level(strucs)
-#> [1] "intact"
+#> [1] "intact" "intact"
 ```
 
 ### Structure Levels
 
 The structures we have seen so far are “intact” structures. They contain
-specific monosaccharides and complete linkage information. In real
-datasets, though, glycan structures often have missing information. For
-example, we might know the topology but not the linkages, or we might
-only know generic monosaccharide classes.
+complete linkage information. In real datasets, though, glycan
+structures often have missing information. For example, we might know
+the topology but not the linkages.
 
-To accommodate these scenarios, `glyrepr` defines four levels of glycan
-structures:
+To accommodate these scenarios, `glyrepr` defines three levels of glycan
+structures. These levels depend only on linkage and anomer information:
 
-- **Intact**: specific monosaccharides and complete linkage information.
-- **Partial**: specific monosaccharides, with at least one missing
-  linkage annotation.
-- **Topological**: specific monosaccharides, but all linkage information
-  is missing.
-- **Basic**: generic monosaccharides, with linkage information treated
-  as missing.
+- **Intact**: all linkage and anomer information is complete and
+  unambiguous.
+- **Partial**: some linkage or anomer information is present, but it is
+  not complete.
+- **Topological**: all linkage and anomer information is missing.
 
-Structure levels are defined at the vector level, so one glycan
-structure vector has one level.
+Floating parts do not change these definitions. Their attachment linkage
+is assessed like any other linkage, while uncertainty about the
+candidate parent is independent of the structure level.
+
+Structure levels are defined per glycan and do not depend on whether
+residues are generic, concrete, or mixed.
 
 Let’s see some examples.
 
@@ -527,7 +533,7 @@ as_glycan_structure(c(
   "Gal(b1-3)GalNAc(a1-",
   "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
 )) |> get_structure_level()
-#> [1] "intact"
+#> [1] "intact" "intact"
 ```
 
 **Partial structures**:
@@ -538,7 +544,7 @@ as_glycan_structure(c(
   "Gal(b1-?)GalNAc(a1-",
   "Gal(b1-?)[GlcNAc(b1-6)]GalNAc(a1-"
 )) |> get_structure_level()
-#> [1] "partial"
+#> [1] "partial" "partial"
 ```
 
 **Topological structures**:
@@ -549,10 +555,11 @@ as_glycan_structure(c(
   "Gal(??-?)GalNAc(??-",
   "Gal(??-?)[GlcNAc(??-?)]GalNAc(??-"
 )) |> get_structure_level()
-#> [1] "topological"
+#> [1] "topological" "topological"
 ```
 
-**Basic structures**:
+Generic structures use the same linkage-based levels. For example, these
+are topological structures:
 
 ``` r
 
@@ -560,16 +567,10 @@ as_glycan_structure(c(
   "Hex(??-?)HexNAc(??-",
   "Hex(??-?)[HexNAc(??-?)]HexNAc(??-"
 )) |> get_structure_level()
-#> [1] "basic"
+#> [1] "topological" "topological"
 ```
 
-In theory, you can have something like `"Hex(b1-3)HexNAc(a1-"`, with
-generic monosaccharides but all linkages intact. In practice, linkage
-information is usually harder to obtain than monosaccharide identities,
-so this situation is rare.
-
-If you create such a vector, `glyrepr` classifies it as `"basic"` and
-warns you.
+Generic structures with complete linkages are intact:
 
 ``` r
 
@@ -577,16 +578,14 @@ as_glycan_structure(c(
   "Hex(a1-3)HexNAc(a1-",
   "Hex(a1-3)[HexNAc(b1-6)]HexNAc(a1-"
 )) |> get_structure_level()
-#> Warning: Generic glycan structures with linkage annotations are treated as "basic".
-#> ℹ Linkage information is ignored when residues are generic.
-#> [1] "basic"
+#> [1] "intact" "intact"
 ```
 
 ### Manipulating Glycan Structure Vectors
 
 Glycan structure vectors also support vectorized operations like
 subsetting and concatenation. They also have structure-specific helpers
-for reducing resolution, removing linkages, and removing substituents.
+for removing linkages and substituents.
 
 ``` r
 
@@ -599,19 +598,19 @@ strucs
 
 ``` r
 
-reduce_structure_level(strucs, to_level = "basic")
+remove_linkages(strucs)
 #> <glycan_structure[2]>
-#> [1] Hex(??-?)HexNAc(??-
-#> [2] HexNAc(??-?)[Hex(??-?)]HexNAc(??-
+#> [1] Gal(??-?)GalNAc(??-
+#> [2] GlcNAc(??-?)[Gal(??-?)]GalNAc(??-
 #> # Unique structures: 2
 ```
 
 ``` r
 
-remove_linkages(strucs)  # same as reduce_structure_level(strucs, to_level = "topological")
+convert_to_generic(remove_linkages(strucs))
 #> <glycan_structure[2]>
-#> [1] Gal(??-?)GalNAc(??-
-#> [2] GlcNAc(??-?)[Gal(??-?)]GalNAc(??-
+#> [1] Hex(??-?)HexNAc(??-
+#> [2] HexNAc(??-?)[Hex(??-?)]HexNAc(??-
 #> # Unique structures: 2
 ```
 

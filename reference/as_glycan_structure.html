@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.14.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,6 +72,33 @@ produce an error.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A glyrepr_structure object.</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Character input assumes the natural absolute configuration for unprefixed
+monosaccharides. Less common configurations use a leading <code>D-</code> or <code>L-</code>, such
+as <code>D-Fuc</code>, <code>L-Gul</code>, and <code>D-Fucf</code>.
+Alditols use <code>-ol</code> on the main reducing-end residue, for example
+<code>Gal(b1-4)GlcNAc-ol(a1-</code>. The reducing-end anomer annotation remains part of
+the canonical representation.</p>
+<p>Character input supports floating-part blocks before the main
+IUPAC-condensed structure. <code>{Neu5Ac(a2-3)}&lt;main&gt;</code> allows every feasible
+node outside its own component as a candidate parent, while an explicit
+<code>|&lt;parents&gt;</code> suffix restricts that domain. Parent indices follow residue
+order in the complete supplied sequence: residues in floating blocks are
+counted left to right before the main glycan, and substituent blocks add no
+indices. A floating part may target another floating component or the main
+tree, but cannot target itself. Indices are remapped to canonical complete
+sequence order in the result. The suffix is a <code>glyrepr</code> extension to
+curly-brace IUPAC notation. A singleton candidate set is accepted as input
+but fully localizes the attachment, so
+<code>{Neu5Ac(a2-3)|2}Gal(b1-4)GlcNAc(b1-</code> canonicalizes to the ordinary structure
+<code>Neu5Ac(a2-3)Gal(b1-4)GlcNAc(b1-</code>.</p>
+<p>Floating substituents use the same leading-brace and candidate-parent syntax.
+For example, <code>{6S}&lt;main&gt;</code> leaves the sulfated residue unrestricted across all
+residue nodes, <code>{6S|1,2}&lt;main&gt;</code> restricts it to complete-sequence nodes 1 and
+2, and <code>{?S}&lt;main&gt;</code> also leaves the carbon position unknown. A singleton
+candidate is normalized into the selected residue's ordinary <code>sub</code> attribute.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -111,6 +138,28 @@ produce an error.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-2</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 2</span>
+<span class="r-in"><span><span class="fu">as_glycan_structure</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"D-Fuc(a1-"</span>, <span class="st">"L-Gul(b1-"</span>, <span class="st">"D-Fucf(a1-"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[3]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FF0000;">D-Fuc</span>(<span style="color: #B2B2B2;">a1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #FF8700;">L-Gul</span>(<span style="color: #B2B2B2;">b1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] <span style="color: #FF0000;">D-Fucf</span>(<span style="color: #B2B2B2;">a1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 3</span>
+<span class="r-in"><span><span class="fu">as_glycan_structure</span><span class="op">(</span><span class="st">"Gal(b1-4)GlcNAc-ol(a1-"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[1]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>-ol(<span style="color: #B2B2B2;">a1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Parse a floating residue with two candidate parents</span></span></span>
+<span class="r-in"><span><span class="va">floating_iupac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"{Neu5Ac(a2-3)|2,5}"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"Gal(b1-4)GlcNAc(b1-2)Man(a1-3)"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">as_glycan_structure</span><span class="op">(</span><span class="va">floating_iupac</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[1]&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] {<span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">a2-3</span>)|2,5}<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-3</span>)[<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-2</span>)<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">a1-6</span>)]<span style="color: #00AF5F;">Man</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-4</span>)<span style="color: #0087D7;">GlcNAc</span>(<span style="color: #B2B2B2;">b1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Preserve valid elements while replacing an invalid element with NA</span></span></span>
 <span class="r-in"><span><span class="fu">as_glycan_structure</span><span class="op">(</span></span></span>
@@ -119,9 +168,7 @@ produce an error.</p></dd>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>1 structure failed validation and was replaced with `NA`.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">✖</span> Position 2 (`invalid`): Could not parse IUPAC-condensed string:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">"not-a-structure"</span> <span style="color: #00BBBB;">ℹ</span> Can't extract anomer information. <span style="color: #00BBBB;">ℹ</span> Anomer information is</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>   required for the reducing-end monosaccharide. <span style="color: #00BBBB;">ℹ</span> For example, use 'Man(a1-'</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>   instead of 'Man'.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">"not-a-structure"</span> <span style="color: #00BBBB;">ℹ</span> Invalid characters or format in IUPAC-condensed string</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[2]&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] valid	<span style="color: #0087D7;">Glc</span>(<span style="color: #B2B2B2;">?1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] invalid	NA</span>

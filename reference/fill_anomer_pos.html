@@ -11,7 +11,7 @@ information. For example, "Gal(??-?)GalNAc(??-" is converted to
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.14.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,19 +59,23 @@ information. For example, <code>"Gal(??-?)GalNAc(??-"</code> is converted to
 
 
 <dl><dt id="arg-strucs">strucs<a class="anchor" aria-label="anchor" href="#arg-strucs"></a></dt>
-<dd><p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector with concrete or generic
-monosaccharides.</p></dd>
+<dd><p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector or glycan <code>igraph</code> with concrete
+or generic monosaccharides.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code><a href="glycan_structure.html">glycan_structure()</a></code> vector with anomer positions added where
-missing.</p>
+    <p>An object of the same representation as <code>strucs</code> with anomer
+positions added where missing. Graph input retains its vertex IDs and
+order.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For anomer positions that are already specified in the input structures,
 this function does not modify them.</p>
+<p>For a structure with floating parts, the reducing-end position is inferred
+from the root of the main tree. Positions in virtual floating-part
+attachment linkages are inferred from each floating part's root residue.</p>
     </div>
 
     <div class="section level2">
@@ -82,8 +86,8 @@ this function does not modify them.</p>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">fill_anomer_pos</span><span class="op">(</span><span class="va">glycans</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;glycan_structure[2]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FFD700;">Gal</span>(?1-?)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">?1-</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #AF5FAF;">Neu5Ac</span>(?2-?)<span style="color: #FFD700;">Gal</span>(?1-?)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">?1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] <span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">?1-?</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">?1-</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] <span style="color: #AF5FAF;">Neu5Ac</span>(<span style="color: #B2B2B2;">?2-?</span>)<span style="color: #FFD700;">Gal</span>(<span style="color: #B2B2B2;">?1-?</span>)<span style="color: #FFD700;">GalNAc</span>(<span style="color: #B2B2B2;">?1-</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Unique structures: 2</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

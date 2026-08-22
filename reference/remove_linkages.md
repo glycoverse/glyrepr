@@ -1,7 +1,8 @@
 # Remove All Linkages from a Glycan
 
-This function replaces all linkages in a glycan structure with "??-?",
-as well as the reducing end anomer with "??-".
+This function replaces all graph-edge and floating-part attachment
+linkages in a glycan structure with "??-?", as well as the reducing end
+anomer with "??-".
 
 ## Usage
 
@@ -13,11 +14,12 @@ remove_linkages(glycan)
 
 - glycan:
 
-  A glyrepr_structure vector.
+  A glyrepr_structure vector or a glycan `igraph`.
 
 ## Value
 
-A glyrepr_structure vector with all linkages removed.
+An object of the same representation as `glycan` with all linkages
+removed. Graph input retains its vertex IDs and order.
 
 ## Examples
 
