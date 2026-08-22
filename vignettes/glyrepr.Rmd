@@ -121,11 +121,10 @@ where it is often difficult to distinguish isomers from MS evidence alone.
 For example, one `Hex` residue could be Man, Gal, Glc, or another hexose.
 Specific names carry more biological detail and are common in glycan databases and literature.
 
-`glyrepr` supports both types of names, but you cannot mix them in the same vector.
+`glyrepr` supports both types of names, and you can mix them in the same vector or even in the same glycan.
 
 ```{r}
-# This raises an error because the monosaccharide names are mixed.
-try(as_glycan_composition(c("Hex(5)HexNAc(2)", "Man(5)GlcNAc(2)")), silent = TRUE)
+as_glycan_composition(c("Hex(5)HexNAc(2)", "Man(5)GlcNAc(2)", "Hex(5)GlcNAc(2)"))
 ```
 
 The same rule applies to glycan structure vectors.
@@ -342,8 +341,7 @@ get_structure_level(strucs)
 The structures we have seen so far are "intact" structures.
 They contain complete linkage information.
 In real datasets, though, glycan structures often have missing information.
-For example, we might know the topology but not the linkages,
-or we might only know generic monosaccharide classes.
+For example, we might know the topology but not the linkages.
 
 To accommodate these scenarios, `glyrepr` defines three levels of glycan structures.
 These levels depend only on linkage and anomer information:
