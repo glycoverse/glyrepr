@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.14.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.0.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,14 +40,17 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.0" id="glyrepr-100">glyrepr 1.0.0<a class="anchor" aria-label="anchor" href="#glyrepr-100"></a></h2>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-1-0-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-0-0"></a></h3>
 <ul><li>
 <code><a href="../reference/get_mono_type.html">get_mono_type()</a></code> now returns one value per structure or composition instead of one scalar for the whole vector and may return <code>"mixed"</code>; callers that assume a scalar result must handle aligned per-element values. Generic and concrete residues can now coexist within structures, compositions, and their vectors. (<a href="https://github.com/glycoverse/glyrepr/issues/90" class="external-link">#90</a>)</li>
 <li>Structure levels now depend only on linkage and anomer information. <code><a href="../reference/get_structure_level.html">get_structure_level()</a></code> returns one <code>"intact"</code>, <code>"partial"</code>, or <code>"topological"</code> value per structure; the former <code>"basic"</code> level and <code>reduce_structure_level()</code> have been removed. Use <code><a href="../reference/remove_linkages.html">remove_linkages()</a></code> to remove linkage information and <code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code> to convert residue identities. (<a href="https://github.com/glycoverse/glyrepr/issues/90" class="external-link">#90</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-1-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-0-0"></a></h3>
 <ul><li>Generic and concrete residues can now coexist within structures, compositions, and their vectors; use aligned <code><a href="../reference/get_mono_type.html">get_mono_type()</a></code> results to inspect each element. (<a href="https://github.com/glycoverse/glyrepr/issues/90" class="external-link">#90</a>)</li>
 <li>Glycan structures now support alditols through reducing-end <code>-ol</code> IUPAC syntax, such as <code>Gal(b1-4)GlcNAc-ol(a1-</code>. New <code><a href="../reference/get_alditol.html">get_alditol()</a></code> inspects the graph-level status, and <code><a href="../reference/structure_tables.html">structure_from_tibbles()</a></code> gains an <code>alditols</code> argument for lossless table round-trips; legacy graphs without the attribute remain non-alditols. (<a href="https://github.com/glycoverse/glyrepr/issues/88" class="external-link">#88</a>)</li>
 <li>Concrete monosaccharides now support explicit unusual absolute configurations using a leading <code>D-</code> or <code>L-</code>, such as <code>D-Fuc</code>, <code>L-Gul</code>, and <code>D-Fucf</code>; unprefixed names retain their natural configurations. (<a href="https://github.com/glycoverse/glyrepr/issues/85" class="external-link">#85</a>, <a href="https://github.com/glycoverse/glyrepr/issues/86" class="external-link">#86</a>)</li>
@@ -64,7 +67,7 @@
 <li>Structure inspection, transformation, graph-table, composition, and IUPAC APIs now accept individual glycan <code>igraph</code> objects directly while preserving existing <code>glyrepr_structure</code> vector behavior and vertex IDs. (<a href="https://github.com/glycoverse/glyrepr/issues/81" class="external-link">#81</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-fixes-development-version">Minor improvements and fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-fixes-1-0-0">Minor improvements and fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-1-0-0"></a></h3>
 <ul><li>
 <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> now support ambiguous substituent positions such as <code>Gal4/6S(a1-</code> and preserve them during graph and IUPAC conversion. (<a href="https://github.com/glycoverse/glyrepr/issues/84" class="external-link">#84</a>)</li>
 <li>

@@ -2,6 +2,8 @@
 
 ## glyrepr (development version)
 
+## glyrepr 1.0.0
+
 ### Breaking changes
 
 - [`get_mono_type()`](https://glycoverse.github.io/glyrepr/dev/reference/get_mono_type.md)
