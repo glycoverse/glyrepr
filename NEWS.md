@@ -2,18 +2,19 @@
 
 ## Breaking changes
 
-* Generic and concrete residues can now coexist within glycan structures and compositions and across their vectors. `get_mono_type()` now returns one value per element and reports mixed elements as `"mixed"`. (#90)
+* `get_mono_type()` now returns one value per structure or composition instead of one scalar for the whole vector and may return `"mixed"`; callers that assume a scalar result must handle aligned per-element values. Generic and concrete residues can now coexist within structures, compositions, and their vectors. (#90)
 * Structure levels now depend only on linkage and anomer information. `get_structure_level()` returns one `"intact"`, `"partial"`, or `"topological"` value per structure; the former `"basic"` level and `reduce_structure_level()` have been removed. Use `remove_linkages()` to remove linkage information and `convert_to_generic()` to convert residue identities. (#90)
 
 ## New features
 
+* Generic and concrete residues can now coexist within structures, compositions, and their vectors; use aligned `get_mono_type()` results to inspect each element. (#90)
 * Glycan structures now support alditols through reducing-end `-ol` IUPAC syntax, such as `Gal(b1-4)GlcNAc-ol(a1-`. New `get_alditol()` inspects the graph-level status, and `structure_from_tibbles()` gains an `alditols` argument for lossless table round-trips; legacy graphs without the attribute remain non-alditols. (#88)
 * Concrete monosaccharides now support explicit unusual absolute configurations using a leading `D-` or `L-`, such as `D-Fuc`, `L-Gul`, and `D-Fucf`; unprefixed names retain their natural configurations. (#85, #86)
-* Floating parent indices now follow complete IUPAC-condensed residue order. Floating parts may attach to any other floating component or the main tree, floating substituents may target any residue node, and localization and enumeration retain only conflict-free acyclic assignments that connect every component to the main tree. (#89)
-* `as_glycan_structure()` and `glycan_structure()` now support floating substituents with unresolved parent residues using `{<substituent>}` and `{<substituent>|<parents>}` syntax, including unknown carbon positions such as `{?S}`. (#87)
-* `as_glycan_structure()` and `glycan_structure()` now support floating glycan substructures with optional candidate-parent indices using `{<floating>}` and `{<floating>|<parents>}` syntax. Floating structures are validated, canonicalized, transformed, and converted to graph tables while preserving parent-index semantics. (#80)
 * Concrete monosaccharides now support explicit furanose forms such as `Galf` and `GlcfNAc`; generic conversion remains unchanged, so these become `Hex` and `HexNAc`, respectively. (#82)
-* New `enumerate_floating_graph_localizations()` and `enumerate_floating_localizations()` APIs enumerate conflict-free floating-part and floating-substituent assignments with provenance, while `localize_floating_parts()` attaches selected floating parts; graph-level results retain original vertex IDs, and `deduplicate = FALSE` retains assignments that canonicalize to the same structure. (#80)
+* `as_glycan_structure()` and `glycan_structure()` now support floating glycan substructures with optional candidate-parent indices using `{<floating>}` and `{<floating>|<parents>}` syntax. Floating structures retain component-node and candidate-parent metadata through validation, canonicalization, transformations, and graph-table round-trips. (#80)
+* `as_glycan_structure()` and `glycan_structure()` now support floating substituents with unresolved parent residues using `{<substituent>}` and `{<substituent>|<parents>}` syntax, including unknown carbon positions such as `{?S}`. (#87)
+* Floating candidate-parent indices follow complete IUPAC-condensed residue order. Floating parts may attach to other floating components or the main tree, floating substituents may target any residue node, and localization retains only conflict-free acyclic assignments that connect every component to the main tree. (#89)
+* New `enumerate_floating_graph_localizations()` and `enumerate_floating_localizations()` return conflict-free floating-part and floating-substituent assignments with provenance, while `localize_floating_parts()` attaches selected floating parts; graph-level results retain original vertex IDs, and `deduplicate = FALSE` retains assignments that canonicalize to the same structure. (#80)
 * `print()` gains an `n` argument for `glyrepr_structure` and `glyrepr_composition` vectors. (#77)
 * New `structure_candidate_edges()`, `structure_component_membership()`, and `structure_floating_candidates()` helpers expose floating-part membership and virtual edges plus floating-part and floating-substituent candidate parents for inspection, drawing, and constraint-aware graph operations. (#80)
 * Structure inspection, transformation, graph-table, composition, and IUPAC APIs now accept individual glycan `igraph` objects directly while preserving existing `glyrepr_structure` vector behavior and vertex IDs. (#81)
@@ -22,9 +23,8 @@
 
 * `as_glycan_structure()` and `glycan_structure()` now support ambiguous substituent positions such as `Gal4/6S(a1-` and preserve them during graph and IUPAC conversion. (#84)
 * `as_glycan_structure()` now accepts omitted reducing-end annotations by inferring the anomer position, normalizes `(?-?)` to `(??-?)`, and collapses linkage-position choices containing `?` to a single unknown position. (#83)
-* Floating-part graph metadata now records the nodes in each component, while legacy graph inputs without this metadata remain supported. (#80)
 * `get_structure_level()` treats floating candidate-parent ambiguity independently from linkage resolution; fully specified floating structures can be intact. (#80)
-* IUPAC-condensed sequence generation from glycan graphs is faster by reducing repeated `igraph` extraction. (#78)
+* IUPAC-condensed sequence generation from glycan graphs is now faster. (#78)
 * `validate_glycan_graph()` and `as_glycan_structure()` are faster through bulk linkage-position validation. (#79)
 
 # glyrepr 0.14.0
