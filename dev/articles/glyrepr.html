@@ -179,14 +179,14 @@ difficult to distinguish isomers from MS evidence alone. For example,
 one <code>Hex</code> residue could be Man, Gal, Glc, or another hexose.
 Specific names carry more biological detail and are common in glycan
 databases and literature.</p>
-<p><code>glyrepr</code> supports both types of names, but you cannot mix
-them in the same vector.</p>
+<p><code>glyrepr</code> supports both types of names, and you can mix
+them in the same vector or even in the same glycan.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># This raises an error because the monosaccharide names are mixed.</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hex(5)HexNAc(2)"</span>, <span class="st">"Man(5)GlcNAc(2)"</span><span class="op">)</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;glycan_composition[2]&gt;</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/as_glycan_composition.html">as_glycan_composition</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hex(5)HexNAc(2)"</span>, <span class="st">"Man(5)GlcNAc(2)"</span>, <span class="st">"Hex(5)GlcNAc(2)"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;glycan_composition[3]&gt;</span></span>
 <span><span class="co">#&gt; [1] <span style="color: #000000;">Hex</span>(5)<span style="color: #000000;">HexNAc</span>(2)</span></span>
-<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span></code></pre></div>
+<span><span class="co">#&gt; [2] <span style="color: #00AF5F;">Man</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #000000;">Hex</span>(5)<span style="color: #0087D7;">GlcNAc</span>(2)</span></span></code></pre></div>
 <p>The same rule applies to glycan structure vectors.</p>
 </div>
 <div class="section level3">
@@ -406,17 +406,17 @@ but under the hood the glycan structures are stored as
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_structure_graphs.html">get_structure_graphs</a></span><span class="op">(</span><span class="va">strucs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; IGRAPH c4d0c12 DN-- 2 1 -- </span></span>
+<span><span class="co">#&gt; IGRAPH 54bd5f7 DN-- 2 1 -- </span></span>
 <span><span class="co">#&gt; + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),</span></span>
 <span><span class="co">#&gt; | linkage (e/c)</span></span>
-<span><span class="co">#&gt; + edge from c4d0c12 (vertex names):</span></span>
+<span><span class="co">#&gt; + edge from 54bd5f7 (vertex names):</span></span>
 <span><span class="co">#&gt; [1] 2-&gt;1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; IGRAPH 31a49fc DN-- 3 2 -- </span></span>
+<span><span class="co">#&gt; IGRAPH bb318f2 DN-- 3 2 -- </span></span>
 <span><span class="co">#&gt; + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),</span></span>
 <span><span class="co">#&gt; | linkage (e/c)</span></span>
-<span><span class="co">#&gt; + edges from 31a49fc (vertex names):</span></span>
+<span><span class="co">#&gt; + edges from bb318f2 (vertex names):</span></span>
 <span><span class="co">#&gt; [1] 3-&gt;1 3-&gt;2</span></span></code></pre></div>
 <p>Details of how a glycan structure is modeled as a graph are covered
 in the <a href="https://glycoverse.github.io/glyrepr/articles/glycan-graph.html">glycan
@@ -448,8 +448,7 @@ inspect specific aspects of the structures.</p>
 <p>The structures we have seen so far are “intact” structures. They
 contain complete linkage information. In real datasets, though, glycan
 structures often have missing information. For example, we might know
-the topology but not the linkages, or we might only know generic
-monosaccharide classes.</p>
+the topology but not the linkages.</p>
 <p>To accommodate these scenarios, <code>glyrepr</code> defines three
 levels of glycan structures. These levels depend only on linkage and
 anomer information:</p>

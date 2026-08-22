@@ -141,16 +141,16 @@ one `Hex` residue could be Man, Gal, Glc, or another hexose. Specific
 names carry more biological detail and are common in glycan databases
 and literature.
 
-`glyrepr` supports both types of names, but you cannot mix them in the
-same vector.
+`glyrepr` supports both types of names, and you can mix them in the same
+vector or even in the same glycan.
 
 ``` r
 
-# This raises an error because the monosaccharide names are mixed.
-try(as_glycan_composition(c("Hex(5)HexNAc(2)", "Man(5)GlcNAc(2)")), silent = TRUE)
-#> <glycan_composition[2]>
+as_glycan_composition(c("Hex(5)HexNAc(2)", "Man(5)GlcNAc(2)", "Hex(5)GlcNAc(2)"))
+#> <glycan_composition[3]>
 #> [1] Hex(5)HexNAc(2)
 #> [2] Man(5)GlcNAc(2)
+#> [3] Hex(5)GlcNAc(2)
 ```
 
 The same rule applies to glycan structure vectors.
@@ -444,17 +444,17 @@ access the underlying `igraph` objects using
 
 get_structure_graphs(strucs)
 #> [[1]]
-#> IGRAPH c4d0c12 DN-- 2 1 -- 
+#> IGRAPH 54bd5f7 DN-- 2 1 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edge from c4d0c12 (vertex names):
+#> + edge from 54bd5f7 (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 31a49fc DN-- 3 2 -- 
+#> IGRAPH bb318f2 DN-- 3 2 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from 31a49fc (vertex names):
+#> + edges from bb318f2 (vertex names):
 #> [1] 3->1 3->2
 ```
 
@@ -505,8 +505,7 @@ get_structure_level(strucs)
 The structures we have seen so far are “intact” structures. They contain
 complete linkage information. In real datasets, though, glycan
 structures often have missing information. For example, we might know
-the topology but not the linkages, or we might only know generic
-monosaccharide classes.
+the topology but not the linkages.
 
 To accommodate these scenarios, `glyrepr` defines three levels of glycan
 structures. These levels depend only on linkage and anomer information:
