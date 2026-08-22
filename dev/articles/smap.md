@@ -255,10 +255,10 @@ huge_struc <- rep(struc, 5000)  # 25,000 structures, only 5 unique
 
 cat("Dataset size:", length(huge_struc), "structures\n")
 #> Dataset size: 25000 structures
-cat("Unique structures:", length(attr(huge_struc, "structures")), "\n")
-#> Unique structures: 0
-cat("Redundancy factor:", length(huge_struc) / length(attr(huge_struc, "structures")), "x\n")
-#> Redundancy factor: Inf x
+cat("Unique structures:", length(attr(huge_struc, "graphs")), "\n")
+#> Unique structures: 5
+cat("Redundancy factor:", length(huge_struc) / length(attr(huge_struc, "graphs")), "x\n")
+#> Redundancy factor: 5000 x
 
 library(tictoc)
 
@@ -266,14 +266,14 @@ library(tictoc)
 tic("smap_int (optimized)")
 vertex_counts_optimized <- smap_int(huge_struc, igraph::vcount)
 toc()
-#> smap_int (optimized): 0.032 sec elapsed
+#> smap_int (optimized): 0.021 sec elapsed
 
 # Naive approach: extract all graphs and process each one
 tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.236 sec elapsed
+#> Naive approach (all graphs): 0.178 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
