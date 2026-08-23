@@ -162,6 +162,22 @@ test_that("as_glycan_composition works for a glycan structure with multiple subs
   expect_equal(comp, expected_comp)
 })
 
+test_that("structure conversion maps duplicates and missing values", {
+  structure <- as_glycan_structure(
+    "{6S|1,2}Gal3Me(a1-3)Glc(a1-"
+  )
+  structures <- c(first = structure, missing = NA, second = structure)
+
+  result <- as_glycan_composition(structures)
+  expected <- glycan_composition(
+    first = c(Glc = 1L, Gal = 1L, Me = 1L, S = 1L),
+    missing = NULL,
+    second = c(Glc = 1L, Gal = 1L, Me = 1L, S = 1L)
+  )
+
+  expect_identical(result, expected)
+})
+
 test_that("ambiguous positions contribute one substituent to compositions", {
   structure <- as_glycan_structure("Gal4/6S(a1-")
 
