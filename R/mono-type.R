@@ -80,19 +80,33 @@ convert_to_generic.glyrepr_structure <- function(x) {
     return(x)
   }
 
-  # Get current mono types
-  from <- get_mono_type(x)
-  if (!any(from %in% c("concrete", "mixed"))) {
+  input_iupacs <- glycan_structure_iupac_data(x)
+  used_iupacs <- unique(input_iupacs[!is.na(input_iupacs)])
+  if (length(used_iupacs) == 0) {
     return(x)
   }
 
-  # Use spmap_structure with optimized implementation
-  spmap_structure(list(x, from), function(graph, from) {
-    if (from == "generic") {
-      return(graph)
-    }
-    convert_glycan_mono_type_impl(graph, from, "generic")
-  })
+  source_graphs <- attr(x, "graphs")[used_iupacs]
+  converted <- Map(
+    convert_structure_graph_to_generic,
+    source_graphs,
+    used_iupacs
+  )
+  changed <- vapply(converted, `[[`, logical(1), "changed")
+  if (!any(changed)) {
+    return(x)
+  }
+
+  converted_graphs <- lapply(converted, `[[`, "graph")
+  new_unique_iupacs <- vapply(converted, `[[`, character(1), "iupac")
+  result_iupacs <- new_unique_iupacs[match(input_iupacs, used_iupacs)]
+  names(result_iupacs) <- names(x)
+
+  keep <- !duplicated(new_unique_iupacs)
+  final_graphs <- converted_graphs[keep]
+  names(final_graphs) <- new_unique_iupacs[keep]
+
+  new_glycan_structure(result_iupacs, final_graphs)
 }
 
 #' @export
@@ -340,6 +354,20 @@ convert_glycan_mono_type_impl <- function(glycan, from, to) {
   new_names <- convert_mono_type_impl(old_names)
   raise_error_for_na(old_names, new_names, to)
   igraph::set_vertex_attr(glycan, "mono", value = new_names)
+}
+
+convert_structure_graph_to_generic <- function(graph, iupac) {
+  old_names <- igraph::vertex_attr(graph, "mono")
+  new_names <- convert_mono_type_impl(old_names)
+  raise_error_for_na(old_names, new_names, "generic")
+
+  if (identical(old_names, new_names)) {
+    return(list(graph = graph, iupac = iupac, changed = FALSE))
+  }
+
+  graph <- igraph::set_vertex_attr(graph, "mono", value = new_names)
+  canonical <- canonicalize_graph_with_iupac(graph)
+  list(graph = canonical$graph, iupac = canonical$iupac, changed = TRUE)
 }
 
 raise_error_for_na <- function(old_names, new_names, to) {
