@@ -278,20 +278,24 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
 
 #' @export
 vec_cast.glyrepr_composition.glyrepr_structure <- function(x, to, ...) {
+  component_order <- .composition_component_order()
+
   # Use smap to convert each structure to composition
-  compositions <- smap(x, graph_to_composition)
+  compositions <- smap(
+    x,
+    graph_to_composition,
+    component_order = component_order
+  )
 
   # Create composition object
   new_glycan_composition(compositions)
 }
 
-graph_to_composition <- function(graph) {
-  monos <- igraph::V(graph)$mono
-  mono_tb <- table(monos)
-  mono_result <- as.integer(mono_tb)
-  names(mono_result) <- names(mono_tb)
+graph_to_composition <- function(graph, component_order = NULL) {
+  monos <- igraph::vertex_attr(graph, "mono")
+  mono_result <- .count_composition_components(monos)
 
-  subs <- igraph::V(graph)$sub
+  subs <- igraph::vertex_attr(graph, "sub")
   floating_substituents <- normalize_floating_substituents(graph)
   if (length(floating_substituents) > 0) {
     subs <- c(
@@ -301,14 +305,25 @@ graph_to_composition <- function(graph) {
   }
   sub_types <- extract_substituent_types(subs)
   if (length(sub_types) > 0) {
-    sub_tb <- table(sub_types)
-    sub_result <- as.integer(sub_tb)
-    names(sub_result) <- names(sub_tb)
+    sub_result <- .count_composition_components(sub_types)
   } else {
     sub_result <- integer()
   }
 
-  .reorder_composition_components(c(mono_result, sub_result))
+  .reorder_composition_components(
+    c(mono_result, sub_result),
+    component_order = component_order
+  )
+}
+
+.count_composition_components <- function(components) {
+  component_names <- unique(components)
+  counts <- tabulate(
+    match(components, component_names),
+    nbins = length(component_names)
+  )
+  names(counts) <- component_names
+  counts
 }
 
 #' @export
@@ -695,13 +710,21 @@ parse_single_composition <- function(char) {
 #' Monosaccharides are placed before substituents.
 #'
 #' @param components A named integer vector of composition components.
+#' @param component_order Optional precomputed composition component order.
 #' @returns A named integer vector of reordered composition components.
 #' @noRd
-.reorder_composition_components <- function(components) {
-  mono_orders <- available_monosaccharides()
-  sub_orders <- available_substituents()
-  orders <- c(mono_orders, sub_orders)
-  components[order(match(names(components), orders))]
+.reorder_composition_components <- function(
+  components,
+  component_order = NULL
+) {
+  if (is.null(component_order)) {
+    component_order <- .composition_component_order()
+  }
+  components[order(match(names(components), component_order))]
+}
+
+.composition_component_order <- function() {
+  c(available_monosaccharides(), available_substituents())
 }
 
 #' Aggregate duplicated composition components
