@@ -526,6 +526,32 @@ test_that("glycan_structure validates input", {
   expect_error(glycan_structure(list(1, 2)), "igraph objects")
 })
 
+test_that("graph construction preserves custom attributes through canonicalization", {
+  graph <- get_structure_graphs(n_glycan_core())
+  graph <- igraph::set_vertex_attr(graph, "label", value = letters[1:5])
+  graph <- igraph::set_edge_attr(graph, "weight", value = seq_len(4))
+  graph <- igraph::set_graph_attr(graph, "source", value = "example")
+  graph <- igraph::permute(graph, c(3, 5, 1, 4, 2))
+  expected <- canonicalize_glycan_graph(validate_glycan_graph(graph))
+
+  for (on_failure in c("error", "na")) {
+    result <- as_glycan_structure(list(graph, graph), on_failure = on_failure)
+    actual <- get_structure_graphs(result[1])
+
+    expect_identical(as.character(result), rep(graph_to_iupac(expected), 2))
+    expect_length(attr(result, "graphs"), 1L)
+    expect_identical(
+      igraph::as_data_frame(actual, "vertices"),
+      igraph::as_data_frame(expected, "vertices")
+    )
+    expect_identical(
+      igraph::as_data_frame(actual, "edges"),
+      igraph::as_data_frame(expected, "edges")
+    )
+    expect_identical(igraph::graph_attr(actual), igraph::graph_attr(expected))
+  }
+})
+
 # Tests for as_glycan_structure -------------------------------------------------
 
 test_that("as_glycan_structure creates valid glycan_structure object from igraph", {

@@ -1,5 +1,6 @@
 # glyrepr (development version)
 
+* `as_glycan_structure()` and `glycan_structure()` construct vectors from graphs faster while preserving validation and canonical ordering.
 * `glycan_structure()` uses less temporary memory when constructing large vectors.
 * `as_glycan_structure()` parses IUPAC-condensed strings faster, especially structures without additional substituents.
 
