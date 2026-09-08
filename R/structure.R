@@ -199,33 +199,10 @@ glycan_structure <- function(...) {
   }
 
   valid_graphs <- unname(args[valid_idx])
+  canonical <- canonicalize_and_validate_iupac_graphs(valid_graphs)
+  iupacs[valid_idx] <- canonical$iupacs
 
-  # Validate and process each valid graph
-  processed_graphs <- purrr::map(valid_graphs, function(graph) {
-    checkmate::assert_class(graph, "igraph")
-    graph %>%
-      validate_glycan_graph() %>%
-      canonicalize_glycan_graph()
-  })
-
-  # Validate the graph-list container.
-  validate_glycan_graph_vector(processed_graphs)
-
-  # Use IUPAC codes directly as data for the glycan_structure vctrs vector
-  processed_iupacs <- purrr::map_chr(
-    processed_graphs,
-    graph_to_iupac
-  )
-
-  # Create a unique list based on uniqueness of IUPAC codes for structures storage
-  unique_indices <- which(!duplicated(processed_iupacs))
-  unique_graphs <- processed_graphs[unique_indices]
-  unique_iupacs <- processed_iupacs[unique_indices]
-  names(unique_graphs) <- unique_iupacs
-
-  iupacs[valid_idx] <- processed_iupacs
-
-  new_glycan_structure(iupacs, unique_graphs)
+  new_glycan_structure(iupacs, canonical$graphs)
 }
 
 #' Extract stored IUPAC-condensed strings from a glycan structure vector
@@ -580,15 +557,11 @@ glycan_structure_from_iupac_character <- function(x) {
 #' @returns A list with canonical `iupacs` and unique named `graphs`.
 #' @noRd
 canonicalize_and_validate_iupac_graphs <- function(graphs) {
-  graphs <- purrr::map(graphs, function(graph) {
-    graph %>%
-      validate_glycan_graph() %>%
-      canonicalize_glycan_graph()
-  })
-
+  processed <- purrr::map(graphs, process_glycan_structure_element)
+  graphs <- purrr::map(processed, "graph")
   validate_glycan_graph_vector(graphs)
 
-  iupacs <- purrr::map_chr(graphs, graph_to_iupac)
+  iupacs <- purrr::map_chr(processed, "iupac")
   unique_indices <- which(!duplicated(iupacs))
   unique_graphs <- graphs[unique_indices]
   names(unique_graphs) <- iupacs[unique_indices]
@@ -918,12 +891,7 @@ recover_glycan_structure_elements <- function(
 #' @noRd
 process_glycan_structure_element <- function(graph) {
   graph <- validate_glycan_graph(graph)
-  graph <- canonicalize_glycan_graph(graph)
-
-  list(
-    graph = graph,
-    iupac = graph_to_iupac(graph)
-  )
+  canonicalize_graph_with_iupac(graph)
 }
 
 #' Test whether a graph-list element represents a missing structure
