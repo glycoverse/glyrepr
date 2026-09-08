@@ -1,5 +1,7 @@
 # glyrepr (development version)
 
+* `as_glycan_structure()` parses IUPAC-condensed strings faster, especially structures without additional substituents.
+
 # glyrepr 1.0.0
 
 ## Breaking changes

@@ -106,20 +106,18 @@ valid_anomer <- function(anomer) {
 #' @returns A regex pattern string.
 #'
 #' @noRd
-linkage_pattern <- function(anchored = TRUE) {
-  checkmate::assert_flag(anchored)
-
+linkage_pattern <- local({
   anomer_p <- "[ab\\?]"
   pos1_p <- "([12]|\\?)"
   pos2_p <- "([1-9](/[1-9])*|\\?)"
   pattern <- stringr::str_glue("{anomer_p}{pos1_p}-{pos2_p}")
+  patterns <- list(pattern, stringr::str_glue("^{pattern}$"))
 
-  if (anchored) {
-    pattern <- stringr::str_glue("^{pattern}$")
+  function(anchored = TRUE) {
+    checkmate::assert_flag(anchored)
+    patterns[[as.integer(anchored) + 1L]]
   }
-
-  pattern
-}
+})
 
 
 #' Check if Linkages are Valid
