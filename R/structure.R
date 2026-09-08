@@ -181,44 +181,24 @@
 glycan_structure <- function(...) {
   args <- list(...)
 
-  # Handle different input types
-  graphs <- list()
-  iupacs <- character()
-  na_positions <- logical()
+  iupacs <- rep(NA_character_, length(args))
+  na_positions <- logical(length(args))
 
   for (i in seq_along(args)) {
     arg <- args[[i]]
     if (is.null(arg) || (is.atomic(arg) && length(arg) == 1 && is.na(arg))) {
-      # Track NA position
-      iupacs <- c(iupacs, NA_character_)
-      na_positions <- c(na_positions, TRUE)
-    } else if (inherits(arg, "igraph")) {
-      graphs <- c(graphs, list(arg))
-      iupacs <- c(iupacs, NA_character_) # placeholder
-      na_positions <- c(na_positions, FALSE)
-    } else {
+      na_positions[i] <- TRUE
+    } else if (!inherits(arg, "igraph")) {
       cli::cli_abort("All arguments must be igraph objects or NA values.")
     }
   }
 
-  if (length(iupacs) == 0) {
-    return(new_glycan_structure())
-  }
-
-  # Get indices of valid (non-NA) positions
   valid_idx <- which(!na_positions)
-
-  if (length(valid_idx) == 0 && all(na_positions)) {
-    # All are NA
-    return(new_glycan_structure(rep(NA_character_, length(iupacs)), list()))
-  }
-
   if (length(valid_idx) == 0) {
-    return(new_glycan_structure(character(), list()))
+    return(new_glycan_structure(iupacs, list()))
   }
 
-  # Extract valid graphs
-  valid_graphs <- graphs
+  valid_graphs <- unname(args[valid_idx])
 
   # Validate and process each valid graph
   processed_graphs <- purrr::map(valid_graphs, function(graph) {
@@ -243,13 +223,7 @@ glycan_structure <- function(...) {
   unique_iupacs <- processed_iupacs[unique_indices]
   names(unique_graphs) <- unique_iupacs
 
-  # Build final result - replace placeholders with actual IUPACs
-  # Map reordered positions back to original positions
-  for (i in seq_along(processed_graphs)) {
-    final_pos <- valid_idx[i]
-    iupac <- processed_iupacs[i]
-    iupacs[final_pos] <- iupac
-  }
+  iupacs[valid_idx] <- processed_iupacs
 
   new_glycan_structure(iupacs, unique_graphs)
 }

@@ -453,6 +453,34 @@ test_that("glycan_structure creates empty vector by default", {
   expect_length(attr(sv, "graphs"), 0)
 })
 
+test_that("glycan_structure preserves interleaved missing values and duplicates", {
+  graph <- get_structure_graphs(o_glycan_core_1())
+  result <- glycan_structure(
+    first = NA,
+    graph,
+    gap = NULL,
+    graph,
+    NA_character_
+  )
+
+  expect_identical(
+    as.character(result),
+    c(
+      NA_character_,
+      "Gal(b1-3)GalNAc(a1-",
+      NA_character_,
+      "Gal(b1-3)GalNAc(a1-",
+      NA_character_
+    )
+  )
+  expect_null(names(result))
+  expect_length(attr(result, "graphs"), 1L)
+
+  missing <- glycan_structure(NA, NULL, NA_character_, NA_real_)
+  expect_identical(as.character(missing), rep(NA_character_, 4L))
+  expect_identical(attr(missing, "graphs"), list())
+})
+
 test_that("glycan_structure works with single glycan structure", {
   sv <- o_glycan_core_1()
 

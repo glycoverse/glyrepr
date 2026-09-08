@@ -1,5 +1,6 @@
 # glyrepr (development version)
 
+* `glycan_structure()` uses less temporary memory when constructing large vectors.
 * `as_glycan_structure()` parses IUPAC-condensed strings faster, especially structures without additional substituents.
 
 # glyrepr 1.0.0
