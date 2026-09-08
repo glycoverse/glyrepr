@@ -1,3 +1,18 @@
+test_that("known monosaccharides retain their identity without substituents", {
+  monos <- available_monosaccharides()
+  glycans <- as_glycan_structure(paste0(monos, "(?1-"))
+  graphs <- as.list(glycans)
+
+  expect_identical(
+    purrr::map_chr(graphs, \(graph) igraph::vertex_attr(graph, "mono")),
+    monos
+  )
+  expect_identical(
+    purrr::map_chr(graphs, \(graph) igraph::vertex_attr(graph, "sub")),
+    rep("", length(monos))
+  )
+})
+
 test_that("as_glycan_structure.character parses simple IUPAC-condensed strings", {
   # Single monosaccharide
   glycan1 <- as_glycan_structure("Man(?1-")

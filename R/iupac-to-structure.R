@@ -550,6 +550,10 @@ parse_alditol_iupac <- function(iupac) {
 
 # Extract substituent from monosaccharide name
 .extract_substituent <- function(mono) {
+  if (is_known_monosaccharide(mono)) {
+    return(c(mono = mono, sub = ""))
+  }
+
   single_sub_pattern <- substituent_token_pattern(longest_first = TRUE)
 
   result <- .extract_substituent_without_configuration(

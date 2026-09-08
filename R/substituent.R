@@ -50,23 +50,20 @@ substituent_position_pattern <- function() {
 #' @returns A regex pattern for one complete substituent token.
 #'
 #' @noRd
-substituent_token_pattern <- function(
-  longest_first = FALSE,
-  anchored = FALSE
-) {
-  checkmate::assert_flag(longest_first)
-  checkmate::assert_flag(anchored)
-
+substituent_token_pattern <- local({
   position <- substituent_position_pattern()
-  name <- substituent_name_pattern(longest_first = longest_first)
-  pattern <- stringr::str_glue("{position}(?:{name})")
+  patterns <- lapply(c(FALSE, TRUE), function(longest_first) {
+    name <- substituent_name_pattern(longest_first = longest_first)
+    pattern <- stringr::str_glue("{position}(?:{name})")
+    list(pattern, stringr::str_glue("^{pattern}$"))
+  })
 
-  if (anchored) {
-    pattern <- stringr::str_glue("^{pattern}$")
+  function(longest_first = FALSE, anchored = FALSE) {
+    checkmate::assert_flag(longest_first)
+    checkmate::assert_flag(anchored)
+    patterns[[as.integer(longest_first) + 1L]][[as.integer(anchored) + 1L]]
   }
-
-  pattern
-}
+})
 
 #' Normalize Substituent String
 #'
