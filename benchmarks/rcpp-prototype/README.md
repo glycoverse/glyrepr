@@ -1,5 +1,9 @@
 # Rcpp canonicalization / serialization prototype
 
+Historical experiment: the recorded baseline predates production parser batching.
+Use commit `ca6c70f` in a separate checkout to reproduce the comparisons below;
+running these scripts on a later checkout changes their baseline.
+
 This standalone experiment leaves the production R code, DESCRIPTION and NAMESPACE
 unchanged. `benchmarks/` is already excluded from package builds. Requires the
 package's development dependencies, Rcpp, a C++ compiler, and the installed glydb

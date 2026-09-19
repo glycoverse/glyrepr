@@ -723,3 +723,43 @@ test_that("as_glycan_structure.character makes order of vertices and edges consi
     c("b1-2", "a1-3", "b1-2", "a1-6", "b1-4", "b1-4", "a1-3")
   )
 })
+
+test_that("tree parsing preserves nested branch attachments and attributes", {
+  graph <- .parse_iupac_tree_single(paste0(
+    "Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-2)",
+    "[Man(a1-6)]Man(b1-4)GlcNAc-ol"
+  ))
+
+  expect_identical(igraph::vertex_attr(graph, "name"), as.character(1:6))
+  expect_identical(
+    igraph::vertex_attr(graph, "mono"),
+    c("GlcNAc", "Man", "Man", "GlcNAc", "Fuc", "Gal")
+  )
+  expect_identical(igraph::vertex_attr(graph, "sub"), c(rep("", 5), "6S"))
+  expect_equal(
+    igraph::as_edgelist(graph, names = FALSE),
+    matrix(c(1, 2, 2, 3, 2, 4, 4, 5, 4, 6), ncol = 2, byrow = TRUE)
+  )
+  expect_identical(
+    igraph::edge_attr(graph, "linkage"),
+    c("b1-4", "a1-6", "b1-2", "a1-3", "b1-4")
+  )
+  expect_identical(
+    igraph::graph_attr(graph),
+    list(anomer = "?1", alditol = TRUE)
+  )
+})
+
+test_that("single-residue trees retain empty linkage metadata", {
+  graph <- .parse_iupac_tree_single("GlcNAc-ol(b1-")
+
+  expect_identical(
+    igraph::vertex_attr(graph),
+    list(name = "1", mono = "GlcNAc", sub = "")
+  )
+  expect_identical(igraph::edge_attr(graph), list(linkage = character()))
+  expect_identical(
+    igraph::graph_attr(graph),
+    list(anomer = "b1", alditol = TRUE)
+  )
+})

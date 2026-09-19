@@ -354,31 +354,19 @@ combine_floating_iupac_graphs <- function(
 
       tokens <- .tokenize_iupac(x)
 
-      # Require anomer information - no longer auto-supplement
+      # Collect residue and edge attributes before constructing the graph.
+      node_count <- sum(!tokens %in% c("[", "]"))
+      monos <- subs <- character(node_count)
+      edges <- integer(2L * (node_count - 1L))
+      linkages <- character(node_count - 1L)
       first_mono_sub_res <- .extract_substituent(tokens[[1]])
+      monos[[1]] <- first_mono_sub_res[["mono"]]
+      subs[[1]] <- first_mono_sub_res[["sub"]]
 
-      # Create a new graph and add the first node
-      graph <- igraph::make_empty_graph()
-      graph <- igraph::add_vertices(
-        graph,
-        1,
-        name = "1",
-        mono = first_mono_sub_res[["mono"]],
-        sub = first_mono_sub_res[["sub"]]
-      )
-
-      if (length(tokens) == 1) {
-        graph <- igraph::set_edge_attr(graph, "linkage", value = character(0))
-        graph$anomer <- anomer
-        graph$alditol <- alditol
-        return(graph)
-      }
-
-      # Iterate over the tokens
-      node_stack <- rstackdeque::rstack()
-      node_stack <- rstackdeque::insert_top(node_stack, 1)
-      current_node_id <- 1
-      for (token in tokens[2:length(tokens)]) {
+      node_stack <- rstackdeque::insert_top(rstackdeque::rstack(), 1L)
+      current_node_id <- 1L
+      new_node_id <- 1L
+      for (token in tokens[-1L]) {
         if (token == "[") {
           node_stack <- rstackdeque::insert_top(node_stack, current_node_id)
         } else if (token == "]") {
@@ -386,21 +374,29 @@ combine_floating_iupac_graphs <- function(
           node_stack <- rstackdeque::without_top(node_stack)
         } else {
           parsed_token <- .parse_token(token)
-          new_node_id <- igraph::vcount(graph) + 1
-          graph <- igraph::add_vertices(
-            graph,
-            1,
-            name = as.character(new_node_id),
-            mono = parsed_token[["mono"]],
-            sub = parsed_token[["sub"]]
-          )
-          graph <- igraph::add_edges(
-            graph,
-            c(current_node_id, new_node_id),
-            linkage = parsed_token[["linkage"]]
-          )
+          new_node_id <- new_node_id + 1L
+          monos[[new_node_id]] <- parsed_token[["mono"]]
+          subs[[new_node_id]] <- parsed_token[["sub"]]
+          edge_id <- new_node_id - 1L
+          edges[[2L * edge_id - 1L]] <- current_node_id
+          edges[[2L * edge_id]] <- new_node_id
+          linkages[[edge_id]] <- parsed_token[["linkage"]]
           current_node_id <- new_node_id
         }
+      }
+
+      graph <- igraph::make_empty_graph(node_count, directed = TRUE)
+      graph <- igraph::set_vertex_attr(
+        graph,
+        "name",
+        value = as.character(seq_len(node_count))
+      )
+      graph <- igraph::set_vertex_attr(graph, "mono", value = monos)
+      graph <- igraph::set_vertex_attr(graph, "sub", value = subs)
+      if (length(edges) > 0L) {
+        graph <- igraph::add_edges(graph, edges, linkage = linkages)
+      } else {
+        graph <- igraph::set_edge_attr(graph, "linkage", value = character())
       }
 
       graph$anomer <- anomer

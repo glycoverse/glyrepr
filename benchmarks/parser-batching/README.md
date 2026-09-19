@@ -1,5 +1,9 @@
 # IUPAC parser batching experiment
 
+Historical experiment: the recorded baseline predates production parser batching.
+Use commit `fec0648` in a separate checkout to reproduce the comparisons below;
+running these scripts on a later checkout changes their baseline.
+
 Standalone prototype; production package code is unchanged. This experiment tests
 batching in R before considering a C++ parser, and measures its interaction with
 the previous Rcpp sequence kernel.
