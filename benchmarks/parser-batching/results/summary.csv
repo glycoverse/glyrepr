@@ -1,0 +1,6 @@
+"operation","variant","baseline_median_s","variant_median_s","paired_speedup_median","paired_speedup_min","paired_speedup_max"
+"complete_tree_parser","batch",0.966999999999999,0.552,1.72903225806451,1.21026282853567,2.7442528735632
+"graph_assembly","batch",0.493,0.113,4.3055555555557,4.21008403361344,4.9345794392524
+"public_constructor","batch",1.727,1.339,1.30059523809524,1.23490909090909,1.5865671641791
+"public_constructor","combined",1.727,1.235,1.40406504065041,1.13811563169165,1.5085020242915
+"public_constructor","sequence",1.727,1.635,1.05691554467564,1.02385321100917,1.26172106824926
