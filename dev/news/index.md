@@ -2,7 +2,25 @@
 
 ## glyrepr (development version)
 
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  and
+  [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+  construct structures from IUPAC-condensed strings faster, especially
+  larger glycans and structures without additional substituents.
+  ([\#92](https://github.com/glycoverse/glyrepr/issues/92))
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  and
+  [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+  construct vectors from graphs faster while preserving validation and
+  canonical ordering.
+  ([\#92](https://github.com/glycoverse/glyrepr/issues/92))
+- [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+  uses less temporary memory when constructing large vectors.
+  ([\#92](https://github.com/glycoverse/glyrepr/issues/92))
+
 ## glyrepr 1.0.0
+
+CRAN release: 2026-08-22
 
 ### Breaking changes
 
