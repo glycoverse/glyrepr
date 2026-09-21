@@ -1,82 +1,89 @@
-# Compact C++ parsing prototype
+# Compact-array C++ IUPAC prototype
 
-This experiment leaves package code and dependencies unchanged. It tests whether
-parsing and canonicalizing **before** materializing an igraph removes the graph
-allocation/permutation bottleneck. It is not a production replacement.
+The current experiment parses ordinary trees, modified residues, floating glycan
+parts and floating substituents into C++ arrays. It validates and canonicalizes
+those arrays before creating each distinct final glycan igraph once. Package
+code and dependencies remain unchanged.
 
-## Design
+The first experiment is preserved in [RESULTS.md](RESULTS.md) and `results/`.
+It covered 7,356/8,573 inputs natively and fell back for the other 1,217.
+The extension is described in [RESULTS-extended.md](RESULTS-extended.md), with
+fresh evidence in `results-v2/`. The old version is reproducible at commit
+`e735332`; the original benchmark scripts describe that historical experiment.
 
-`compact.cpp` scans IUPAC right to left into residue, linkage, parent-index, and
-child-index arrays. Parents already exist when children are parsed. It validates
-syntax, residue membership, linkage syntax, tree construction, and duplicate
-concrete acceptor positions on these arrays. It computes subtree depth/signature,
-selects the backbone, then emits canonical IUPAC plus final vertex/edge arrays in
-one traversal. The R wrapper constructs the topology once with
-`igraph::make_graph()`, then attaches attributes in batches. It never permutes or
-rebuilds the graph, and C++ never calls igraph or reads its internal object layout.
-Canonical duplicates share one stored graph; input names, duplicates and NA are
-preserved.
+## Current implementation
 
-The bounded fast path accepts known, unmodified residues (including concrete,
-generic and unusual configurations), branches, ambiguous linkages, reducing-end
-annotations, inferred donor position, and alditols. Modified residues and floating
-metadata go to the existing public constructor. This preserves their validation
-and canonicalization; it is **not evidence of C++ support for those features**.
-Unknown residues and errors also return to the public constructor to preserve
-its diagnostics. The prototype implements the strict character-input constructor;
-it does not implement the `on_failure = "na"` interface or graph inputs.
+`compact.cpp` owns residue/substituent/linkage/parent arrays, adjacency arrays,
+subtree signatures, canonical traversal and floating metadata. It handles:
 
-R's active collation matters for tied branch signatures. Under `LC_COLLATE=C`,
-the kernel sorts strings directly. Under other locales, it calls `base::order()`
-on small signature vectors; all graph/tree work remains on arrays. Thus the
-normal-locale prototype is not entirely free of R callbacks. Residue vocabulary
-and donor positions are initialized from package tables, never from the benchmark
-corpus. Strings are parsed afresh on every call (deduplicated within the call).
-The 2,048-node guard routes oversized trees to the reference implementation.
+- Known concrete/generic residues, unusual configurations, reducing-end inference
+  and alditols; ambiguous and unknown linkage positions.
+- Substituent extraction, Neu5Ac/Neu5Gc rules, normalized slash-separated
+  positions, stable ordering and conflict-free substituent position assignment.
+- Leading floating blocks and global input parent indices, including floating
+  substituents, parent domains across components, and explicit parent validation.
+- Joint carbon-slot feasibility via bipartite matching, component reachability,
+  acyclic parent assignment, and iterative singleton-component attachment.
+- Canonical component/branch ordering, symmetry-aware ties, complete-sequence
+  parent remapping, and final graph metadata and IUPAC serialization.
 
-## Reproduce
+No glycan igraph is created during parsing or validation. The final R bridge uses
+one `igraph::make_graph()` per distinct canonical glycan and attaches attributes
+in batches. It never inserts edges, permutes a graph, or reconstructs one.
+Duplicates and NA preserve vector semantics, and there is no cross-call input
+cache. Vocabulary/configuration tables come from the package, not the corpus.
 
-From the package root, with package development dependencies, Rcpp and glydb:
+Two explicit library boundaries remain. Non-C collation uses `base::order()` on
+small signature vectors, as in the original prototype. A forest with unresolved
+floating metadata makes **one BLISS callback** through public igraph APIs. C++
+builds the colored augmented-constraint arrays; the callback constructs one
+auxiliary undirected graph and obtains canonical labels. C++ then completes
+ordering and metadata remapping. This is not a claim of zero R callbacks or one
+graph allocation including the auxiliary graph. It avoids per-component glycan
+graph creation and all repeated R parsing/validation/canonicalization work, and
+does not depend on igraph's private object layout or C ABI.
+
+The character constructor's `fallback = FALSE` mode strictly exercises this
+array pipeline. Verification and benchmarks use that mode. Default fallback
+exists only to get the public error diagnostic for a native failure or size
+limit; passing benchmarks must never use it to hide unsupported valid inputs.
+The prototype has a 2,048-residue limit per complete structure. Recursive
+traversal, materialized subtree signatures and potentially combinatorial
+floating-parent search still need deep/adversarial-input engineering before
+production. It does not implement graph-input conversion or `on_failure="na"`.
+
+## Reproduce the extension
+
+Run from the package root with package development dependencies, Rcpp and glydb.
+Use sequential workers to avoid benchmark contention:
 
 ```sh
-Rscript benchmarks/compact-cpp/verify.R
-Rscript benchmarks/compact-cpp/audit-syntax.R
-Rscript benchmarks/compact-cpp/benchmark.R 1
-Rscript benchmarks/compact-cpp/benchmark.R 2
-Rscript benchmarks/compact-cpp/benchmark.R 3
-Rscript benchmarks/compact-cpp/audit-graph-calls.R
-Rscript benchmarks/compact-cpp/summarize.R
+Rscript -e 'source("benchmarks/compact-cpp/verify-extended.R")'
+Rscript -e 'source("benchmarks/compact-cpp/audit-extended.R")'
+Rscript -e 'source("benchmarks/compact-cpp/audit-graph-calls-extended.R")'
+Rscript benchmarks/compact-cpp/benchmark-extended.R 1
+Rscript benchmarks/compact-cpp/benchmark-extended.R 2
+Rscript benchmarks/compact-cpp/benchmark-extended.R 3
+Rscript benchmarks/compact-cpp/audit-size-guard.R
+Rscript benchmarks/compact-cpp/summarize-extended.R
 ```
 
-Run workers sequentially to avoid benchmark contention. Each starts in a fresh R
-process; compilation/source time is recorded separately and excluded from steady
-state timings. Each worker runs two paired repetitions with alternating order,
-explicit garbage collection before measurements, and three-element warmups.
-Seed 20260921 freezes workloads. Full constructor timings include parsing,
-validation, canonicalization, graph creation, deduplication, vector construction,
-and any fallback. This is compared with the current checkout's public R API.
+Each benchmark worker starts in a fresh R process and records source/compilation
+time separately. Six paired repetitions alternate baseline/prototype order;
+GC and three-element warmups occur outside timing regions. Four original
+workloads are reused verbatim. New workloads add 500 modified inputs selected
+from the original 653 fallback entries with seed 20260922, and all 564 floating
+entries. All timings include the native collation/BLISS bridges as applicable.
 
-Isolated `parse_validate_canonical_pairs` returns equivalent graph/IUPAC pairs in
-both implementations without vector assembly/deduplication. `arrays_only` and
-`graph_materialization` report absolute costs for different stages; they are not
-compared as if their outputs were equivalent. CPU contention and GC variation
-remain possible; retain ranges and paired ratios rather than extrapolating one
-measurement to the whole package.
+The constructor comparisons include parsing, validation, ordering, graph creation,
+canonical deduplication and vector assembly. The pair stage returns equivalent
+canonical graph/IUPAC pairs on both paths without vector assembly. Array-only
+and final-materialization timings are separate absolute measurements, not
+comparisons of equivalent outputs or additive decompositions of medians.
 
-`results/` contains corpus/workload snapshots, row-level fast-path coverage, exact
-parity outcomes, raw repeated timings, paired speedups, session information and
-sampled profiles. Verification compares canonical strings, exact ordered edge
-endpoints, all vertex/edge/graph attributes, graph dictionary keys, names, missing
-values and canonical deduplication. It includes all glydb entries, every known
-residue and its alditol, 500 seeded noncanonical random trees, malformed inputs,
-multiple collation settings, and literals extracted from existing parser tests.
-
-See `RESULTS.md` for measured outcomes and remaining limitations.
-
-Before production integration, extend array validation to substituent extraction,
-normalization and position assignment, and floating-component localization. The
-current implementation also uses recursive emission and materialized subtree
-signatures (potentially quadratic string storage on long chains); this experiment
-does not establish performance or robustness for adversarially deep inputs.
-A public supported bridge is used for graph creation, so there is no dependency
-on igraph's private C ABI or R object layout.
+Evidence is retained as corpus/workload/random-input RDS snapshots, per-input
+coverage/parity CSVs, graph-call counts, six raw timing repetitions, paired
+ratios, session details, profiles and source/input checksums. The extended audit
+mines existing test literals and adds modified-residue, floating-parent,
+cycle/conflict, singleton and symmetry cases; it compares native acceptance and
+rejection directly to R without fallback.

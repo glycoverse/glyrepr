@@ -1,0 +1,6 @@
+corpus 8573
+fast 8573
+fallback 0
+random 500
+invalid 17
+PASS: canonical strings, ordered graph attributes/endpoints, names, NA, duplicates, locales
