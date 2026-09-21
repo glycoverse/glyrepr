@@ -42,6 +42,7 @@ reference:
   contents:
   - validate_glycan_graph
   - canonicalize_glycan_graph
+  - canonicalize_glycan_graphs
   - validate_glycan_graph_vector
   - enumerate_floating_graph_localizations
   - graph_to_iupac
