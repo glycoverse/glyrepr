@@ -1,0 +1,13 @@
+Tracing function "make_graph" in package "namespace:igraph"
+Tracing function "make_empty_graph" in package "namespace:igraph"
+Tracing function "add_edges" in package "namespace:igraph"
+Tracing function "permute" in package "namespace:igraph"
+Tracing function "graph_from_data_frame" in package
+"namespace:igraph"
+Untracing function "make_graph" in package "namespace:igraph"
+Untracing function "make_empty_graph" in package "namespace:igraph"
+Untracing function "add_edges" in package "namespace:igraph"
+Untracing function "permute" in package "namespace:igraph"
+Untracing function "graph_from_data_frame" in package
+"namespace:igraph"
+Graph creation audit passed

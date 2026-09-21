@@ -1,0 +1,19 @@
+         workload                          stage  method n median   min   max
+         fast_500                    arrays_only compact 6 0.0215 0.019 0.033
+         fast_500          graph_materialization compact 6 0.1465 0.104 0.218
+         fast_500 parse_validate_canonical_pairs compact 6 0.1445 0.119 0.212
+ duplicates_10000             public_constructor compact 6 0.0250 0.024 0.044
+         fast_500             public_constructor compact 6 0.1205 0.110 0.240
+        mixed_500             public_constructor compact 6 1.1440 0.925 1.707
+     ordinary_500             public_constructor compact 6 0.3290 0.260 0.695
+         fast_500 parse_validate_canonical_pairs       R 6 2.0425 1.460 3.759
+ duplicates_10000             public_constructor       R 6 0.2915 0.274 0.529
+         fast_500             public_constructor       R 6 1.2350 1.198 2.494
+        mixed_500             public_constructor       R 6 2.2040 1.971 3.766
+     ordinary_500             public_constructor       R 6 1.6990 1.258 2.179
+          workload                          stage   speedup
+1         fast_500 parse_validate_canonical_pairs 13.115129
+2 duplicates_10000             public_constructor 11.900000
+3         fast_500             public_constructor 10.773467
+4        mixed_500             public_constructor  2.014319
+5     ordinary_500             public_constructor  4.923832

@@ -1,0 +1,4 @@
+worker 1 fast_500 complete
+worker 1 ordinary_500 complete
+worker 1 mixed_500 complete
+worker 1 duplicates_10000 complete
