@@ -32,12 +32,7 @@ structure_from_arrays <- function(x, on_failure = c("error", "na")) {
   if (!length(x)) {
     return(new_glycan_structure(stats::setNames(character(), names(x))))
   }
-  outcomes <- lapply(seq_along(x), function(i) {
-    if (is.null(x[[i]])) {
-      return(NULL)
-    }
-    tryCatch(.structure_array_outcome(x[[i]]), error = identity)
-  })
+  outcomes <- .structure_array_outcomes(x)
   failed <- vapply(outcomes, inherits, logical(1), "error")
   if (any(failed) && on_failure == "error") {
     i <- which(failed)[[1]]
@@ -52,9 +47,45 @@ structure_from_arrays <- function(x, on_failure = c("error", "na")) {
   )
 }
 
-.structure_array_outcome <- function(a) {
-  a <- .validate_structure_arrays(a)
-  process_glycan_structure_element(.compact_build_graph(a))
+.structure_array_outcomes <- function(x) {
+  checked <- lapply(x, function(a) {
+    if (is.null(a)) {
+      return(NULL)
+    }
+    tryCatch(.validate_structure_arrays(a), error = identity)
+  })
+  valid <- !vapply(checked, inherits, logical(1), "error")
+  native <- .compact_arrays_native(
+    checked[valid],
+    base::order,
+    .compact_bliss_labels,
+    identical(Sys.getlocale("LC_COLLATE"), "C")
+  )
+  cache <- new.env(hash = TRUE, parent = emptyenv())
+  valid_indices <- which(valid)
+  for (j in seq_along(native)) {
+    i <- valid_indices[[j]]
+    a <- native[[j]]
+    if (a$status == "missing") {
+      next
+    }
+    checked[i] <- list(tryCatch(
+      {
+        if (a$status != "ok") {
+          # Reference graph path handles unsupported sizes and supplies established
+          # semantic errors without reparsing any format-specific string.
+          process_glycan_structure_element(.compact_build_graph(checked[[i]]))
+        } else {
+          if (!exists(a$iupac, cache, inherits = FALSE)) {
+            cache[[a$iupac]] <- .compact_build_graph(a)
+          }
+          list(graph = cache[[a$iupac]], iupac = a$iupac)
+        }
+      },
+      error = identity
+    ))
+  }
+  checked
 }
 
 .validate_structure_arrays <- function(a) {
@@ -117,6 +148,33 @@ structure_from_arrays <- function(x, on_failure = c("error", "na")) {
       }
       p
     })
+  }
+  if (!all(is_known_mono(a$mono))) {
+    cli::cli_abort("Unknown monosaccharide.")
+  }
+  if (!all(valid_substituent(a$sub))) {
+    cli::cli_abort("Invalid substituent.")
+  }
+  if (!all(valid_linkages(a$linkage))) {
+    cli::cli_abort("Invalid linkage.")
+  }
+  if (!valid_anomer(a$anomer)) {
+    cli::cli_abort("Invalid anomer.")
+  }
+  for (p in a$floating_parts) {
+    if (!valid_linkages(p$linkage)) cli::cli_abort("Invalid floating linkage.")
+  }
+  for (p in a$floating_substituents) {
+    if (
+      !grepl(
+        substituent_token_pattern(anchored = TRUE),
+        p$substituent,
+        perl = TRUE
+      ) ||
+        !valid_substituent(p$substituent)
+    ) {
+      cli::cli_abort("Invalid floating substituent.")
+    }
   }
   a$edges <- as.integer(a$edges)
   a

@@ -27,3 +27,12 @@
       1 structure failed validation and was replaced with `NA`.
       x Position 1 (`bad`): Assertion on 'x' failed: Element 2 is not <= 1.
 
+# native topology validation rejects cycles and incomplete components
+
+    Code
+      result <- structure_from_arrays(bad, on_failure = "na")
+    Condition
+      Warning:
+      3 structures failed validation and were replaced with `NA`.
+      x Position 1: Glycan structure must be an out tree., Position 2: Glycan structure must be an out tree., and Position 3: Floating part node metadata does not match its graph component. x Floating part 1 must contain exactly node 2.
+

@@ -68,3 +68,100 @@ test_that("malformed array records fail before graph construction", {
   )
   expect_identical(is.na(result), c(bad = TRUE, absent = TRUE))
 })
+
+test_that("native arrays agree with the graph reference for arbitrary node order", {
+  strings <- c(
+    "Gal(b1-4)[Fuc(a1-3)]GlcNAc",
+    "Gal6S(b1-4)GlcNAc-ol",
+    "{Neu5Ac(a2-3)|2,4}Gal(a1-?)[Gal(a1-?)]Glc(a1-",
+    "{6S|1,2}Gal(b1-4)Glc",
+    "{Neu5Ac(a2-6)|2}Gal",
+    "{6S|1}Gal",
+    "D-Fucf(a1-3)GlcNAc",
+    "Hex(??-?)HexNAc"
+  )
+  graphs <- lapply(strings, .parse_iupac_condensed_single)
+  records <- lapply(graphs, function(g) {
+    list(
+      mono = igraph::V(g)$mono,
+      sub = igraph::V(g)$sub,
+      edges = as.integer(t(igraph::as_edgelist(g, names = FALSE))),
+      linkage = igraph::E(g)$linkage,
+      anomer = g$anomer,
+      alditol = isTRUE(g$alditol),
+      floating_parts = g$floating_parts,
+      floating_substituents = g$floating_substituents
+    )
+  })
+  # Reverse all source node IDs, including cross-component parent domains.
+  reversed <- lapply(records, function(a) {
+    n <- length(a$mono)
+    a$mono <- rev(a$mono)
+    a$sub <- rev(a$sub)
+    a$edges <- n + 1L - a$edges
+    a$floating_parts <- lapply(a$floating_parts, function(p) {
+      p$root <- n + 1L - p$root
+      p$nodes <- n + 1L - p$nodes
+      p$parents <- n + 1L - p$parents
+      p
+    })
+    a$floating_substituents <- lapply(a$floating_substituents, function(p) {
+      p$parents <- n + 1L - p$parents
+      p
+    })
+    a
+  })
+  expected <- as_glycan_structure(graphs)
+  # Successful native records must not need the reference graph pipeline.
+  testthat::local_mocked_bindings(process_glycan_structure_element = function(
+    ...
+  ) {
+    stop("unexpected graph fallback")
+  })
+  for (input in list(records, reversed)) {
+    result <- structure_from_arrays(input)
+    expect_identical(as.character(result), as.character(expected))
+    for (accessor in list(
+      structure_nodes,
+      structure_edges,
+      structure_floating_parts,
+      structure_floating_substituents,
+      get_alditol,
+      get_anomer
+    )) {
+      expect_equal(accessor(result), accessor(expected))
+    }
+  }
+})
+
+test_that("native topology validation rejects cycles and incomplete components", {
+  a <- list(
+    mono = c("Gal", "Glc"),
+    sub = c("", ""),
+    edges = c(1L, 2L, 2L, 1L),
+    linkage = c("b1-4", "b1-3"),
+    anomer = "?1"
+  )
+  bad <- list(a)
+  a$edges <- integer()
+  a$linkage <- character()
+  bad <- c(bad, list(a))
+  a$floating_parts <- list(list(
+    root = 2L,
+    nodes = c(1L, 2L),
+    linkage = "b1-4",
+    parents = 1L
+  ))
+  bad <- c(bad, list(a))
+  native <- .compact_arrays_native(
+    lapply(bad, .validate_structure_arrays),
+    base::order,
+    .compact_bliss_labels
+  )
+  expect_identical(
+    vapply(native, `[[`, character(1), "status"),
+    rep("invalid", 3)
+  )
+  expect_snapshot(result <- structure_from_arrays(bad, on_failure = "na"))
+  expect_identical(unname(is.na(result)), rep(TRUE, 3))
+})
