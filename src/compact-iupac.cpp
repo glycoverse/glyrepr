@@ -41,7 +41,7 @@ Tree parse_tree(std::string s, const std::unordered_map<std::string, int>& known
       // Normalize any ambiguous acceptor containing '?' to unknown, like R.
       if (link.size() >= 4 && link[2] == '-' && link.substr(3).find('?') != std::string::npos) {
         static const std::regex unknown("^[ab?][12?]-([1-9]/)*\\?(/[1-9])*$");
-        if (std::regex_match(link, unknown)) link = link.substr(0,3) + "?";
+        if (std::regex_match(link, unknown)) link.replace(3, std::string::npos, "?");
       }
       if (!std::regex_match(link, linkage)) throw std::runtime_error("invalid linkage");
     }

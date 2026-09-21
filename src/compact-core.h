@@ -408,7 +408,7 @@ inline List finish_forest(Forest& f, Function& order, bool byte_order, Function&
   auto labels=symmetry_labels(f,bliss);
   int n=t.mono.size(), part_offset=n+f.edge_order.size(), sub_offset=part_offset+f.parts.size();
   t.symmetry.assign(labels.begin(),labels.begin()+n);
-  auto key_candidates=[&](std::vector<int> candidates) {
+  auto key_candidates=[&](const std::vector<int>& candidates) {
     std::vector<int> lab;for(int v:candidates) lab.push_back(labels[v]);std::sort(lab.begin(),lab.end());return int_join(lab);
   };
   std::vector<std::string> keys;
