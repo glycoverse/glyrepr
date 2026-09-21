@@ -1,0 +1,7 @@
+"worker","method","workload","round","elapsed"
+1,"R","valid_error",1,1.887
+1,"R","valid_error",2,1.895
+1,"R","valid_na",1,1.901
+1,"R","valid_na",2,1.912
+1,"R","partial_na",1,1.951
+1,"R","partial_na",2,1.914

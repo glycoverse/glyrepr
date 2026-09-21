@@ -1,6 +1,6 @@
 # glyrepr (development version)
 
-* `as_glycan_structure()` and `glycan_structure()` construct structures from IUPAC-condensed strings faster, especially larger glycans and structures without additional substituents. (#92)
+* `as_glycan_structure()` converts IUPAC-condensed strings faster, including modified residues and floating structures, with unchanged `on_failure = "error"` and `on_failure = "na"` behavior. The package now uses Rcpp; source installation requires a C++17 compiler.
 * `as_glycan_structure()` and `glycan_structure()` construct vectors from graphs faster while preserving validation and canonical ordering. (#92)
 * `glycan_structure()` uses less temporary memory when constructing large vectors. (#92)
 

@@ -1,0 +1,188 @@
+ℹ Testing glyrepr
+✔ | F W  S  OK | Context
+
+⠏ |          0 | alditol                                                        
+⠼ |          5 | alditol                                                        
+⠙ |         12 | alditol                                                        
+⠏ |         20 | alditol                                                        
+⠙ |         22 | alditol                                                        
+⠸ |         24 | alditol                                                        
+✔ |         25 | alditol
+
+⠏ |          0 | anomer                                                         
+✔ |          2 | anomer
+
+⠏ |          0 | color-substituents                                             
+⠧ |          8 | color-substituents                                             
+⠋ |         11 | color-substituents                                             
+✔ |         27 | color-substituents
+
+⠏ |          0 | compact-iupac                                                  
+⠧ |   2      6 | compact-iupac                                                  
+⠙ |   2     20 | compact-iupac                                                  
+⠏ |   2     38 | compact-iupac                                                  
+✔ |   2     41 | compact-iupac
+────────────────────────────────────────────────────────────────────────────────
+Warning ('test-compact-iupac.R:11:3'): character recovery preserves repeated failures and canonical duplicates
+Adding new snapshot:
+Code
+  result <- as_glycan_structure(x, on_failure = "na")
+Condition
+  Warning:
+  2 structures failed validation and were replaced with `NA`.
+  x Position 2 (`bad`): Could not parse IUPAC-condensed string: "not-a-structure" i Invalid characters or format in IUPAC-condensed string and Position 4 (`bad_again`): Could not parse IUPAC-condensed string: "not-a-structure" i Invalid characters or format in IUPAC-condensed string
+
+Warning ('test-compact-iupac.R:29:3'): strict character errors retain parse-before-validation precedence
+Adding new snapshot:
+Code
+  as_glycan_structure(c("Gal(b1-4)[Man(a1-4)]Glc", "not-a-structure"))
+Condition
+  Error in `purrr::map()`:
+  i In index: 2.
+  Caused by error in `value[[3L]]()`:
+  ! Could not parse IUPAC-condensed string: "not-a-structure"
+  i Invalid characters or format in IUPAC-condensed string
+────────────────────────────────────────────────────────────────────────────────
+
+⠏ |          0 | composition                                                    
+⠦ |         17 | composition                                                    
+⠋ |         61 | composition                                                    
+⠏ |         80 | composition                                                    
+⠼ |        105 | composition                                                    
+⠙ |        132 | composition                                                    
+✔ |        160 | composition
+
+⠏ |          0 | count-mono                                                     
+⠧ |         38 | count-mono                                                     
+⠏ |         70 | count-mono                                                     
+✔ |         83 | count-mono
+
+⠏ |          0 | example-glycans                                                
+✔ |          6 | example-glycans
+
+⠏ |          0 | fill-anomer-pos                                                
+✔ |         17 | fill-anomer-pos
+
+⠏ |          0 | floating-localization                                          
+⠧ |         18 | floating-localization                                          
+⠧ |         28 | floating-localization                                          
+⠹ |         33 | floating-localization                                          
+⠦ |         47 | floating-localization                                          
+⠹ |         63 | floating-localization                                          
+⠴ |         96 | floating-localization                                          
+✔ |         98 | floating-localization
+
+⠏ |          0 | floating-parts                                                 
+⠙ |         42 | floating-parts                                                 
+⠇ |         59 | floating-parts                                                 
+⠋ |         61 | floating-parts                                                 
+⠹ |         63 | floating-parts                                                 
+✔ |         80 | floating-parts
+
+⠏ |          0 | floating-substituents                                          
+⠇ |         19 | floating-substituents                                          
+⠋ |         21 | floating-substituents                                          
+⠹ |         23 | floating-substituents                                          
+⠼ |         35 | floating-substituents                                          
+✔ |         48 | floating-substituents
+
+⠏ |          0 | floating-symmetry                                              
+⠦ |         17 | floating-symmetry                                              
+✔ |         22 | floating-symmetry
+
+⠏ |          0 | floating-validation                                            
+⠹ |          3 | floating-validation                                            
+⠴ |          6 | floating-validation                                            
+⠙ |         12 | floating-validation                                            
+✔ |         20 | floating-validation
+
+⠏ |          0 | iupac-to-structure                                             
+⠸ |         14 | iupac-to-structure                                             
+⠴ |         36 | iupac-to-structure                                             
+⠋ |         41 | iupac-to-structure                                             
+⠸ |         64 | iupac-to-structure                                             
+⠇ |         69 | iupac-to-structure                                             
+⠹ |         73 | iupac-to-structure                                             
+⠦ |         77 | iupac-to-structure                                             
+⠇ |         79 | iupac-to-structure                                             
+⠹ |         83 | iupac-to-structure                                             
+⠦ |         87 | iupac-to-structure                                             
+⠦ |         97 | iupac-to-structure                                             
+⠧ |        108 | iupac-to-structure                                             
+⠋ |        121 | iupac-to-structure                                             
+⠇ |        139 | iupac-to-structure                                             
+✔ |        164 | iupac-to-structure [1.6s]
+
+⠏ |          0 | linkage                                                        
+⠹ |         33 | linkage                                                        
+✔ |         49 | linkage
+
+⠏ |          0 | low-level-structure                                            
+⠼ |         25 | low-level-structure                                            
+✔ |         39 | low-level-structure
+
+⠏ |          0 | mono-type                                                      
+⠴ |         36 | mono-type                                                      
+✔ |         65 | mono-type
+
+⠏ |          0 | monosaccharide                                                 
+✔ |         36 | monosaccharide
+
+⠏ |          0 | smap                                                           
+⠸ |         34 | smap                                                           
+⠙ |         72 | smap                                                           
+⠹ |        103 | smap                                                           
+⠦ |        137 | smap                                                           
+⠸ |        184 | smap                                                           
+⠙ |        212 | smap                                                           
+⠧ |        268 | smap                                                           
+⠙ |        302 | smap                                                           
+⠸ |        344 | smap                                                           
+✔ |        347 | smap
+
+⠏ |          0 | structure-level                                                
+✔ |         19 | structure-level
+
+⠏ |          0 | structure-tables                                               
+⠧ |         48 | structure-tables                                               
+⠸ |         94 | structure-tables                                               
+⠼ |        105 | structure-tables                                               
+⠙ |        112 | structure-tables                                               
+⠏ |        130 | structure-tables                                               
+✔ |        134 | structure-tables
+
+⠏ |          0 | structure-to-iupac                                             
+⠼ |         25 | structure-to-iupac                                             
+✔ |         35 | structure-to-iupac
+
+⠏ |          0 | structure                                                      
+⠙ |         12 | structure                                                      
+⠸ |         24 | structure                                                      
+⠼ |         35 | structure                                                      
+⠴ |         46 | structure                                                      
+⠏ |         50 | structure                                                      
+⠹ |         63 | structure                                                      
+⠴ |         96 | structure                                                      
+⠋ |        111 | structure                                                      
+⠹ |        133 | structure                                                      
+⠏ |        150 | structure                                                      
+⠋ |        191 | structure                                                      
+⠇ |        239 | structure                                                      
+⠴ |        276 | structure                                                      
+⠹ |        293 | structure                                                      
+⠴ |        316 | structure                                                      
+⠇ |        359 | structure                                                      
+⠧ |        388 | structure                                                      
+⠙ |        422 | structure                                                      
+✔ |        445 | structure [2.0s]
+
+⠏ |          0 | substituent                                                    
+✔ |         39 | substituent
+
+⠏ |          0 | validate-helper                                                
+✔ |         16 | validate-helper
+
+══ Results ═════════════════════════════════════════════════════════════════════
+Duration: 11.0 s
+
+[ FAIL 0 | WARN 2 | SKIP 0 | PASS 2017 ]

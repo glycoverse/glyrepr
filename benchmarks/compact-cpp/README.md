@@ -1,3 +1,16 @@
+# Current package integration
+
+The array backend is now integrated behind the unchanged public APIs, including
+`on_failure = "na"`. See [API-COMPATIBILITY.md](API-COMPATIBILITY.md) for compatibility,
+installed-package verification, dependencies and public-entry benchmarks.
+
+The material below describes the historical standalone prototype. Reproduce its
+v2 experiment at commit `5b500b2` (v1 at `e735332`); on the current checkout,
+`as_glycan_structure()` is already accelerated and is **not** a pure-R benchmark
+reference. Current comparisons use separately installed reference/candidate packages.
+
+---
+
 # Compact-array C++ IUPAC prototype
 
 The current experiment parses ordinary trees, modified residues, floating glycan

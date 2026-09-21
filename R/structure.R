@@ -537,7 +537,13 @@ glycan_structure_from_iupac_character <- function(x) {
 
   non_na_x <- x[!na_mask]
   unique_x <- unique(non_na_x)
+  arrays <- .compact_iupac_arrays(unique_x)
+  if (all(vapply(arrays, \(x) identical(x$status, "ok"), logical(1)))) {
+    return(.compact_structure_from_arrays(x, unique_x, arrays))
+  }
 
+  # Replay the complete reference path on native failures, preserving the
+  # original parse-before-validation precedence and purrr error indices.
   graphs <- purrr::map(unique_x, .parse_iupac_condensed_single)
   canonical <- canonicalize_and_validate_iupac_graphs(graphs)
 
@@ -809,12 +815,12 @@ glycan_structure_from_iupac_character_with_na <- function(x) {
   groups <- match(x, unique_x)
   positions <- lapply(seq_along(unique_x), function(i) which(groups == i))
 
-  recover_glycan_structure_elements(
-    elements = as.list(unique_x),
+  outcomes <- .compact_iupac_outcomes(unique_x)
+  assemble_recovered_structure_outcomes(
+    outcomes,
     positions = positions,
     size = length(x),
-    input_names = names(x),
-    parser = .parse_iupac_condensed_single
+    input_names = names(x)
   )
 }
 
@@ -840,6 +846,15 @@ recover_glycan_structure_elements <- function(
       error = function(cnd) cnd
     )
   })
+  assemble_recovered_structure_outcomes(outcomes, positions, size, input_names)
+}
+
+assemble_recovered_structure_outcomes <- function(
+  outcomes,
+  positions,
+  size,
+  input_names
+) {
   failed <- vapply(outcomes, inherits, logical(1), what = "error")
   successful <- outcomes[!failed]
 

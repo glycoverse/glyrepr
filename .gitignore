@@ -9,3 +9,7 @@ inst/doc
 /doc/
 /Meta/
 .worktrees/
+
+/src/*.o
+/src/*.so
+/src/*.dll
