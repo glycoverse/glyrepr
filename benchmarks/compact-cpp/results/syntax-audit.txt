@@ -1,3 +1,0 @@
-test_literals 304
-fast_accepted 61
-PASS: every fast-accepted literal accepted by reference with identical canonical string

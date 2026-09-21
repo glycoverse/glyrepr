@@ -1,3 +1,0 @@
-Installed exports: TRUE 
-✔ No problems found.
-Installed smoke passed

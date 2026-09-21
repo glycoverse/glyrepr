@@ -1,7 +1,0 @@
-"workload","method","n","median","min","max"
-"partial_na","compact",6,0.178,0.154,0.278
-"valid_error","compact",6,0.125,0.123,0.151
-"valid_na","compact",6,0.1335,0.126,0.147
-"partial_na","R",6,1.937,1.824,2.024
-"valid_error","R",6,1.9525,1.814,2.107
-"valid_na","R",6,1.8905,1.803,1.995

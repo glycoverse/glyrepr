@@ -1,4 +1,0 @@
-inputs 2870
-accepted 2085
-rejected 785
-PASS: native acceptance/rejection and exact canonical graph parity; no reference fallback

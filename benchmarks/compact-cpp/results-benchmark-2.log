@@ -1,4 +1,0 @@
-worker 2 fast_500 complete
-worker 2 ordinary_500 complete
-worker 2 mixed_500 complete
-worker 2 duplicates_10000 complete

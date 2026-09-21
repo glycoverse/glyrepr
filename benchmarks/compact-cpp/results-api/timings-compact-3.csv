@@ -1,7 +1,0 @@
-"worker","method","workload","round","elapsed"
-3,"compact","valid_error",1,0.126
-3,"compact","valid_error",2,0.151
-3,"compact","valid_na",1,0.147
-3,"compact","valid_na",2,0.141
-3,"compact","partial_na",1,0.197
-3,"compact","partial_na",2,0.154

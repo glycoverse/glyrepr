@@ -1,6 +1,0 @@
-corpus 8573
-fast 7356
-fallback 1217
-random 500
-invalid 17
-PASS: canonical strings, ordered graph attributes/endpoints, names, NA, duplicates, locales

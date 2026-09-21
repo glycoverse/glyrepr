@@ -1,5 +1,0 @@
-"workload","rows","distinct","fast","floating","modified"
-"fast_500",500,500,500,0,0
-"ordinary_500",500,500,456,0,44
-"mixed_500",500,500,433,32,35
-"duplicates_10000",10000,100,10000,0,0
