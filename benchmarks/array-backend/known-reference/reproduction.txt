@@ -1,0 +1,12 @@
+INDEX 11095 
+raw valid: TRUE 
+canonical graph validation:
+[1] "Floating part has impossible explicit parent metadata.\n✖ Floating part 1 cannot use explicit parent node 3 because every acceptor\n  position declared by linkage \"a1-3\" is already occupied."
+array vs reference key: TRUE 
+{Fuc(a1-3)|3,4,5}Neu5Ac(a1-3)Gal(b1-?)[Gal6S(b1-4)]Glc(?1- 
+INDEX 11136 
+raw valid: TRUE 
+canonical graph validation:
+[1] "Floating substituent has impossible explicit parent metadata.\n✖ Floating substituent 1 cannot use explicit parent node 4 because every\n  declared carbon position is already occupied."
+array vs reference key: TRUE 
+{3/6Ac|2,4}{Gal(b1-3/6)|2,6}{Gal6S(b1-3/6)}Neu5Ac(a1-3)Gal6S(b1-4)[Gal(b1-?)]Glc(?1- 

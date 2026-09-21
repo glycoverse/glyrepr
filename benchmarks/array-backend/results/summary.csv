@@ -1,0 +1,11 @@
+"workload","method","elapsed.min","elapsed.median","elapsed.max"
+"distinct_500","array_constructor", 0.210, 0.257, 0.277
+"repeated_1000","array_constructor", 0.149, 0.151, 0.153
+"distinct_500","graph_fused",10.787,14.959,16.324
+"repeated_1000","graph_fused", 1.481, 1.526, 1.585
+"distinct_500","graph_split",10.772,14.966,15.077
+"repeated_1000","graph_split", 1.430, 1.502, 1.531
+"distinct_500","native_arrays_only", 0.016, 0.019, 0.019
+"repeated_1000","native_arrays_only", 0.011, 0.011, 0.011
+"distinct_500","reference_constructor",10.943,11.325,15.084
+"repeated_1000","reference_constructor", 1.760, 1.851, 1.861
