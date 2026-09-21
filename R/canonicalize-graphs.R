@@ -6,6 +6,10 @@
 #' vector construction, this function does not deduplicate graphs: equal
 #' structures can retain different source attributes.
 #'
+#' Strict failures have class `glyrepr_error_structure_failure` with
+#' `position`, `input_name`, and `reason` fields. Recovery warnings have class
+#' `glyrepr_warning_structure_failure` with `positions` and `reasons` fields.
+#'
 #' @param graphs A list of glycan `igraph` objects. `NULL` elements represent
 #'   missing structures. List names and positions are preserved.
 #' @param validate Whether to validate each graph before canonicalization.
@@ -57,9 +61,11 @@ canonicalize_glycan_graphs <- function(
   if (any(failed)) {
     if (on_failure == "error") {
       i <- which(failed)[[1]]
-      cli::cli_abort(
-        "Invalid structure at position {i}.",
-        parent = outcomes[[i]]
+      .abort_structure_failure(
+        outcomes[[i]],
+        i,
+        names(graphs),
+        rlang::current_env()
       )
     }
     warn_structure_failures(which(failed), reasons[failed], names(graphs))

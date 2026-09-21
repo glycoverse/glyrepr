@@ -957,7 +957,10 @@ warn_structure_failures <- function(positions, reasons, input_names = NULL) {
       "{n_failed} structure{?s} failed validation and {?was/were} replaced with {.code NA}.",
       "x" = "{failure_details}"
     ),
-    class = "glyrepr_warning_structure_failure"
+    class = "glyrepr_warning_structure_failure",
+    positions = positions,
+    reasons = reasons,
+    input_names = if (is.null(input_names)) NULL else input_names[positions]
   )
 }
 

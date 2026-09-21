@@ -165,3 +165,119 @@ test_that("native topology validation rejects cycles and incomplete components",
   expect_snapshot(result <- structure_from_arrays(bad, on_failure = "na"))
   expect_identical(unname(is.na(result)), rep(TRUE, 3))
 })
+
+test_that("array failure conditions expose original positions and names", {
+  good <- list(
+    mono = "Gal",
+    sub = "",
+    edges = integer(),
+    linkage = character(),
+    anomer = "?1"
+  )
+  bad <- good
+  bad$mono <- "not-a-residue"
+  input <- list(
+    good = good,
+    bad = bad,
+    absent = NULL,
+    repeated = bad,
+    last = good
+  )
+  cnd <- tryCatch(
+    structure_from_arrays(input),
+    glyrepr_error_structure_failure = identity
+  )
+  expect_s3_class(cnd, "glyrepr_error_structure_failure")
+  expect_identical(cnd$position, 2L)
+  expect_identical(cnd$input_name, "bad")
+  expect_identical(cnd$reason, "Unknown monosaccharide.")
+  warning <- NULL
+  result <- withCallingHandlers(
+    structure_from_arrays(input, on_failure = "na"),
+    glyrepr_warning_structure_failure = function(cnd) {
+      warning <<- cnd
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_identical(warning$positions, c(2L, 4L))
+  expect_identical(warning$reasons, rep("Unknown monosaccharide.", 2))
+  expect_identical(
+    as.character(result),
+    c(
+      good = "Gal(?1-",
+      bad = NA_character_,
+      absent = NA_character_,
+      repeated = NA_character_,
+      last = "Gal(?1-"
+    )
+  )
+  expect_length(attr(result, "graphs"), 1)
+})
+
+test_that("native size guards use reference recovery without rejecting wide trees", {
+  n <- 2049L
+  a <- list(
+    mono = c("Glc", rep("Gal", n - 1L)),
+    sub = rep("", n),
+    edges = as.integer(rbind(1L, 2:n)),
+    linkage = rep("b1-?", n - 1L),
+    anomer = "?1"
+  )
+  native <- .compact_arrays_native(
+    list(.validate_structure_arrays(a)),
+    base::order,
+    .compact_bliss_labels
+  )
+  expect_identical(native[[1]]$status, "unsupported")
+  result <- structure_from_arrays(list(a))
+  expected <- as_glycan_structure(.compact_build_graph(a))
+  expect_identical(as.character(result), as.character(expected))
+  expect_equal(structure_nodes(result), structure_nodes(expected))
+  expect_equal(structure_edges(result), structure_edges(expected))
+})
+
+test_that("chemical and metadata errors are isolated within array batches", {
+  good <- list(
+    mono = c("Glc", "Gal"),
+    sub = c("", ""),
+    edges = c(1L, 2L),
+    linkage = "b1-4",
+    anomer = "?1"
+  )
+  bad <- lapply(
+    c("mono", "sub", "linkage", "anomer", "alditol", "edges"),
+    function(field) {
+      a <- good
+      a[[field]] <- switch(
+        field,
+        mono = c("Glc", NA_character_),
+        sub = c("", "6/4S"),
+        linkage = "a9-4",
+        anomer = "x1",
+        alditol = NA,
+        edges = c(1, 1.5)
+      )
+      a
+    }
+  )
+  bad[[7]] <- good
+  bad[[7]]$floating_substituents <- list(list(
+    substituent = "6S",
+    parents = c(1L, 1L)
+  ))
+  outcomes <- .structure_array_outcomes(c(list(good), bad, list(NULL, good)))
+  expect_identical(
+    vapply(outcomes, inherits, logical(1), "error"),
+    c(FALSE, rep(TRUE, 7), FALSE, FALSE)
+  )
+  expect_identical(outcomes[[1]]$iupac, outcomes[[10]]$iupac)
+})
+
+test_that("empty and wholly missing array batches retain names without warnings", {
+  expect_identical(
+    structure_from_arrays(list(a = NULL, b = NULL)),
+    as_glycan_structure(c(a = NA_character_, b = NA_character_))
+  )
+  empty <- stats::setNames(list(), character())
+  expect_identical(names(structure_from_arrays(empty)), character())
+})

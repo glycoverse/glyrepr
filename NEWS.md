@@ -1,5 +1,9 @@
 # glyrepr (development version)
 
+* New `structure_from_arrays()` constructs glycan vectors directly from residue, edge, and floating-metadata records using the shared compact backend, with canonical graph deduplication and per-element failure recovery.
+* New `canonicalize_glycan_graphs()` returns aligned canonical graphs, IUPAC keys, and failure details in one batch while retaining per-graph source attributes.
+* Structure recovery warnings expose failed positions and reasons as condition fields for programmatic handling.
+
 * `as_glycan_structure()` converts IUPAC-condensed strings faster, including modified residues and floating structures, with unchanged `on_failure = "error"` and `on_failure = "na"` behavior. The package now uses Rcpp; source installation requires a C++17 compiler.
 * `as_glycan_structure()` and `glycan_structure()` construct vectors from graphs faster while preserving validation and canonical ordering. (#92)
 * `glycan_structure()` uses less temporary memory when constructing large vectors. (#92)

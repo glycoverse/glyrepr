@@ -14,6 +14,13 @@
 #' feasible nodes; all indices refer to the original input arrays. Singleton
 #' candidates are resolved during canonicalization.
 #'
+#' Records above the native backend's size guard use the graph reference path;
+#' the guard is not an input-size limit. Only failing or unsupported records
+#' use that path. No format-specific strings are generated and reparsed.
+#' Failures have class `glyrepr_error_structure_failure` and fields `position`,
+#' `input_name`, and `reason`. Recovery warnings have class
+#' `glyrepr_warning_structure_failure` and fields `positions` and `reasons`.
+#'
 #' @param x A list of structure records. A `NULL` element represents a missing
 #'   structure. Names, missing positions, and duplicate positions are preserved.
 #' @param on_failure Either `"error"` (default) or `"na"`. The latter warns and
@@ -36,9 +43,15 @@ structure_from_arrays <- function(x, on_failure = c("error", "na")) {
   failed <- vapply(outcomes, inherits, logical(1), "error")
   if (any(failed) && on_failure == "error") {
     i <- which(failed)[[1]]
-    cli::cli_abort("Invalid structure at position {i}.", parent = outcomes[[i]])
+    .abort_structure_failure(outcomes[[i]], i, names(x), rlang::current_env())
   }
   present <- !vapply(outcomes, is.null, logical(1))
+  if (!any(present)) {
+    return(new_glycan_structure(stats::setNames(
+      rep(NA_character_, length(x)),
+      names(x)
+    )))
+  }
   assemble_recovered_structure_outcomes(
     outcomes[present],
     as.list(which(present)),
@@ -183,4 +196,21 @@ structure_from_arrays <- function(x, on_failure = c("error", "na")) {
 .check_array_indices <- function(x, n, unique = FALSE) {
   checkmate::assert_integerish(x, lower = 1, upper = n, any.missing = FALSE)
   if (unique && anyDuplicated(x)) cli::cli_abort("Node IDs must be unique.")
+}
+
+.abort_structure_failure <- function(cnd, position, input_names, call) {
+  input_name <- if (is.null(input_names)) {
+    NA_character_
+  } else {
+    input_names[[position]]
+  }
+  cli::cli_abort(
+    "Invalid structure at position {position}.",
+    class = "glyrepr_error_structure_failure",
+    position = position,
+    input_name = input_name,
+    reason = normalize_structure_failure_reason(cnd),
+    parent = cnd,
+    call = call
+  )
 }

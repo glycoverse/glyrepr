@@ -32,6 +32,13 @@ in that disconnected component. Optional \code{floating_substituents} is a list 
 records containing \code{substituent} and \code{parents}. Empty \code{parents} means all
 feasible nodes; all indices refer to the original input arrays. Singleton
 candidates are resolved during canonicalization.
+
+Records above the native backend's size guard use the graph reference path;
+the guard is not an input-size limit. Only failing or unsupported records
+use that path. No format-specific strings are generated and reparsed.
+Failures have class \code{glyrepr_error_structure_failure} and fields \code{position},
+\code{input_name}, and \code{reason}. Recovery warnings have class
+\code{glyrepr_warning_structure_failure} and fields \code{positions} and \code{reasons}.
 }
 \examples{
 structure_from_arrays(list(list(

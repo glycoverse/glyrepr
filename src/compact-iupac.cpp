@@ -54,7 +54,7 @@ Tree parse_tree(std::string s, const std::unordered_map<std::string, int>& known
     auto it = known.find(mono);
     if ((current == -1) != link.empty()) throw std::runtime_error("missing or misplaced linkage");
     int id = t.mono.size();
-    if (id >= 2048) throw std::runtime_error("size guard");
+    if (id >= 2048) throw Unsupported("native size guard");
     t.mono.push_back(mono); t.sub.push_back(residue.second); t.link.push_back(link); t.parent.push_back(current);
     t.children.emplace_back(); t.depth.push_back(0); t.sig.emplace_back();
     if (current >= 0) t.children[current].push_back(id);
@@ -90,7 +90,7 @@ List parse_complete(std::string s,const std::unordered_map<std::string,int>& kno
   auto append_component=[&](Tree& component) {
     cache_tree(component,order,byte_order);emit(component,0,order,byte_order);
     int n=component.mono.size(),offset=f.tree.mono.size();
-    if (n + offset > 2048) throw std::runtime_error("size guard");
+    if (n + offset > 2048) throw Unsupported("native size guard");
     std::vector<int> inverse(n);
     for(int j=0;j<n;++j) inverse[component.vertices[j]]=offset+j;
     for(int id:component.vertices) {
@@ -148,6 +148,7 @@ List compact_parse_native(CharacterVector strings,CharacterVector residues,Integ
     if(i%128==0) checkUserInterrupt();
     if(strings[i]==NA_STRING) {out[i]=List::create(_["status"]="missing");continue;}
     try {out[i]=glyrepr_compact::parse_complete(as<std::string>(strings[i]),known,configurations,order,byte_order,bliss);}
+    catch(const glyrepr_compact::Unsupported& e) {out[i]=List::create(_["status"]="unsupported",_["reason"]=e.what());}
     catch(const std::exception& e) {out[i]=List::create(_["status"]="error",_["reason"]=e.what());}
   }
   return out;

@@ -18,6 +18,10 @@
 using namespace Rcpp;
 namespace glyrepr_compact {
 
+struct Unsupported : std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
 // Tree operations use arrays. Unresolved metadata uses one public BLISS callback;
 // no igraph object layout is read and the final glycan graph is built afterward.
 struct Tree {

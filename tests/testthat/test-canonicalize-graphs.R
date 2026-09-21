@@ -74,3 +74,14 @@ test_that("batch graph recovery distinguishes missing and invalid inputs", {
     )
   )
 })
+
+test_that("strict graph errors carry original position and input name", {
+  cnd <- tryCatch(
+    canonicalize_glycan_graphs(list(absent = NULL, bad = 1)),
+    glyrepr_error_structure_failure = identity
+  )
+  expect_s3_class(cnd, "glyrepr_error_structure_failure")
+  expect_identical(cnd$position, 2L)
+  expect_identical(cnd$input_name, "bad")
+  expect_type(cnd$reason, "character")
+})

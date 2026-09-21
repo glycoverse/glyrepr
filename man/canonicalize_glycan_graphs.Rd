@@ -35,6 +35,11 @@ attributes are retained with their corresponding objects. Unlike structure
 vector construction, this function does not deduplicate graphs: equal
 structures can retain different source attributes.
 }
+\details{
+Strict failures have class \code{glyrepr_error_structure_failure} with
+\code{position}, \code{input_name}, and \code{reason} fields. Recovery warnings have class
+\code{glyrepr_warning_structure_failure} with \code{positions} and \code{reasons} fields.
+}
 \examples{
 graphs <- as.list(n_glycan_core())
 result <- canonicalize_glycan_graphs(graphs)
