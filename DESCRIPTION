@@ -25,6 +25,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 URL: https://glycoverse.github.io/glyrepr/, https://github.com/glycoverse/glyrepr
 Imports: 
+    Rcpp,
     checkmate,
     cli,
     dplyr (>= 1.2.0),
@@ -41,3 +42,5 @@ Imports:
 VignetteBuilder: knitr
 BugReports: https://github.com/glycoverse/glyrepr/issues
 RoxygenNote: 7.3.3
+LinkingTo: Rcpp
+SystemRequirements: C++17

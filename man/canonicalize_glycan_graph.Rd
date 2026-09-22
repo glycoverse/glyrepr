@@ -20,13 +20,27 @@ of one glycan graph to match its IUPAC-condensed sequence.
 This function assumes that \code{graph} has already passed
 \code{\link[=validate_glycan_graph]{validate_glycan_graph()}}. It performs no semantic validation.
 }
-\section{Low-level API warning}{
+\section{Choosing a construction pipeline}{
 
-These functions are low-level, developer-facing APIs. Calling them directly
-is usually not a good idea unless you understand and can guarantee all glycan
-graph and \code{glyrepr_structure} invariants. Prefer \code{\link[=as_glycan_structure]{as_glycan_structure()}} for
-ordinary construction. Incorrect use of these functions can create invalid
-structure vectors that fail in later operations.
+Prefer \code{\link[=as_glycan_structure]{as_glycan_structure()}} for ordinary construction from IUPAC strings
+or graphs. Parsers that already produce residue and edge arrays should use
+\code{\link[=structure_from_arrays]{structure_from_arrays()}} to validate and canonicalize records through the
+shared compact backend, then build deduplicated graph storage.
+
+For existing graph parsers, \code{\link[=canonicalize_glycan_graphs]{canonicalize_glycan_graphs()}} validates a batch
+and returns aligned canonical graphs, IUPAC keys, and per-element status.
+It preserves input names and arbitrary graph, vertex, and edge attributes.
+Equal structures retain separate graphs until the caller explicitly
+deduplicates them. This is useful when source attributes differ.
+
+The individual low-level functions remain available when an intermediate
+graph is needed. \code{\link[=validate_glycan_graph]{validate_glycan_graph()}} validates one graph;
+\code{\link[=canonicalize_glycan_graph]{canonicalize_glycan_graph()}} assumes a valid graph; \code{\link[=graph_to_iupac]{graph_to_iupac()}}
+assumes a valid, canonical graph. \code{\link[=validate_glycan_graph_vector]{validate_glycan_graph_vector()}} checks
+the graph-list container, not each graph's semantics.
+\code{\link[=new_glycan_structure]{new_glycan_structure()}} trusts that graphs are valid and canonical and
+match their keys; it does not validate, canonicalize, or deduplicate them.
+Incorrect use can create vectors that fail in later operations.
 }
 
 \section{Floating graph schemas}{
@@ -36,42 +50,43 @@ outward tree and one outward tree per floating part. Its \code{floating_parts}
 graph attribute is a list of entries with integer \code{root}, integer \code{nodes},
 character \code{linkage}, and integer \code{parents} fields. \code{nodes} contains every
 vertex in that floating component. \code{parents = integer()} means all feasible
-main-tree nodes. Legacy input graphs may omit \code{nodes}; canonical output
-graphs always contain it. During canonicalization, a part with exactly one
-effective candidate parent is converted to an ordinary graph edge and its
-floating metadata is removed. Otherwise, the virtual attachment linkage is
-not a graph edge. See \code{\link[=glycan_structure]{glycan_structure()}} for the complete contract.
+nodes outside that component, including nodes in other floating components.
+Legacy input graphs may omit \code{nodes}; canonical output graphs always
+contain it. During canonicalization, a part with exactly one effective
+candidate parent is converted to an ordinary graph edge and its floating
+metadata is removed. Otherwise, the virtual attachment linkage is not a
+graph edge. See \code{\link[=glycan_structure]{glycan_structure()}} for the complete contract.
 
 A graph may also have a \code{floating_substituents} attribute. It is a list of
 entries with character \code{substituent} and integer \code{parents} fields. An empty
-parent vector means all feasible main-tree nodes. A singleton candidate is
-moved into the selected vertex's \code{sub} attribute during canonicalization.
+parent vector means all feasible residue nodes in the complete structure.
+A singleton candidate is moved into the selected vertex's \code{sub} attribute
+during canonicalization. All parent indices refer to the complete graph's
+vertex positions, not positions within a component.
 }
 
-\section{Name-preserving manual construction}{
+\section{Name-preserving graph construction}{
 
-The five low-level functions can reproduce strict graph-based construction
-while preserving the names of the input graph list:
+Use the batch interface to obtain canonical graphs and keys together, then
+explicitly deduplicate graph storage when constructing a structure vector:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{input_names <- names(graphs)
-graphs <- unname(graphs)
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{batch <- canonicalize_glycan_graphs(graphs)
+keep <- batch$status == "ok" & !duplicated(batch$iupac)
+unique_graphs <- batch$graphs[keep]
+names(unique_graphs) <- unname(batch$iupac[keep])
 
-graphs <- purrr::map(graphs, validate_glycan_graph)
-graphs <- purrr::map(graphs, canonicalize_glycan_graph)
-validate_glycan_graph_vector(graphs)
-
-iupacs <- purrr::map_chr(graphs, graph_to_iupac)
-names(iupacs) <- input_names
-
-unique <- !duplicated(unname(iupacs))
-unique_graphs <- graphs[unique]
-names(unique_graphs) <- unname(iupacs[unique])
-
-new_glycan_structure(iupacs, unique_graphs)
+new_glycan_structure(batch$iupac, unique_graphs)
 }\if{html}{\out{</div>}}
 
-Unlike \code{as_glycan_structure(graphs, on_failure = "na")}, this strict
-pipeline stops at the first invalid graph.
+Names and missing positions are preserved; use \code{NULL} for missing input
+graphs. With the default \code{on_failure = "error"}, an invalid graph raises
+an error identifying its original position. Set \code{on_failure = "na"} to
+warn and retain successful entries, with invalid positions represented by
+missing keys and \code{NULL} graphs. The same assembly code works in both modes.
+Deduplication keeps the first graph for each key, including its source
+attributes. Keep \code{batch$graphs} instead when per-input provenance is needed.
+Use \code{validate = FALSE} only when every non-missing graph has already passed
+\code{\link[=validate_glycan_graph]{validate_glycan_graph()}}.
 }
 
 \seealso{

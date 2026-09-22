@@ -14,6 +14,7 @@ reference:
   - glycan_structure
   - as_glycan_structure
   - is_glycan_structure
+  - structure_from_arrays
   - structure_from_tibbles
 - title: "Glycan Composition and Structure Inspection"
   contents:
@@ -41,6 +42,7 @@ reference:
   contents:
   - validate_glycan_graph
   - canonicalize_glycan_graph
+  - canonicalize_glycan_graphs
   - validate_glycan_graph_vector
   - enumerate_floating_graph_localizations
   - graph_to_iupac
