@@ -20,6 +20,7 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/available_monosaccharides.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/available_substituents.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/canonicalize_glycan_graph.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/canonicalize_glycan_graphs.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/colorize_iupac_string.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/convert_to_generic.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/count_mono.html</loc></url>
@@ -62,6 +63,7 @@
 <url><loc>https://glycoverse.github.io/glyrepr/reference/structure_candidate_edges.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/structure_component_membership.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/structure_floating_candidates.html</loc></url>
+<url><loc>https://glycoverse.github.io/glyrepr/reference/structure_from_arrays.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/structure_tables.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/structure_to_iupac.html</loc></url>
 <url><loc>https://glycoverse.github.io/glyrepr/reference/valid_linkages.html</loc></url>
