@@ -366,10 +366,10 @@ sessionInfo()
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.1    tidyselect_1.2.1 
-#>  [5] stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2 textshaping_1.0.5
-#>  [9] yaml_2.3.12       fastmap_1.2.0     R6_2.6.1          generics_0.1.4   
-#> [13] igraph_2.3.3      knitr_1.52        backports_1.5.1   checkmate_2.3.4  
-#> [17] tibble_3.3.1      rstackdeque_1.1.1 desc_1.4.3        bslib_0.12.0     
+#>  [5] Rcpp_1.1.2        stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2
+#>  [9] textshaping_1.0.5 yaml_2.3.12       fastmap_1.2.0     R6_2.6.1         
+#> [13] generics_0.1.4    igraph_2.3.3      knitr_1.52        backports_1.5.1  
+#> [17] checkmate_2.3.4   tibble_3.3.1      desc_1.4.3        bslib_0.12.0     
 #> [21] pillar_1.11.1     rlang_1.3.0       utf8_1.2.6        cachem_1.1.0     
 #> [25] stringi_1.8.9     xfun_0.61         fs_2.1.0          sass_0.4.10      
 #> [29] otel_0.2.0        cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5   

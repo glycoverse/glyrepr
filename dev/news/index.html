@@ -40,12 +40,12 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
-<ul><li>
-<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> construct structures from IUPAC-condensed strings faster, especially larger glycans and structures without additional substituents. (<a href="https://github.com/glycoverse/glyrepr/issues/92" class="external-link">#92</a>)</li>
-<li>
-<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> construct vectors from graphs faster while preserving validation and canonical ordering. (<a href="https://github.com/glycoverse/glyrepr/issues/92" class="external-link">#92</a>)</li>
-<li>
-<code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> uses less temporary memory when constructing large vectors. (<a href="https://github.com/glycoverse/glyrepr/issues/92" class="external-link">#92</a>)</li>
+<ul><li><p>New <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> constructs glycan vectors directly from residue, edge, and floating-metadata records using the shared compact backend, with canonical graph deduplication and per-element failure recovery.</p></li>
+<li><p>New <code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code> returns aligned canonical graphs, IUPAC keys, and failure details in one batch while retaining per-graph source attributes.</p></li>
+<li><p>Structure recovery warnings expose failed positions and reasons as condition fields for programmatic handling.</p></li>
+<li><p><code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> converts IUPAC-condensed strings faster, including modified residues and floating structures, with unchanged <code>on_failure = "error"</code> and <code>on_failure = "na"</code> behavior. The package now uses Rcpp; source installation requires a C++17 compiler.</p></li>
+<li><p><code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> construct vectors from graphs faster while preserving validation and canonical ordering. (<a href="https://github.com/glycoverse/glyrepr/issues/92" class="external-link">#92</a>)</p></li>
+<li><p><code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> uses less temporary memory when constructing large vectors. (<a href="https://github.com/glycoverse/glyrepr/issues/92" class="external-link">#92</a>)</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="glyrepr-100">glyrepr 1.0.0<a class="anchor" aria-label="anchor" href="#glyrepr-100"></a></h2><p class="text-muted">CRAN release: 2026-08-22</p>

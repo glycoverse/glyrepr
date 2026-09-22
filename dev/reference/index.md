@@ -12,6 +12,8 @@
   : Create a Glycan Structure Vector
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   : Convert to Glycan Structure Vector
+- [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
+  : Construct Structures from Residue and Edge Arrays
 - [`structure_nodes()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_edges()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   [`structure_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
@@ -64,6 +66,8 @@ structure vectors.
   : Validate a Glycan Graph
 - [`canonicalize_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graph.md)
   : Canonicalize a Glycan Graph
+- [`canonicalize_glycan_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graphs.md)
+  : Validate and Canonicalize a Batch of Glycan Graphs
 - [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph_vector.md)
   : Validate a List of Glycan Graphs
 - [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md)
