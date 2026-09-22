@@ -866,12 +866,12 @@ prune_localized_floating_domains <- function(graph) {
     main_attachment_domains(graph),
     main_substituent_domains(graph)
   ))
-  prune <- function(parents, positions) {
-    if (length(parents) == 0 || length(positions) == 0) {
+  prune <- function(parents, positions, candidates) {
+    if (length(positions) == 0) {
       return(parents)
     }
     keep <- vapply(
-      parents,
+      candidates,
       function(parent) {
         any(!paste(parent, positions, sep = "\r") %in% occupied)
       },
@@ -879,16 +879,17 @@ prune_localized_floating_domains <- function(graph) {
     )
     if (!any(keep)) {
       cli::cli_abort(
-        "Singleton localization leaves an explicit parent domain empty."
+        "Singleton localization leaves a parent domain empty."
       )
     }
-    parents[keep]
+    if (all(keep)) parents else candidates[keep]
   }
   parts <- normalize_floating_parts(graph)
   parts <- lapply(parts, function(part) {
     part$parents <- prune(
       part$parents,
-      floating_linkage_acceptor_positions(part$linkage)
+      floating_linkage_acceptor_positions(part$linkage),
+      floating_part_candidate_parents(graph, part)
     )
     part
   })
@@ -900,7 +901,11 @@ prune_localized_floating_domains <- function(graph) {
     } else {
       strsplit(positions, "/", fixed = TRUE)[[1]]
     }
-    sub$parents <- prune(sub$parents, positions)
+    sub$parents <- prune(
+      sub$parents,
+      positions,
+      floating_substituent_candidate_parents(graph, sub)
+    )
     sub
   })
   graph <- set_floating_parts_attr(graph, parts)

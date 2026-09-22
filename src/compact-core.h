@@ -363,19 +363,18 @@ inline void resolve_singletons(Forest& f) {
       auto pos=positions(token);
       if(pos.size()==1) occupied.insert(i*10+pos[0]);
     }
-    auto prune = [&](std::vector<int>& parents, const std::vector<int>& pos) {
-      if(parents.empty() || pos.empty()) return;
+    auto prune = [&](std::vector<int>& parents, const std::vector<int>& pos,
+                     const std::vector<int>& candidates) {
+      if(pos.empty()) return;
       std::vector<int> keep;
-      for(int parent:parents) {
+      for(int parent:candidates) {
         for(int slot:slots(parent,pos)) if(!occupied.count(slot)) {
           keep.push_back(parent); break;
         }
       }
       if(keep.empty()) throw std::runtime_error("singleton attachment empties explicit domain");
-      parents=keep;
+      if(keep.size()!=candidates.size()) parents=keep;
     };
-    for(auto& p:f.parts) prune(p.parents,positions(p.linkage.substr(3)));
-    for(auto& s:f.subs) prune(s.parents,positions(s.token));
 
     for(auto& p:f.parts) {
       p.nodes.clear(); std::vector<int> pending={p.root};
@@ -388,7 +387,9 @@ inline void resolve_singletons(Forest& f) {
         if(keep.empty()) throw std::runtime_error("singleton attachment empties explicit domain");
         p.parents=keep;
       }
+      prune(p.parents,positions(p.linkage.substr(3)),candidates(p,n));
     }
+    for(auto& s:f.subs) prune(s.parents,positions(s.token),candidates(s,n));
   }
 }
 
