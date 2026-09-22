@@ -331,17 +331,18 @@ inline void validate_forest(const Forest& f) {
 
 inline void resolve_singletons(Forest& f) {
   int n=f.tree.mono.size();
-  std::vector<FloatingSub> remaining_subs;
-  for(const auto& s:f.subs) {
-    auto c=candidates(s,n);
-    if(c.size()==1) {
-      auto tokens=split(f.tree.sub[c[0]],','); tokens.push_back(s.token);
-      f.tree.sub[c[0]]=collapse_subs(tokens);
-    } else remaining_subs.push_back(s);
-  }
-  f.subs=remaining_subs;
   while(true) {
-    std::vector<Part> remaining; bool changed=false;
+    bool changed=false;
+    std::vector<FloatingSub> remaining_subs;
+    for(const auto& s:f.subs) {
+      auto c=candidates(s,n);
+      if(c.size()==1) {
+        auto tokens=split(f.tree.sub[c[0]],','); tokens.push_back(s.token);
+        f.tree.sub[c[0]]=collapse_subs(tokens); changed=true;
+      } else remaining_subs.push_back(s);
+    }
+    f.subs=remaining_subs;
+    std::vector<Part> remaining;
     for(const auto& p:f.parts) {
       auto c=candidates(p,n);
       if(c.size()==1) {
@@ -351,6 +352,30 @@ inline void resolve_singletons(Forest& f) {
     }
     if(!changed) break;
     f.parts=remaining;
+    // Only prune after localization: invalid raw explicit domains still fail
+    // validation before normalization.
+    std::set<int> occupied;
+    for(int k:f.edge_order) {
+      auto pos=positions(f.tree.link[k].substr(3));
+      if(pos.size()==1) occupied.insert(f.tree.parent[k]*10+pos[0]);
+    }
+    for(int i=0;i<n;++i) for(const auto& token:split(f.tree.sub[i],',')) {
+      auto pos=positions(token);
+      if(pos.size()==1) occupied.insert(i*10+pos[0]);
+    }
+    auto prune = [&](std::vector<int>& parents, const std::vector<int>& pos,
+                     const std::vector<int>& candidates) {
+      if(pos.empty()) return;
+      std::vector<int> keep;
+      for(int parent:candidates) {
+        for(int slot:slots(parent,pos)) if(!occupied.count(slot)) {
+          keep.push_back(parent); break;
+        }
+      }
+      if(keep.empty()) throw std::runtime_error("singleton attachment empties explicit domain");
+      if(keep.size()!=candidates.size()) parents=keep;
+    };
+
     for(auto& p:f.parts) {
       p.nodes.clear(); std::vector<int> pending={p.root};
       while(!pending.empty()) {int v=pending.back();pending.pop_back();p.nodes.push_back(v);
@@ -362,7 +387,9 @@ inline void resolve_singletons(Forest& f) {
         if(keep.empty()) throw std::runtime_error("singleton attachment empties explicit domain");
         p.parents=keep;
       }
+      prune(p.parents,positions(p.linkage.substr(3)),candidates(p,n));
     }
+    for(auto& s:f.subs) prune(s.parents,positions(s.token),candidates(s,n));
   }
 }
 

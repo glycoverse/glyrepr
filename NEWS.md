@@ -1,5 +1,7 @@
 # glyrepr (development version)
 
+* Floating structure canonicalization now prunes occupied candidate parents after singleton localization, preserving valid graphs and canonical-string round-trips. (#93)
+
 * New `structure_from_arrays()` constructs glycan vectors directly from residue, edge, and floating-metadata records using the shared compact backend, with canonical graph deduplication and per-element failure recovery. (#94)
 * New `canonicalize_glycan_graphs()` returns aligned canonical graphs, IUPAC keys, and failure details in one batch while retaining per-graph source attributes. (#94)
 * Structure recovery warnings expose failed positions and reasons as condition fields for programmatic handling. (#94)

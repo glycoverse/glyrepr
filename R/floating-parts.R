@@ -861,6 +861,57 @@ attach_floating_parts <- function(
   set_floating_parts_attr(graph, remaining)
 }
 
+prune_localized_floating_domains <- function(graph) {
+  occupied <- definitely_occupied_main_slots(c(
+    main_attachment_domains(graph),
+    main_substituent_domains(graph)
+  ))
+  prune <- function(parents, positions, candidates) {
+    if (length(positions) == 0) {
+      return(parents)
+    }
+    keep <- vapply(
+      candidates,
+      function(parent) {
+        any(!paste(parent, positions, sep = "\r") %in% occupied)
+      },
+      logical(1)
+    )
+    if (!any(keep)) {
+      cli::cli_abort(
+        "Singleton localization leaves a parent domain empty."
+      )
+    }
+    if (all(keep)) parents else candidates[keep]
+  }
+  parts <- normalize_floating_parts(graph)
+  parts <- lapply(parts, function(part) {
+    part$parents <- prune(
+      part$parents,
+      floating_linkage_acceptor_positions(part$linkage),
+      floating_part_candidate_parents(graph, part)
+    )
+    part
+  })
+  subs <- normalize_floating_substituents(graph)
+  subs <- lapply(subs, function(sub) {
+    positions <- substituent_position_tokens(sub$substituent)
+    positions <- if (identical(positions, "?")) {
+      character()
+    } else {
+      strsplit(positions, "/", fixed = TRUE)[[1]]
+    }
+    sub$parents <- prune(
+      sub$parents,
+      positions,
+      floating_substituent_candidate_parents(graph, sub)
+    )
+    sub
+  })
+  graph <- set_floating_parts_attr(graph, parts)
+  set_floating_substituents_attr(graph, subs)
+}
+
 resolve_single_parent_floating_parts <- function(graph) {
   repeat {
     parts <- normalize_floating_parts(graph)
@@ -883,12 +934,27 @@ resolve_single_parent_floating_parts <- function(graph) {
       resolved,
       purrr::map_int(candidate_parents[resolved], 1L)
     )
+    graph <- prune_localized_floating_domains(graph)
   }
 }
 
 canonicalize_floating_graph <- function(graph) {
-  graph <- resolve_single_parent_floating_substituents(graph)
-  graph <- resolve_single_parent_floating_parts(graph)
+  repeat {
+    before <- length(floating_parts_attr(graph)) +
+      length(floating_substituents_attr(graph))
+    graph <- resolve_single_parent_floating_substituents(graph)
+    if (
+      length(floating_parts_attr(graph)) +
+        length(floating_substituents_attr(graph)) <
+        before
+    ) {
+      graph <- prune_localized_floating_domains(graph)
+    }
+    graph <- resolve_single_parent_floating_parts(graph)
+    after <- length(floating_parts_attr(graph)) +
+      length(floating_substituents_attr(graph))
+    if (after == before) break
+  }
   if (!has_floating_metadata(graph)) {
     seq_cache <- build_seq_cache(graph)
     order <- seq_glycan_order(seq_cache$root, seq_cache)
