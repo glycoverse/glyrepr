@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.0.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,22 +40,25 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.0" id="glyrepr-110">glyrepr 1.1.0<a class="anchor" aria-label="anchor" href="#glyrepr-110"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-1-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-1-0"></a></h3>
 <ul><li>New <code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code> validates and canonicalizes a batch of glycan graphs, returning aligned canonical graphs, IUPAC keys, statuses, and failure reasons while preserving source attributes. (<a href="https://github.com/glycoverse/glyrepr/issues/94" class="external-link">#94</a>)</li>
 <li>
 <code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code> and <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> support per-element recovery with <code>on_failure = "na"</code>; their warning conditions expose failed positions and reasons for programmatic handling. (<a href="https://github.com/glycoverse/glyrepr/issues/94" class="external-link">#94</a>)</li>
 <li>New <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> constructs glycan vectors directly from residue, edge, and floating-metadata records, preserving names and missing values while deduplicating canonical graphs. (<a href="https://github.com/glycoverse/glyrepr/issues/94" class="external-link">#94</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="performance-improvements-development-version">Performance improvements<a class="anchor" aria-label="anchor" href="#performance-improvements-development-version"></a></h3>
+<h3 id="performance-improvements-1-1-0">Performance improvements<a class="anchor" aria-label="anchor" href="#performance-improvements-1-1-0"></a></h3>
 <ul><li>
 <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> converts IUPAC-condensed strings faster, including strings with modified residues or floating structures, while preserving <code>on_failure = "error"</code> and <code>on_failure = "na"</code> behavior. Source installation now requires Rcpp and a C++17 compiler. (<a href="https://github.com/glycoverse/glyrepr/issues/94" class="external-link">#94</a>)</li>
 <li>
 <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> construct vectors from graphs faster while preserving validation and canonical ordering; <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code> also uses less temporary memory for large vectors. (<a href="https://github.com/glycoverse/glyrepr/issues/92" class="external-link">#92</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-1-1-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-0"></a></h3>
 <ul><li>Floating structure canonicalization now removes occupied candidate parents after singleton localization, preserving valid graphs and canonical-string round-trips. (<a href="https://github.com/glycoverse/glyrepr/issues/95" class="external-link">#95</a>)</li>
 </ul></div>
 </div>
