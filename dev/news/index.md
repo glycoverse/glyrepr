@@ -2,36 +2,47 @@
 
 ## glyrepr (development version)
 
+### New features
+
+- New
+  [`canonicalize_glycan_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graphs.md)
+  validates and canonicalizes a batch of glycan graphs, returning
+  aligned canonical graphs, IUPAC keys, statuses, and failure reasons
+  while preserving source attributes.
+  ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
+- [`canonicalize_glycan_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graphs.md)
+  and
+  [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
+  support per-element recovery with `on_failure = "na"`; their warning
+  conditions expose failed positions and reasons for programmatic
+  handling. ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
 - New
   [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
   constructs glycan vectors directly from residue, edge, and
-  floating-metadata records using the shared compact backend, with
-  canonical graph deduplication and per-element failure recovery.
+  floating-metadata records, preserving names and missing values while
+  deduplicating canonical graphs.
   ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
-- New
-  [`canonicalize_glycan_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graphs.md)
-  returns aligned canonical graphs, IUPAC keys, and failure details in
-  one batch while retaining per-graph source attributes.
-  ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
-- Structure recovery warnings expose failed positions and reasons as
-  condition fields for programmatic handling.
-  ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
+
+### Performance improvements
+
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
-  converts IUPAC-condensed strings faster, including modified residues
-  and floating structures, with unchanged `on_failure = "error"` and
-  `on_failure = "na"` behavior. The package now uses Rcpp; source
-  installation requires a C++17 compiler.
+  converts IUPAC-condensed strings faster, including strings with
+  modified residues or floating structures, while preserving
+  `on_failure = "error"` and `on_failure = "na"` behavior. Source
+  installation now requires Rcpp and a C++17 compiler.
   ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   and
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
   construct vectors from graphs faster while preserving validation and
-  canonical ordering.
+  canonical ordering;
+  [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
+  also uses less temporary memory for large vectors.
   ([\#92](https://github.com/glycoverse/glyrepr/issues/92))
-- [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md)
-  uses less temporary memory when constructing large vectors.
-  ([\#92](https://github.com/glycoverse/glyrepr/issues/92))
-- Floating structure canonicalization now prunes occupied candidate
+
+### Bug fixes
+
+- Floating structure canonicalization now removes occupied candidate
   parents after singleton localization, preserving valid graphs and
   canonical-string round-trips.
   ([\#95](https://github.com/glycoverse/glyrepr/issues/95))
