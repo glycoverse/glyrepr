@@ -59,6 +59,7 @@ canonicalize_glycan_graphs <- function(
       error = identity
     )
   })
+  names(outcomes) <- names(graphs)
   failed <- vapply(outcomes, inherits, logical(1), "error")
   reasons <- rep(NA_character_, length(graphs))
   reasons[failed] <- vapply(
