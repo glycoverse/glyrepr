@@ -24,6 +24,51 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compact_graphs_native
+List compact_graphs_native(List records, std::string mode, bool validate, std::string operation, CharacterVector from, CharacterVector to, Function order, Function bliss, bool byte_order);
+RcppExport SEXP _glyrepr_compact_graphs_native(SEXP recordsSEXP, SEXP modeSEXP, SEXP validateSEXP, SEXP operationSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP orderSEXP, SEXP blissSEXP, SEXP byte_orderSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type records(recordsSEXP);
+    Rcpp::traits::input_parameter< std::string >::type mode(modeSEXP);
+    Rcpp::traits::input_parameter< bool >::type validate(validateSEXP);
+    Rcpp::traits::input_parameter< std::string >::type operation(operationSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type to(toSEXP);
+    Rcpp::traits::input_parameter< Function >::type order(orderSEXP);
+    Rcpp::traits::input_parameter< Function >::type bliss(blissSEXP);
+    Rcpp::traits::input_parameter< bool >::type byte_order(byte_orderSEXP);
+    rcpp_result_gen = Rcpp::wrap(compact_graphs_native(records, mode, validate, operation, from, to, order, bliss, byte_order));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compact_localizations_native
+List compact_localizations_native(List record, List domains, int combinations);
+RcppExport SEXP _glyrepr_compact_localizations_native(SEXP recordSEXP, SEXP domainsSEXP, SEXP combinationsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type record(recordSEXP);
+    Rcpp::traits::input_parameter< List >::type domains(domainsSEXP);
+    Rcpp::traits::input_parameter< int >::type combinations(combinationsSEXP);
+    rcpp_result_gen = Rcpp::wrap(compact_localizations_native(record, domains, combinations));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compact_localize_parts_native
+List compact_localize_parts_native(List record, IntegerVector part_ids, IntegerVector parents);
+RcppExport SEXP _glyrepr_compact_localize_parts_native(SEXP recordSEXP, SEXP part_idsSEXP, SEXP parentsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type record(recordSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type part_ids(part_idsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type parents(parentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(compact_localize_parts_native(record, part_ids, parents));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compact_parse_native
 List compact_parse_native(CharacterVector strings, CharacterVector residues, IntegerVector anomer_positions, CharacterVector configuration_names, CharacterVector configuration_values, Function order, Function bliss, bool byte_order);
 RcppExport SEXP _glyrepr_compact_parse_native(SEXP stringsSEXP, SEXP residuesSEXP, SEXP anomer_positionsSEXP, SEXP configuration_namesSEXP, SEXP configuration_valuesSEXP, SEXP orderSEXP, SEXP blissSEXP, SEXP byte_orderSEXP) {
@@ -45,6 +90,9 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_glyrepr_compact_arrays_native", (DL_FUNC) &_glyrepr_compact_arrays_native, 4},
+    {"_glyrepr_compact_graphs_native", (DL_FUNC) &_glyrepr_compact_graphs_native, 9},
+    {"_glyrepr_compact_localizations_native", (DL_FUNC) &_glyrepr_compact_localizations_native, 3},
+    {"_glyrepr_compact_localize_parts_native", (DL_FUNC) &_glyrepr_compact_localize_parts_native, 3},
     {"_glyrepr_compact_parse_native", (DL_FUNC) &_glyrepr_compact_parse_native, 8},
     {NULL, NULL, 0}
 };

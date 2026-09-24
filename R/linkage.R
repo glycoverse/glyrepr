@@ -176,6 +176,11 @@ remove_linkages <- function(glycan) {
     ))
   }
 
+  native <- .compact_transform_structure(glycan, "remove_linkages")
+  if (!is.null(native)) {
+    return(native)
+  }
+
   .smap_structure_impl(
     glycan,
     .remove_linkages_single,

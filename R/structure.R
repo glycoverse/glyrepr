@@ -563,7 +563,15 @@ glycan_structure_from_iupac_character <- function(x) {
 #' @returns A list with canonical `iupacs` and unique named `graphs`.
 #' @noRd
 canonicalize_and_validate_iupac_graphs <- function(graphs) {
-  processed <- purrr::map(graphs, process_glycan_structure_element)
+  native <- .compact_graph_results(graphs, validate = TRUE)
+  processed <- purrr::map(seq_along(graphs), function(i) {
+    a <- native[[i]]
+    if (.compact_graph_ok(a)) {
+      list(graph = .compact_restore_graph(graphs[[i]], a), iupac = a$iupac)
+    } else {
+      process_glycan_structure_element(graphs[[i]])
+    }
+  })
   graphs <- purrr::map(processed, "graph")
   validate_glycan_graph_vector(graphs)
 
@@ -905,6 +913,13 @@ assemble_recovered_structure_outcomes <- function(
 #' @returns A list containing the canonical graph and IUPAC string.
 #' @noRd
 process_glycan_structure_element <- function(graph) {
+  native <- .compact_graph_results(list(graph), validate = TRUE)[[1]]
+  if (.compact_graph_ok(native)) {
+    return(list(
+      graph = .compact_restore_graph(graph, native),
+      iupac = native$iupac
+    ))
+  }
   graph <- validate_glycan_graph(graph)
   canonicalize_graph_with_iupac(graph)
 }

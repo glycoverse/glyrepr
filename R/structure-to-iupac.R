@@ -67,6 +67,10 @@
 #' @export
 structure_to_iupac <- function(glycan) {
   if (inherits(glycan, "igraph")) {
+    native <- .compact_graph_results(list(glycan), validate = TRUE)[[1]]
+    if (.compact_graph_ok(native)) {
+      return(native$iupac)
+    }
     glycan <- validate_glycan_graph(glycan)
     glycan <- canonicalize_glycan_graph(glycan)
     return(graph_to_iupac(glycan))

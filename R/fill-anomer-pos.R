@@ -31,6 +31,11 @@ fill_anomer_pos <- function(strucs) {
     return(.fill_anomer_pos_single(strucs))
   }
   checkmate::assert_class(strucs, "glyrepr_structure")
+  native <- .compact_transform_structure(strucs, "fill_anomer_pos")
+  if (!is.null(native)) {
+    return(native)
+  }
+
   .smap_structure_impl(
     strucs,
     .fill_anomer_pos_single,

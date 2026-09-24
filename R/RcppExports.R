@@ -5,6 +5,18 @@
     .Call(`_glyrepr_compact_arrays_native`, records, order, bliss, byte_order)
 }
 
+.compact_graphs_native <- function(records, mode, validate, operation, from, to, order, bliss, byte_order = FALSE) {
+    .Call(`_glyrepr_compact_graphs_native`, records, mode, validate, operation, from, to, order, bliss, byte_order)
+}
+
+.compact_localizations_native <- function(record, domains, combinations) {
+    .Call(`_glyrepr_compact_localizations_native`, record, domains, combinations)
+}
+
+.compact_localize_parts_native <- function(record, part_ids, parents) {
+    .Call(`_glyrepr_compact_localize_parts_native`, record, part_ids, parents)
+}
+
 .compact_parse_native <- function(strings, residues, anomer_positions, configuration_names, configuration_values, order, bliss, byte_order = FALSE) {
     .Call(`_glyrepr_compact_parse_native`, strings, residues, anomer_positions, configuration_names, configuration_values, order, bliss, byte_order)
 }

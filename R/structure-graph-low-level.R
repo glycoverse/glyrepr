@@ -16,6 +16,14 @@
 #' @family low-level glycan structure functions
 #' @export
 validate_glycan_graph <- function(graph) {
+  native <- .compact_graph_results(
+    list(graph),
+    mode = "validate",
+    validate = TRUE
+  )[[1]]
+  if (.compact_graph_ok(native)) {
+    return(graph)
+  }
   checkmate::assert_class(graph, "igraph")
 
   if (!is_directed_graph(graph)) {
@@ -136,6 +144,10 @@ validate_single_glycan_structure <- function(glycan) {
 #' @family low-level glycan structure functions
 #' @export
 canonicalize_glycan_graph <- function(graph) {
+  native <- .compact_graph_results(list(graph))[[1]]
+  if (.compact_graph_ok(native)) {
+    return(.compact_restore_graph(graph, native))
+  }
   checkmate::assert_class(graph, "igraph")
   graph <- normalize_alditol_attr(graph)
   graph <- ensure_name_vertex_attr(graph)
@@ -188,6 +200,10 @@ validate_glycan_graph_vector <- function(graphs, label = NULL) {
 #' @family low-level glycan structure functions
 #' @export
 graph_to_iupac <- function(graph) {
+  native <- .compact_graph_results(list(graph), mode = "serialize")[[1]]
+  if (.compact_graph_ok(native)) {
+    return(native$iupac)
+  }
   checkmate::assert_class(graph, "igraph")
   raw_parts <- igraph::graph_attr(graph, "floating_parts")
   raw_substituents <- igraph::graph_attr(graph, "floating_substituents")

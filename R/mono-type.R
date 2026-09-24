@@ -80,6 +80,11 @@ convert_to_generic.glyrepr_structure <- function(x) {
     return(x)
   }
 
+  native <- .compact_transform_structure(x, "generic")
+  if (!is.null(native)) {
+    return(native)
+  }
+
   input_iupacs <- glycan_structure_iupac_data(x)
   used_iupacs <- unique(input_iupacs[!is.na(input_iupacs)])
   if (length(used_iupacs) == 0) {
