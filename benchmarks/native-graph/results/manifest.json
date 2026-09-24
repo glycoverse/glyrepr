@@ -1,0 +1,38 @@
+{
+  "baseline_commit": "59fbdc355ce26210e36dff4ebdbda4f6156e1b3e",
+  "implementation_commit": "c9ee177ee7c9877785d8ba0377c8076b51145011",
+  "package_version": "1.1.0.9000",
+  "check": {
+    "errors": 0,
+    "warnings": 0,
+    "notes": 0,
+    "tests_passed": 2218,
+    "environment": {
+      "_R_CHECK_SYSTEM_CLOCK_": "FALSE",
+      "_R_CHECK_THINGS_IN_TEMP_DIR_EXCLUDE_": "^xcrun_db$"
+    }
+  },
+  "audit": {
+    "corpus_structures": 200,
+    "exported_interfaces": 80,
+    "floating_examples": 51,
+    "timed_workloads": 18,
+    "measurements_per_workload": 5,
+    "short_workload_repetitions": 10,
+    "parity": "passed",
+    "parity_difference_bytes": 0
+  },
+  "sha256": {
+    "R-CMD-check.log": "ae2352a32cc54e8c4f6e967f2500b5099dfe058b4602a14f498fd2dcc63e66c9",
+    "baseline-outputs.rds": "35ee591349a92d178bd292e81b5453d9090c908a63932e7ac376167bab291028",
+    "baseline-session.txt": "6edc39f6a0f54376114ecd007a5f5dda09b30f1d62dadaa96e5e3a5733f275da",
+    "baseline-timings.csv": "1bac458976ebabf216fddcaec91f18256c96d869a878ef7bfc4db9239f206590",
+    "comparison.csv": "79d8b0ba7140d1f00967c7631262e30783a36753cc5ec55a04fc5480e7459fce",
+    "corpus.rds": "7952e9f5842ac2b483ce3b1935c0dc587cf3a9c2de992ca965ca5d0ac23b7ed6",
+    "current-outputs.rds": "35ee591349a92d178bd292e81b5453d9090c908a63932e7ac376167bab291028",
+    "current-session.txt": "cbd502cb3d5a53797c396b7dc3e17b0bae2c2f041a2a41d1bc11dacc4dae6943",
+    "current-timings.csv": "cb009cc34329916a3f6bb9464c96b092c1883eb85c36b8ac3d511458023da0f0",
+    "parity-differences.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "testthat.Rout": "a3e2fa39da86adf1ea3ac9e69c5e191b2d110c690836d091f7ac2217aa168a95"
+  }
+}
