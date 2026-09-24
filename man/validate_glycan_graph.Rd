@@ -33,6 +33,9 @@ and returns aligned canonical graphs, IUPAC keys, and per-element status.
 It preserves input names and arbitrary graph, vertex, and edge attributes.
 Equal structures retain separate graphs until the caller explicitly
 deduplicates them. This is useful when source attributes differ.
+Graph and array construction share native processing. Unsupported inputs
+use the R path, which also supplies the established failure diagnostics.
+\code{\link[=structure_from_tibbles]{structure_from_tibbles()}} converts table rows directly to array records.
 
 The individual low-level functions remain available when an intermediate
 graph is needed. \code{\link[=validate_glycan_graph]{validate_glycan_graph()}} validates one graph;
