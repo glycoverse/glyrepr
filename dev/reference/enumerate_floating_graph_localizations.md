@@ -140,6 +140,16 @@ is needed. Use `validate = FALSE` only when every non-missing graph has
 already passed
 [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph.md).
 
+Both
+[`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+and
+[`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
+accept `progress = TRUE` for stage-level progress. A parser that owns
+its progress display can instead pass a function
+`function(stage, current, total)` to receive updates without creating a
+nested bar. Counts restart for each stage; completion of parsing alone
+does not mean structure construction is finished.
+
 ## See also
 
 [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md)
@@ -154,17 +164,17 @@ graph <- get_structure_graphs(glycan, return_list = FALSE)
 localizations <- enumerate_floating_graph_localizations(graph)
 localizations$graph
 #> [[1]]
-#> IGRAPH 241867e DN-- 3 2 -- 
+#> IGRAPH cacaea1 DN-- 3 2 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from 241867e (vertex names):
+#> + edges from cacaea1 (vertex names):
 #> [1] 3->2 2->1
 #> 
 #> [[2]]
-#> IGRAPH c30b6cb DN-- 3 2 -- 
+#> IGRAPH 4d77705 DN-- 3 2 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from c30b6cb (vertex names):
+#> + edges from 4d77705 (vertex names):
 #> [1] 3->2 3->1
 #> 
 ```

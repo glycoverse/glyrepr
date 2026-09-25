@@ -5,7 +5,7 @@ Convert an object to a glycan structure vector.
 ## Usage
 
 ``` r
-as_glycan_structure(x, on_failure = c("error", "na"))
+as_glycan_structure(x, on_failure = c("error", "na"), progress = FALSE)
 ```
 
 ## Arguments
@@ -24,6 +24,20 @@ as_glycan_structure(x, on_failure = c("error", "na"))
   warning that reports their positions and failure reasons. Existing
   missing elements remain missing without a warning. Vector-level
   incompatibilities still produce an error.
+
+- progress:
+
+  `FALSE` (default) for silent operation, `TRUE` for a cli progress bar,
+  or a function with arguments `stage`, `current`, and `total`. A
+  callback owns its display; no cli bar is created. Counts are local to
+  each stage, not an overall percentage. Character parsing counts unique
+  non-missing inputs; graph construction may count deduplicated
+  canonical structures. Updates are throttled, with stage boundaries
+  always reported. Empty or already-converted inputs may report no
+  stages. Callback errors abort the operation, including with
+  `on_failure = "na"`. The cli bar is closed when the call exits,
+  including on errors or interrupts, and follows cli display settings
+  (short or non-interactive calls may show no visible bar).
 
 ## Value
 

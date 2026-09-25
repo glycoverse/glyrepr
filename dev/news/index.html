@@ -41,6 +41,8 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
 <ul><li>
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> gain a <code>progress</code> argument for stage-level progress bars or callbacks, including native parsing, graph construction, and failure recovery.</li>
+<li>
 <code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code>, <code><a href="../reference/fill_anomer_pos.html">fill_anomer_pos()</a></code>, <code><a href="../reference/remove_linkages.html">remove_linkages()</a></code>, and <code><a href="../reference/remove_substituents.html">remove_substituents()</a></code> transform structure vectors faster while reusing unchanged structures.</li>
 <li>
 <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code>, graph inputs to <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code>, <code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code>, and the <code><a href="../reference/smap.html">smap_structure()</a></code> family share faster graph processing while preserving source attributes and error recovery.</li>

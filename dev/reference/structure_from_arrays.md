@@ -10,7 +10,7 @@ tokens (or empty strings). Optional `alditol` defaults to `FALSE`.
 ## Usage
 
 ``` r
-structure_from_arrays(x, on_failure = c("error", "na"))
+structure_from_arrays(x, on_failure = c("error", "na"), progress = FALSE)
 ```
 
 ## Arguments
@@ -25,6 +25,20 @@ structure_from_arrays(x, on_failure = c("error", "na"))
 
   Either `"error"` (default) or `"na"`. The latter warns and returns
   missing structures at invalid positions.
+
+- progress:
+
+  `FALSE` (default) for silent operation, `TRUE` for a cli progress bar,
+  or a function with arguments `stage`, `current`, and `total`. A
+  callback owns its display; no cli bar is created. Counts are local to
+  each stage, not an overall percentage. Character parsing counts unique
+  non-missing inputs; graph construction may count deduplicated
+  canonical structures. Updates are throttled, with stage boundaries
+  always reported. Empty or already-converted inputs may report no
+  stages. Callback errors abort the operation, including with
+  `on_failure = "na"`. The cli bar is closed when the call exits,
+  including on errors or interrupts, and follows cli display settings
+  (short or non-interactive calls may show no visible bar).
 
 ## Value
 

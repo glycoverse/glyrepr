@@ -110,6 +110,16 @@ source attributes. Keep `batch$graphs` instead when per-input provenance
 is needed. Use `validate = FALSE` only when every non-missing graph has
 already passed `validate_glycan_graph()`.
 
+Both
+[`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+and
+[`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
+accept `progress = TRUE` for stage-level progress. A parser that owns
+its progress display can instead pass a function
+`function(stage, current, total)` to receive updates without creating a
+nested bar. Counts restart for each stage; completion of parsing alone
+does not mean structure construction is finished.
+
 ## See also
 
 Other low-level glycan structure functions:

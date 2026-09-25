@@ -187,6 +187,11 @@ Deduplication keeps the first graph for each key, including its source
 attributes. Keep <code>batch$graphs</code> instead when per-input provenance is needed.
 Use <code>validate = FALSE</code> only when every non-missing graph has already passed
 <code><a href="validate_glycan_graph.html">validate_glycan_graph()</a></code>.</p>
+<p>Both <code><a href="as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="structure_from_arrays.html">structure_from_arrays()</a></code> accept
+<code>progress = TRUE</code> for stage-level progress. A parser that owns its progress
+display can instead pass a function <code>function(stage, current, total)</code> to
+receive updates without creating a nested bar. Counts restart for each stage;
+completion of parsing alone does not mean structure construction is finished.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -202,17 +207,17 @@ Use <code>validate = FALSE</code> only when every non-missing graph has already 
 <span class="r-in"><span><span class="va">localizations</span> <span class="op">&lt;-</span> <span class="fu">enumerate_floating_graph_localizations</span><span class="op">(</span><span class="va">graph</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">localizations</span><span class="op">$</span><span class="va">graph</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 241867e DN-- 3 2 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH cacaea1 DN-- 3 2 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 241867e (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from cacaea1 (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3-&gt;2 2-&gt;1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH c30b6cb DN-- 3 2 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 4d77705 DN-- 3 2 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | linkage (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from c30b6cb (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 4d77705 (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3-&gt;2 3-&gt;1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>

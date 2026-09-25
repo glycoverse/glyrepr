@@ -148,6 +148,11 @@ Deduplication keeps the first graph for each key, including its source
 attributes. Keep <code>batch$graphs</code> instead when per-input provenance is needed.
 Use <code>validate = FALSE</code> only when every non-missing graph has already passed
 <code><a href="validate_glycan_graph.html">validate_glycan_graph()</a></code>.</p>
+<p>Both <code><a href="as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="structure_from_arrays.html">structure_from_arrays()</a></code> accept
+<code>progress = TRUE</code> for stage-level progress. A parser that owns its progress
+display can instead pass a function <code>function(stage, current, total)</code> to
+receive updates without creating a nested bar. Counts restart for each stage;
+completion of parsing alone does not mean structure construction is finished.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

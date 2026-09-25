@@ -2,6 +2,11 @@
 
 ## glyrepr (development version)
 
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  and
+  [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
+  gain a `progress` argument for stage-level progress bars or callbacks,
+  including native parsing, graph construction, and failure recovery.
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md),
   [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md),
   [`remove_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_linkages.md),
