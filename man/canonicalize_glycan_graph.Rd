@@ -90,6 +90,12 @@ Deduplication keeps the first graph for each key, including its source
 attributes. Keep \code{batch$graphs} instead when per-input provenance is needed.
 Use \code{validate = FALSE} only when every non-missing graph has already passed
 \code{\link[=validate_glycan_graph]{validate_glycan_graph()}}.
+
+Both \code{\link[=as_glycan_structure]{as_glycan_structure()}} and \code{\link[=structure_from_arrays]{structure_from_arrays()}} accept
+\code{progress = TRUE} for stage-level progress. A parser that owns its progress
+display can instead pass a function \verb{function(stage, current, total)} to
+receive updates without creating a nested bar. Counts restart for each stage;
+completion of parsing alone does not mean structure construction is finished.
 }
 
 \seealso{

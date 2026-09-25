@@ -77,11 +77,17 @@
   graphs,
   mode = "canonicalize",
   validate = FALSE,
-  operation = ""
+  operation = "",
+  progress = NULL
 ) {
-  records <- lapply(graphs, function(graph) {
-    tryCatch(.compact_graph_record(graph, validate), error = function(e) NULL)
-  })
+  records <- .structure_progress_map(
+    graphs,
+    function(graph) {
+      tryCatch(.compact_graph_record(graph, validate), error = function(e) NULL)
+    },
+    progress,
+    "Validating graphs"
+  )
   from <- to <- character()
   if (operation == "generic") {
     from <- unique(monosaccharides$concrete[!is.na(monosaccharides$concrete)])
@@ -99,7 +105,12 @@
     to,
     base::order,
     .compact_bliss_labels,
-    identical(Sys.getlocale("LC_COLLATE"), "C")
+    identical(Sys.getlocale("LC_COLLATE"), "C"),
+    progress = .structure_progress_stage(
+      progress,
+      "Canonicalizing graphs",
+      length(graphs)
+    )
   )
 }
 

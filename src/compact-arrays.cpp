@@ -1,3 +1,4 @@
+#include "compact-progress.h"
 #include "compact-core.h"
 
 namespace glyrepr_compact {
@@ -84,10 +85,11 @@ Forest import_arrays(const List& a, bool preserve_parent_order = false) {
 } // namespace glyrepr_compact
 
 // [[Rcpp::export(name = ".compact_arrays_native")]]
-List compact_arrays_native(List records, Function order, Function bliss, bool byte_order = false) {
+List compact_arrays_native(List records, Function order, Function bliss, bool byte_order = false, SEXP progress = R_NilValue) {
+  CompactProgress reporter(progress);
   List out(records.size());
   for (int i = 0; i < records.size(); ++i) {
-    if (i % 128 == 0) checkUserInterrupt();
+    if (i % 128 == 0) { checkUserInterrupt(); reporter.update(i); }
     if (Rf_isNull(records[i])) {out[i] = List::create(_["status"]="missing"); continue;}
     try {
       List a = records[i];
@@ -103,6 +105,7 @@ List compact_arrays_native(List records, Function order, Function bliss, bool by
       out[i] = List::create(_["status"]="invalid", _["reason"]=e.what());
     }
   }
+  reporter.update(records.size(), true);
   return out;
 }
 
@@ -179,13 +182,14 @@ void transform_graph(Forest& f, const std::string& operation,
 List compact_graphs_native(List records, const std::string& mode, bool validate,
                            const std::string& operation, CharacterVector from,
                            CharacterVector to, Function order, Function bliss,
-                           bool byte_order = false) {
+                           bool byte_order = false, SEXP progress = R_NilValue) {
   std::unordered_map<std::string, std::string> mapping;
   for (int i = 0; i < from.size(); ++i)
     mapping.emplace(as<std::string>(from[i]), as<std::string>(to[i]));
+  CompactProgress reporter(progress);
   List out(records.size());
   for (int i = 0; i < records.size(); ++i) {
-    if (i % 128 == 0) checkUserInterrupt();
+    if (i % 128 == 0) { checkUserInterrupt(); reporter.update(i); }
     if (Rf_isNull(records[i])) continue;
     try {
       List a = records[i];
@@ -208,6 +212,7 @@ List compact_graphs_native(List records, const std::string& mode, bool validate,
       out[i] = List::create(_["status"] = "fallback", _["reason"] = e.what());
     }
   }
+  reporter.update(records.size(), true);
   return out;
 }
 

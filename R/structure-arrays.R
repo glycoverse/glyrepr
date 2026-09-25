@@ -25,6 +25,7 @@
 #'   structure. Names, missing positions, and duplicate positions are preserved.
 #' @param on_failure Either `"error"` (default) or `"na"`. The latter warns and
 #'   returns missing structures at invalid positions.
+#' @inheritParams as_glycan_structure
 #' @returns A `glyrepr_structure` vector, with graph storage deduplicated by
 #'   canonical IUPAC key.
 #' @examples
@@ -33,13 +34,18 @@
 #'   edges = c(1L, 2L), linkage = "b1-4", anomer = "?1"
 #' )))
 #' @export
-structure_from_arrays <- function(x, on_failure = c("error", "na")) {
+structure_from_arrays <- function(
+  x,
+  on_failure = c("error", "na"),
+  progress = FALSE
+) {
+  progress <- .structure_progress(progress)
   checkmate::assert_list(x)
   on_failure <- match.arg(on_failure)
   if (!length(x)) {
     return(new_glycan_structure(stats::setNames(character(), names(x))))
   }
-  outcomes <- .structure_array_outcomes(x)
+  outcomes <- .structure_array_outcomes(x, progress)
   failed <- vapply(outcomes, inherits, logical(1), "error")
   if (any(failed) && on_failure == "error") {
     i <- which(failed)[[1]]
@@ -56,27 +62,46 @@ structure_from_arrays <- function(x, on_failure = c("error", "na")) {
     outcomes[present],
     as.list(which(present)),
     length(x),
-    names(x)
+    names(x),
+    progress = progress
   )
 }
 
-.structure_array_outcomes <- function(x) {
-  checked <- lapply(x, function(a) {
-    if (is.null(a)) {
-      return(NULL)
-    }
-    tryCatch(.validate_structure_arrays(a), error = identity)
-  })
+.structure_array_outcomes <- function(x, progress = NULL) {
+  checked <- .structure_progress_map(
+    x,
+    function(a) {
+      if (is.null(a)) {
+        return(NULL)
+      }
+      tryCatch(.validate_structure_arrays(a), error = identity)
+    },
+    progress,
+    "Validating records"
+  )
   valid <- !vapply(checked, inherits, logical(1), "error")
   native <- .compact_arrays_native(
     checked[valid],
     base::order,
     .compact_bliss_labels,
-    identical(Sys.getlocale("LC_COLLATE"), "C")
+    identical(Sys.getlocale("LC_COLLATE"), "C"),
+    progress = .structure_progress_stage(
+      progress,
+      "Canonicalizing records",
+      sum(valid)
+    )
   )
   cache <- new.env(hash = TRUE, parent = emptyenv())
   valid_indices <- which(valid)
+  update <- .structure_progress_stage(
+    progress,
+    "Building structures",
+    length(native)
+  )
   for (j in seq_along(native)) {
+    if (!is.null(update) && j > 1L) {
+      update(j - 1L)
+    }
     i <- valid_indices[[j]]
     a <- native[[j]]
     if (a$status == "missing") {
@@ -97,6 +122,9 @@ structure_from_arrays <- function(x, on_failure = c("error", "na")) {
       },
       error = identity
     ))
+  }
+  if (!is.null(update)) {
+    update(length(native))
   }
   checked
 }

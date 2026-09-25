@@ -1,3 +1,4 @@
+#include "compact-progress.h"
 #include "compact-core.h"
 
 namespace glyrepr_compact {
@@ -138,18 +139,20 @@ List parse_complete(std::string s,const std::unordered_map<std::string,int>& kno
 
 // [[Rcpp::export(name = ".compact_parse_native")]]
 List compact_parse_native(CharacterVector strings,CharacterVector residues,IntegerVector anomer_positions,
-    CharacterVector configuration_names,CharacterVector configuration_values,Function order,Function bliss,bool byte_order=false) {
+    CharacterVector configuration_names,CharacterVector configuration_values,Function order,Function bliss,bool byte_order=false, SEXP progress = R_NilValue) {
   std::unordered_map<std::string,int> known;
   std::unordered_map<std::string,std::string> configurations;
   for(int i=0;i<residues.size();++i) known.emplace(as<std::string>(residues[i]),anomer_positions[i]);
   for(int i=0;i<configuration_names.size();++i) configurations.emplace(as<std::string>(configuration_names[i]),as<std::string>(configuration_values[i]));
+  CompactProgress reporter(progress);
   List out(strings.size());
   for(int i=0;i<strings.size();++i) {
-    if(i%128==0) checkUserInterrupt();
+    if(i%128==0) { checkUserInterrupt(); reporter.update(i); }
     if(strings[i]==NA_STRING) {out[i]=List::create(_["status"]="missing");continue;}
     try {out[i]=glyrepr_compact::parse_complete(as<std::string>(strings[i]),known,configurations,order,byte_order,bliss);}
     catch(const glyrepr_compact::Unsupported& e) {out[i]=List::create(_["status"]="unsupported",_["reason"]=e.what());}
     catch(const std::exception& e) {out[i]=List::create(_["status"]="error",_["reason"]=e.what());}
   }
+  reporter.update(strings.size(), true);
   return out;
 }
