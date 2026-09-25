@@ -4,7 +4,7 @@
 \alias{as_glycan_structure}
 \title{Convert to Glycan Structure Vector}
 \usage{
-as_glycan_structure(x, on_failure = c("error", "na"))
+as_glycan_structure(x, on_failure = c("error", "na"), progress = FALSE)
 }
 \arguments{
 \item{x}{An object to convert to a glycan structure vector.
@@ -18,6 +18,17 @@ behavior. \code{"na"} replaces failed elements with \code{NA} and emits one warn
 that reports their positions and failure reasons. Existing missing elements
 remain missing without a warning. Vector-level incompatibilities still
 produce an error.}
+
+\item{progress}{\code{FALSE} (default) for silent operation, \code{TRUE} for a cli
+progress bar, or a function with arguments \code{stage}, \code{current}, and \code{total}.
+A callback owns its display; no cli bar is created. Counts are local to each
+stage, not an overall percentage. Character parsing counts unique non-missing
+inputs; graph construction may count deduplicated canonical structures.
+Updates are throttled, with stage boundaries always reported. Empty or
+already-converted inputs may report no stages. Callback errors abort the
+operation, including with \code{on_failure = "na"}. The cli bar is closed when
+the call exits, including on errors or interrupts, and follows cli display
+settings (short or non-interactive calls may show no visible bar).}
 }
 \value{
 A glyrepr_structure object.

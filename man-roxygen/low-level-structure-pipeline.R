@@ -64,3 +64,9 @@
 #' attributes. Keep `batch$graphs` instead when per-input provenance is needed.
 #' Use `validate = FALSE` only when every non-missing graph has already passed
 #' [validate_glycan_graph()].
+#'
+#' Both [as_glycan_structure()] and [structure_from_arrays()] accept
+#' `progress = TRUE` for stage-level progress. A parser that owns its progress
+#' display can instead pass a function `function(stage, current, total)` to
+#' receive updates without creating a nested bar. Counts restart for each stage;
+#' completion of parsing alone does not mean structure construction is finished.
