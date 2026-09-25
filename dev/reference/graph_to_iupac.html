@@ -77,7 +77,10 @@ shared compact backend, then build deduplicated graph storage.</p>
 and returns aligned canonical graphs, IUPAC keys, and per-element status.
 It preserves input names and arbitrary graph, vertex, and edge attributes.
 Equal structures retain separate graphs until the caller explicitly
-deduplicates them. This is useful when source attributes differ.</p>
+deduplicates them. This is useful when source attributes differ.
+Graph and array construction share native processing. Unsupported inputs
+use the R path, which also supplies the established failure diagnostics.
+<code><a href="structure_tables.html">structure_from_tibbles()</a></code> converts table rows directly to array records.</p>
 <p>The individual low-level functions remain available when an intermediate
 graph is needed. <code><a href="validate_glycan_graph.html">validate_glycan_graph()</a></code> validates one graph;
 <code><a href="canonicalize_glycan_graph.html">canonicalize_glycan_graph()</a></code> assumes a valid graph; <code>graph_to_iupac()</code>

@@ -40,9 +40,17 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
-</div>
+<ul><li>
+<code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code>, <code><a href="../reference/fill_anomer_pos.html">fill_anomer_pos()</a></code>, <code><a href="../reference/remove_linkages.html">remove_linkages()</a></code>, and <code><a href="../reference/remove_substituents.html">remove_substituents()</a></code> transform structure vectors faster while reusing unchanged structures.</li>
+<li>
+<code><a href="../reference/glycan_structure.html">glycan_structure()</a></code>, graph inputs to <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code>, <code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code>, and the <code><a href="../reference/smap.html">smap_structure()</a></code> family share faster graph processing while preserving source attributes and error recovery.</li>
+<li>
+<code><a href="../reference/structure_tables.html">structure_from_tibbles()</a></code> constructs structures directly from arrays, avoiding intermediate graphs; low-level graph validation, canonicalization, and IUPAC generation also use the shared native backend.</li>
+<li>
+<code><a href="../reference/localize_floating_parts.html">localize_floating_parts()</a></code>, <code><a href="../reference/enumerate_floating_localizations.html">enumerate_floating_localizations()</a></code>, and <code><a href="../reference/enumerate_floating_graph_localizations.html">enumerate_floating_graph_localizations()</a></code> process floating assignments faster while preserving node IDs, candidate order, and assignment records.</li>
+</ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.0" id="glyrepr-110">glyrepr 1.1.0<a class="anchor" aria-label="anchor" href="#glyrepr-110"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.1.0" id="glyrepr-110">glyrepr 1.1.0<a class="anchor" aria-label="anchor" href="#glyrepr-110"></a></h2><p class="text-muted">CRAN release: 2026-09-22</p>
 <div class="section level3">
 <h3 id="new-features-1-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-1-0"></a></h3>
 <ul><li>New <code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code> validates and canonicalizes a batch of glycan graphs, returning aligned canonical graphs, IUPAC keys, statuses, and failure reasons while preserving source attributes. (<a href="https://github.com/glycoverse/glyrepr/issues/94" class="external-link">#94</a>)</li>

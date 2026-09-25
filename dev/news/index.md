@@ -2,7 +2,34 @@
 
 ## glyrepr (development version)
 
+- [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md),
+  [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md),
+  [`remove_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_linkages.md),
+  and
+  [`remove_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_substituents.md)
+  transform structure vectors faster while reusing unchanged structures.
+- [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md),
+  graph inputs to
+  [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md),
+  [`canonicalize_glycan_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graphs.md),
+  and the
+  [`smap_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)
+  family share faster graph processing while preserving source
+  attributes and error recovery.
+- [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+  constructs structures directly from arrays, avoiding intermediate
+  graphs; low-level graph validation, canonicalization, and IUPAC
+  generation also use the shared native backend.
+- [`localize_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/localize_floating_parts.md),
+  [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md),
+  and
+  [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md)
+  process floating assignments faster while preserving node IDs,
+  candidate order, and assignment records.
+
 ## glyrepr 1.1.0
+
+CRAN release: 2026-09-22
 
 ### New features
 

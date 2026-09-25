@@ -71,7 +71,11 @@ validates a batch and returns aligned canonical graphs, IUPAC keys, and
 per-element status. It preserves input names and arbitrary graph,
 vertex, and edge attributes. Equal structures retain separate graphs
 until the caller explicitly deduplicates them. This is useful when
-source attributes differ.
+source attributes differ. Graph and array construction share native
+processing. Unsupported inputs use the R path, which also supplies the
+established failure diagnostics.
+[`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+converts table rows directly to array records.
 
 The individual low-level functions remain available when an intermediate
 graph is needed.
@@ -150,17 +154,17 @@ graph <- get_structure_graphs(glycan, return_list = FALSE)
 localizations <- enumerate_floating_graph_localizations(graph)
 localizations$graph
 #> [[1]]
-#> IGRAPH 912907d DN-- 3 2 -- 
+#> IGRAPH 241867e DN-- 3 2 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from 912907d (vertex names):
+#> + edges from 241867e (vertex names):
 #> [1] 3->2 2->1
 #> 
 #> [[2]]
-#> IGRAPH 498040a DN-- 3 2 -- 
+#> IGRAPH c30b6cb DN-- 3 2 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from 498040a (vertex names):
+#> + edges from c30b6cb (vertex names):
 #> [1] 3->2 3->1
 #> 
 ```
