@@ -176,8 +176,8 @@ void transform_graph(Forest& f, const std::string& operation,
 // Records have checked scalar types and indices before crossing this boundary.
 // Errors are returned to R, which replays the public reference path for diagnostics.
 // [[Rcpp::export(name = ".compact_graphs_native")]]
-List compact_graphs_native(List records, std::string mode, bool validate,
-                           std::string operation, CharacterVector from,
+List compact_graphs_native(List records, const std::string& mode, bool validate,
+                           const std::string& operation, CharacterVector from,
                            CharacterVector to, Function order, Function bliss,
                            bool byte_order = false) {
   std::unordered_map<std::string, std::string> mapping;

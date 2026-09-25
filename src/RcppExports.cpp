@@ -25,15 +25,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // compact_graphs_native
-List compact_graphs_native(List records, std::string mode, bool validate, std::string operation, CharacterVector from, CharacterVector to, Function order, Function bliss, bool byte_order);
+List compact_graphs_native(List records, const std::string& mode, bool validate, const std::string& operation, CharacterVector from, CharacterVector to, Function order, Function bliss, bool byte_order);
 RcppExport SEXP _glyrepr_compact_graphs_native(SEXP recordsSEXP, SEXP modeSEXP, SEXP validateSEXP, SEXP operationSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP orderSEXP, SEXP blissSEXP, SEXP byte_orderSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type records(recordsSEXP);
-    Rcpp::traits::input_parameter< std::string >::type mode(modeSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type mode(modeSEXP);
     Rcpp::traits::input_parameter< bool >::type validate(validateSEXP);
-    Rcpp::traits::input_parameter< std::string >::type operation(operationSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type operation(operationSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type from(fromSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type to(toSEXP);
     Rcpp::traits::input_parameter< Function >::type order(orderSEXP);
