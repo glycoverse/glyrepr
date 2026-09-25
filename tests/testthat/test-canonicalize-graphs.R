@@ -85,3 +85,19 @@ test_that("strict graph errors carry original position and input name", {
   expect_identical(cnd$input_name, "bad")
   expect_type(cnd$reason, "character")
 })
+
+test_that("batch recovery retains input names on warning positions", {
+  warning <- NULL
+  result <- withCallingHandlers(
+    canonicalize_glycan_graphs(
+      list(missing = NULL, bad = 1),
+      on_failure = "na"
+    ),
+    glyrepr_warning_structure_failure = function(cnd) {
+      warning <<- cnd
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_identical(warning$positions, c(bad = 2L))
+  expect_identical(result$status, c(missing = "missing", bad = "invalid"))
+})

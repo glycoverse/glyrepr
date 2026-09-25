@@ -117,10 +117,21 @@ NULL
   rebuild_graph <- validate_graph | canonicalize_graph
   if (any(rebuild_graph)) {
     rebuild_indices <- which(rebuild_graph)
+    native <- .compact_graph_results(
+      modified_graphs[rebuild_indices],
+      validate = TRUE
+    )
     rebuilt <- purrr::map(
       rebuild_indices,
       function(i) {
         graph <- modified_graphs[[i]]
+        a <- native[[match(i, rebuild_indices)]]
+        if (.compact_graph_ok(a)) {
+          return(list(
+            graph = .compact_restore_graph(graph, a),
+            iupac = a$iupac
+          ))
+        }
         iupac <- NA_character_
         if (validate_graph[[i]]) {
           graph <- validate_glycan_graph(graph)

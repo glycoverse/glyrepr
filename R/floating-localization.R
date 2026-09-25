@@ -82,7 +82,8 @@ localize_floating_parts <- function(x, assignments) {
     graphs[[glycan_id]] <- localize_floating_graph(
       graphs[[glycan_id]],
       graph_assignments,
-      glycan_id
+      glycan_id,
+      canonicalize = FALSE
     )
   }
 
@@ -292,13 +293,10 @@ enumerate_floating_localizations_one <- function(
     input_id,
     error_call
   )
-  localized_graphs <- purrr::map(
-    variants$graphs,
-    canonicalize_glycan_graph
-  )
+  canonical <- canonicalize_glycan_graphs(variants$graphs, validate = FALSE)
+  localized_graphs <- canonical$graphs
   assignment_tables <- variants$assignments
-
-  iupacs <- purrr::map_chr(localized_graphs, graph_to_iupac)
+  iupacs <- canonical$iupac
   if (deduplicate) {
     unique_variants <- !duplicated(iupacs)
     iupacs <- iupacs[unique_variants]
@@ -382,6 +380,24 @@ enumerate_floating_graph_localizations_one <- function(
       ),
       call = error_call
     )
+  }
+
+  native <- .compact_enumerate_localizations(
+    graph,
+    candidate_domains,
+    combination_count,
+    length(parts),
+    length(substituents),
+    input_id
+  )
+  if (!is.null(native)) {
+    if (!length(native$graphs)) {
+      cli::cli_abort(
+        "Input {.val {input_id}} has no conflict-free floating localization.",
+        call = error_call
+      )
+    }
+    return(native)
   }
 
   names(candidate_domains) <- c(
@@ -675,6 +691,11 @@ localize_floating_graph <- function(
         "i" = "Candidate parent domain: {.val {candidate_parents}}."
       ))
     }
+  }
+
+  native <- .compact_localize_parts(graph, assignments)
+  if (!is.null(native)) {
+    return(if (canonicalize) canonicalize_glycan_graph(native) else native)
   }
 
   validate_floating_assignment_compatibility(

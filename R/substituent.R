@@ -272,6 +272,11 @@ remove_substituents <- function(glycan) {
     ))
   }
 
+  native <- .compact_transform_structure(glycan, "remove_substituents")
+  if (!is.null(native)) {
+    return(native)
+  }
+
   smap_structure(glycan, .remove_substituents_single)
 }
 

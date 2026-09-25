@@ -622,8 +622,16 @@ test_that("as_glycan_structure keeps existing missing elements silently", {
 
 test_that("as_glycan_structure validates graph elements only once", {
   original_validator <- validate_glycan_graph
+  original_native <- .compact_graphs_native
   validation_count <- 0
   testthat::local_mocked_bindings(
+    .compact_graphs_native = function(records, mode, validate, ...) {
+      if (validate) {
+        validation_count <<- validation_count +
+          sum(!vapply(records, is.null, logical(1)))
+      }
+      original_native(records, mode, validate, ...)
+    },
     validate_glycan_graph = function(glycan) {
       validation_count <<- validation_count + 1
       original_validator(glycan)

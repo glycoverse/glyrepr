@@ -36,7 +36,15 @@ canonicalize_glycan_graphs <- function(
   checkmate::assert_list(graphs)
   checkmate::assert_flag(validate)
   on_failure <- match.arg(on_failure)
-  outcomes <- lapply(graphs, function(graph) {
+  native <- .compact_graph_results(graphs, validate = validate)
+  outcomes <- lapply(seq_along(graphs), function(i) {
+    graph <- graphs[[i]]
+    if (.compact_graph_ok(native[[i]])) {
+      return(list(
+        graph = .compact_restore_graph(graph, native[[i]]),
+        iupac = native[[i]]$iupac
+      ))
+    }
     if (is.null(graph)) {
       return(NULL)
     }
@@ -51,6 +59,7 @@ canonicalize_glycan_graphs <- function(
       error = identity
     )
   })
+  names(outcomes) <- names(graphs)
   failed <- vapply(outcomes, inherits, logical(1), "error")
   reasons <- rep(NA_character_, length(graphs))
   reasons[failed] <- vapply(

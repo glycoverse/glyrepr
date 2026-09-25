@@ -1056,8 +1056,16 @@ test_that("structure mappers reuse unchanged validated graphs", {
     missing = glycan_structure(NA)
   )
   original_validator <- validate_glycan_graph
+  original_native <- .compact_graphs_native
   validation_count <- 0
   testthat::local_mocked_bindings(
+    .compact_graphs_native = function(records, mode, validate, ...) {
+      if (validate) {
+        validation_count <<- validation_count +
+          sum(!vapply(records, is.null, logical(1)))
+      }
+      original_native(records, mode, validate, ...)
+    },
     validate_glycan_graph = function(graph) {
       validation_count <<- validation_count + 1
       original_validator(graph)

@@ -59,6 +59,13 @@ is_canonical_sequence_order <- function(sequence_order) {
 }
 
 canonicalize_graph_with_iupac <- function(graph) {
+  native <- .compact_graph_results(list(graph))[[1]]
+  if (.compact_graph_ok(native)) {
+    return(list(
+      graph = .compact_restore_graph(graph, native),
+      iupac = native$iupac
+    ))
+  }
   graph <- normalize_alditol_attr(graph)
   if (
     any(

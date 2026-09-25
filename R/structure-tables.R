@@ -454,6 +454,36 @@ structure_from_tibbles <- function(
     return(glycan_structure())
   }
 
+  native <- tryCatch(
+    {
+      records <- purrr::map(seq_along(anomers), function(glycan_id) {
+        build_structure_graph_from_table_rows(
+          nodes[nodes$glycan_id == glycan_id, , drop = FALSE],
+          edges[edges$glycan_id == glycan_id, , drop = FALSE],
+          floating_parts[
+            floating_parts$glycan_id == glycan_id,
+            ,
+            drop = FALSE
+          ],
+          floating_substituents[
+            floating_substituents$glycan_id == glycan_id,
+            ,
+            drop = FALSE
+          ],
+          anomers[[glycan_id]],
+          alditols[[glycan_id]],
+          glycan_id,
+          .arrays = TRUE
+        )
+      })
+      .compact_table_structure(records, glycan_names)
+    },
+    error = function(e) NULL
+  )
+  if (!is.null(native)) {
+    return(native)
+  }
+
   graphs <- purrr::map(seq_along(anomers), function(glycan_id) {
     build_structure_graph_from_table_rows(
       nodes[nodes$glycan_id == glycan_id, , drop = FALSE],
@@ -1479,7 +1509,8 @@ build_structure_graph_from_table_rows <- function(
   floating_substituent_rows,
   anomer,
   alditol,
-  glycan_id
+  glycan_id,
+  .arrays = FALSE
 ) {
   if (nrow(node_rows) == 0) {
     if (nrow(edge_rows) > 0) {
@@ -1503,7 +1534,7 @@ build_structure_graph_from_table_rows <- function(
       )
     }
 
-    return(NA)
+    return(if (.arrays) NULL else NA)
   }
 
   if (is.na(anomer)) {
@@ -1546,6 +1577,17 @@ build_structure_graph_from_table_rows <- function(
     glycan_id
   )
   validate_structure_edge_nodes(edge_rows, nrow(node_rows), glycan_id)
+
+  if (.arrays) {
+    return(.compact_table_record(
+      node_rows,
+      edge_rows,
+      floating_rows,
+      floating_substituent_rows,
+      anomer,
+      alditol
+    ))
+  }
 
   graph <- igraph::make_empty_graph(n = nrow(node_rows), directed = TRUE)
   if (nrow(edge_rows) > 0) {
