@@ -11,7 +11,6 @@
 ## New features
 
 * New `canonicalize_glycan_graphs()` validates and canonicalizes a batch of glycan graphs, returning aligned canonical graphs, IUPAC keys, statuses, and failure reasons while preserving source attributes. (#94)
-* `canonicalize_glycan_graphs()` and `structure_from_arrays()` support per-element recovery with `on_failure = "na"`; their warning conditions expose failed positions and reasons for programmatic handling. (#94)
 * New `structure_from_arrays()` constructs glycan vectors directly from residue, edge, and floating-metadata records, preserving names and missing values while deduplicating canonical graphs. (#94)
 
 ## Performance improvements
