@@ -44,12 +44,6 @@ CRAN release: 2026-09-22
   aligned canonical graphs, IUPAC keys, statuses, and failure reasons
   while preserving source attributes.
   ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
-- [`canonicalize_glycan_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graphs.md)
-  and
-  [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
-  support per-element recovery with `on_failure = "na"`; their warning
-  conditions expose failed positions and reasons for programmatic
-  handling. ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
 - New
   [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
   constructs glycan vectors directly from residue, edge, and
