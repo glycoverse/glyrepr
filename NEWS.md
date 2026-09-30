@@ -1,5 +1,7 @@
 # glyrepr (development version)
 
+* `as_glycan_composition()` and `count_mono()` process structure and graph inputs faster; structure counts avoid intermediate composition objects and reuse results for duplicate structures.
+
 * `as_glycan_structure()` and `structure_from_arrays()` gain a `progress` argument for stage-level progress bars or callbacks, including native parsing, graph construction, and failure recovery.
 * `convert_to_generic()`, `fill_anomer_pos()`, `remove_linkages()`, and `remove_substituents()` transform structure vectors faster while reusing unchanged structures.
 * `glycan_structure()`, graph inputs to `as_glycan_structure()`, `canonicalize_glycan_graphs()`, and the `smap_structure()` family share faster graph processing while preserving source attributes and error recovery.

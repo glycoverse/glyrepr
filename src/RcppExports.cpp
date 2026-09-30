@@ -90,6 +90,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// graph_counts_native
+SEXP graph_counts_native(List records, CharacterVector components, CharacterVector targets, CharacterVector generic, bool count, bool uncertain);
+RcppExport SEXP _glyrepr_graph_counts_native(SEXP recordsSEXP, SEXP componentsSEXP, SEXP targetsSEXP, SEXP genericSEXP, SEXP countSEXP, SEXP uncertainSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type records(recordsSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type components(componentsSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type targets(targetsSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type generic(genericSEXP);
+    Rcpp::traits::input_parameter< bool >::type count(countSEXP);
+    Rcpp::traits::input_parameter< bool >::type uncertain(uncertainSEXP);
+    rcpp_result_gen = Rcpp::wrap(graph_counts_native(records, components, targets, generic, count, uncertain));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_glyrepr_compact_arrays_native", (DL_FUNC) &_glyrepr_compact_arrays_native, 5},
@@ -97,6 +113,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_glyrepr_compact_localizations_native", (DL_FUNC) &_glyrepr_compact_localizations_native, 3},
     {"_glyrepr_compact_localize_parts_native", (DL_FUNC) &_glyrepr_compact_localize_parts_native, 3},
     {"_glyrepr_compact_parse_native", (DL_FUNC) &_glyrepr_compact_parse_native, 9},
+    {"_glyrepr_graph_counts_native", (DL_FUNC) &_glyrepr_graph_counts_native, 6},
     {NULL, NULL, 0}
 };
 
