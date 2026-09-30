@@ -116,6 +116,10 @@ count_mono.glyrepr_composition <- function(
 #' @export
 count_mono.glyrepr_structure <- function(x, mono = NULL, include_subs = FALSE) {
   .check_count_mono_args(mono, include_subs)
+  native <- .native_structure_compositions(x, mono, include_subs, count = TRUE)
+  if (!is.null(native)) {
+    return(native)
+  }
   comps <- as_glycan_composition(x)
   count_mono.glyrepr_composition(comps, mono, include_subs)
 }
@@ -124,6 +128,10 @@ count_mono.glyrepr_structure <- function(x, mono = NULL, include_subs = FALSE) {
 #' @export
 count_mono.igraph <- function(x, mono = NULL, include_subs = FALSE) {
   .check_count_mono_args(mono, include_subs)
+  native <- .native_graph_counts(list(x), mono, include_subs, count = TRUE)
+  if (!is.null(native)) {
+    return(native)
+  }
   comps <- as_glycan_composition(x)
   count_mono.glyrepr_composition(comps, mono, include_subs)
 }

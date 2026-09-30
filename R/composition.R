@@ -278,6 +278,10 @@ vec_cast.glyrepr_composition.character <- function(x, to, ...) {
 
 #' @export
 vec_cast.glyrepr_composition.glyrepr_structure <- function(x, to, ...) {
+  native <- .native_structure_compositions(x)
+  if (!is.null(native)) {
+    return(new_glycan_composition(native))
+  }
   component_order <- .composition_component_order()
 
   # Use smap to convert each structure to composition
@@ -292,6 +296,17 @@ vec_cast.glyrepr_composition.glyrepr_structure <- function(x, to, ...) {
 }
 
 graph_to_composition <- function(graph, component_order = NULL) {
+  native <- .native_graph_counts(list(graph))
+  if (!is.null(native)) {
+    if (!is.null(component_order)) {
+      return(.reorder_composition_components(native[[1L]], component_order))
+    }
+    return(native[[1L]])
+  }
+  .graph_to_composition_reference(graph, component_order)
+}
+
+.graph_to_composition_reference <- function(graph, component_order = NULL) {
   monos <- igraph::vertex_attr(graph, "mono")
   mono_result <- .count_composition_components(monos)
 

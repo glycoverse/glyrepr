@@ -21,3 +21,7 @@
     .Call(`_glyrepr_compact_parse_native`, strings, residues, anomer_positions, configuration_names, configuration_values, order, bliss, byte_order, progress)
 }
 
+.graph_counts_native <- function(records, components, targets, generic, count, uncertain) {
+    .Call(`_glyrepr_graph_counts_native`, records, components, targets, generic, count, uncertain)
+}
+
