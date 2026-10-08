@@ -1,12 +1,17 @@
 # glyrepr (development version)
 
-* `as_glycan_composition()` and `count_mono()` process structure and graph inputs faster; structure counts avoid intermediate composition objects and reuse results for duplicate structures.
+## New features
 
-* `as_glycan_structure()` and `structure_from_arrays()` gain a `progress` argument for stage-level progress bars or callbacks, including native parsing, graph construction, and failure recovery.
-* `convert_to_generic()`, `fill_anomer_pos()`, `remove_linkages()`, and `remove_substituents()` transform structure vectors faster while reusing unchanged structures.
-* `glycan_structure()`, graph inputs to `as_glycan_structure()`, `canonicalize_glycan_graphs()`, and the `smap_structure()` family share faster graph processing while preserving source attributes and error recovery.
-* `structure_from_tibbles()` constructs structures directly from arrays, avoiding intermediate graphs; low-level graph validation, canonicalization, and IUPAC generation also use the shared native backend.
-* `localize_floating_parts()`, `enumerate_floating_localizations()`, and `enumerate_floating_graph_localizations()` process floating assignments faster while preserving node IDs, candidate order, and assignment records.
+* `as_glycan_structure()` and `structure_from_arrays()` gain a `progress` argument: use `TRUE` to display a progress bar or a function accepting `stage`, `current`, and `total` to receive updates during parsing, graph construction, and failure recovery. The default remains `FALSE`. (#98)
+
+## Performance improvements
+
+* `as_glycan_composition()` and `count_mono()` process structure and graph inputs faster while preserving names and missing values; repeated structures reuse counting results. (#99)
+* `as_glycan_structure()` with graph inputs, `glycan_structure()`, `canonicalize_glycan_graphs()`, and the `smap_structure()` family process graphs faster while preserving source attributes and failure handling. (#97)
+* `canonicalize_glycan_graph()`, `graph_to_iupac()`, `structure_to_iupac()`, `validate_glycan_graph()`, and `validate_glycan_graph_vector()` process graphs faster while preserving validation and canonical IUPAC output. (#97)
+* `convert_to_generic()`, `fill_anomer_pos()`, `remove_linkages()`, and `remove_substituents()` transform structure vectors faster while reusing unchanged structures. (#97)
+* `localize_floating_parts()`, `enumerate_floating_localizations()`, and `enumerate_floating_graph_localizations()` process floating assignments faster while preserving node IDs, candidate order, and assignment records. (#97)
+* `structure_from_tibbles()` constructs structures faster by avoiding intermediate graphs. (#97)
 
 # glyrepr 1.1.0
 
