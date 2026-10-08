@@ -176,7 +176,6 @@
 #' is_glycan_structure(simple_struct)  # TRUE
 #' is_glycan_structure(graph)          # FALSE
 #'
-#' @importFrom magrittr %>%
 #' @export
 glycan_structure <- function(...) {
   .glycan_structure_from_graphs(list(...))

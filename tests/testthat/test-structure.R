@@ -1157,22 +1157,22 @@ test_that("dplyr filter operations optimize structure storage", {
   df <- tibble::tibble(id = 1:3, structure = sv, score = c(10, 20, 30))
 
   # Filter to single row should optimize to 1 unique structure
-  filtered1 <- df %>% dplyr::filter(id == 1)
+  filtered1 <- df |> dplyr::filter(id == 1)
   expect_equal(length(filtered1$structure), 1)
   expect_length(attr(filtered1$structure, "graphs"), 1)
 
   # Filter to multiple rows with same structure should optimize
-  filtered2 <- df %>% dplyr::filter(id != 2) # Keeps rows 1 and 3 (same structure)
+  filtered2 <- df |> dplyr::filter(id != 2) # Keeps rows 1 and 3 (same structure)
   expect_equal(length(filtered2$structure), 2)
   expect_length(attr(filtered2$structure, "graphs"), 1)
 
   # Filter to multiple rows with different structures should keep both
-  filtered3 <- df %>% dplyr::filter(id >= 2) # Keeps rows 2 and 3 (different structures)
+  filtered3 <- df |> dplyr::filter(id >= 2) # Keeps rows 2 and 3 (different structures)
   expect_equal(length(filtered3$structure), 2)
   expect_length(attr(filtered3$structure, "graphs"), 2)
 
   # Filter by score
-  filtered4 <- df %>% dplyr::filter(score >= 20)
+  filtered4 <- df |> dplyr::filter(score >= 20)
   expect_equal(length(filtered4$structure), 2)
   expect_length(attr(filtered4$structure, "graphs"), 2)
 })
@@ -1185,24 +1185,24 @@ test_that("dplyr slice operations optimize structure storage", {
   df <- tibble::tibble(id = 1:3, structure = sv)
 
   # slice() operations
-  sliced1 <- df %>% dplyr::slice(1)
+  sliced1 <- df |> dplyr::slice(1)
   expect_equal(length(sliced1$structure), 1)
   expect_length(attr(sliced1$structure, "graphs"), 1)
 
-  sliced2 <- df %>% dplyr::slice(c(1, 3))
+  sliced2 <- df |> dplyr::slice(c(1, 3))
   expect_equal(length(sliced2$structure), 2)
   expect_length(attr(sliced2$structure, "graphs"), 1)
 
-  sliced3 <- df %>% dplyr::slice(2:3)
+  sliced3 <- df |> dplyr::slice(2:3)
   expect_equal(length(sliced3$structure), 2)
   expect_length(attr(sliced3$structure, "graphs"), 2)
 
   # slice_head() and slice_tail()
-  head_slice <- df %>% dplyr::slice_head(n = 1)
+  head_slice <- df |> dplyr::slice_head(n = 1)
   expect_equal(length(head_slice$structure), 1)
   expect_length(attr(head_slice$structure, "graphs"), 1)
 
-  tail_slice <- df %>% dplyr::slice_tail(n = 1)
+  tail_slice <- df |> dplyr::slice_tail(n = 1)
   expect_equal(length(tail_slice$structure), 1)
   expect_length(attr(tail_slice$structure, "graphs"), 1)
 })
@@ -1215,17 +1215,17 @@ test_that("dplyr arrange and other operations preserve structure optimization", 
   df <- tibble::tibble(id = 1:3, structure = sv, score = c(30, 10, 20))
 
   # arrange() should maintain all structures
-  arranged <- df %>% dplyr::arrange(score)
+  arranged <- df |> dplyr::arrange(score)
   expect_equal(length(arranged$structure), 3)
   expect_length(attr(arranged$structure, "graphs"), 2)
 
   # arrange() + slice() should optimize
-  arranged_sliced <- df %>% dplyr::arrange(score) %>% dplyr::slice(1)
+  arranged_sliced <- df |> dplyr::arrange(score) |> dplyr::slice(1)
   expect_equal(length(arranged_sliced$structure), 1)
   expect_length(attr(arranged_sliced$structure, "graphs"), 1)
 
   # top_n() operations
-  top2 <- df %>% dplyr::top_n(2, score)
+  top2 <- df |> dplyr::top_n(2, score)
   expect_equal(length(top2$structure), 2)
   expect_length(attr(top2$structure, "graphs"), 1) # top_n selects id=1 and id=3, both have same structure
 
@@ -1234,7 +1234,7 @@ test_that("dplyr arrange and other operations preserve structure optimization", 
     id = rep(1:3, each = 2),
     structure = rep(sv, each = 2)
   )
-  distinct_result <- df_with_dups %>%
+  distinct_result <- df_with_dups |>
     dplyr::distinct(structure, .keep_all = TRUE)
   expect_equal(length(distinct_result$structure), 2)
   expect_length(attr(distinct_result$structure, "graphs"), 2)
@@ -1262,26 +1262,26 @@ test_that("complex tibble and dplyr workflows maintain optimization", {
   expect_length(attr(sv, "graphs"), 2)
 
   # Complex workflow: filter + arrange + slice
-  result1 <- df %>%
-    dplyr::filter(type == "A") %>%
-    dplyr::arrange(desc(score)) %>%
+  result1 <- df |>
+    dplyr::filter(type == "A") |>
+    dplyr::arrange(desc(score)) |>
     dplyr::slice(1:2)
 
   expect_equal(length(result1$structure), 2)
   expect_length(attr(result1$structure, "graphs"), 1) # All type A have same structure
 
   # Another complex workflow: group operations
-  result2 <- df %>%
-    dplyr::group_by(type) %>%
-    dplyr::slice_max(score, n = 1) %>%
+  result2 <- df |>
+    dplyr::group_by(type) |>
+    dplyr::slice_max(score, n = 1) |>
     dplyr::ungroup()
 
   expect_equal(length(result2$structure), 2)
   expect_length(attr(result2$structure, "graphs"), 2) # One from each type
 
   # Workflow with structure column operations
-  result3 <- df %>%
-    dplyr::filter(score >= 20) %>%
+  result3 <- df |>
+    dplyr::filter(score >= 20) |>
     dplyr::select(structure, score)
 
   expect_equal(length(result3$structure), 3) # score >= 20 selects 3 rows (id=2,4,5)
@@ -1296,7 +1296,7 @@ test_that("tibble operations preserve structure content integrity", {
   df <- tibble::tibble(id = 1:3, structure = sv)
 
   # Verify that optimization doesn't affect structure content
-  subset_df <- df %>% dplyr::filter(id == 1)
+  subset_df <- df |> dplyr::filter(id == 1)
 
   # Extract the structure and verify it's correct
   structure_graph <- get_structure_graphs(
@@ -1554,11 +1554,11 @@ test_that("names work correctly with dplyr operations", {
   df <- tibble::tibble(id = 1:2, structure = glycans)
 
   # filter should preserve names
-  filtered <- df %>% dplyr::filter(id == 1)
+  filtered <- df |> dplyr::filter(id == 1)
   expect_equal(names(filtered$structure), "A")
 
   # slice should preserve names
-  sliced <- df %>% dplyr::slice(2)
+  sliced <- df |> dplyr::slice(2)
   expect_equal(names(sliced$structure), "B")
 })
 

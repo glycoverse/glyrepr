@@ -31,7 +31,6 @@ Imports:
     dplyr (>= 1.2.0),
     glue,
     igraph,
-    magrittr,
     pillar,
     purrr,
     rlang,
