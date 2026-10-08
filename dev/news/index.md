@@ -2,46 +2,59 @@
 
 ## glyrepr (development version)
 
-- [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_composition.md)
-  and
-  [`count_mono()`](https://glycoverse.github.io/glyrepr/dev/reference/count_mono.md)
-  process structure and graph inputs faster; structure counts avoid
-  intermediate composition objects and reuse results for duplicate
-  structures.
+### New features
 
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   and
   [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
-  gain a `progress` argument for stage-level progress bars or callbacks,
-  including native parsing, graph construction, and failure recovery.
+  gain a `progress` argument: use `TRUE` to display a progress bar or a
+  function accepting `stage`, `current`, and `total` to receive updates
+  during parsing, graph construction, and failure recovery. The default
+  remains `FALSE`.
+  ([\#98](https://github.com/glycoverse/glyrepr/issues/98))
 
+### Performance improvements
+
+- [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_composition.md)
+  and
+  [`count_mono()`](https://glycoverse.github.io/glyrepr/dev/reference/count_mono.md)
+  process structure and graph inputs faster while preserving names and
+  missing values; repeated structures reuse counting results.
+  ([\#99](https://github.com/glycoverse/glyrepr/issues/99))
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  with graph inputs,
+  [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md),
+  [`canonicalize_glycan_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graphs.md),
+  and the
+  [`smap_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)
+  family process graphs faster while preserving source attributes and
+  failure handling.
+  ([\#97](https://github.com/glycoverse/glyrepr/issues/97))
+- [`canonicalize_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graph.md),
+  [`graph_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/graph_to_iupac.md),
+  [`structure_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_to_iupac.md),
+  [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph.md),
+  and
+  [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph_vector.md)
+  process graphs faster while preserving validation and canonical IUPAC
+  output. ([\#97](https://github.com/glycoverse/glyrepr/issues/97))
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md),
   [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md),
   [`remove_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_linkages.md),
   and
   [`remove_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_substituents.md)
   transform structure vectors faster while reusing unchanged structures.
-
-- [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md),
-  graph inputs to
-  [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md),
-  [`canonicalize_glycan_graphs()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graphs.md),
-  and the
-  [`smap_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/smap.md)
-  family share faster graph processing while preserving source
-  attributes and error recovery.
-
-- [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
-  constructs structures directly from arrays, avoiding intermediate
-  graphs; low-level graph validation, canonicalization, and IUPAC
-  generation also use the shared native backend.
-
+  ([\#97](https://github.com/glycoverse/glyrepr/issues/97))
 - [`localize_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/localize_floating_parts.md),
   [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md),
   and
   [`enumerate_floating_graph_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_graph_localizations.md)
   process floating assignments faster while preserving node IDs,
   candidate order, and assignment records.
+  ([\#97](https://github.com/glycoverse/glyrepr/issues/97))
+- [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
+  constructs structures faster by avoiding intermediate graphs.
+  ([\#97](https://github.com/glycoverse/glyrepr/issues/97))
 
 ## glyrepr 1.1.0
 

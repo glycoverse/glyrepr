@@ -40,13 +40,27 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glyrepr-development-version">glyrepr (development version)<a class="anchor" aria-label="anchor" href="#glyrepr-development-version"></a></h2>
-<ul><li><p><code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> and <code><a href="../reference/count_mono.html">count_mono()</a></code> process structure and graph inputs faster; structure counts avoid intermediate composition objects and reuse results for duplicate structures.</p></li>
-<li><p><code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> gain a <code>progress</code> argument for stage-level progress bars or callbacks, including native parsing, graph construction, and failure recovery.</p></li>
-<li><p><code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code>, <code><a href="../reference/fill_anomer_pos.html">fill_anomer_pos()</a></code>, <code><a href="../reference/remove_linkages.html">remove_linkages()</a></code>, and <code><a href="../reference/remove_substituents.html">remove_substituents()</a></code> transform structure vectors faster while reusing unchanged structures.</p></li>
-<li><p><code><a href="../reference/glycan_structure.html">glycan_structure()</a></code>, graph inputs to <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code>, <code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code>, and the <code><a href="../reference/smap.html">smap_structure()</a></code> family share faster graph processing while preserving source attributes and error recovery.</p></li>
-<li><p><code><a href="../reference/structure_tables.html">structure_from_tibbles()</a></code> constructs structures directly from arrays, avoiding intermediate graphs; low-level graph validation, canonicalization, and IUPAC generation also use the shared native backend.</p></li>
-<li><p><code><a href="../reference/localize_floating_parts.html">localize_floating_parts()</a></code>, <code><a href="../reference/enumerate_floating_localizations.html">enumerate_floating_localizations()</a></code>, and <code><a href="../reference/enumerate_floating_graph_localizations.html">enumerate_floating_graph_localizations()</a></code> process floating assignments faster while preserving node IDs, candidate order, and assignment records.</p></li>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> gain a <code>progress</code> argument: use <code>TRUE</code> to display a progress bar or a function accepting <code>stage</code>, <code>current</code>, and <code>total</code> to receive updates during parsing, graph construction, and failure recovery. The default remains <code>FALSE</code>. (<a href="https://github.com/glycoverse/glyrepr/issues/98" class="external-link">#98</a>)</li>
 </ul></div>
+<div class="section level3">
+<h3 id="performance-improvements-development-version">Performance improvements<a class="anchor" aria-label="anchor" href="#performance-improvements-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> and <code><a href="../reference/count_mono.html">count_mono()</a></code> process structure and graph inputs faster while preserving names and missing values; repeated structures reuse counting results. (<a href="https://github.com/glycoverse/glyrepr/issues/99" class="external-link">#99</a>)</li>
+<li>
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> with graph inputs, <code><a href="../reference/glycan_structure.html">glycan_structure()</a></code>, <code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code>, and the <code><a href="../reference/smap.html">smap_structure()</a></code> family process graphs faster while preserving source attributes and failure handling. (<a href="https://github.com/glycoverse/glyrepr/issues/97" class="external-link">#97</a>)</li>
+<li>
+<code><a href="../reference/canonicalize_glycan_graph.html">canonicalize_glycan_graph()</a></code>, <code><a href="../reference/graph_to_iupac.html">graph_to_iupac()</a></code>, <code><a href="../reference/structure_to_iupac.html">structure_to_iupac()</a></code>, <code><a href="../reference/validate_glycan_graph.html">validate_glycan_graph()</a></code>, and <code><a href="../reference/validate_glycan_graph_vector.html">validate_glycan_graph_vector()</a></code> process graphs faster while preserving validation and canonical IUPAC output. (<a href="https://github.com/glycoverse/glyrepr/issues/97" class="external-link">#97</a>)</li>
+<li>
+<code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code>, <code><a href="../reference/fill_anomer_pos.html">fill_anomer_pos()</a></code>, <code><a href="../reference/remove_linkages.html">remove_linkages()</a></code>, and <code><a href="../reference/remove_substituents.html">remove_substituents()</a></code> transform structure vectors faster while reusing unchanged structures. (<a href="https://github.com/glycoverse/glyrepr/issues/97" class="external-link">#97</a>)</li>
+<li>
+<code><a href="../reference/localize_floating_parts.html">localize_floating_parts()</a></code>, <code><a href="../reference/enumerate_floating_localizations.html">enumerate_floating_localizations()</a></code>, and <code><a href="../reference/enumerate_floating_graph_localizations.html">enumerate_floating_graph_localizations()</a></code> process floating assignments faster while preserving node IDs, candidate order, and assignment records. (<a href="https://github.com/glycoverse/glyrepr/issues/97" class="external-link">#97</a>)</li>
+<li>
+<code><a href="../reference/structure_tables.html">structure_from_tibbles()</a></code> constructs structures faster by avoiding intermediate graphs. (<a href="https://github.com/glycoverse/glyrepr/issues/97" class="external-link">#97</a>)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="glyrepr-110">glyrepr 1.1.0<a class="anchor" aria-label="anchor" href="#glyrepr-110"></a></h2><p class="text-muted">CRAN release: 2026-09-22</p>
 <div class="section level3">
