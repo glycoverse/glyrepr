@@ -100,3 +100,40 @@ test_that("graph conversion retains arbitrary graph vertex and edge attributes",
     expect_identical(igraph::E(result)$weight, 2.5)
   }
 })
+
+test_that("linkage scanning preserves unknown alternatives and floating linkages", {
+  x <- c(
+    "Gal(b1-3/?/6)Glc",
+    "Gal(?-?)Glc",
+    "{Gal(b1-3/?/6)}Glc",
+    "{Gal(?-?)}Glc"
+  )
+  expect_identical(
+    as.character(as_glycan_structure(x)),
+    c(
+      "Gal(b1-?)Glc(?1-",
+      "Gal(??-?)Glc(?1-",
+      "Gal(b1-?)Glc(?1-",
+      "Gal(??-?)Glc(?1-"
+    )
+  )
+  bad <- c("Gal(b1-?/?/6)Glc", "Gal(b1-3/)Glc", "Gal(b1-03)Glc")
+  expect_snapshot(result <- as_glycan_structure(bad, on_failure = "na"))
+  expect_identical(is.na(result), rep(TRUE, 3))
+})
+
+test_that("a single floating constraint skips only irrelevant symmetry analysis", {
+  ordinary <- "{6S|1,2}Gal(b1-4)Glc"
+  symmetric <- "{Neu5Ac(a2-3)|2,4}Gal(a1-?)[Gal(a1-?)]Glc(a1-"
+  expected <- .compact_iupac_arrays(c(ordinary, symmetric))
+  calls <- 0L
+  original <- .compact_bliss_labels
+  local_mocked_bindings(.compact_bliss_labels = function(edges, colors) {
+    calls <<- calls + 1L
+    original(edges, colors)
+  })
+  expect_identical(.compact_iupac_arrays(ordinary), expected[1])
+  expect_identical(calls, 0L)
+  expect_identical(.compact_iupac_arrays(symmetric), expected[2])
+  expect_identical(calls, 1L)
+})

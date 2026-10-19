@@ -18,3 +18,12 @@
       ! Could not parse IUPAC-condensed string: "not-a-structure"
       i Invalid characters or format in IUPAC-condensed string
 
+# linkage scanning preserves unknown alternatives and floating linkages
+
+    Code
+      result <- as_glycan_structure(bad, on_failure = "na")
+    Condition
+      Warning:
+      3 structures failed validation and were replaced with `NA`.
+      x Position 1: Could not parse IUPAC-condensed string: "Gal(b1-?/?/6)Glc" i Invalid characters or format in IUPAC-condensed string, Position 2: Could not parse IUPAC-condensed string: "Gal(b1-3/)Glc" i Invalid characters or format in IUPAC-condensed string, and Position 3: Could not parse IUPAC-condensed string: "Gal(b1-03)Glc" i Invalid characters or format in IUPAC-condensed string
+
