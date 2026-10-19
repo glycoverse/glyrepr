@@ -17,6 +17,14 @@
     .Call(`_glyrepr_compact_localize_parts_native`, record, part_ids, parents)
 }
 
+.compact_build_graphs_native <- function(records, model, progress = NULL) {
+    .Call(`_glyrepr_compact_build_graphs_native`, records, model, progress)
+}
+
+.compact_blank_graph_native <- function(edges, n, directed, model) {
+    .Call(`_glyrepr_compact_blank_graph_native`, edges, n, directed, model)
+}
+
 .compact_parse_native <- function(strings, residues, anomer_positions, configuration_names, configuration_values, order, bliss, byte_order = FALSE, progress = NULL) {
     .Call(`_glyrepr_compact_parse_native`, strings, residues, anomer_positions, configuration_names, configuration_values, order, bliss, byte_order, progress)
 }
