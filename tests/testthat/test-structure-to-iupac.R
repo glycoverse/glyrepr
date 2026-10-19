@@ -111,24 +111,48 @@ test_that("structure_to_iupac ensures isomorphic graphs produce same sequence", 
 })
 
 test_that("structure_to_iupac handles complex branched structures", {
-  # Create a more complex structure with multiple levels of branching
-  # Glc -> Man -> GlcNAc -> Gal
-  #                |        ├─ Fuc
-  #                |        └─ NeuAc
-  #                └─ Hex
   graph <- igraph::make_graph(~ 1 - +2, 2 - +3, 3 - +4, 3 - +5, 2 - +6)
   igraph::V(graph)$mono <- c("Glc", "Man", "GlcNAc", "Gal", "Fuc", "GalNAc")
   igraph::V(graph)$sub <- ""
-  igraph::E(graph)$linkage <- c("b1-4", "a1-3", "a1-2", "a1-6", "b1-3")
   graph$anomer <- "a1"
-  glycan <- glycan_structure(graph)
 
-  result <- structure_to_iupac(glycan)
-  # Based on actual algorithm output
-  expect_equal(
-    result,
-    "Fuc(b1-3)[Gal(a1-6)]GlcNAc(a1-3)[GalNAc(a1-2)]Man(b1-4)Glc(a1-"
+  # Match linkages to endpoints, independently of graph_from_literal() ordering.
+  edge_ids <- igraph::get_edge_ids(
+    graph,
+    c("1", "2", "2", "3", "2", "6", "3", "4", "3", "5")
   )
+  graph <- igraph::set_edge_attr(
+    graph,
+    "linkage",
+    index = edge_ids,
+    value = c("b1-4", "a1-3", "a1-2", "a1-6", "b1-3")
+  )
+  expected <-
+    "Fuc(b1-3)[Gal(a1-6)]GlcNAc(a1-3)[GalNAc(a1-2)]Man(b1-4)Glc(a1-"
+
+  edges <- igraph::as_data_frame(graph, what = "edges")
+  vertices <- igraph::as_data_frame(graph, what = "vertices")
+  orders <- list(
+    formula = igraph::get_edge_ids(
+      graph,
+      c("1", "2", "2", "3", "3", "4", "3", "5", "2", "6")
+    ),
+    endpoints = edge_ids,
+    reversed = rev(edge_ids)
+  )
+  expect_equal(structure_to_iupac(glycan_structure(graph)), expected)
+  for (order in orders) {
+    reordered <- igraph::graph_from_data_frame(
+      edges[order, ],
+      directed = TRUE,
+      vertices = vertices
+    )
+    reordered$anomer <- graph$anomer
+    expect_equal(graph_to_iupac(reordered), expected)
+    result <- structure_to_iupac(glycan_structure(reordered))
+    expect_equal(result, expected)
+    expect_equal(structure_to_iupac(as_glycan_structure(result)), expected)
+  }
 })
 
 test_that("structure_to_iupac selects correct backbone based on depth", {
