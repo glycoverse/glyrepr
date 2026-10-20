@@ -1,7 +1,5 @@
 # glyrepr (development version)
 
-* `convert_to_generic()`, `remove_linkages()`, and `remove_substituents()` process large structure vectors faster while preserving canonical output and custom graph attributes.
-
 ## Bug fixes
 
 * The compact graph template no longer retains an igraph native pointer, allowing coverage counters to be serialized safely during R shutdown. (#102)
@@ -12,6 +10,7 @@
 
 ## Performance improvements
 
+* `convert_to_generic()`, `remove_linkages()`, and `remove_substituents()` process large structure vectors faster while preserving canonical output and custom graph attributes. (#103)
 * `as_glycan_structure()` parses IUPAC-condensed vectors faster through streamlined parsing, floating-structure canonicalization, and batch graph construction while preserving validation and canonical output (#102).
 * `as_glycan_composition()` and `count_mono()` process structure and graph inputs faster while preserving names and missing values; repeated structures reuse counting results. (#99)
 * `as_glycan_structure()` with graph inputs, `glycan_structure()`, `canonicalize_glycan_graphs()`, and the `smap_structure()` family process graphs faster while preserving source attributes and failure handling. (#97)
