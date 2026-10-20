@@ -25,6 +25,9 @@
 #'   structure. Names, missing positions, and duplicate positions are preserved.
 #' @param on_failure Either `"error"` (default) or `"na"`. The latter warns and
 #'   returns missing structures at invalid positions.
+#' @param warn Whether to warn about invalid records when `on_failure = "na"`.
+#'   Validation is always performed. Set to `FALSE` when the caller handles
+#'   missing results itself.
 #' @inheritParams as_glycan_structure
 #' @returns A `glyrepr_structure` vector, with graph storage deduplicated by
 #'   canonical IUPAC key.
@@ -37,15 +40,21 @@
 structure_from_arrays <- function(
   x,
   on_failure = c("error", "na"),
-  progress = FALSE
+  progress = FALSE,
+  warn = TRUE
 ) {
   progress <- .structure_progress(progress)
   checkmate::assert_list(x)
   on_failure <- match.arg(on_failure)
+  checkmate::assert_flag(warn)
   if (!length(x)) {
     return(new_glycan_structure(stats::setNames(character(), names(x))))
   }
-  outcomes <- .structure_array_outcomes(x, progress)
+  outcomes <- .structure_array_outcomes(
+    x,
+    progress,
+    quiet = !warn && on_failure == "na"
+  )
   failed <- vapply(outcomes, inherits, logical(1), "error")
   if (any(failed) && on_failure == "error") {
     i <- which(failed)[[1]]
@@ -63,22 +72,56 @@ structure_from_arrays <- function(
     as.list(which(present)),
     length(x),
     names(x),
-    progress = progress
+    progress = progress,
+    warn = warn
   )
 }
 
-.structure_array_outcomes <- function(x, progress = NULL) {
-  checked <- .structure_progress_map(
+.structure_array_outcomes <- function(x, progress = NULL, quiet = FALSE) {
+  flags <- .compact_check_arrays_native(
     x,
-    function(a) {
-      if (is.null(a)) {
-        return(NULL)
-      }
-      tryCatch(.validate_structure_arrays(a), error = identity)
-    },
-    progress,
-    "Validating records"
+    is_known_mono,
+    valid_substituent,
+    valid_linkages,
+    valid_anomer,
+    function(s) {
+      grepl(substituent_token_pattern(anchored = TRUE), s, perl = TRUE) &&
+        valid_substituent(s)
+    }
   )
+  chemical_errors <- vector("list", 7L)
+  validate_one <- function(i) {
+    if (flags[[i]] == 1L) {
+      return(x[[i]])
+    }
+    flag <- flags[[i]]
+    if (quiet && flag > 1L) {
+      return(NULL)
+    }
+    if (flag > 1L && !is.null(chemical_errors[[flag]])) {
+      return(chemical_errors[[flag]])
+    }
+    result <- tryCatch(.validate_structure_arrays(x[[i]]), error = identity)
+    if (flag > 1L && inherits(result, "error")) {
+      attr(result, "array_failure_reason") <-
+        normalize_structure_failure_reason(result)
+      chemical_errors[[flag]] <<- result
+    }
+    result
+  }
+  if (is.null(progress)) {
+    checked <- x
+    for (i in which(flags != 1L)) {
+      checked[i] <- list(validate_one(i))
+    }
+  } else {
+    checked <- .structure_progress_map(
+      seq_along(x),
+      validate_one,
+      progress,
+      "Validating records"
+    )
+  }
   valid <- !vapply(checked, inherits, logical(1), "error")
   native <- .compact_arrays_native(
     checked[valid],
@@ -91,14 +134,25 @@ structure_from_arrays <- function(
       sum(valid)
     )
   )
-  cache <- new.env(hash = TRUE, parent = emptyenv())
+  ok <- vapply(native, function(a) identical(a$status, "ok"), logical(1))
+  keys <- vapply(native[ok], `[[`, character(1), "iupac")
+  unique_keys <- !duplicated(keys)
+  graphs <- .compact_build_graphs(native[ok][unique_keys], progress)
+  names(graphs) <- keys[unique_keys]
+  graph_index <- integer(length(native))
+  graph_index[ok] <- match(keys, keys[unique_keys])
   valid_indices <- which(valid)
+  checked[valid_indices[ok]] <- Map(
+    function(graph, iupac) list(graph = graph, iupac = iupac),
+    graphs[graph_index[ok]],
+    keys
+  )
   update <- .structure_progress_stage(
     progress,
     "Building structures",
     length(native)
   )
-  for (j in seq_along(native)) {
+  for (j in which(!ok)) {
     if (!is.null(update) && j > 1L) {
       update(j - 1L)
     }
@@ -107,18 +161,30 @@ structure_from_arrays <- function(
     if (a$status == "missing") {
       next
     }
+    # These failures prove invalid topology or an impossible floating assignment.
+    # Unsupported sizes and other canonicalization failures still use the
+    # reference path, which may support cases beyond the native backend.
+    if (
+      quiet &&
+        a$status == "invalid" &&
+        a$reason %in%
+          c(
+            "self edge or multiple parents",
+            "cyclic graph",
+            "glycan components must be out trees",
+            "undeclared disconnected component",
+            "missing main component",
+            "no conflict-free acyclic floating assignment"
+          )
+    ) {
+      checked[i] <- list(NULL)
+      next
+    }
     checked[i] <- list(tryCatch(
       {
-        if (a$status != "ok") {
-          # Reference graph path handles unsupported sizes and supplies established
-          # semantic errors without reparsing any format-specific string.
-          process_glycan_structure_element(.compact_build_graph(checked[[i]]))
-        } else {
-          if (!exists(a$iupac, cache, inherits = FALSE)) {
-            cache[[a$iupac]] <- .compact_build_graph(a)
-          }
-          list(graph = cache[[a$iupac]], iupac = a$iupac)
-        }
+        # Reference graph path handles unsupported sizes and supplies established
+        # semantic errors without reparsing any format-specific string.
+        process_glycan_structure_element(.compact_build_graph(checked[[i]]))
       },
       error = identity
     ))

@@ -105,6 +105,7 @@ Forest import_arrays(const List& a, bool preserve_parent_order = false) {
 List compact_arrays_native(List records, Function order, Function bliss, bool byte_order = false, SEXP progress = R_NilValue) {
   CompactProgress reporter(progress);
   List out(records.size());
+  glyrepr_compact::LexicalCache lexical_cache;
   for (int i = 0; i < records.size(); ++i) {
     if (i % 128 == 0) { checkUserInterrupt(); reporter.update(i); }
     if (Rf_isNull(records[i])) {out[i] = List::create(_["status"]="missing"); continue;}
@@ -116,6 +117,17 @@ List compact_arrays_native(List records, Function order, Function bliss, bool by
         continue;
       }
       auto f = glyrepr_compact::import_arrays(a);
+      f.tree.order_cache = &lexical_cache;
+      if (f.parts.empty() && f.subs.empty()) {
+        f.tree.distinct_link_ranks = true;
+        for (const auto& children : f.tree.children) {
+          std::set<double> ranks;
+          for (int child : children)
+            if (!ranks.insert(glyrepr_compact::rank_link(f.tree.link[child])).second)
+              f.tree.distinct_link_ranks = false;
+          if (!f.tree.distinct_link_ranks) break;
+        }
+      }
       if (!f.parts.empty() || !f.subs.empty()) glyrepr_compact::validate_forest(f);
       out[i] = glyrepr_compact::finish_forest(f, order, byte_order, bliss);
     } catch (const std::exception& e) {

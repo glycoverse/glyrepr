@@ -1,5 +1,7 @@
 # glyrepr (development version)
 
+* `structure_from_arrays()` validates shared chemical tokens and builds graphs in batches. The new `warn = FALSE` option returns missing values for invalid records without emitting recovery warnings; validation remains mandatory.
+
 ## Bug fixes
 
 * The compact graph template no longer retains an igraph native pointer, allowing coverage counters to be serialized safely during R shutdown. (#102)

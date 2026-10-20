@@ -924,7 +924,8 @@ assemble_recovered_structure_outcomes <- function(
   positions,
   size,
   input_names,
-  progress = NULL
+  progress = NULL,
+  warn = TRUE
 ) {
   update <- .structure_progress_stage(
     progress,
@@ -950,7 +951,7 @@ assemble_recovered_structure_outcomes <- function(
   out <- new_glycan_structure(result_iupacs, unique_graphs)
   names(out) <- input_names
 
-  if (any(failed)) {
+  if (warn && any(failed)) {
     failure_positions <- unlist(positions[failed], use.names = FALSE)
     failure_reasons <- unlist(
       Map(
@@ -1011,6 +1012,10 @@ is_missing_structure_input <- function(x) {
 #' @returns A one-line character scalar.
 #' @noRd
 normalize_structure_failure_reason <- function(cnd) {
+  cached <- attr(cnd, "array_failure_reason", exact = TRUE)
+  if (!is.null(cached)) {
+    return(cached)
+  }
   reason <- conditionMessage(cnd)
   reason <- stringr::str_replace_all(reason, "\\s*\\n\\s*", " ")
   stringr::str_squish(reason)

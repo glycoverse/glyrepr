@@ -10,6 +10,22 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// compact_check_arrays_native
+IntegerVector compact_check_arrays_native(List records, Function mono, Function sub, Function link, Function anomer, Function floating);
+RcppExport SEXP _glyrepr_compact_check_arrays_native(SEXP recordsSEXP, SEXP monoSEXP, SEXP subSEXP, SEXP linkSEXP, SEXP anomerSEXP, SEXP floatingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type records(recordsSEXP);
+    Rcpp::traits::input_parameter< Function >::type mono(monoSEXP);
+    Rcpp::traits::input_parameter< Function >::type sub(subSEXP);
+    Rcpp::traits::input_parameter< Function >::type link(linkSEXP);
+    Rcpp::traits::input_parameter< Function >::type anomer(anomerSEXP);
+    Rcpp::traits::input_parameter< Function >::type floating(floatingSEXP);
+    rcpp_result_gen = Rcpp::wrap(compact_check_arrays_native(records, mono, sub, link, anomer, floating));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compact_arrays_native
 List compact_arrays_native(List records, Function order, Function bliss, bool byte_order, SEXP progress);
 RcppExport SEXP _glyrepr_compact_arrays_native(SEXP recordsSEXP, SEXP orderSEXP, SEXP blissSEXP, SEXP byte_orderSEXP, SEXP progressSEXP) {
@@ -154,6 +170,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_glyrepr_compact_check_arrays_native", (DL_FUNC) &_glyrepr_compact_check_arrays_native, 6},
     {"_glyrepr_compact_arrays_native", (DL_FUNC) &_glyrepr_compact_arrays_native, 5},
     {"_glyrepr_compact_graphs_native", (DL_FUNC) &_glyrepr_compact_graphs_native, 10},
     {"_glyrepr_compact_localizations_native", (DL_FUNC) &_glyrepr_compact_localizations_native, 3},
