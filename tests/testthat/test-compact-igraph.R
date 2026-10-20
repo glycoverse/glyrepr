@@ -19,7 +19,9 @@ test_that("the graph template can be serialized by an exit finalizer", {
   # A new process cannot see pkgload's in-memory development namespace.
   skip_if_not(
     file.exists(file.path(
-      getNamespaceInfo(asNamespace("glyrepr"), "path"), "Meta", "package.rds"
+      getNamespaceInfo(asNamespace("glyrepr"), "path"),
+      "Meta",
+      "package.rds"
     )),
     "Requires the installed package; run R CMD check"
   )
@@ -31,17 +33,20 @@ test_that("the graph template can be serialized by an exit finalizer", {
   saveRDS(.libPaths(), libpaths)
   # Exit finalizers run in reverse registration order. Register the saver
   # before creating the graph, reproducing covr's shutdown serialization.
-  writeLines(c(
-    "args <- commandArgs(trailingOnly = TRUE)",
-    ".libPaths(readRDS(args[[1L]]))",
-    "holder <- new.env(parent = emptyenv())",
-    "holder$path <- args[[2L]]",
-    "reg.finalizer(holder, function(e) saveRDS(e$fun, e$path), onexit = TRUE)",
-    'holder$fun <- getFromNamespace(".compact_graph_template", "glyrepr")',
-    "stopifnot(!isNamespace(environment(holder$fun)))",
-    "invisible(holder$fun())",
-    'q(save = "no", status = 0L, runLast = FALSE)'
-  ), script)
+  writeLines(
+    c(
+      "args <- commandArgs(trailingOnly = TRUE)",
+      ".libPaths(readRDS(args[[1L]]))",
+      "holder <- new.env(parent = emptyenv())",
+      "holder$path <- args[[2L]]",
+      "reg.finalizer(holder, function(e) saveRDS(e$fun, e$path), onexit = TRUE)",
+      'holder$fun <- getFromNamespace(".compact_graph_template", "glyrepr")',
+      "stopifnot(!isNamespace(environment(holder$fun)))",
+      "invisible(holder$fun())",
+      'q(save = "no", status = 0L, runLast = FALSE)'
+    ),
+    script
+  )
   status <- system2(
     file.path(R.home("bin"), "Rscript"),
     c("--vanilla", shQuote(script), shQuote(libpaths), shQuote(output)),
@@ -49,7 +54,8 @@ test_that("the graph template can be serialized by an exit finalizer", {
     stderr = log
   )
   expect_identical(
-    status, 0L,
+    status,
+    0L,
     info = paste(readLines(log, warn = FALSE), collapse = "\n")
   )
   expect_true(file.exists(output))
@@ -135,4 +141,20 @@ test_that("unknown igraph object formats use the public graph builder", {
       )$labeling
     )
   )
+})
+
+test_that("floating graph callbacks remain rooted during garbage collection", {
+  input <- c(
+    "{Neu5Ac(a2-3)|2,4}Gal(a1-?)[Gal(a1-?)]Glc(a1-",
+    "{6S|1,2}Gal(b1-4)Glc",
+    "{6S|1,2}{3P|1,2}Gal(b1-4)Glc"
+  )
+  reference <- .compact_iupac_arrays(input)
+  previous <- gctorture2(100L)
+  on.exit(gctorture2(previous), add = TRUE)
+  actual <- lapply(seq_len(4L), function(i) .compact_iupac_arrays(input))
+  gctorture2(previous)
+  for (result in actual) {
+    expect_identical(result, reference)
+  }
 })

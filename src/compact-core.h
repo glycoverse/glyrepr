@@ -477,7 +477,11 @@ inline std::vector<int> symmetry_labels(Forest& f, Function& bliss) {
     for(int p:candidates(f.subs[i],n)) relation(sub_offset+i,p,"floating-substituent-parent");
   auto unique=keys;std::sort(unique.begin(),unique.end());unique.erase(std::unique(unique.begin(),unique.end()),unique.end());
   std::vector<int> colors;for(const auto& key:keys) colors.push_back(std::lower_bound(unique.begin(),unique.end(),key)-unique.begin()+1);
-  IntegerVector labels=bliss(wrap(edges),wrap(colors));
+  // Keep both callback arguments rooted across allocation of the other
+  // vector and evaluation of the R callback (including forced GC).
+  IntegerVector edge_vector = wrap(edges);
+  IntegerVector color_vector = wrap(colors);
+  IntegerVector labels=bliss(edge_vector,color_vector);
   return as<std::vector<int>>(labels);
 }
 
@@ -541,13 +545,13 @@ inline List finish_forest(Forest& f, Function& order, bool byte_order, Function&
   List parts(part_ids.size()),subs(sub_ids.size());std::string sequence;
   for(int j=0;j<(int)sub_ids.size();++j) {
     const auto& s=f.subs[sub_ids[j]];auto parents=remap(s.parents);
-    subs[j]=List::create(_["substituent"]=s.token,_["parents"]=wrap(parents));
+    subs[j]=List::create(_["substituent"]=s.token,_["parents"]=parents);
     sequence+="{"+s.token+(parents.empty()?"":"|"+int_join(parents))+"}";
   }
   for(int j=0;j<(int)part_ids.size();++j) {
     int id=part_ids[j];const auto& p=f.parts[id];auto parents=remap(p.parents);
     std::vector<int> nodes;for(int v:part_vertices[id]) nodes.push_back(inverse[v]);
-    parts[j]=List::create(_["root"]=inverse[p.root],_["nodes"]=wrap(nodes),_["linkage"]=p.linkage,_["parents"]=wrap(parents));
+    parts[j]=List::create(_["root"]=inverse[p.root],_["nodes"]=nodes,_["linkage"]=p.linkage,_["parents"]=parents);
     sequence+="{"+sequences[id]+"("+p.linkage+")"+(parents.empty()?"":"|"+int_join(parents))+"}";
   }
   t.sequence=sequence+main;

@@ -358,8 +358,8 @@ List compact_localize_parts_native(List record, IntegerVector part_ids,
       auto nodes = p.nodes, domains = p.parents;
       for (int& id : nodes) ++id;
       for (int& id : domains) ++id;
-      parts[i] = List::create(_["root"] = p.root + 1, _["nodes"] = wrap(nodes),
-                             _["linkage"] = p.linkage, _["parents"] = wrap(domains));
+      parts[i] = List::create(_["root"] = p.root + 1, _["nodes"] = nodes,
+                             _["linkage"] = p.linkage, _["parents"] = domains);
     }
     out["floating_parts"] = parts;
     return out;
