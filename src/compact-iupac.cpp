@@ -104,14 +104,29 @@ std::vector<int> parse_parents(const std::string& text) {
 }
 
 List parse_complete(std::string s,const std::unordered_map<std::string,int>& known,
-    const std::unordered_map<std::string,std::string>& configurations,Function& order,bool byte_order,Function& bliss) {
+    const std::unordered_map<std::string,std::string>& configurations,Function& order,bool byte_order,Function& bliss,LexicalCache& lexical_cache) {
   if(s.empty() || s[0]!='{') {
-    Tree t=parse_tree(s,known,configurations);cache_tree(t,order,byte_order);
+    Tree t=parse_tree(s,known,configurations);
+    t.order_cache = &lexical_cache;
+    // With distinct acceptor ranks at every branch, lexical signatures cannot
+    // affect the canonical backbone or sibling order. Topology and occupied
+    // positions are still checked by cache_tree.
+    t.distinct_link_ranks = true;
+    for (const auto& children : t.children) {
+      std::set<double> ranks;
+      for (int child : children)
+        if (!ranks.insert(rank_link(t.link[child])).second)
+          t.distinct_link_ranks = false;
+      if (!t.distinct_link_ranks) break;
+    }
+    cache_tree(t,order,byte_order);
     t.sequence=emit(t,0,order,byte_order)+(t.alditol?"-ol":"")+"("+t.anomer+"-";
     return serialize_tree(t);
   }
   Forest f;std::vector<int> source_map;
+  f.tree.order_cache = &lexical_cache;
   auto append_component=[&](Tree& component) {
+    component.order_cache = &lexical_cache;
     cache_tree(component,order,byte_order);emit(component,0,order,byte_order);
     int n=component.mono.size(),offset=f.tree.mono.size();
     if (n + offset > 2048) throw Unsupported("native size guard");
@@ -167,10 +182,11 @@ List compact_parse_native(CharacterVector strings,CharacterVector residues,Integ
   for(int i=0;i<configuration_names.size();++i) configurations.emplace(as<std::string>(configuration_names[i]),as<std::string>(configuration_values[i]));
   CompactProgress reporter(progress);
   List out(strings.size());
+  glyrepr_compact::LexicalCache lexical_cache;
   for(int i=0;i<strings.size();++i) {
     if(i%128==0) { checkUserInterrupt(); reporter.update(i); }
     if(strings[i]==NA_STRING) {out[i]=List::create(_["status"]="missing");continue;}
-    try {out[i]=glyrepr_compact::parse_complete(as<std::string>(strings[i]),known,configurations,order,byte_order,bliss);}
+    try {out[i]=glyrepr_compact::parse_complete(as<std::string>(strings[i]),known,configurations,order,byte_order,bliss,lexical_cache);}
     catch(const glyrepr_compact::Unsupported& e) {out[i]=List::create(_["status"]="unsupported",_["reason"]=e.what());}
     catch(const std::exception& e) {out[i]=List::create(_["status"]="error",_["reason"]=e.what());}
   }

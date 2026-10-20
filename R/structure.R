@@ -869,10 +869,22 @@ glycan_structure_from_iupac_character_with_na <- function(x, progress = NULL) {
   }
 
   unique_x <- unique(x[non_missing])
+  arrays <- .compact_iupac_arrays(unique_x, progress)
+  if (
+    is.null(progress) &&
+      all(vapply(arrays, function(a) identical(a$status, "ok"), logical(1)))
+  ) {
+    out <- .compact_structure_from_arrays(x, unique_x, arrays, progress)
+    names(out) <- names(x)
+    return(out)
+  }
   groups <- match(x, unique_x)
-  positions <- lapply(seq_along(unique_x), function(i) which(groups == i))
+  positions <- unname(split(
+    non_missing,
+    factor(groups[non_missing], levels = seq_along(unique_x))
+  ))
 
-  outcomes <- .compact_iupac_outcomes(unique_x, progress)
+  outcomes <- .compact_iupac_outcomes(unique_x, progress, arrays)
   assemble_recovered_structure_outcomes(
     outcomes,
     positions = positions,

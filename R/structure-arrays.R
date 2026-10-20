@@ -53,8 +53,12 @@ structure_from_arrays <- function(
   outcomes <- .structure_array_outcomes(
     x,
     progress,
-    quiet = !warn && on_failure == "na"
+    quiet = !warn && on_failure == "na",
+    direct = TRUE
   )
+  if (inherits(outcomes, "glyrepr_structure")) {
+    return(outcomes)
+  }
   failed <- vapply(outcomes, inherits, logical(1), "error")
   if (any(failed) && on_failure == "error") {
     i <- which(failed)[[1]]
@@ -77,7 +81,12 @@ structure_from_arrays <- function(
   )
 }
 
-.structure_array_outcomes <- function(x, progress = NULL, quiet = FALSE) {
+.structure_array_outcomes <- function(
+  x,
+  progress = NULL,
+  quiet = FALSE,
+  direct = FALSE
+) {
   flags <- .compact_check_arrays_native(
     x,
     is_known_mono,
@@ -139,6 +148,22 @@ structure_from_arrays <- function(
   unique_keys <- !duplicated(keys)
   graphs <- .compact_build_graphs(native[ok][unique_keys], progress)
   names(graphs) <- keys[unique_keys]
+  if (
+    direct &&
+      is.null(progress) &&
+      all(valid) &&
+      all(
+        ok |
+          vapply(native, function(a) identical(a$status, "missing"), logical(1))
+      )
+  ) {
+    result <- stats::setNames(rep(NA_character_, length(x)), names(x))
+    if (!any(ok)) {
+      return(new_glycan_structure(result))
+    }
+    result[ok] <- keys
+    return(new_glycan_structure(stats::setNames(result, names(x)), graphs))
+  }
   graph_index <- integer(length(native))
   graph_index[ok] <- match(keys, keys[unique_keys])
   valid_indices <- which(valid)
