@@ -21,6 +21,13 @@
 
 ### Performance improvements
 
+- [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md),
+  [`remove_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_linkages.md),
+  and
+  [`remove_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_substituents.md)
+  process large structure vectors faster while preserving canonical
+  output and custom graph attributes.
+  ([\#103](https://github.com/glycoverse/glyrepr/issues/103))
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   parses IUPAC-condensed vectors faster through streamlined parsing,
   floating-structure canonicalization, and batch graph construction

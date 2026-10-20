@@ -52,6 +52,8 @@
 <div class="section level3">
 <h3 id="performance-improvements-development-version">Performance improvements<a class="anchor" aria-label="anchor" href="#performance-improvements-development-version"></a></h3>
 <ul><li>
+<code><a href="../reference/convert_to_generic.html">convert_to_generic()</a></code>, <code><a href="../reference/remove_linkages.html">remove_linkages()</a></code>, and <code><a href="../reference/remove_substituents.html">remove_substituents()</a></code> process large structure vectors faster while preserving canonical output and custom graph attributes. (<a href="https://github.com/glycoverse/glyrepr/issues/103" class="external-link">#103</a>)</li>
+<li>
 <code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> parses IUPAC-condensed vectors faster through streamlined parsing, floating-structure canonicalization, and batch graph construction while preserving validation and canonical output (<a href="https://github.com/glycoverse/glyrepr/issues/102" class="external-link">#102</a>).</li>
 <li>
 <code><a href="../reference/as_glycan_composition.html">as_glycan_composition()</a></code> and <code><a href="../reference/count_mono.html">count_mono()</a></code> process structure and graph inputs faster while preserving names and missing values; repeated structures reuse counting results. (<a href="https://github.com/glycoverse/glyrepr/issues/99" class="external-link">#99</a>)</li>
