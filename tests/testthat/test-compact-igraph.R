@@ -1,3 +1,66 @@
+test_that("the cached graph template is detached from native igraph state", {
+  model <- .compact_graph_template()
+  skip_if(is.null(model), "Installed igraph uses an unsupported graph format")
+  expect_null(unclass(model)[[10L]][["igraph"]])
+
+  restored <- unserialize(serialize(.compact_graph_template, NULL))
+  restored_model <- restored()
+  expect_null(unclass(restored_model)[[10L]][["igraph"]])
+  arrays <- .compact_iupac_arrays(c("Gal", "Gal(b1-4)Glc"))
+  actual <- .compact_build_graphs_native(arrays, restored_model)
+  expected <- lapply(arrays, .compact_build_graph)
+  expect_identical(
+    lapply(actual, igraph::as_data_frame, what = "both"),
+    lapply(expected, igraph::as_data_frame, what = "both")
+  )
+})
+
+test_that("the graph template can be serialized by an exit finalizer", {
+  # A new process cannot see pkgload's in-memory development namespace.
+  skip_if_not(
+    file.exists(file.path(
+      getNamespaceInfo(asNamespace("glyrepr"), "path"), "Meta", "package.rds"
+    )),
+    "Requires the installed package; run R CMD check"
+  )
+  script <- tempfile(fileext = ".R")
+  libpaths <- tempfile(fileext = ".rds")
+  output <- tempfile(fileext = ".rds")
+  log <- tempfile(fileext = ".log")
+  on.exit(unlink(c(script, libpaths, output, log)), add = TRUE)
+  saveRDS(.libPaths(), libpaths)
+  # Exit finalizers run in reverse registration order. Register the saver
+  # before creating the graph, reproducing covr's shutdown serialization.
+  writeLines(c(
+    "args <- commandArgs(trailingOnly = TRUE)",
+    ".libPaths(readRDS(args[[1L]]))",
+    "holder <- new.env(parent = emptyenv())",
+    "holder$path <- args[[2L]]",
+    "reg.finalizer(holder, function(e) saveRDS(e$fun, e$path), onexit = TRUE)",
+    'holder$fun <- getFromNamespace(".compact_graph_template", "glyrepr")',
+    "stopifnot(!isNamespace(environment(holder$fun)))",
+    "invisible(holder$fun())",
+    'q(save = "no", status = 0L, runLast = FALSE)'
+  ), script)
+  status <- system2(
+    file.path(R.home("bin"), "Rscript"),
+    c("--vanilla", shQuote(script), shQuote(libpaths), shQuote(output)),
+    stdout = log,
+    stderr = log
+  )
+  expect_identical(
+    status, 0L,
+    info = paste(readLines(log, warn = FALSE), collapse = "\n")
+  )
+  expect_true(file.exists(output))
+  restored <- readRDS(output)
+  expect_type(restored, "closure")
+  model <- environment(restored)$model
+  if (!identical(model, FALSE)) {
+    expect_null(unclass(model)[[10L]][["igraph"]])
+  }
+})
+
 test_that("batch graph construction preserves igraph behavior and serialization", {
   x <- c(
     "Gal(b1-4)GlcNAc-ol",

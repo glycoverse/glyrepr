@@ -114,7 +114,10 @@
       model <<- if (is.null(.compact_build_graphs_native(list(), candidate))) {
         FALSE
       } else {
-        candidate
+        # Keep ordinary vectors and no native pointer in the cached closure.
+        # covr may serialize this environment during R shutdown, after igraph's
+        # finalizer has freed a live graph's pointer-backed endpoint vectors.
+        .compact_blank_graph_native(integer(), 0L, TRUE, candidate)
       }
     }
     if (identical(model, FALSE)) NULL else model

@@ -1,5 +1,9 @@
 # glyrepr (development version)
 
+## Bug fixes
+
+* The compact graph template no longer retains an igraph native pointer, allowing coverage counters to be serialized safely during R shutdown. (#102)
+
 ## New features
 
 * `as_glycan_structure()` and `structure_from_arrays()` gain a `progress` argument: use `TRUE` to display a progress bar or a function accepting `stage`, `current`, and `total` to receive updates during parsing, graph construction, and failure recovery. The default remains `FALSE`. (#98)
