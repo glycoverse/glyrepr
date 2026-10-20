@@ -71,6 +71,33 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compact_build_graphs_native
+SEXP compact_build_graphs_native(List records, SEXP model, SEXP progress);
+RcppExport SEXP _glyrepr_compact_build_graphs_native(SEXP recordsSEXP, SEXP modelSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type records(recordsSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(compact_build_graphs_native(records, model, progress));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compact_blank_graph_native
+SEXP compact_blank_graph_native(IntegerVector edges, int n, bool directed, SEXP model);
+RcppExport SEXP _glyrepr_compact_blank_graph_native(SEXP edgesSEXP, SEXP nSEXP, SEXP directedSEXP, SEXP modelSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type edges(edgesSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< bool >::type directed(directedSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type model(modelSEXP);
+    rcpp_result_gen = Rcpp::wrap(compact_blank_graph_native(edges, n, directed, model));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compact_parse_native
 List compact_parse_native(CharacterVector strings, CharacterVector residues, IntegerVector anomer_positions, CharacterVector configuration_names, CharacterVector configuration_values, Function order, Function bliss, bool byte_order, SEXP progress);
 RcppExport SEXP _glyrepr_compact_parse_native(SEXP stringsSEXP, SEXP residuesSEXP, SEXP anomer_positionsSEXP, SEXP configuration_namesSEXP, SEXP configuration_valuesSEXP, SEXP orderSEXP, SEXP blissSEXP, SEXP byte_orderSEXP, SEXP progressSEXP) {
@@ -112,6 +139,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_glyrepr_compact_graphs_native", (DL_FUNC) &_glyrepr_compact_graphs_native, 10},
     {"_glyrepr_compact_localizations_native", (DL_FUNC) &_glyrepr_compact_localizations_native, 3},
     {"_glyrepr_compact_localize_parts_native", (DL_FUNC) &_glyrepr_compact_localize_parts_native, 3},
+    {"_glyrepr_compact_build_graphs_native", (DL_FUNC) &_glyrepr_compact_build_graphs_native, 3},
+    {"_glyrepr_compact_blank_graph_native", (DL_FUNC) &_glyrepr_compact_blank_graph_native, 4},
     {"_glyrepr_compact_parse_native", (DL_FUNC) &_glyrepr_compact_parse_native, 9},
     {"_glyrepr_graph_counts_native", (DL_FUNC) &_glyrepr_graph_counts_native, 6},
     {NULL, NULL, 0}

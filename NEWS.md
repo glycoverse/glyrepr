@@ -1,11 +1,16 @@
 # glyrepr (development version)
 
+## Bug fixes
+
+* The compact graph template no longer retains an igraph native pointer, allowing coverage counters to be serialized safely during R shutdown. (#102)
+
 ## New features
 
 * `as_glycan_structure()` and `structure_from_arrays()` gain a `progress` argument: use `TRUE` to display a progress bar or a function accepting `stage`, `current`, and `total` to receive updates during parsing, graph construction, and failure recovery. The default remains `FALSE`. (#98)
 
 ## Performance improvements
 
+* `as_glycan_structure()` parses IUPAC-condensed vectors faster through streamlined parsing, floating-structure canonicalization, and batch graph construction while preserving validation and canonical output (#102).
 * `as_glycan_composition()` and `count_mono()` process structure and graph inputs faster while preserving names and missing values; repeated structures reuse counting results. (#99)
 * `as_glycan_structure()` with graph inputs, `glycan_structure()`, `canonicalize_glycan_graphs()`, and the `smap_structure()` family process graphs faster while preserving source attributes and failure handling. (#97)
 * `canonicalize_glycan_graph()`, `graph_to_iupac()`, `structure_to_iupac()`, `validate_glycan_graph()`, and `validate_glycan_graph_vector()` process graphs faster while preserving validation and canonical IUPAC output. (#97)

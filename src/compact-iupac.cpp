@@ -3,17 +3,50 @@
 
 namespace glyrepr_compact {
 
+// Linkage syntax is small and fixed; scan once instead of running a regular
+// expression over every residue and again over the complete structure.
+inline bool anomer_char(char c) { return c == 'a' || c == 'b' || c == '?'; }
+inline bool donor_char(char c) { return c == '1' || c == '2' || c == '?'; }
+inline bool ascii_letter(char c) {
+  return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+}
+inline bool residue_syntax(const std::string& s) {
+  size_t i = (s.size() > 2 && (s[0] == 'D' || s[0] == 'L') && s[1] == '-') ? 2 : 0;
+  if (i < s.size() && s[i] >= '0' && s[i] <= '9') ++i;
+  if (i == s.size() || !ascii_letter(s[i++])) return false;
+  for (; i < s.size(); ++i)
+    if (!ascii_letter(s[i]) && !(s[i] >= '0' && s[i] <= '9') && s[i] != '?' && s[i] != '/') return false;
+  return true;
+}
+inline std::string normalize_linkage(std::string s) {
+  if (s == "?-?") s = "?" "?-?";
+  if (s.size() < 4 || !anomer_char(s[0]) || !donor_char(s[1]) || s[2] != '-')
+    throw std::runtime_error("invalid linkage");
+  bool unknown = false;
+  for (size_t i = 3; i < s.size(); ++i) {
+    if ((i - 3) % 2) {
+      if (s[i] != '/') throw std::runtime_error("invalid linkage");
+    } else if (s[i] == '?') {
+      if (unknown) throw std::runtime_error("invalid linkage");
+      unknown = true;
+    } else if (s[i] < '1' || s[i] > '9') throw std::runtime_error("invalid linkage");
+  }
+  if (s.size() % 2) throw std::runtime_error("invalid linkage");
+  if (unknown) {
+    s.resize(4);
+    s[3] = '?';
+  }
+  return s;
+}
+
 Tree parse_tree(std::string s, const std::unordered_map<std::string, int>& known,
                 const std::unordered_map<std::string, std::string>& configurations) {
   if (s.empty() || std::any_of(s.begin(), s.end(), [](unsigned char c){ return std::isspace(c); }))
     throw std::runtime_error("empty input or whitespace");
   Tree t;
-  static const std::regex reducing("\\(([ab?][12?])-$");
-  static const std::regex linkage("^[ab?][12?]-([1-9](/[1-9])*|\\?)$");
-  static const std::regex mono_pattern("^([DL]-)?([A-Za-z]|[0-9][A-Za-z])[A-Za-z0-9?/]*$");
-  std::smatch match;
-  if (std::regex_search(s, match, reducing)) {
-    t.anomer = match[1]; s.resize(match.position());
+  if (s.size() >= 4 && s[s.size()-4] == '(' &&
+      anomer_char(s[s.size()-3]) && donor_char(s[s.size()-2]) && s.back() == '-') {
+    t.anomer = s.substr(s.size()-3, 2); s.resize(s.size()-4);
   }
   if (s.size() >= 3 && s.substr(s.size()-3) == "-ol") {
     t.alditol = true; s.resize(s.size()-3);
@@ -38,18 +71,12 @@ Tree parse_tree(std::string s, const std::unordered_map<std::string, int>& known
       while (cursor >= 0 && s[cursor] != '(') --cursor;
       if (cursor < 0) throw std::runtime_error("missing opening parenthesis");
       link = s.substr(cursor+1, end-cursor-1); --cursor;
-      if (link == "?-?") link = "?" "?-?";
-      // Normalize any ambiguous acceptor containing '?' to unknown, like R.
-      if (link.size() >= 4 && link[2] == '-' && link.substr(3).find('?') != std::string::npos) {
-        static const std::regex unknown("^[ab?][12?]-([1-9]/)*\\?(/[1-9])*$");
-        if (std::regex_match(link, unknown)) link.replace(3, std::string::npos, "?");
-      }
-      if (!std::regex_match(link, linkage)) throw std::runtime_error("invalid linkage");
+      link = normalize_linkage(link);
     }
     int end = cursor;
     while (cursor >= 0 && s[cursor] != '[' && s[cursor] != ']' && s[cursor] != ')') --cursor;
     std::string mono = s.substr(cursor+1, end-cursor);
-    if (!std::regex_match(mono, mono_pattern)) throw std::runtime_error("invalid residue syntax");
+    if (!residue_syntax(mono)) throw std::runtime_error("invalid residue syntax");
     auto residue = extract_residue(mono, known, configurations);
     mono = residue.first;
     auto it = known.find(mono);
@@ -78,10 +105,6 @@ std::vector<int> parse_parents(const std::string& text) {
 
 List parse_complete(std::string s,const std::unordered_map<std::string,int>& known,
     const std::unordered_map<std::string,std::string>& configurations,Function& order,bool byte_order,Function& bliss) {
-  // Same two linkage normalizations as the public string entrypoint.
-  size_t p=0;while((p=s.find("(?-?)",p))!=std::string::npos) {s.replace(p,5,"(?" "?-?)");p+=6;}
-  static const std::regex unknown("\\(([ab?][12?])-([1-9]/)*\\?(/[1-9])*\\)");
-  s=std::regex_replace(s,unknown,"($1-?)");
   if(s.empty() || s[0]!='{') {
     Tree t=parse_tree(s,known,configurations);cache_tree(t,order,byte_order);
     t.sequence=emit(t,0,order,byte_order)+(t.alditol?"-ol":"")+"("+t.anomer+"-";
@@ -111,9 +134,7 @@ List parse_complete(std::string s,const std::unordered_map<std::string,int>& kno
     if(std::regex_match(fields[0],sub_regex)) {f.subs.push_back({normalize_sub(fields[0]),parents});continue;}
     auto sequence=fields[0];size_t start=sequence.rfind('(');
     if(start==std::string::npos || sequence.back()!=')') throw std::runtime_error("floating part requires linkage");
-    std::string linkage=sequence.substr(start+1,sequence.size()-start-2);
-    static const std::regex link_pattern("^[ab?][12?]-([1-9](/[1-9])*|\\?)$");
-    if(!std::regex_match(linkage,link_pattern)) throw std::runtime_error("invalid floating linkage");
+    std::string linkage=normalize_linkage(sequence.substr(start+1,sequence.size()-start-2));
     Tree component=parse_tree(sequence.substr(0,start)+"("+linkage.substr(0,2)+"-",known,configurations);
     if(component.alditol) throw std::runtime_error("floating alditol");
     int offset=f.tree.mono.size(),root=append_component(component);
