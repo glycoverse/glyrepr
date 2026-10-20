@@ -17,6 +17,10 @@
     .Call(`_glyrepr_compact_localize_parts_native`, record, part_ids, parents)
 }
 
+.compact_transform_graphs_native <- function(graphs, keys, operation, from, to, order, bliss, byte_order, model) {
+    .Call(`_glyrepr_compact_transform_graphs_native`, graphs, keys, operation, from, to, order, bliss, byte_order, model)
+}
+
 .compact_build_graphs_native <- function(records, model, progress = NULL) {
     .Call(`_glyrepr_compact_build_graphs_native`, records, model, progress)
 }

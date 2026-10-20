@@ -71,6 +71,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compact_transform_graphs_native
+SEXP compact_transform_graphs_native(List graphs, CharacterVector keys, const std::string& operation, CharacterVector from, CharacterVector to, Function order, Function bliss, bool byte_order, SEXP model);
+RcppExport SEXP _glyrepr_compact_transform_graphs_native(SEXP graphsSEXP, SEXP keysSEXP, SEXP operationSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP orderSEXP, SEXP blissSEXP, SEXP byte_orderSEXP, SEXP modelSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type graphs(graphsSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type keys(keysSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type operation(operationSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type to(toSEXP);
+    Rcpp::traits::input_parameter< Function >::type order(orderSEXP);
+    Rcpp::traits::input_parameter< Function >::type bliss(blissSEXP);
+    Rcpp::traits::input_parameter< bool >::type byte_order(byte_orderSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type model(modelSEXP);
+    rcpp_result_gen = Rcpp::wrap(compact_transform_graphs_native(graphs, keys, operation, from, to, order, bliss, byte_order, model));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compact_build_graphs_native
 SEXP compact_build_graphs_native(List records, SEXP model, SEXP progress);
 RcppExport SEXP _glyrepr_compact_build_graphs_native(SEXP recordsSEXP, SEXP modelSEXP, SEXP progressSEXP) {
@@ -139,6 +158,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_glyrepr_compact_graphs_native", (DL_FUNC) &_glyrepr_compact_graphs_native, 10},
     {"_glyrepr_compact_localizations_native", (DL_FUNC) &_glyrepr_compact_localizations_native, 3},
     {"_glyrepr_compact_localize_parts_native", (DL_FUNC) &_glyrepr_compact_localize_parts_native, 3},
+    {"_glyrepr_compact_transform_graphs_native", (DL_FUNC) &_glyrepr_compact_transform_graphs_native, 9},
     {"_glyrepr_compact_build_graphs_native", (DL_FUNC) &_glyrepr_compact_build_graphs_native, 3},
     {"_glyrepr_compact_blank_graph_native", (DL_FUNC) &_glyrepr_compact_blank_graph_native, 4},
     {"_glyrepr_compact_parse_native", (DL_FUNC) &_glyrepr_compact_parse_native, 9},

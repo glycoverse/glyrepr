@@ -5,26 +5,38 @@ namespace glyrepr_compact {
 
 // R validates field types, lengths and chemistry before crossing this boundary.
 // This importer verifies topology without constructing an intermediate igraph.
-Forest import_arrays(const List& a, bool preserve_parent_order = false) {
+Forest import_graph_data(SEXP mono, SEXP sub, SEXP anomer, SEXP alditol,
+                         SEXP edge_data, SEXP link_data, SEXP parts, SEXP subs,
+                         bool preserve_parent_order, SEXP to = R_NilValue) {
   Forest f;
   Tree& t = f.tree;
-  t.mono = as<std::vector<std::string>>(a["mono"]);
-  t.sub = as<std::vector<std::string>>(a["sub"]);
-  t.anomer = as<std::string>(a["anomer"]);
-  t.alditol = as<bool>(a["alditol"]);
-  int n = t.mono.size();
+  int n = Rf_xlength(mono);
+  t.mono.reserve(n);
+  t.sub.reserve(n);
+  for (int i = 0; i < n; ++i) {
+    t.mono.emplace_back(CHAR(STRING_ELT(mono, i)));
+    t.sub.emplace_back(CHAR(STRING_ELT(sub, i)));
+  }
+  t.anomer = as<std::string>(anomer);
+  t.alditol = as<bool>(alditol);
   t.parent.assign(n, -1);
   t.link.resize(n);
   t.children.resize(n);
-  IntegerVector edges = a["edges"];
-  CharacterVector links = a["linkage"];
+  CharacterVector links(link_data);
   for (int i = 0; i < links.size(); ++i) {
-    int parent = edges[2*i]-1, child = edges[2*i+1]-1;
+    int parent, child;
+    if (Rf_isNull(to)) {
+      parent = INTEGER(edge_data)[2*i] - 1;
+      child = INTEGER(edge_data)[2*i+1] - 1;
+    } else {
+      parent = REAL_ELT(edge_data, i);
+      child = REAL_ELT(to, i);
+    }
     if (parent == child || t.parent[child] != -1)
       throw std::runtime_error("self edge or multiple parents");
     t.parent[child] = parent;
     t.children[parent].push_back(child);
-    t.link[child] = as<std::string>(links[i]);
+    t.link[child] = CHAR(STRING_ELT(link_data, i));
     f.edge_order.push_back(child);
   }
   // Iterative traversal also rejects rootless cycles before recursive emit/cache.
@@ -48,9 +60,8 @@ Forest import_arrays(const List& a, bool preserve_parent_order = false) {
     return ids;
   };
   std::set<int> declared;
-  if (a.containsElementNamed("floating_parts") && !Rf_isNull(a["floating_parts"])) {
-    List parts = a["floating_parts"];
-    for (SEXP item : parts) {
+  if (!Rf_isNull(parts)) {
+    for (SEXP item : List(parts)) {
       List p(item);
       Part part;
       part.root = as<int>(p["root"])-1;
@@ -72,14 +83,20 @@ Forest import_arrays(const List& a, bool preserve_parent_order = false) {
     f.root = root;
   }
   if (f.root == -1) throw std::runtime_error("missing main component");
-  if (a.containsElementNamed("floating_substituents") && !Rf_isNull(a["floating_substituents"])) {
-    List subs = a["floating_substituents"];
-    for (SEXP item : subs) {
+  if (!Rf_isNull(subs)) {
+    for (SEXP item : List(subs)) {
       List s(item);
       f.subs.push_back({as<std::string>(s["substituent"]), indices(s["parents"], !preserve_parent_order)});
     }
   }
   return f;
+}
+
+Forest import_arrays(const List& a, bool preserve_parent_order = false) {
+  SEXP parts = a.containsElementNamed("floating_parts") ? (SEXP)a["floating_parts"] : R_NilValue;
+  SEXP subs = a.containsElementNamed("floating_substituents") ? (SEXP)a["floating_substituents"] : R_NilValue;
+  return import_graph_data(a["mono"], a["sub"], a["anomer"], a["alditol"],
+    a["edges"], a["linkage"], parts, subs, preserve_parent_order);
 }
 
 } // namespace glyrepr_compact

@@ -1,5 +1,7 @@
 # glyrepr (development version)
 
+* `convert_to_generic()`, `remove_linkages()`, and `remove_substituents()` process large structure vectors faster while preserving canonical output and custom graph attributes.
+
 ## Bug fixes
 
 * The compact graph template no longer retains an igraph native pointer, allowing coverage counters to be serialized safely during R shutdown. (#102)

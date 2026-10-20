@@ -22,14 +22,20 @@ struct Unsupported : std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-// Tree operations use arrays. Unresolved metadata uses one public BLISS callback;
-// no igraph object layout is read and the final glycan graph is built afterward.
+struct LexicalCache {
+  std::unordered_map<std::string, std::vector<int>> orders;
+};
+
+// Tree operations are independent of igraph's representation. Unresolved
+// metadata uses a public BLISS callback; the final graph is built afterward.
 struct Tree {
   std::vector<std::string> mono, sub, link, sig;
   std::vector<int> parent, depth, vertices, edge_nodes, symmetry;
   std::vector<std::vector<int>> children;
   std::string anomer, sequence;
   bool alditol = false;
+  LexicalCache* order_cache = nullptr;
+  bool distinct_link_ranks = false;
 };
 
 
@@ -163,9 +169,18 @@ inline std::pair<std::string,std::string> extract_residue(const std::string& mon
 }
 
 inline std::vector<int> lexical_order(const std::vector<std::string>& strings,
-                               Function& order, bool byte_order) {
+                               Function& order, bool byte_order, LexicalCache* cache = nullptr) {
   std::vector<int> ids(strings.size());
   std::iota(ids.begin(), ids.end(), 0);
+  if (strings.size() < 2 ||
+      std::all_of(strings.begin() + 1, strings.end(),
+                  [&](const std::string& x) { return x == strings[0]; })) return ids;
+  std::string key;
+  if (cache && !byte_order) {
+    for (const auto& s : strings) { key += s; key += '\0'; }
+    auto found = cache->orders.find(key);
+    if (found != cache->orders.end()) return found->second;
+  }
   if (byte_order) {
     std::stable_sort(ids.begin(), ids.end(), [&](int a, int b) {
       return strings[a] < strings[b];
@@ -175,6 +190,11 @@ inline std::vector<int> lexical_order(const std::vector<std::string>& strings,
     CharacterVector values = wrap(strings);
     R_orderVector1(ids.data(), ids.size(), values, TRUE, FALSE);
   }
+  // Repeated branch signatures share locale-aware ordering only within this
+  // call. Bound temporary storage; neither user inputs nor results are cached
+  // between calls or locales.
+  if (cache && !byte_order && cache->orders.size() < 4096 && key.size() <= 8192)
+    cache->orders.emplace(std::move(key), ids);
   return ids;
 }
 
@@ -193,14 +213,16 @@ inline std::string emit(Tree& t, int node, Function& order, bool byte_order) {
     return result + residue_label(t, node);
   }
   if (!kids.empty()) {
-    std::vector<std::string> signatures;
-    for (int k : kids) signatures.push_back(t.sig[k]);
-    auto lexical = lexical_order(signatures, order, byte_order);
     std::vector<int> ranks(kids.size());
-    int r = 0;
-    for (int j = 0; j < (int)lexical.size(); ++j) {
-      if (j && signatures[lexical[j]] != signatures[lexical[j-1]]) ++r;
-      ranks[lexical[j]] = r;
+    if (!t.distinct_link_ranks) {
+      std::vector<std::string> signatures;
+      for (int k : kids) signatures.push_back(t.sig[k]);
+      auto lexical = lexical_order(signatures, order, byte_order, t.order_cache);
+      int r = 0;
+      for (int j = 0; j < (int)lexical.size(); ++j) {
+        if (j && signatures[lexical[j]] != signatures[lexical[j-1]]) ++r;
+        ranks[lexical[j]] = r;
+      }
     }
     std::vector<int> ids(kids.size());
     std::iota(ids.begin(), ids.end(), 0);
@@ -246,13 +268,14 @@ inline void cache_tree(Tree& t, Function& order, bool byte_order) {
       }
       visit(k);
       t.depth[n] = std::max(t.depth[n], t.depth[k]+1);
-      tokens.push_back(t.link[k] + "->" + t.sig[k]);
+      if (!t.distinct_link_ranks) tokens.push_back(t.link[k] + "->" + t.sig[k]);
     }
+    if (t.distinct_link_ranks) return;
     t.sig[n] = residue_label(t, n);
     if (tokens.size() == 1) {
       t.sig[n] += "{" + tokens[0] + "}";
     } else if (!tokens.empty()) {
-      auto ids = lexical_order(tokens, order, byte_order);
+      auto ids = lexical_order(tokens, order, byte_order, t.order_cache);
       t.sig[n] += "{";
       for (int j = 0; j < (int)ids.size(); ++j) t.sig[n] += (j ? "," : "") + tokens[ids[j]];
       t.sig[n] += "}";
@@ -331,6 +354,11 @@ inline void validate_forest(const Forest& f) {
   while(changed) {changed=false; for(int i=0;i<np;++i) if(!reaches[i]) for(int p:parent_domains[i])
     if(mem[p]<0 || reaches[mem[p]]) {reaches[i]=true;changed=true;break;}}
   if(std::find(reaches.begin(),reaches.end(),false)!=reaches.end()) throw std::runtime_error("floating components cannot reach main");
+  // Without carbon constraints, reachability already proves that an acyclic
+  // assignment exists: each component can choose a parent closer to the main
+  // component. Fixed-position conflicts were checked above.
+  if (std::all_of(position_domains.begin(), position_domains.end(),
+                  [](const std::vector<int>& domain) { return domain.empty(); })) return;
   std::vector<int> selected(np,-2);
   std::vector<std::vector<int>> domains=fixed;
   size_t visits=0;
@@ -453,14 +481,15 @@ inline std::vector<int> symmetry_labels(Forest& f, Function& bliss) {
   return as<std::vector<int>>(labels);
 }
 
-inline List finish_forest(Forest& f, Function& order, bool byte_order, Function& bliss) {
+inline List finish_forest(Forest& f, Function& order, bool byte_order, Function& bliss,
+                          bool arrays = true) {
   Tree& t=f.tree;
   resolve_singletons(f);
   cache_tree(t,order,byte_order);
   t.vertices.clear();t.edge_nodes.clear();
   if(f.parts.empty() && f.subs.empty()) {
     t.sequence=emit(t,f.root,order,byte_order)+(t.alditol?"-ol":"")+"("+t.anomer+"-";
-    return serialize_tree(t);
+    return arrays ? serialize_tree(t) : List::create();
   }
   // With one constraint and no tied sibling signatures, BLISS labels cannot
   // affect either constraint order or vertex order. Avoid building its auxiliary
@@ -494,7 +523,7 @@ inline List finish_forest(Forest& f, Function& order, bool byte_order, Function&
     keys.push_back(seq+"\r"+p.linkage+"\r"+(p.parents.empty()?"all":"explicit")+"\r"+key_candidates(candidates(p,n)));
   }
   auto sorted_constraints=[&](const std::vector<std::string>& keys,int offset) {
-    auto ids=lexical_order(keys,order,byte_order);
+    auto ids=lexical_order(keys,order,byte_order,t.order_cache);
     // R orders by key then BLISS label; exact equal keys are the relevant ties.
     size_t begin=0;
     while(begin<ids.size()) {size_t end=begin+1;while(end<ids.size() && keys[ids[begin]]==keys[ids[end]]) ++end;
@@ -522,7 +551,7 @@ inline List finish_forest(Forest& f, Function& order, bool byte_order, Function&
     sequence+="{"+sequences[id]+"("+p.linkage+")"+(parents.empty()?"":"|"+int_join(parents))+"}";
   }
   t.sequence=sequence+main;
-  List result=serialize_tree(t);
+  List result = arrays ? serialize_tree(t) : List::create();
   if(parts.size()) result["floating_parts"]=parts;
   if(subs.size()) result["floating_substituents"]=subs;
   return result;
