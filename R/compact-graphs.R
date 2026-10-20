@@ -1,4 +1,4 @@
-# Graph bridge uses only public igraph accessors. A NULL outcome requests the
+# The reference bridge uses public igraph accessors. A NULL outcome requests the
 # existing R path, including its condition classes, messages and failure order.
 .compact_graph_record <- function(graph, validate = FALSE) {
   if (!inherits(graph, "igraph") || !igraph::is_directed(graph)) {
@@ -175,6 +175,58 @@
 }
 
 .compact_transform_structure <- function(x, operation) {
+  if (operation == "fill_anomer_pos") {
+    return(.compact_transform_structure_reference(x, operation))
+  }
+  iupacs <- glycan_structure_iupac_data(x)
+  keys <- unique(iupacs[!is.na(iupacs)])
+  if (!length(keys)) {
+    return(x)
+  }
+  graphs <- attr(x, "graphs")[keys]
+  from <- to <- character()
+  if (operation == "generic") {
+    from <- unique(monosaccharides$concrete[!is.na(monosaccharides$concrete)])
+    to <- convert_mono_type_impl(from)
+  }
+  native <- .compact_transform_graphs_native(
+    graphs,
+    keys,
+    operation,
+    from,
+    to,
+    base::order,
+    .compact_bliss_labels,
+    identical(Sys.getlocale("LC_COLLATE"), "C"),
+    .compact_graph_template()
+  )
+  if (is.null(native)) {
+    return(.compact_transform_structure_reference(x, operation))
+  }
+  fallback <- which(!native$supported)
+  if (length(fallback)) {
+    reference <- .compact_transform_structure_reference(
+      new_glycan_structure(keys[fallback], graphs[fallback]),
+      operation
+    )
+    if (is.null(reference)) {
+      return(NULL)
+    }
+    native$keys[fallback] <- glycan_structure_iupac_data(reference)
+    native$graphs[fallback] <- attr(reference, "graphs")[native$keys[fallback]]
+  }
+  if (identical(unname(keys), native$keys)) {
+    return(x)
+  }
+  keep <- !duplicated(native$keys)
+  graphs <- native$graphs[keep]
+  names(graphs) <- native$keys[keep]
+  values <- native$keys[match(iupacs, keys)]
+  names(values) <- names(x)
+  new_glycan_structure(values, graphs)
+}
+
+.compact_transform_structure_reference <- function(x, operation) {
   iupacs <- glycan_structure_iupac_data(x)
   keys <- unique(iupacs[!is.na(iupacs)])
   if (!length(keys)) {
@@ -228,11 +280,13 @@
     return(x)
   }
   keep <- !duplicated(new_keys)
-  restore <- which(changed & keep)
-  for (i in restore) {
+  changed_indices <- which(changed)
+  restore <- which(keep[changed_indices])
+  for (j in restore) {
+    i <- changed_indices[[j]]
     graphs[[i]] <- .compact_restore_graph(
       graphs[[i]],
-      native[[match(i, which(changed))]]
+      native[[j]]
     )
   }
   graphs <- graphs[keep]
