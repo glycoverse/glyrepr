@@ -164,17 +164,17 @@ graph <- get_structure_graphs(glycan, return_list = FALSE)
 localizations <- enumerate_floating_graph_localizations(graph)
 localizations$graph
 #> [[1]]
-#> IGRAPH 83a4701 DN-- 3 2 -- 
+#> IGRAPH c387d3d DN-- 3 2 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from 83a4701 (vertex names):
+#> + edges from c387d3d (vertex names):
 #> [1] 3->2 2->1
 #> 
 #> [[2]]
-#> IGRAPH 3f8c8a5 DN-- 3 2 -- 
+#> IGRAPH c5f49af DN-- 3 2 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from 3f8c8a5 (vertex names):
+#> + edges from c5f49af (vertex names):
 #> [1] 3->2 3->1
 #> 
 ```

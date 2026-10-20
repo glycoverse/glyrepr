@@ -2,6 +2,12 @@
 
 ## glyrepr (development version)
 
+### Bug fixes
+
+- The compact graph template no longer retains an igraph native pointer,
+  allowing coverage counters to be serialized safely during R shutdown.
+  ([\#102](https://github.com/glycoverse/glyrepr/issues/102))
+
 ### New features
 
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
@@ -15,6 +21,11 @@
 
 ### Performance improvements
 
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  parses IUPAC-condensed vectors faster through streamlined parsing,
+  floating-structure canonicalization, and batch graph construction
+  while preserving validation and canonical output
+  ([\#102](https://github.com/glycoverse/glyrepr/issues/102)).
 - [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_composition.md)
   and
   [`count_mono()`](https://glycoverse.github.io/glyrepr/dev/reference/count_mono.md)

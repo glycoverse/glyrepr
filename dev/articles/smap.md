@@ -88,7 +88,7 @@ length(large_struc)
 
 library(lobstr)
 obj_sizes(struc, large_struc)
-#> *  15.95 kB
+#> *  15.34 kB
 #> * 320.69 kB
 ```
 
@@ -273,7 +273,7 @@ tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.247 sec elapsed
+#> Naive approach (all graphs): 0.248 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
