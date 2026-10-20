@@ -6,7 +6,7 @@
 
 ## Performance improvements
 
-* `as_glycan_structure()` parses IUPAC-condensed vectors faster through streamlined parsing, floating-structure canonicalization, and batch graph construction while preserving validation and canonical output.
+* `as_glycan_structure()` parses IUPAC-condensed vectors faster through streamlined parsing, floating-structure canonicalization, and batch graph construction while preserving validation and canonical output (#102).
 * `as_glycan_composition()` and `count_mono()` process structure and graph inputs faster while preserving names and missing values; repeated structures reuse counting results. (#99)
 * `as_glycan_structure()` with graph inputs, `glycan_structure()`, `canonicalize_glycan_graphs()`, and the `smap_structure()` family process graphs faster while preserving source attributes and failure handling. (#97)
 * `canonicalize_glycan_graph()`, `graph_to_iupac()`, `structure_to_iupac()`, `validate_glycan_graph()`, and `validate_glycan_graph_vector()` process graphs faster while preserving validation and canonical IUPAC output. (#97)
