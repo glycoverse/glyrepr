@@ -1,5 +1,7 @@
 # glyrepr (development version)
 
+* `as_glycan_structure()` and `structure_from_arrays()` combine native canonicalization and graph construction to reduce temporary allocation. `as_glycan_structure(warn = FALSE, on_failure = "na")` suppresses recovery diagnostics while retaining validation.
+
 * `structure_from_arrays()` validates shared chemical tokens and builds graphs in batches. The new `warn = FALSE` option returns missing values for invalid records without emitting recovery warnings; validation remains mandatory.
 
 ## Bug fixes

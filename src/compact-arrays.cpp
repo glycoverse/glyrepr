@@ -93,10 +93,19 @@ Forest import_graph_data(SEXP mono, SEXP sub, SEXP anomer, SEXP alditol,
 }
 
 Forest import_arrays(const List& a, bool preserve_parent_order = false) {
-  SEXP parts = a.containsElementNamed("floating_parts") ? (SEXP)a["floating_parts"] : R_NilValue;
-  SEXP subs = a.containsElementNamed("floating_substituents") ? (SEXP)a["floating_substituents"] : R_NilValue;
-  return import_graph_data(a["mono"], a["sub"], a["anomer"], a["alditol"],
-    a["edges"], a["linkage"], parts, subs, preserve_parent_order);
+  SEXP fields[8] = {R_NilValue,R_NilValue,R_NilValue,R_NilValue,
+    R_NilValue,R_NilValue,R_NilValue,R_NilValue};
+  const char* expected[] = {"mono","sub","anomer","alditol","edges",
+    "linkage","floating_parts","floating_substituents"};
+  SEXP names = Rf_getAttrib(a, R_NamesSymbol);
+  for (int i = 0; i < a.size(); ++i) {
+    const char* name = CHAR(STRING_ELT(names, i));
+    for (int j = 0; j < 8; ++j) if (!std::strcmp(name, expected[j])) {
+      fields[j] = VECTOR_ELT(a, i); break;
+    }
+  }
+  return import_graph_data(fields[0], fields[1], fields[2], fields[3],
+    fields[4], fields[5], fields[6], fields[7], preserve_parent_order);
 }
 
 } // namespace glyrepr_compact
@@ -119,14 +128,7 @@ List compact_arrays_native(List records, Function order, Function bliss, bool by
       auto f = glyrepr_compact::import_arrays(a);
       f.tree.order_cache = &lexical_cache;
       if (f.parts.empty() && f.subs.empty()) {
-        f.tree.distinct_link_ranks = true;
-        for (const auto& children : f.tree.children) {
-          std::set<double> ranks;
-          for (int child : children)
-            if (!ranks.insert(glyrepr_compact::rank_link(f.tree.link[child])).second)
-              f.tree.distinct_link_ranks = false;
-          if (!f.tree.distinct_link_ranks) break;
-        }
+        glyrepr_compact::mark_distinct_link_ranks(f.tree);
       }
       if (!f.parts.empty() || !f.subs.empty()) glyrepr_compact::validate_forest(f);
       out[i] = glyrepr_compact::finish_forest(f, order, byte_order, bliss);
@@ -170,8 +172,8 @@ List finish_graph(Forest& f, Function& order, bool byte_order, Function& bliss) 
   IntegerVector vertices(f.tree.vertices.size()), edges(f.tree.edge_nodes.size());
   for (int i = 0; i < vertices.size(); ++i) vertices[i] = f.tree.vertices[i] + 1;
   for (int i = 0; i < edges.size(); ++i) edges[i] = original_edges[f.tree.edge_nodes[i]];
-  out["vertex_order"] = vertices;
-  out["edge_order"] = edges;
+  out.push_back(vertices, "vertex_order");
+  out.push_back(edges, "edge_order");
   return out;
 }
 
@@ -361,7 +363,7 @@ List compact_localize_parts_native(List record, IntegerVector part_ids,
       parts[i] = List::create(_["root"] = p.root + 1, _["nodes"] = nodes,
                              _["linkage"] = p.linkage, _["parents"] = domains);
     }
-    out["floating_parts"] = parts;
+    out.push_back(parts, "floating_parts");
     return out;
   } catch (const std::exception& e) {
     return List::create(_["status"] = "fallback", _["reason"] = e.what());

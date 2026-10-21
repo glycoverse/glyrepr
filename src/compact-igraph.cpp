@@ -9,6 +9,10 @@ namespace glyrepr_compact {
 Forest import_graph_data(SEXP mono, SEXP sub, SEXP anomer, SEXP alditol,
                          SEXP edge_data, SEXP link_data, SEXP parts, SEXP subs,
                          bool preserve_parent_order, SEXP to);
+Forest import_arrays(const List& a, bool preserve_parent_order);
+List parse_complete(std::string s, const std::unordered_map<std::string,int>& known,
+    const std::unordered_map<std::string,std::string>& configurations, Function& order,
+    bool byte_order, Function& bliss, LexicalCache& lexical_cache, Forest* destination);
 void transform_graph(Forest& f, const std::string& operation,
                      const std::unordered_map<std::string, std::string>& mapping);
 }
@@ -43,14 +47,18 @@ bool supported_template(SEXP x) {
     LENGTH(STRING_ELT(id, 0)) > 0;
 }
 
+std::string next_graph_id(const std::string& prefix) {
+  static uint64_t serial = 0;
+  return prefix + ":" + std::to_string(++serial);
+}
+
 List graph_from_endpoints(NumericVector from, NumericVector to, int n, bool directed,
                          List attrs, List model) {
-  static uint64_t serial = 0;
   Environment source = model[9];
   Environment env(R_NewEnv(R_EmptyEnv, FALSE, 0));
   // The prefix is an igraph-generated UUID, and the counter is process-local.
   // Graph IDs are opaque strings; each graph has its own ID and environment.
-  env["myid"] = as<std::string>(source["myid"]) + ":" + std::to_string(++serial);
+  env["myid"] = next_graph_id(as<std::string>(source["myid"]));
   env[".__igraph_version__."] = static_cast<SEXP>(source[".__igraph_version__."]);
   env["igraph"] = R_NilValue;
   List graph = List::create((double)n, directed, from, to, R_NilValue,
@@ -267,8 +275,8 @@ List forest_graph(const glyrepr_compact::Forest& f, List metadata, List model,
     graph_attrs = found->second;
   } else {
     graph_attrs = List::create(_["anomer"] = t.anomer, _["alditol"] = t.alditol);
-    if (metadata.containsElementNamed("floating_parts")) graph_attrs["floating_parts"] = metadata["floating_parts"];
-    if (metadata.containsElementNamed("floating_substituents")) graph_attrs["floating_substituents"] = metadata["floating_substituents"];
+    if (metadata.containsElementNamed("floating_parts")) graph_attrs.push_back(static_cast<SEXP>(metadata["floating_parts"]), "floating_parts");
+    if (metadata.containsElementNamed("floating_substituents")) graph_attrs.push_back(static_cast<SEXP>(metadata["floating_substituents"]), "floating_substituents");
   }
   List vertex_attrs = List::create(entry->second, mono, sub);
   vertex_attrs.attr("names") = vertex_fields;
@@ -278,6 +286,93 @@ List forest_graph(const glyrepr_compact::Forest& f, List metadata, List model,
     vertex_attrs, edge_attrs);
   return graph_from_endpoints(from, to, n, true, attrs, model);
 }
+// The graph owns every allocation before the next allocation can collect it.
+// Pool only immutable names/scalars; endpoint arrays, flags and environments
+// remain private to each graph so igraph may materialize and mutate its index.
+class ParserGraphBuilder {
+  List model;
+  std::string prefix;
+  SEXP version, id_symbol, version_symbol, graph_symbol;
+  CharacterVector vertex_fields, edge_fields;
+  LogicalVector directed;
+  std::unordered_map<int, CharacterVector> node_names;
+  std::unordered_map<int, NumericVector> sizes;
+  std::unordered_map<std::string, List> attributes;
+  static SEXP allocate(SEXP parent, int slot, SEXPTYPE type, int n) {
+    SEXP value = Rf_allocVector(type, n);
+    SET_VECTOR_ELT(parent, slot, value);
+    return value;
+  }
+ public:
+  explicit ParserGraphBuilder(SEXP x) : model(x),
+      vertex_fields(CharacterVector::create("name", "mono", "sub")),
+      edge_fields(CharacterVector::create("linkage")),
+      directed(LogicalVector::create(true)) {
+    Environment env(VECTOR_ELT(x, 9));
+    id_symbol = Rf_install("myid");
+    version_symbol = Rf_install(".__igraph_version__.");
+    graph_symbol = Rf_install("igraph");
+    prefix = as<std::string>(env["myid"]);
+    version = env[".__igraph_version__."];
+  }
+  List build(const glyrepr_compact::Forest& forest, List metadata) {
+    const auto& t = forest.tree;
+    int n = t.mono.size(), ne = t.edge_nodes.size();
+    auto names = node_names.find(n);
+    if (names == node_names.end()) {
+      CharacterVector values(n);
+      for (int i = 0; i < n; ++i) SET_STRING_ELT(values, i, Rf_mkChar(std::to_string(i+1).c_str()));
+      names = node_names.emplace(n, values).first;
+      sizes.emplace(n, NumericVector::create(n));
+    }
+    std::string attr_key = t.anomer + (t.alditol ? "1" : "0");
+    auto attr = attributes.find(attr_key);
+    if (attr == attributes.end()) attr = attributes.emplace(attr_key,
+      List::create(_["anomer"] = t.anomer, _["alditol"] = t.alditol)).first;
+    List ga = attr->second;
+    if (metadata.size()) {
+      ga = clone(ga);
+      for (int i = 0; i < metadata.size(); ++i)
+        ga.push_back(static_cast<SEXP>(metadata[i]), CHAR(STRING_ELT(Rf_getAttrib(metadata,R_NamesSymbol),i)));
+    }
+    List graph(10);
+    SET_VECTOR_ELT(graph, 0, sizes.at(n));
+    SET_VECTOR_ELT(graph, 1, directed);
+    SEXP from = allocate(graph, 2, REALSXP, ne), to = allocate(graph, 3, REALSXP, ne);
+    SEXP attrs = allocate(graph, 8, VECSXP, 4);
+    SEXP flags = allocate(attrs, 0, REALSXP, 3);
+    REAL(flags)[0] = 1; REAL(flags)[1] = 0; REAL(flags)[2] = 1;
+    SET_VECTOR_ELT(attrs, 1, ga);
+    SEXP va = allocate(attrs, 2, VECSXP, 3);
+    SET_VECTOR_ELT(va, 0, names->second);
+    SEXP mono = allocate(va, 1, STRSXP, n), sub = allocate(va, 2, STRSXP, n);
+    Rf_setAttrib(va, R_NamesSymbol, vertex_fields);
+    SEXP ea = allocate(attrs, 3, VECSXP, 1);
+    SEXP link = allocate(ea, 0, STRSXP, ne);
+    Rf_setAttrib(ea, R_NamesSymbol, edge_fields);
+    std::vector<int> inverse(n);
+    for (int i = 0; i < n; ++i) {
+      int v = t.vertices[i]; inverse[v] = i;
+      SET_STRING_ELT(mono, i, Rf_mkChar(t.mono[v].c_str()));
+      SET_STRING_ELT(sub, i, Rf_mkChar(t.sub[v].c_str()));
+    }
+    for (int i = 0; i < ne; ++i) {
+      int v = t.edge_nodes[i];
+      REAL(from)[i] = inverse[t.parent[v]]; REAL(to)[i] = inverse[v];
+      SET_STRING_ELT(link, i, Rf_mkChar(t.link[v].c_str()));
+    }
+    SEXP env = R_NewEnv(R_EmptyEnv, FALSE, 0);
+    SET_VECTOR_ELT(graph, 9, env);
+    SEXP id = PROTECT(Rf_mkString(next_graph_id(prefix).c_str()));
+    Rf_defineVar(id_symbol, id, env);
+    UNPROTECT(1);
+    Rf_defineVar(version_symbol, version, env);
+    Rf_defineVar(graph_symbol, R_NilValue, env);
+    Rf_setAttrib(graph, R_ClassSymbol, Rf_getAttrib(model, R_ClassSymbol));
+    return graph;
+  }
+};
+
 }
 
 // [[Rcpp::export(name = ".compact_transform_graphs_native")]]
@@ -384,8 +479,8 @@ SEXP compact_build_graphs_native(List records, SEXP model, SEXP progress = R_Nil
     }
     CharacterVector names = entry->second;
     List graph_attrs = List::create(_["anomer"] = a["anomer"], _["alditol"] = a["alditol"]);
-    if (a.containsElementNamed("floating_parts")) graph_attrs["floating_parts"] = a["floating_parts"];
-    if (a.containsElementNamed("floating_substituents")) graph_attrs["floating_substituents"] = a["floating_substituents"];
+    if (a.containsElementNamed("floating_parts")) graph_attrs.push_back(static_cast<SEXP>(a["floating_parts"]), "floating_parts");
+    if (a.containsElementNamed("floating_substituents")) graph_attrs.push_back(static_cast<SEXP>(a["floating_substituents"]), "floating_substituents");
     NumericVector flags = clone(as<NumericVector>(template_attrs[0]));
     List attrs = List::create(flags, graph_attrs,
       List::create(_["name"] = names, _["mono"] = mono, _["sub"] = subs),
@@ -402,4 +497,75 @@ SEXP compact_blank_graph_native(IntegerVector edges, int n, bool directed, SEXP 
   List template_graph(model);
   List attrs = clone(as<List>(template_graph[8]));
   return make_graph(edges, n, directed, attrs, template_graph);
+}
+
+// Canonicalize and build once, without serializing an intermediate array record
+// for every successful input. Public callers validate array chemistry first.
+// [[Rcpp::export(name = ".compact_construct_native")]]
+SEXP compact_construct_native(SEXP inputs, bool character_input,
+    CharacterVector residues, IntegerVector anomer_positions,
+    CharacterVector configuration_names, CharacterVector configuration_values,
+    Function order, Function bliss, bool byte_order, SEXP model) {
+  if (!supported_template(model)) return R_NilValue;
+  std::unordered_map<std::string,int> known;
+  std::unordered_map<std::string,std::string> configurations;
+  for (int i = 0; i < residues.size(); ++i)
+    known.emplace(as<std::string>(residues[i]), anomer_positions[i]);
+  for (int i = 0; i < configuration_names.size(); ++i)
+    configurations.emplace(as<std::string>(configuration_names[i]), as<std::string>(configuration_values[i]));
+  int size = Rf_xlength(inputs);
+  CharacterVector keys(size, NA_STRING), reasons(size, NA_STRING);
+  LogicalVector failed(size, false);
+  List graph_storage(size);
+  CharacterVector graph_keys(size);
+  int count = 0;
+  std::unordered_map<std::string,int> seen;
+  glyrepr_compact::LexicalCache lexical_cache;
+  ParserGraphBuilder builder(model);
+  for (int i = 0; i < size; ++i) {
+    if (i % 128 == 0) checkUserInterrupt();
+    if (character_input ? STRING_ELT(inputs,i) == NA_STRING : Rf_isNull(VECTOR_ELT(inputs,i))) continue;
+    try {
+      glyrepr_compact::Forest f;
+      List metadata;
+      if (character_input) {
+        metadata = glyrepr_compact::parse_complete(CHAR(STRING_ELT(inputs,i)), known,
+          configurations, order, byte_order, bliss, lexical_cache, &f);
+      } else {
+        List a(VECTOR_ELT(inputs,i));
+        if (Rf_xlength(a["mono"]) > 2048) throw glyrepr_compact::Unsupported("native size guard");
+        f = glyrepr_compact::import_arrays(a, false);
+        f.tree.order_cache = &lexical_cache;
+        if (f.parts.empty() && f.subs.empty()) {
+          glyrepr_compact::mark_distinct_link_ranks(f.tree);
+        } else glyrepr_compact::validate_forest(f);
+        metadata = glyrepr_compact::finish_forest(f, order, byte_order, bliss, false);
+      }
+      auto found = seen.find(f.tree.sequence);
+      if (found == seen.end()) {
+        graph_storage[count] = builder.build(f, metadata);
+        graph_keys[count] = f.tree.sequence;
+        found = seen.emplace(f.tree.sequence, count++).first;
+      }
+      SET_STRING_ELT(keys, i, STRING_ELT(graph_keys, found->second));
+    } catch (const std::exception& e) {
+      failed[i] = true;
+      reasons[i] = e.what();
+    }
+  }
+  List graphs(count);
+  CharacterVector names(count);
+  for (int i = 0; i < count; ++i) { graphs[i] = graph_storage[i]; names[i] = graph_keys[i]; }
+  if (count) graphs.attr("names") = names;
+  return List::create(_["keys"] = keys, _["graphs"] = graphs,
+    _["failed"] = failed, _["reasons"] = reasons);
+}
+
+// [[Rcpp::export(name = ".compact_graph_list_valid_native")]]
+bool compact_graph_list_valid_native(List graphs) {
+  for (R_xlen_t i = 0; i < graphs.size(); ++i) {
+    SEXP graph = VECTOR_ELT(graphs, i);
+    if (Rf_isS4(graph) || !Rf_inherits(graph, "igraph")) return false;
+  }
+  return true;
 }

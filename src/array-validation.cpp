@@ -6,11 +6,13 @@ using namespace Rcpp;
 namespace {
 struct ArrayValidator {
   Function mono, sub, link, anomer, floating;
-  std::unordered_map<std::string, bool> monos, subs, links, anomers, floats;
+  std::unordered_map<SEXP, bool> monos, subs, links, anomers, floats;
   ArrayValidator(Function m, Function s, Function l, Function a, Function f)
       : mono(m), sub(s), link(l), anomer(a), floating(f) {}
-  bool cached(SEXP s, Function& fn, std::unordered_map<std::string, bool>& cache) {
-    std::string key = Rf_translateCharUTF8(s);
+  bool cached(SEXP s, Function& fn, std::unordered_map<SEXP, bool>& cache) {
+    // Input CHARSXPs stay rooted in the records for this batch. Distinct
+    // encodings may miss the cache but still use the same R validator.
+    SEXP key = s;
     auto found = cache.find(key);
     if (found != cache.end()) return found->second;
     bool ok = as<bool>(fn(CharacterVector::create(s)));
@@ -32,7 +34,7 @@ struct ArrayValidator {
     }
     return true;
   }
-  bool fields(SEXP x, const std::vector<std::string>& allowed,
+  bool fields(SEXP x, std::initializer_list<const char*> allowed,
               int required, std::vector<SEXP>& out) {
     if (TYPEOF(x) != VECSXP) return false;
     SEXP names = Rf_getAttrib(x, R_NamesSymbol);
@@ -41,8 +43,9 @@ struct ArrayValidator {
     std::vector<bool> seen(allowed.size(), false);
     for (R_xlen_t i = 0; i < XLENGTH(x); ++i) {
       if (STRING_ELT(names, i) == NA_STRING) return false;
-      std::string name = Rf_translateCharUTF8(STRING_ELT(names, i));
-      auto at = std::find(allowed.begin(), allowed.end(), name);
+      const char* name = CHAR(STRING_ELT(names, i));
+      auto at = std::find_if(allowed.begin(), allowed.end(),
+        [&](const char* value) { return std::strcmp(value, name) == 0; });
       if (at == allowed.end()) return false;
       size_t j = at - allowed.begin();
       if (seen[j]) return false;

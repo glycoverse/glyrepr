@@ -152,3 +152,23 @@
     "Building structures"
   )
 }
+
+.compact_construct <- function(x, character_input = FALSE) {
+  residues <- if (character_input) {
+    unique(na.omit(c(monosaccharides$concrete, monosaccharides$generic)))
+  } else {
+    character()
+  }
+  .compact_construct_native(
+    x,
+    character_input,
+    residues,
+    infer_anomer_pos(residues),
+    names(unusual_configuration_monosaccharides),
+    unname(unusual_configuration_monosaccharides),
+    base::order,
+    .compact_bliss_labels,
+    identical(Sys.getlocale("LC_COLLATE"), "C"),
+    .compact_graph_template()
+  )
+}

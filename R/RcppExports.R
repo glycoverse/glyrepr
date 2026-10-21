@@ -33,6 +33,14 @@
     .Call(`_glyrepr_compact_blank_graph_native`, edges, n, directed, model)
 }
 
+.compact_construct_native <- function(inputs, character_input, residues, anomer_positions, configuration_names, configuration_values, order, bliss, byte_order, model) {
+    .Call(`_glyrepr_compact_construct_native`, inputs, character_input, residues, anomer_positions, configuration_names, configuration_values, order, bliss, byte_order, model)
+}
+
+.compact_graph_list_valid_native <- function(graphs) {
+    .Call(`_glyrepr_compact_graph_list_valid_native`, graphs)
+}
+
 .compact_parse_native <- function(strings, residues, anomer_positions, configuration_names, configuration_values, order, bliss, byte_order = FALSE, progress = NULL) {
     .Call(`_glyrepr_compact_parse_native`, strings, residues, anomer_positions, configuration_names, configuration_values, order, bliss, byte_order, progress)
 }

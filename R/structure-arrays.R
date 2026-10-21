@@ -131,7 +131,49 @@ structure_from_arrays <- function(
       "Validating records"
     )
   }
-  valid <- !vapply(checked, inherits, logical(1), "error")
+  valid <- if (all(flags == 1L) || (quiet && all(flags > 0L))) {
+    rep(TRUE, length(checked))
+  } else {
+    !vapply(checked, inherits, logical(1), "error")
+  }
+  if (direct && is.null(progress) && all(valid)) {
+    batch <- .compact_construct(checked)
+    if (!is.null(batch)) {
+      if (quiet) {
+        proven <- batch$reasons %in%
+          c(
+            "self edge or multiple parents",
+            "cyclic graph",
+            "glycan components must be out trees",
+            "undeclared disconnected component",
+            "missing main component",
+            "no conflict-free acyclic floating assignment"
+          )
+        batch$failed[proven] <- FALSE
+      }
+      if (quiet && any(batch$failed)) {
+        failed_ids <- which(batch$failed)
+        fallback <- .structure_array_outcomes(checked[failed_ids], quiet = TRUE)
+        for (j in seq_along(fallback)) {
+          item <- fallback[[j]]
+          if (is.null(item) || inherits(item, "error")) {
+            next
+          }
+          batch$keys[failed_ids[[j]]] <- item$iupac
+          batch$graphs[[item$iupac]] <- item$graph
+        }
+        used <- unique(batch$keys[!is.na(batch$keys)])
+        batch$graphs <- if (length(used)) batch$graphs[used] else list()
+        batch$failed[] <- FALSE
+      }
+      if (!any(batch$failed)) {
+        return(new_glycan_structure(
+          stats::setNames(batch$keys, names(x)),
+          batch$graphs
+        ))
+      }
+    }
+  }
   native <- .compact_arrays_native(
     checked[valid],
     base::order,

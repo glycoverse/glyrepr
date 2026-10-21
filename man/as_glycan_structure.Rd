@@ -4,7 +4,12 @@
 \alias{as_glycan_structure}
 \title{Convert to Glycan Structure Vector}
 \usage{
-as_glycan_structure(x, on_failure = c("error", "na"), progress = FALSE)
+as_glycan_structure(
+  x,
+  on_failure = c("error", "na"),
+  progress = FALSE,
+  warn = TRUE
+)
 }
 \arguments{
 \item{x}{An object to convert to a glycan structure vector.
@@ -29,6 +34,9 @@ already-converted inputs may report no stages. Callback errors abort the
 operation, including with \code{on_failure = "na"}. The cli bar is closed when
 the call exits, including on errors or interrupts, and follows cli display
 settings (short or non-interactive calls may show no visible bar).}
+
+\item{warn}{Whether to warn about recovered failures with \code{on_failure = "na"}.
+Validation is always performed.}
 }
 \value{
 A glyrepr_structure object.
