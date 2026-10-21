@@ -155,7 +155,7 @@
 
 .compact_construct <- function(x, character_input = FALSE) {
   residues <- if (character_input) {
-    unique(na.omit(c(monosaccharides$concrete, monosaccharides$generic)))
+    unique(stats::na.omit(c(monosaccharides$concrete, monosaccharides$generic)))
   } else {
     character()
   }
