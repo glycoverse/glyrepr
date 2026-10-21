@@ -1,6 +1,12 @@
 # glyrepr (development version)
 
+* `as_glycan_structure()` and `structure_from_arrays()` combine native canonicalization and graph construction to reduce temporary allocation. `as_glycan_structure(warn = FALSE, on_failure = "na")` suppresses recovery diagnostics while retaining validation. (#104)
+
+* `structure_from_arrays()` validates shared chemical tokens and builds graphs in batches. The new `warn = FALSE` option returns missing values for invalid records without emitting recovery warnings; validation remains mandatory. (#104)
+
 ## Bug fixes
+
+* Floating-structure canonicalization protects temporary R vectors across allocations and callbacks, preventing intermittent garbage-collection crashes in long parsing batches. (#104)
 
 * The compact graph template no longer retains an igraph native pointer, allowing coverage counters to be serialized safely during R shutdown. (#102)
 
@@ -9,6 +15,8 @@
 * `as_glycan_structure()` and `structure_from_arrays()` gain a `progress` argument: use `TRUE` to display a progress bar or a function accepting `stage`, `current`, and `total` to receive updates during parsing, graph construction, and failure recovery. The default remains `FALSE`. (#98)
 
 ## Performance improvements
+
+* Character-input recovery builds graphs in batches and groups duplicate positions in linear time. Fully valid character and array batches assemble results directly, and ordinary IUPAC trees avoid unnecessary branch-signature comparisons while preserving locale-dependent ordering. (#104)
 
 * `convert_to_generic()`, `remove_linkages()`, and `remove_substituents()` process large structure vectors faster while preserving canonical output and custom graph attributes. (#103)
 * `as_glycan_structure()` parses IUPAC-condensed vectors faster through streamlined parsing, floating-structure canonicalization, and batch graph construction while preserving validation and canonical output (#102).

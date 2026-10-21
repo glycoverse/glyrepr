@@ -24,6 +24,7 @@ struct Unsupported : std::runtime_error {
 
 struct LexicalCache {
   std::unordered_map<std::string, std::vector<int>> orders;
+  std::unordered_map<std::string, std::vector<int>> symmetries;
 };
 
 // Tree operations are independent of igraph's representation. Unresolved
@@ -203,14 +204,27 @@ inline double rank_link(const std::string& link) {
   return p == "?" || p.find('/') != std::string::npos ? 1.0 : 1.0 / (p[0] - '0');
 }
 
-inline std::string emit(Tree& t, int node, Function& order, bool byte_order) {
+inline void mark_distinct_link_ranks(Tree& t) {
+  t.distinct_link_ranks = true;
+  for (const auto& children : t.children) {
+    for (size_t i = 1; i < children.size(); ++i)
+      for (size_t j = 0; j < i; ++j)
+        if (rank_link(t.link[children[i]]) == rank_link(t.link[children[j]])) {
+          t.distinct_link_ranks = false; return;
+        }
+  }
+}
+
+inline void emit_into(Tree& t, int node, Function& order, bool byte_order, std::string& result) {
   const auto& kids = t.children[node];
   if (kids.size() == 1) {
     int child = kids[0];
-    std::string result = emit(t, child, order, byte_order) + "(" + t.link[child] + ")";
+    emit_into(t, child, order, byte_order, result);
+    result += "(" + t.link[child] + ")";
     t.edge_nodes.push_back(child);
     t.vertices.push_back(node);
-    return result + residue_label(t, node);
+    result += residue_label(t, node);
+    return;
   }
   if (!kids.empty()) {
     std::vector<int> ranks(kids.size());
@@ -238,22 +252,33 @@ inline std::string emit(Tree& t, int node, Function& order, bool byte_order) {
           (t.depth[kids[j]] == t.depth[kids[backbone]] && better(j, backbone))) backbone = j;
     }
     std::stable_sort(ids.begin(), ids.end(), better);
-    std::string result = emit(t, kids[backbone], order, byte_order) + "(" + t.link[kids[backbone]] + ")";
+    emit_into(t, kids[backbone], order, byte_order, result);
+    result += "(" + t.link[kids[backbone]] + ")";
     t.edge_nodes.push_back(kids[backbone]);
     for (int j : ids) if (j != backbone) {
-      result += "[" + emit(t, kids[j], order, byte_order) + "(" + t.link[kids[j]] + ")]";
+      result += "[";
+      emit_into(t, kids[j], order, byte_order, result);
+      result += "(" + t.link[kids[j]] + ")]";
       t.edge_nodes.push_back(kids[j]);
     }
     t.vertices.push_back(node);
-    return result + residue_label(t, node);
+    result += residue_label(t, node);
+    return;
   }
   t.vertices.push_back(node);
-  return residue_label(t, node);
+  result += residue_label(t, node);
+}
+
+inline std::string emit(Tree& t, int node, Function& order, bool byte_order) {
+  std::string result;
+  result.reserve(t.mono.size()*12);
+  emit_into(t, node, order, byte_order, result);
+  return result;
 }
 
 inline void cache_tree(Tree& t, Function& order, bool byte_order) {
   t.depth.assign(t.mono.size(), -1);
-  t.sig.resize(t.mono.size());
+  if (!t.distinct_link_ranks) t.sig.resize(t.mono.size());
   std::function<void(int)> visit = [&](int n) {
     if (t.depth[n] >= 0) return;
     int occupied = 0;
@@ -268,9 +293,9 @@ inline void cache_tree(Tree& t, Function& order, bool byte_order) {
       }
       visit(k);
       t.depth[n] = std::max(t.depth[n], t.depth[k]+1);
-      if (!t.distinct_link_ranks) tokens.push_back(t.link[k] + "->" + t.sig[k]);
+      if (!t.distinct_link_ranks && t.parent[n] >= 0) tokens.push_back(t.link[k] + "->" + t.sig[k]);
     }
-    if (t.distinct_link_ranks) return;
+    if (t.distinct_link_ranks || t.parent[n] < 0) return;
     t.sig[n] = residue_label(t, n);
     if (tokens.size() == 1) {
       t.sig[n] += "{" + tokens[0] + "}";
@@ -477,14 +502,34 @@ inline std::vector<int> symmetry_labels(Forest& f, Function& bliss) {
     for(int p:candidates(f.subs[i],n)) relation(sub_offset+i,p,"floating-substituent-parent");
   auto unique=keys;std::sort(unique.begin(),unique.end());unique.erase(std::unique(unique.begin(),unique.end()),unique.end());
   std::vector<int> colors;for(const auto& key:keys) colors.push_back(std::lower_bound(unique.begin(),unique.end(),key)-unique.begin()+1);
-  IntegerVector labels=bliss(wrap(edges),wrap(colors));
-  return as<std::vector<int>>(labels);
+  // BLISS depends only on the numbered auxiliary graph and color partition.
+  // Different chemistry can share that partition. Reuse this intermediate
+  // permutation within the current batch; still validate and build each glycan.
+  std::string cache_key;
+  auto cache = t.order_cache;
+  if (cache) {
+    size_t count = edges.size();
+    cache_key.assign(reinterpret_cast<const char*>(&count), sizeof(count));
+    if (!edges.empty()) cache_key.append(reinterpret_cast<const char*>(edges.data()), edges.size()*sizeof(int));
+    cache_key.append(reinterpret_cast<const char*>(colors.data()), colors.size()*sizeof(int));
+    auto found = cache->symmetries.find(cache_key);
+    if (found != cache->symmetries.end()) return found->second;
+  }
+  // Keep both callback arguments rooted across allocation of the other
+  // vector and evaluation of the R callback (including forced GC).
+  IntegerVector edge_vector = wrap(edges);
+  IntegerVector color_vector = wrap(colors);
+  IntegerVector labels=bliss(edge_vector,color_vector);
+  auto result = as<std::vector<int>>(labels);
+  if (cache && cache->symmetries.size() < 4096 && cache_key.size() <= 8192)
+    cache->symmetries.emplace(std::move(cache_key), result);
+  return result;
 }
 
 inline List finish_forest(Forest& f, Function& order, bool byte_order, Function& bliss,
                           bool arrays = true) {
   Tree& t=f.tree;
-  resolve_singletons(f);
+  if (!f.parts.empty() || !f.subs.empty()) resolve_singletons(f);
   cache_tree(t,order,byte_order);
   t.vertices.clear();t.edge_nodes.clear();
   if(f.parts.empty() && f.subs.empty()) {
@@ -541,19 +586,19 @@ inline List finish_forest(Forest& f, Function& order, bool byte_order, Function&
   List parts(part_ids.size()),subs(sub_ids.size());std::string sequence;
   for(int j=0;j<(int)sub_ids.size();++j) {
     const auto& s=f.subs[sub_ids[j]];auto parents=remap(s.parents);
-    subs[j]=List::create(_["substituent"]=s.token,_["parents"]=wrap(parents));
+    subs[j]=List::create(_["substituent"]=s.token,_["parents"]=parents);
     sequence+="{"+s.token+(parents.empty()?"":"|"+int_join(parents))+"}";
   }
   for(int j=0;j<(int)part_ids.size();++j) {
     int id=part_ids[j];const auto& p=f.parts[id];auto parents=remap(p.parents);
     std::vector<int> nodes;for(int v:part_vertices[id]) nodes.push_back(inverse[v]);
-    parts[j]=List::create(_["root"]=inverse[p.root],_["nodes"]=wrap(nodes),_["linkage"]=p.linkage,_["parents"]=wrap(parents));
+    parts[j]=List::create(_["root"]=inverse[p.root],_["nodes"]=nodes,_["linkage"]=p.linkage,_["parents"]=parents);
     sequence+="{"+sequences[id]+"("+p.linkage+")"+(parents.empty()?"":"|"+int_join(parents))+"}";
   }
   t.sequence=sequence+main;
   List result = arrays ? serialize_tree(t) : List::create();
-  if(parts.size()) result["floating_parts"]=parts;
-  if(subs.size()) result["floating_substituents"]=subs;
+  if(parts.size()) result.push_back(parts, "floating_parts");
+  if(subs.size()) result.push_back(subs, "floating_substituents");
   return result;
 }
 

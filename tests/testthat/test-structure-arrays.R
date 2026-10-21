@@ -281,3 +281,63 @@ test_that("empty and wholly missing array batches retain names without warnings"
   empty <- stats::setNames(list(), character())
   expect_identical(names(structure_from_arrays(empty)), character())
 })
+
+test_that("batched array validation agrees with the reference on invalid chemistry", {
+  a <- list(
+    mono = "Glc",
+    sub = "",
+    edges = integer(),
+    linkage = character(),
+    anomer = "a1",
+    alditol = FALSE
+  )
+  variants <- list(
+    a,
+    modifyList(a, list(mono = "Unknown")),
+    modifyList(a, list(sub = "9Unknown")),
+    modifyList(a, list(anomer = "z1")),
+    modifyList(a, list(edges = c(1L, 2L), linkage = "b1-4")),
+    modifyList(a, list(alditol = NA)),
+    modifyList(a, list(edges = numeric()))
+  )
+  reference <- vapply(
+    variants,
+    function(x) {
+      !inherits(
+        tryCatch(.validate_structure_arrays(x), error = identity),
+        "error"
+      )
+    },
+    logical(1)
+  )
+  input <- rep(variants, 2)
+  quiet <- structure_from_arrays(input, on_failure = "na", warn = FALSE)
+  noisy <- suppressWarnings(structure_from_arrays(input, on_failure = "na"))
+  expect_identical(!is.na(quiet), rep(reference, 2))
+  expect_identical(as.character(quiet), as.character(noisy))
+  expect_snapshot(
+    error = TRUE,
+    structure_from_arrays(variants[2], warn = FALSE)
+  )
+})
+
+test_that("quiet recovery rejects topology while preserving valid neighbors", {
+  a <- list(
+    mono = c("Glc", "Gal"),
+    sub = c("", ""),
+    edges = c(1L, 2L),
+    linkage = "b1-4",
+    anomer = "a1",
+    alditol = FALSE
+  )
+  invalid <- list(
+    modifyList(a, list(edges = integer(), linkage = character())),
+    modifyList(a, list(edges = c(1L, 1L))),
+    modifyList(a, list(edges = c(1L, 2L, 2L, 1L), linkage = c("b1-4", "a1-3")))
+  )
+  inputs <- c(list(a, NULL), invalid, list(a))
+  expected <- suppressWarnings(structure_from_arrays(inputs, on_failure = "na"))
+  actual <- structure_from_arrays(inputs, on_failure = "na", warn = FALSE)
+  expect_identical(as.character(actual), as.character(expected))
+  expect_identical(is.na(actual), c(FALSE, TRUE, TRUE, TRUE, TRUE, FALSE))
+})

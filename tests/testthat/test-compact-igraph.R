@@ -19,7 +19,9 @@ test_that("the graph template can be serialized by an exit finalizer", {
   # A new process cannot see pkgload's in-memory development namespace.
   skip_if_not(
     file.exists(file.path(
-      getNamespaceInfo(asNamespace("glyrepr"), "path"), "Meta", "package.rds"
+      getNamespaceInfo(asNamespace("glyrepr"), "path"),
+      "Meta",
+      "package.rds"
     )),
     "Requires the installed package; run R CMD check"
   )
@@ -31,17 +33,20 @@ test_that("the graph template can be serialized by an exit finalizer", {
   saveRDS(.libPaths(), libpaths)
   # Exit finalizers run in reverse registration order. Register the saver
   # before creating the graph, reproducing covr's shutdown serialization.
-  writeLines(c(
-    "args <- commandArgs(trailingOnly = TRUE)",
-    ".libPaths(readRDS(args[[1L]]))",
-    "holder <- new.env(parent = emptyenv())",
-    "holder$path <- args[[2L]]",
-    "reg.finalizer(holder, function(e) saveRDS(e$fun, e$path), onexit = TRUE)",
-    'holder$fun <- getFromNamespace(".compact_graph_template", "glyrepr")',
-    "stopifnot(!isNamespace(environment(holder$fun)))",
-    "invisible(holder$fun())",
-    'q(save = "no", status = 0L, runLast = FALSE)'
-  ), script)
+  writeLines(
+    c(
+      "args <- commandArgs(trailingOnly = TRUE)",
+      ".libPaths(readRDS(args[[1L]]))",
+      "holder <- new.env(parent = emptyenv())",
+      "holder$path <- args[[2L]]",
+      "reg.finalizer(holder, function(e) saveRDS(e$fun, e$path), onexit = TRUE)",
+      'holder$fun <- getFromNamespace(".compact_graph_template", "glyrepr")',
+      "stopifnot(!isNamespace(environment(holder$fun)))",
+      "invisible(holder$fun())",
+      'q(save = "no", status = 0L, runLast = FALSE)'
+    ),
+    script
+  )
   status <- system2(
     file.path(R.home("bin"), "Rscript"),
     c("--vanilla", shQuote(script), shQuote(libpaths), shQuote(output)),
@@ -49,7 +54,8 @@ test_that("the graph template can be serialized by an exit finalizer", {
     stderr = log
   )
   expect_identical(
-    status, 0L,
+    status,
+    0L,
     info = paste(readLines(log, warn = FALSE), collapse = "\n")
   )
   expect_true(file.exists(output))
@@ -134,5 +140,81 @@ test_that("unknown igraph object formats use the public graph builder", {
         colors = c(1, 1)
       )$labeling
     )
+  )
+})
+
+test_that("floating graph callbacks remain rooted during garbage collection", {
+  input <- c(
+    "{Neu5Ac(a2-3)|2,4}Gal(a1-?)[Gal(a1-?)]Glc(a1-",
+    "{6S|1,2}Gal(b1-4)Glc",
+    "{6S|1,2}{3P|1,2}Gal(b1-4)Glc"
+  )
+  reference <- .compact_iupac_arrays(input)
+  previous <- gctorture2(100L)
+  on.exit(gctorture2(previous), add = TRUE)
+  actual <- lapply(seq_len(4L), function(i) .compact_iupac_arrays(input))
+  gctorture2(previous)
+  for (result in actual) {
+    expect_identical(result, reference)
+  }
+})
+
+test_that("fused construction preserves graphs through GC and mutation", {
+  input <- c(
+    "Gal",
+    "Glc",
+    "Gal(b1-4)Glc",
+    "Glc(b1-4)Gal",
+    "{6S|1,2}{3P|1,2}Gal(b1-4)Glc",
+    NA_character_,
+    "Gal"
+  )
+  describe <- function(g) {
+    list(
+      vertices = igraph::vertex_attr(g),
+      edges = igraph::edge_attr(g),
+      graph = igraph::graph_attr(g),
+      ends = igraph::as_edgelist(g, names = FALSE)
+    )
+  }
+  reference_arrays <- .compact_iupac_arrays(unique(na.omit(input)))
+  reference <- .compact_build_graphs(reference_arrays)
+  previous <- gctorture2(37L)
+  on.exit(gctorture2(previous), add = TRUE)
+  actual <- .compact_construct(input, TRUE)
+  gctorture2(previous)
+  expect_false(any(actual$failed))
+  expect_identical(
+    unname(lapply(actual$graphs, describe)),
+    lapply(reference, describe)
+  )
+  restored <- unserialize(serialize(actual$graphs, NULL))
+  expect_identical(lapply(restored, describe), lapply(actual$graphs, describe))
+  ids <- vapply(actual$graphs, igraph::graph_id, character(1))
+  expect_identical(anyDuplicated(ids), 0L)
+  modified <- igraph::set_graph_attr(actual$graphs[[1]], "anomer", "a1")
+  modified <- igraph::set_vertex_attr(modified, "sub", 1, "6S")
+  expect_identical(describe(actual$graphs[[2]]), describe(reference[[2]]))
+  expect_identical(describe(actual$graphs[[1]]), describe(reference[[1]]))
+})
+
+test_that("quiet character recovery preserves validation and unsupported fallback", {
+  input <- c(
+    valid = "Gal(b1-4)Glc",
+    missing = NA_character_,
+    unknown = "Bad",
+    conflict = "Gal(b1-4)[Man(a1-4)]Glc",
+    empty = ""
+  )
+  reference <- suppressWarnings(as_glycan_structure(input, on_failure = "na"))
+  expect_no_warning(
+    actual <- as_glycan_structure(input, on_failure = "na", warn = FALSE)
+  )
+  expect_identical(as.character(actual), as.character(reference))
+  # Larger valid structures continue through the reference path.
+  local_mocked_bindings(.compact_construct = function(...) NULL)
+  expect_identical(
+    as.character(as_glycan_structure(input, on_failure = "na", warn = FALSE)),
+    as.character(reference)
   )
 })

@@ -72,27 +72,29 @@
   new_glycan_structure(unname(keys[match(x, unique_x)]), graphs)
 }
 
-.compact_iupac_outcomes <- function(x, progress = NULL) {
-  arrays <- .compact_iupac_arrays(x, progress)
-  graph_cache <- new.env(hash = TRUE, parent = emptyenv())
-  .structure_progress_map(
-    seq_along(arrays),
+.compact_iupac_outcomes <- function(x, progress = NULL, arrays = NULL) {
+  if (is.null(arrays)) {
+    arrays <- .compact_iupac_arrays(x, progress)
+  }
+  ok <- vapply(arrays, function(a) identical(a$status, "ok"), logical(1))
+  keys <- vapply(arrays[ok], `[[`, character(1), "iupac")
+  unique_keys <- !duplicated(keys)
+  graphs <- .compact_build_graphs(arrays[ok][unique_keys], progress)
+  outcomes <- vector("list", length(arrays))
+  outcomes[ok] <- Map(
+    function(graph, iupac) list(graph = graph, iupac = iupac),
+    graphs[match(keys, keys[unique_keys])],
+    keys
+  )
+  outcomes[!ok] <- .structure_progress_map(
+    which(!ok),
     function(i) {
       tryCatch(
         {
-          a <- arrays[[i]]
-          if (!identical(a$status, "ok")) {
-            # Only the failing element takes the reference path under recovery.
-            # This preserves its condition class, message, and normalization rules.
-            return(process_glycan_structure_element(.parse_iupac_condensed_single(x[[
-              i
-            ]])))
-          }
-          key <- a$iupac
-          if (!exists(key, graph_cache, inherits = FALSE)) {
-            graph_cache[[key]] <- .compact_build_graph(a)
-          }
-          list(graph = graph_cache[[key]], iupac = key)
+          # Only unsupported or failing elements need reference diagnostics.
+          process_glycan_structure_element(.parse_iupac_condensed_single(x[[
+            i
+          ]]))
         },
         error = \(cnd) cnd
       )
@@ -100,6 +102,7 @@
     progress,
     "Building structures"
   )
+  outcomes
 }
 
 # Cache only the empty format template, never parsed structures or user inputs.
@@ -147,5 +150,25 @@
     .compact_build_graph,
     progress,
     "Building structures"
+  )
+}
+
+.compact_construct <- function(x, character_input = FALSE) {
+  residues <- if (character_input) {
+    unique(stats::na.omit(c(monosaccharides$concrete, monosaccharides$generic)))
+  } else {
+    character()
+  }
+  .compact_construct_native(
+    x,
+    character_input,
+    residues,
+    infer_anomer_pos(residues),
+    names(unusual_configuration_monosaccharides),
+    unname(unusual_configuration_monosaccharides),
+    base::order,
+    .compact_bliss_labels,
+    identical(Sys.getlocale("LC_COLLATE"), "C"),
+    .compact_graph_template()
   )
 }

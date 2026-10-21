@@ -36,3 +36,13 @@
       3 structures failed validation and were replaced with `NA`.
       x Position 1: Glycan structure must be an out tree., Position 2: Glycan structure must be an out tree., and Position 3: Floating part node metadata does not match its graph component. x Floating part 1 must contain exactly node 2.
 
+# batched array validation agrees with the reference on invalid chemistry
+
+    Code
+      structure_from_arrays(variants[2], warn = FALSE)
+    Condition
+      Error in `structure_from_arrays()`:
+      ! Invalid structure at position 1.
+      Caused by error in `.validate_structure_arrays()`:
+      ! Unknown monosaccharide.
+

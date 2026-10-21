@@ -4,7 +4,12 @@
 \alias{structure_from_arrays}
 \title{Construct Structures from Residue and Edge Arrays}
 \usage{
-structure_from_arrays(x, on_failure = c("error", "na"), progress = FALSE)
+structure_from_arrays(
+  x,
+  on_failure = c("error", "na"),
+  progress = FALSE,
+  warn = TRUE
+)
 }
 \arguments{
 \item{x}{A list of structure records. A \code{NULL} element represents a missing
@@ -23,6 +28,10 @@ already-converted inputs may report no stages. Callback errors abort the
 operation, including with \code{on_failure = "na"}. The cli bar is closed when
 the call exits, including on errors or interrupts, and follows cli display
 settings (short or non-interactive calls may show no visible bar).}
+
+\item{warn}{Whether to warn about invalid records when \code{on_failure = "na"}.
+Validation is always performed. Set to \code{FALSE} when the caller handles
+missing results itself.}
 }
 \value{
 A \code{glyrepr_structure} vector, with graph storage deduplicated by

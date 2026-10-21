@@ -274,6 +274,9 @@ structure_na_mask <- function(x) {
 filter_used_structure_graphs <- function(iupacs, graphs) {
   used_codes <- unique(unname(iupacs[!is.na(iupacs)]))
   used_graphs <- graphs[used_codes]
+  if (.compact_graph_list_valid_native(used_graphs)) {
+    return(used_graphs)
+  }
   used_graphs[!vapply(used_graphs, is.null, logical(1))]
 }
 
@@ -541,6 +544,15 @@ glycan_structure_from_iupac_character <- function(x, progress = NULL) {
 
   non_na_x <- x[!na_mask]
   unique_x <- unique(non_na_x)
+  if (is.null(progress)) {
+    batch <- .compact_construct(unique_x, TRUE)
+    if (!is.null(batch) && !any(batch$failed)) {
+      return(new_glycan_structure(
+        unname(batch$keys[match(x, unique_x)]),
+        batch$graphs
+      ))
+    }
+  }
   arrays <- .compact_iupac_arrays(unique_x, progress)
   if (all(vapply(arrays, \(x) identical(x$status, "ok"), logical(1)))) {
     return(.compact_structure_from_arrays(x, unique_x, arrays, progress))
@@ -730,6 +742,8 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 #'   remain missing without a warning. Vector-level incompatibilities still
 #'   produce an error.
 #'
+#' @param warn Whether to warn about recovered failures with `on_failure = "na"`.
+#'   Validation is always performed.
 #' @returns A glyrepr_structure object.
 #'
 #' @examples
@@ -772,10 +786,12 @@ vec_restore.glyrepr_structure <- function(x, to, ...) {
 as_glycan_structure <- function(
   x,
   on_failure = c("error", "na"),
-  progress = FALSE
+  progress = FALSE,
+  warn = TRUE
 ) {
   progress <- .structure_progress(progress)
   on_failure <- rlang::arg_match(on_failure)
+  checkmate::assert_flag(warn)
 
   if (identical(on_failure, "error")) {
     if (!is.null(progress) && !inherits(x, "glyrepr_structure")) {
@@ -798,6 +814,21 @@ as_glycan_structure <- function(
     return(vctrs::vec_cast(x, glycan_structure()))
   }
 
+  if (!warn && is.character(x)) {
+    return(glycan_structure_from_iupac_character_with_na(
+      x,
+      progress,
+      quiet = TRUE
+    ))
+  }
+  if (!warn) {
+    return(withCallingHandlers(
+      as_glycan_structure_with_na(x, progress),
+      glyrepr_warning_structure_failure = function(cnd) {
+        invokeRestart("muffleWarning")
+      }
+    ))
+  }
   as_glycan_structure_with_na(x, progress)
 }
 
@@ -859,7 +890,11 @@ glycan_structure_from_graph_list_with_na <- function(x, progress = NULL) {
 #' @param x A character vector of IUPAC-condensed strings.
 #' @returns A `glyrepr_structure` vector.
 #' @noRd
-glycan_structure_from_iupac_character_with_na <- function(x, progress = NULL) {
+glycan_structure_from_iupac_character_with_na <- function(
+  x,
+  progress = NULL,
+  quiet = FALSE
+) {
   non_missing <- which(!is.na(x))
 
   if (length(non_missing) == 0) {
@@ -869,16 +904,93 @@ glycan_structure_from_iupac_character_with_na <- function(x, progress = NULL) {
   }
 
   unique_x <- unique(x[non_missing])
+  if (is.null(progress)) {
+    batch <- .compact_construct(unique_x, TRUE)
+    if (!is.null(batch)) {
+      if (quiet) {
+        # These failures prove chemical invalidity, independently of the
+        # reference parser's broader syntax/size support.
+        proven <- batch$reasons %in%
+          c(
+            "unknown monosaccharide",
+            "duplicated linkage positions",
+            "conflicting substituent positions",
+            "conflicting Neu markers",
+            "no conflict-free acyclic floating assignment"
+          )
+        proven <- proven | unique_x == ""
+        batch$failed[proven] <- FALSE
+      }
+      if (!any(batch$failed)) {
+        out <- new_glycan_structure(
+          batch$keys[match(x, unique_x)],
+          batch$graphs
+        )
+        names(out) <- names(x)
+        return(out)
+      }
+      # Only rejected/unsupported inputs need diagnostic reference parsing.
+      failed_ids <- which(batch$failed)
+      fallback <- .compact_iupac_outcomes(unique_x[failed_ids])
+      if (quiet || !any(vapply(fallback, inherits, logical(1), "error"))) {
+        for (j in seq_along(fallback)) {
+          item <- fallback[[j]]
+          if (is.null(item) || inherits(item, "error")) {
+            next
+          }
+          batch$keys[failed_ids[[j]]] <- item$iupac
+          batch$graphs[[item$iupac]] <- item$graph
+        }
+        used <- unique(batch$keys[!is.na(batch$keys)])
+        graphs <- if (length(used)) batch$graphs[used] else list()
+        return(new_glycan_structure(
+          stats::setNames(batch$keys[match(x, unique_x)], names(x)),
+          graphs
+        ))
+      }
+      outcomes <- Map(
+        function(graph, iupac) list(graph = graph, iupac = iupac),
+        batch$graphs[match(batch$keys, names(batch$graphs))],
+        batch$keys
+      )
+      outcomes[failed_ids] <- fallback
+      groups <- match(x, unique_x)
+      positions <- unname(split(
+        non_missing,
+        factor(groups[non_missing], levels = seq_along(unique_x))
+      ))
+      return(assemble_recovered_structure_outcomes(
+        outcomes,
+        positions,
+        length(x),
+        names(x),
+        warn = !quiet
+      ))
+    }
+  }
+  arrays <- .compact_iupac_arrays(unique_x, progress)
+  if (
+    is.null(progress) &&
+      all(vapply(arrays, function(a) identical(a$status, "ok"), logical(1)))
+  ) {
+    out <- .compact_structure_from_arrays(x, unique_x, arrays, progress)
+    names(out) <- names(x)
+    return(out)
+  }
   groups <- match(x, unique_x)
-  positions <- lapply(seq_along(unique_x), function(i) which(groups == i))
+  positions <- unname(split(
+    non_missing,
+    factor(groups[non_missing], levels = seq_along(unique_x))
+  ))
 
-  outcomes <- .compact_iupac_outcomes(unique_x, progress)
+  outcomes <- .compact_iupac_outcomes(unique_x, progress, arrays)
   assemble_recovered_structure_outcomes(
     outcomes,
     positions = positions,
     size = length(x),
     input_names = names(x),
-    progress = progress
+    progress = progress,
+    warn = !quiet
   )
 }
 
@@ -924,7 +1036,8 @@ assemble_recovered_structure_outcomes <- function(
   positions,
   size,
   input_names,
-  progress = NULL
+  progress = NULL,
+  warn = TRUE
 ) {
   update <- .structure_progress_stage(
     progress,
@@ -950,7 +1063,7 @@ assemble_recovered_structure_outcomes <- function(
   out <- new_glycan_structure(result_iupacs, unique_graphs)
   names(out) <- input_names
 
-  if (any(failed)) {
+  if (warn && any(failed)) {
     failure_positions <- unlist(positions[failed], use.names = FALSE)
     failure_reasons <- unlist(
       Map(
@@ -1011,6 +1124,10 @@ is_missing_structure_input <- function(x) {
 #' @returns A one-line character scalar.
 #' @noRd
 normalize_structure_failure_reason <- function(cnd) {
+  cached <- attr(cnd, "array_failure_reason", exact = TRUE)
+  if (!is.null(cached)) {
+    return(cached)
+  }
   reason <- conditionMessage(cnd)
   reason <- stringr::str_replace_all(reason, "\\s*\\n\\s*", " ")
   stringr::str_squish(reason)

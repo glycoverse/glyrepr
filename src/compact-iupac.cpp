@@ -44,6 +44,12 @@ Tree parse_tree(std::string s, const std::unordered_map<std::string, int>& known
   if (s.empty() || std::any_of(s.begin(), s.end(), [](unsigned char c){ return std::isspace(c); }))
     throw std::runtime_error("empty input or whitespace");
   Tree t;
+  size_t capacity = std::count(s.begin(), s.end(), '(') + 1;
+  capacity = std::min(capacity, size_t(2048));
+  t.mono.reserve(capacity); t.sub.reserve(capacity); t.link.reserve(capacity);
+  t.parent.reserve(capacity); t.children.reserve(capacity);
+  t.depth.reserve(capacity); t.sig.reserve(capacity);
+  t.vertices.reserve(capacity); t.edge_nodes.reserve(capacity);
   if (s.size() >= 4 && s[s.size()-4] == '(' &&
       anomer_char(s[s.size()-3]) && donor_char(s[s.size()-2]) && s.back() == '-') {
     t.anomer = s.substr(s.size()-3, 2); s.resize(s.size()-4);
@@ -84,7 +90,7 @@ Tree parse_tree(std::string s, const std::unordered_map<std::string, int>& known
     int id = t.mono.size();
     if (id >= 2048) throw Unsupported("native size guard");
     t.mono.push_back(mono); t.sub.push_back(residue.second); t.link.push_back(link); t.parent.push_back(current);
-    t.children.emplace_back(); t.depth.push_back(0); t.sig.emplace_back();
+    t.children.emplace_back();
     if (current >= 0) t.children[current].push_back(id);
     else if (t.anomer.empty()) t.anomer = "?" + std::to_string(it->second);
     current = id;
@@ -104,14 +110,23 @@ std::vector<int> parse_parents(const std::string& text) {
 }
 
 List parse_complete(std::string s,const std::unordered_map<std::string,int>& known,
-    const std::unordered_map<std::string,std::string>& configurations,Function& order,bool byte_order,Function& bliss) {
+    const std::unordered_map<std::string,std::string>& configurations,Function& order,bool byte_order,Function& bliss,LexicalCache& lexical_cache, Forest* destination = nullptr) {
   if(s.empty() || s[0]!='{') {
-    Tree t=parse_tree(s,known,configurations);cache_tree(t,order,byte_order);
+    Tree t=parse_tree(s,known,configurations);
+    t.order_cache = &lexical_cache;
+    // With distinct acceptor ranks at every branch, lexical signatures cannot
+    // affect the canonical backbone or sibling order. Topology and occupied
+    // positions are still checked by cache_tree.
+    mark_distinct_link_ranks(t);
+    cache_tree(t,order,byte_order);
     t.sequence=emit(t,0,order,byte_order)+(t.alditol?"-ol":"")+"("+t.anomer+"-";
+    if (destination) { destination->tree = std::move(t); destination->root = 0; return List::create(); }
     return serialize_tree(t);
   }
   Forest f;std::vector<int> source_map;
+  f.tree.order_cache = &lexical_cache;
   auto append_component=[&](Tree& component) {
+    component.order_cache = &lexical_cache;
     cache_tree(component,order,byte_order);emit(component,0,order,byte_order);
     int n=component.mono.size(),offset=f.tree.mono.size();
     if (n + offset > 2048) throw Unsupported("native size guard");
@@ -153,7 +168,9 @@ List parse_complete(std::string s,const std::unordered_map<std::string,int>& kno
   }
   for(auto& sub:f.subs) remap(sub.parents);
   validate_forest(f);
-  return finish_forest(f,order,byte_order,bliss);
+  List metadata = finish_forest(f,order,byte_order,bliss,destination == nullptr);
+  if (destination) *destination = std::move(f);
+  return metadata;
 }
 
 } // namespace glyrepr_compact
@@ -167,10 +184,11 @@ List compact_parse_native(CharacterVector strings,CharacterVector residues,Integ
   for(int i=0;i<configuration_names.size();++i) configurations.emplace(as<std::string>(configuration_names[i]),as<std::string>(configuration_values[i]));
   CompactProgress reporter(progress);
   List out(strings.size());
+  glyrepr_compact::LexicalCache lexical_cache;
   for(int i=0;i<strings.size();++i) {
     if(i%128==0) { checkUserInterrupt(); reporter.update(i); }
     if(strings[i]==NA_STRING) {out[i]=List::create(_["status"]="missing");continue;}
-    try {out[i]=glyrepr_compact::parse_complete(as<std::string>(strings[i]),known,configurations,order,byte_order,bliss);}
+    try {out[i]=glyrepr_compact::parse_complete(as<std::string>(strings[i]),known,configurations,order,byte_order,bliss,lexical_cache);}
     catch(const glyrepr_compact::Unsupported& e) {out[i]=List::create(_["status"]="unsupported",_["reason"]=e.what());}
     catch(const std::exception& e) {out[i]=List::create(_["status"]="error",_["reason"]=e.what());}
   }

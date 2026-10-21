@@ -178,7 +178,10 @@ canonicalize_glycan_graph <- function(graph) {
 #' @family low-level glycan structure functions
 #' @export
 validate_glycan_graph_vector <- function(graphs, label = NULL) {
-  checkmate::assert_list(graphs, types = "igraph")
+  checkmate::assert_list(graphs)
+  if (!.compact_graph_list_valid_native(graphs)) {
+    checkmate::assert_list(graphs, types = "igraph")
+  }
   checkmate::assert_string(label, null.ok = TRUE)
   invisible(NULL)
 }
@@ -278,7 +281,10 @@ graph_to_iupac <- function(graph) {
 #' @export
 new_glycan_structure <- function(iupac = character(), graphs = list()) {
   checkmate::assert_character(iupac, any.missing = TRUE)
-  checkmate::assert_list(graphs, types = "igraph")
+  checkmate::assert_list(graphs)
+  if (!.compact_graph_list_valid_native(graphs)) {
+    checkmate::assert_list(graphs, types = "igraph")
+  }
 
   graph_names <- names(graphs)
   if (
