@@ -5,7 +5,12 @@ Convert an object to a glycan structure vector.
 ## Usage
 
 ``` r
-as_glycan_structure(x, on_failure = c("error", "na"), progress = FALSE)
+as_glycan_structure(
+  x,
+  on_failure = c("error", "na"),
+  progress = FALSE,
+  warn = TRUE
+)
 ```
 
 ## Arguments
@@ -38,6 +43,11 @@ as_glycan_structure(x, on_failure = c("error", "na"), progress = FALSE)
   `on_failure = "na"`. The cli bar is closed when the call exits,
   including on errors or interrupts, and follows cli display settings
   (short or non-interactive calls may show no visible bar).
+
+- warn:
+
+  Whether to warn about recovered failures with `on_failure = "na"`.
+  Validation is always performed.
 
 ## Value
 

@@ -2,7 +2,27 @@
 
 ## glyrepr (development version)
 
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
+  and
+  [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
+  combine native canonicalization and graph construction to reduce
+  temporary allocation.
+  `as_glycan_structure(warn = FALSE, on_failure = "na")` suppresses
+  recovery diagnostics while retaining validation.
+  ([\#104](https://github.com/glycoverse/glyrepr/issues/104))
+
+- [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_from_arrays.md)
+  validates shared chemical tokens and builds graphs in batches. The new
+  `warn = FALSE` option returns missing values for invalid records
+  without emitting recovery warnings; validation remains mandatory.
+  ([\#104](https://github.com/glycoverse/glyrepr/issues/104))
+
 ### Bug fixes
+
+- Floating-structure canonicalization protects temporary R vectors
+  across allocations and callbacks, preventing intermittent
+  garbage-collection crashes in long parsing batches.
+  ([\#104](https://github.com/glycoverse/glyrepr/issues/104))
 
 - The compact graph template no longer retains an igraph native pointer,
   allowing coverage counters to be serialized safely during R shutdown.
@@ -21,6 +41,12 @@
 
 ### Performance improvements
 
+- Character-input recovery builds graphs in batches and groups duplicate
+  positions in linear time. Fully valid character and array batches
+  assemble results directly, and ordinary IUPAC trees avoid unnecessary
+  branch-signature comparisons while preserving locale-dependent
+  ordering. ([\#104](https://github.com/glycoverse/glyrepr/issues/104))
+
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md),
   [`remove_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_linkages.md),
   and
@@ -28,17 +54,20 @@
   process large structure vectors faster while preserving canonical
   output and custom graph attributes.
   ([\#103](https://github.com/glycoverse/glyrepr/issues/103))
+
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   parses IUPAC-condensed vectors faster through streamlined parsing,
   floating-structure canonicalization, and batch graph construction
   while preserving validation and canonical output
   ([\#102](https://github.com/glycoverse/glyrepr/issues/102)).
+
 - [`as_glycan_composition()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_composition.md)
   and
   [`count_mono()`](https://glycoverse.github.io/glyrepr/dev/reference/count_mono.md)
   process structure and graph inputs faster while preserving names and
   missing values; repeated structures reuse counting results.
   ([\#99](https://github.com/glycoverse/glyrepr/issues/99))
+
 - [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/as_glycan_structure.md)
   with graph inputs,
   [`glycan_structure()`](https://glycoverse.github.io/glyrepr/dev/reference/glycan_structure.md),
@@ -48,6 +77,7 @@
   family process graphs faster while preserving source attributes and
   failure handling.
   ([\#97](https://github.com/glycoverse/glyrepr/issues/97))
+
 - [`canonicalize_glycan_graph()`](https://glycoverse.github.io/glyrepr/dev/reference/canonicalize_glycan_graph.md),
   [`graph_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/graph_to_iupac.md),
   [`structure_to_iupac()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_to_iupac.md),
@@ -56,6 +86,7 @@
   [`validate_glycan_graph_vector()`](https://glycoverse.github.io/glyrepr/dev/reference/validate_glycan_graph_vector.md)
   process graphs faster while preserving validation and canonical IUPAC
   output. ([\#97](https://github.com/glycoverse/glyrepr/issues/97))
+
 - [`convert_to_generic()`](https://glycoverse.github.io/glyrepr/dev/reference/convert_to_generic.md),
   [`fill_anomer_pos()`](https://glycoverse.github.io/glyrepr/dev/reference/fill_anomer_pos.md),
   [`remove_linkages()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_linkages.md),
@@ -63,6 +94,7 @@
   [`remove_substituents()`](https://glycoverse.github.io/glyrepr/dev/reference/remove_substituents.md)
   transform structure vectors faster while reusing unchanged structures.
   ([\#97](https://github.com/glycoverse/glyrepr/issues/97))
+
 - [`localize_floating_parts()`](https://glycoverse.github.io/glyrepr/dev/reference/localize_floating_parts.md),
   [`enumerate_floating_localizations()`](https://glycoverse.github.io/glyrepr/dev/reference/enumerate_floating_localizations.md),
   and
@@ -70,6 +102,7 @@
   process floating assignments faster while preserving node IDs,
   candidate order, and assignment records.
   ([\#97](https://github.com/glycoverse/glyrepr/issues/97))
+
 - [`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/dev/reference/structure_tables.md)
   constructs structures faster by avoiding intermediate graphs.
   ([\#97](https://github.com/glycoverse/glyrepr/issues/97))

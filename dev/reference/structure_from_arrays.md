@@ -10,7 +10,12 @@ tokens (or empty strings). Optional `alditol` defaults to `FALSE`.
 ## Usage
 
 ``` r
-structure_from_arrays(x, on_failure = c("error", "na"), progress = FALSE)
+structure_from_arrays(
+  x,
+  on_failure = c("error", "na"),
+  progress = FALSE,
+  warn = TRUE
+)
 ```
 
 ## Arguments
@@ -39,6 +44,12 @@ structure_from_arrays(x, on_failure = c("error", "na"), progress = FALSE)
   `on_failure = "na"`. The cli bar is closed when the call exits,
   including on errors or interrupts, and follows cli display settings
   (short or non-interactive calls may show no visible bar).
+
+- warn:
+
+  Whether to warn about invalid records when `on_failure = "na"`.
+  Validation is always performed. Set to `FALSE` when the caller handles
+  missing results itself.
 
 ## Value
 
