@@ -1,31 +1,18 @@
-# glyrepr (development version)
-
-* `as_glycan_structure()` and `structure_from_arrays()` combine native canonicalization and graph construction to reduce temporary allocation. `as_glycan_structure(warn = FALSE, on_failure = "na")` suppresses recovery diagnostics while retaining validation. (#104)
-
-* `structure_from_arrays()` validates shared chemical tokens and builds graphs in batches. The new `warn = FALSE` option returns missing values for invalid records without emitting recovery warnings; validation remains mandatory. (#104)
-
-## Bug fixes
-
-* Floating-structure canonicalization protects temporary R vectors across allocations and callbacks, preventing intermittent garbage-collection crashes in long parsing batches. (#104)
-
-* The compact graph template no longer retains an igraph native pointer, allowing coverage counters to be serialized safely during R shutdown. (#102)
+# glyrepr 1.2.0
 
 ## New features
 
-* `as_glycan_structure()` and `structure_from_arrays()` gain a `progress` argument: use `TRUE` to display a progress bar or a function accepting `stage`, `current`, and `total` to receive updates during parsing, graph construction, and failure recovery. The default remains `FALSE`. (#98)
+* `as_glycan_structure()` and `structure_from_arrays()` gain a `progress` argument for progress bars or custom callbacks. (#98)
+* `as_glycan_structure()` and `structure_from_arrays()` gain `warn = FALSE` to silence recovery warnings when invalid inputs are replaced with missing values; validation is unchanged. (#104)
 
 ## Performance improvements
 
-* Character-input recovery builds graphs in batches and groups duplicate positions in linear time. Fully valid character and array batches assemble results directly, and ordinary IUPAC trees avoid unnecessary branch-signature comparisons while preserving locale-dependent ordering. (#104)
+* Parsing and constructing glycan structures from IUPAC strings, graphs, arrays, and tables is faster and uses less temporary memory. (#97, #102, #104)
+* Structure transformations, canonicalization, composition calculation, residue counting, and floating-part localization are faster while preserving output and graph attributes. (#97, #99, #103)
 
-* `convert_to_generic()`, `remove_linkages()`, and `remove_substituents()` process large structure vectors faster while preserving canonical output and custom graph attributes. (#103)
-* `as_glycan_structure()` parses IUPAC-condensed vectors faster through streamlined parsing, floating-structure canonicalization, and batch graph construction while preserving validation and canonical output (#102).
-* `as_glycan_composition()` and `count_mono()` process structure and graph inputs faster while preserving names and missing values; repeated structures reuse counting results. (#99)
-* `as_glycan_structure()` with graph inputs, `glycan_structure()`, `canonicalize_glycan_graphs()`, and the `smap_structure()` family process graphs faster while preserving source attributes and failure handling. (#97)
-* `canonicalize_glycan_graph()`, `graph_to_iupac()`, `structure_to_iupac()`, `validate_glycan_graph()`, and `validate_glycan_graph_vector()` process graphs faster while preserving validation and canonical IUPAC output. (#97)
-* `convert_to_generic()`, `fill_anomer_pos()`, `remove_linkages()`, and `remove_substituents()` transform structure vectors faster while reusing unchanged structures. (#97)
-* `localize_floating_parts()`, `enumerate_floating_localizations()`, and `enumerate_floating_graph_localizations()` process floating assignments faster while preserving node IDs, candidate order, and assignment records. (#97)
-* `structure_from_tibbles()` constructs structures faster by avoiding intermediate graphs. (#97)
+## Bug fixes
+
+* Fix intermittent crashes when parsing floating glycan structures. (#104)
 
 # glyrepr 1.1.0
 
