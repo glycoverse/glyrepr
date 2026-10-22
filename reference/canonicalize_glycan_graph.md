@@ -41,7 +41,11 @@ validates a batch and returns aligned canonical graphs, IUPAC keys, and
 per-element status. It preserves input names and arbitrary graph,
 vertex, and edge attributes. Equal structures retain separate graphs
 until the caller explicitly deduplicates them. This is useful when
-source attributes differ.
+source attributes differ. Graph and array construction share native
+processing. Unsupported inputs use the R path, which also supplies the
+established failure diagnostics.
+[`structure_from_tibbles()`](https://glycoverse.github.io/glyrepr/reference/structure_tables.md)
+converts table rows directly to array records.
 
 The individual low-level functions remain available when an intermediate
 graph is needed.
@@ -104,6 +108,16 @@ source attributes. Keep `batch$graphs` instead when per-input provenance
 is needed. Use `validate = FALSE` only when every non-missing graph has
 already passed
 [`validate_glycan_graph()`](https://glycoverse.github.io/glyrepr/reference/validate_glycan_graph.md).
+
+Both
+[`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md)
+and
+[`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/reference/structure_from_arrays.md)
+accept `progress = TRUE` for stage-level progress. A parser that owns
+its progress display can instead pass a function
+`function(stage, current, total)` to receive updates without creating a
+nested bar. Counts restart for each stage; completion of parsing alone
+does not mean structure construction is finished.
 
 ## See also
 

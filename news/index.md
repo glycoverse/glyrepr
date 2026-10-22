@@ -1,6 +1,43 @@
 # Changelog
 
+## glyrepr 1.2.0
+
+### New features
+
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md)
+  and
+  [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/reference/structure_from_arrays.md)
+  gain a `progress` argument for progress bars or custom callbacks.
+  ([\#98](https://github.com/glycoverse/glyrepr/issues/98))
+- [`as_glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.md)
+  and
+  [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/reference/structure_from_arrays.md)
+  gain `warn = FALSE` to silence recovery warnings when invalid inputs
+  are replaced with missing values; validation is unchanged.
+  ([\#104](https://github.com/glycoverse/glyrepr/issues/104))
+
+### Performance improvements
+
+- Parsing and constructing glycan structures from IUPAC strings, graphs,
+  arrays, and tables is faster and uses less temporary memory.
+  ([\#97](https://github.com/glycoverse/glyrepr/issues/97),
+  [\#102](https://github.com/glycoverse/glyrepr/issues/102),
+  [\#104](https://github.com/glycoverse/glyrepr/issues/104))
+- Structure transformations, canonicalization, composition calculation,
+  residue counting, and floating-part localization are faster while
+  preserving output and graph attributes.
+  ([\#97](https://github.com/glycoverse/glyrepr/issues/97),
+  [\#99](https://github.com/glycoverse/glyrepr/issues/99),
+  [\#103](https://github.com/glycoverse/glyrepr/issues/103))
+
+### Bug fixes
+
+- Fix intermittent crashes when parsing floating glycan structures.
+  ([\#104](https://github.com/glycoverse/glyrepr/issues/104))
+
 ## glyrepr 1.1.0
+
+CRAN release: 2026-09-22
 
 ### New features
 
@@ -10,12 +47,6 @@
   aligned canonical graphs, IUPAC keys, statuses, and failure reasons
   while preserving source attributes.
   ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
-- [`canonicalize_glycan_graphs()`](https://glycoverse.github.io/glyrepr/reference/canonicalize_glycan_graphs.md)
-  and
-  [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/reference/structure_from_arrays.md)
-  support per-element recovery with `on_failure = "na"`; their warning
-  conditions expose failed positions and reasons for programmatic
-  handling. ([\#94](https://github.com/glycoverse/glyrepr/issues/94))
 - New
   [`structure_from_arrays()`](https://glycoverse.github.io/glyrepr/reference/structure_from_arrays.md)
   constructs glycan vectors directly from residue, edge, and

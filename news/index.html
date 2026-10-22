@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glyrepr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,12 +39,29 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.0" id="glyrepr-110">glyrepr 1.1.0<a class="anchor" aria-label="anchor" href="#glyrepr-110"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.2.0" id="glyrepr-120">glyrepr 1.2.0<a class="anchor" aria-label="anchor" href="#glyrepr-120"></a></h2>
+<div class="section level3">
+<h3 id="new-features-1-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> gain a <code>progress</code> argument for progress bars or custom callbacks. (<a href="https://github.com/glycoverse/glyrepr/issues/98" class="external-link">#98</a>)</li>
+<li>
+<code><a href="../reference/as_glycan_structure.html">as_glycan_structure()</a></code> and <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> gain <code>warn = FALSE</code> to silence recovery warnings when invalid inputs are replaced with missing values; validation is unchanged. (<a href="https://github.com/glycoverse/glyrepr/issues/104" class="external-link">#104</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="performance-improvements-1-2-0">Performance improvements<a class="anchor" aria-label="anchor" href="#performance-improvements-1-2-0"></a></h3>
+<ul><li>Parsing and constructing glycan structures from IUPAC strings, graphs, arrays, and tables is faster and uses less temporary memory. (<a href="https://github.com/glycoverse/glyrepr/issues/97" class="external-link">#97</a>, <a href="https://github.com/glycoverse/glyrepr/issues/102" class="external-link">#102</a>, <a href="https://github.com/glycoverse/glyrepr/issues/104" class="external-link">#104</a>)</li>
+<li>Structure transformations, canonicalization, composition calculation, residue counting, and floating-part localization are faster while preserving output and graph attributes. (<a href="https://github.com/glycoverse/glyrepr/issues/97" class="external-link">#97</a>, <a href="https://github.com/glycoverse/glyrepr/issues/99" class="external-link">#99</a>, <a href="https://github.com/glycoverse/glyrepr/issues/103" class="external-link">#103</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-1-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-2-0"></a></h3>
+<ul><li>Fix intermittent crashes when parsing floating glycan structures. (<a href="https://github.com/glycoverse/glyrepr/issues/104" class="external-link">#104</a>)</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.0" id="glyrepr-110">glyrepr 1.1.0<a class="anchor" aria-label="anchor" href="#glyrepr-110"></a></h2><p class="text-muted">CRAN release: 2026-09-22</p>
 <div class="section level3">
 <h3 id="new-features-1-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-1-0"></a></h3>
 <ul><li>New <code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code> validates and canonicalizes a batch of glycan graphs, returning aligned canonical graphs, IUPAC keys, statuses, and failure reasons while preserving source attributes. (<a href="https://github.com/glycoverse/glyrepr/issues/94" class="external-link">#94</a>)</li>
-<li>
-<code><a href="../reference/canonicalize_glycan_graphs.html">canonicalize_glycan_graphs()</a></code> and <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> support per-element recovery with <code>on_failure = "na"</code>; their warning conditions expose failed positions and reasons for programmatic handling. (<a href="https://github.com/glycoverse/glyrepr/issues/94" class="external-link">#94</a>)</li>
 <li>New <code><a href="../reference/structure_from_arrays.html">structure_from_arrays()</a></code> constructs glycan vectors directly from residue, edge, and floating-metadata records, preserving names and missing values while deduplicating canonical graphs. (<a href="https://github.com/glycoverse/glyrepr/issues/94" class="external-link">#94</a>)</li>
 </ul></div>
 <div class="section level3">
