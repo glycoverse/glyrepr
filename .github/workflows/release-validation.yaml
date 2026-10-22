@@ -1,0 +1,188 @@
+# One-off release validation. No CRAN submission, tags, releases, or repository writes.
+name: glyrepr 1.2.0 release validation
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/release-validation.yaml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release-validation-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  release-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      EVIDENCE: ${{ runner.temp }}/release-evidence
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: r-lib/actions/setup-pandoc@v2
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-tinytex@v2
+      - name: Audit release metadata
+        shell: Rscript {0}
+        run: |
+          d <- read.dcf('DESCRIPTION')
+          stopifnot(d[1, 'Package'] == 'glyrepr', d[1, 'Version'] == '1.2.0')
+          stopifnot(!'Remotes' %in% colnames(d))
+          dir.create(Sys.getenv('EVIDENCE'), recursive = TRUE)
+          writeLines(Sys.getenv('GITHUB_SHA'), file.path(Sys.getenv('EVIDENCE'), 'candidate-commit.txt'))
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::devtools
+            any::urlchecker
+            any::rcmdcheck
+            any::sessioninfo
+          needs: check
+      - name: Record and audit released dependency sources
+        shell: Rscript {0}
+        run: |
+          e <- Sys.getenv('EVIDENCE')
+          ip <- installed.packages(fields = c('RemoteType', 'RemoteRepo', 'RemoteSha', 'Repository'))
+          write.csv(ip, file.path(e, 'installed-packages.csv'), row.names = FALSE)
+          writeLines(capture.output(sessioninfo::session_info()), file.path(e, 'session-info.txt'))
+          d <- read.dcf('DESCRIPTION')
+          fields <- intersect(c('Depends', 'Imports', 'LinkingTo'), colnames(d))
+          direct <- trimws(sub(' *[(].*', '', unlist(strsplit(paste(d[1, fields], collapse = ','), ','))))
+          direct <- setdiff(direct, 'R')
+          closure <- unique(c(direct, unlist(tools::package_dependencies(direct, db = ip, recursive = TRUE))))
+          closure <- intersect(closure, rownames(ip))
+          bad <- closure[!is.na(ip[closure, 'RemoteType']) & !ip[closure, 'RemoteType'] %in% c('standard', 'cran', 'bioc')]
+          if (length(bad)) stop('Non-release required dependencies: ', paste(bad, collapse = ', '))
+      - name: Check URLs
+        shell: Rscript {0}
+        run: |
+          result <- urlchecker::url_check()
+          saveRDS(result, file.path(Sys.getenv('EVIDENCE'), 'url-check.rds'))
+          if (NROW(result)) stop('URL findings require review; see artifact')
+      - name: Rebuild README and require no source drift
+        shell: Rscript {0}
+        run: devtools::build_readme()
+      - name: Verify generated files are unchanged
+        run: git diff --exit-code
+      - name: Full remote and PDF manual check (release-issue command)
+        shell: Rscript {0}
+        run: |
+          stopifnot(nzchar(Sys.which('pdflatex')))
+          result <- devtools::check(remote = TRUE, manual = TRUE, document = FALSE,
+            check_dir = file.path(Sys.getenv('EVIDENCE'), 'issue-check'), error_on = 'never')
+          saveRDS(result, file.path(Sys.getenv('EVIDENCE'), 'issue-check.rds'))
+          stopifnot(length(result$errors) == 0L, length(result$warnings) == 0L)
+          logs <- list.files(file.path(Sys.getenv('EVIDENCE'), 'issue-check'), pattern = '^00check[.]log$', recursive = TRUE, full.names = TRUE)
+          stopifnot(length(logs) == 1L)
+          txt <- readLines(logs, warn = FALSE)
+          stopifnot(any(grepl('^Status: OK[[:space:]]*$', txt)), !any(grepl('aborted|Execution halted', txt, ignore.case = TRUE)))
+      - name: Retain the exact tarball checked by rcmdcheck
+        shell: Rscript {0}
+        run: |
+          e <- Sys.getenv('EVIDENCE')
+          # rcmdcheck::build_package copies file inputs into check_dir unchanged.
+          candidates <- list.files(file.path(e, 'issue-check'), pattern = '[.]tar[.]gz$', full.names = TRUE)
+          stopifnot(length(candidates) == 1L, basename(candidates) == 'glyrepr_1.2.0.tar.gz')
+          destination <- file.path(e, basename(candidates))
+          stopifnot(file.copy(candidates, destination, overwrite = FALSE))
+          stopifnot(unname(tools::md5sum(candidates)) == unname(tools::md5sum(destination)))
+      - name: Record tarball checksum and final source identity
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$EVIDENCE"
+          git rev-parse HEAD > "$EVIDENCE/candidate-commit.txt"
+          git diff > "$EVIDENCE/source-diff.patch"
+          if compgen -G "$EVIDENCE/*.tar.gz" > /dev/null; then
+            (cd "$EVIDENCE" && sha256sum *.tar.gz > SHA256SUMS)
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: glyrepr-1.2.0-release-check-${{ github.sha }}
+          path: ${{ runner.temp }}/release-evidence
+          retention-days: 30
+          if-no-files-found: error
+  reverse-dependencies:
+    needs: release-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: r-lib/actions/setup-pandoc@v2
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-tinytex@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            r-lib/revdepcheck
+            any::sessioninfo
+          needs: check
+      - uses: actions/download-artifact@v4
+        with:
+          name: glyrepr-1.2.0-release-check-${{ github.sha }}
+          path: ${{ runner.temp }}/release-input
+      - name: Verify and unpack the checked submission artifact
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/release-input"
+          sha256sum -c SHA256SUMS
+          test "$(cat candidate-commit.txt)" = "$GITHUB_SHA"
+          mkdir -p "$RUNNER_TEMP/revdep-candidate"
+          tar -xzf glyrepr_1.2.0.tar.gz -C "$RUNNER_TEMP/revdep-candidate"
+      - name: Check all current CRAN reverse dependencies against old and new
+        shell: Rscript {0}
+        run: |
+          # revdepcheck is a GitHub-installed CHECK TOOL, not a package dependency.
+          # Source CRAN repository is required by revdepcheck, not a binary-only URL.
+          options(repos = c(CRAN = 'https://cloud.r-project.org'))
+          pkg <- file.path(Sys.getenv('RUNNER_TEMP'), 'revdep-candidate', 'glyrepr')
+          stopifnot(read.dcf(file.path(pkg, 'DESCRIPTION'))[1, 'Version'] == '1.2.0')
+          expected <- c('glydraw', 'glymotif', 'glyparse')
+          ap <- available.packages(type = 'source')
+          required <- c(glydraw = '0.9.0', glymotif = '1.0.1', glyparse = '0.8.1')
+          stopifnot(all(c(expected, 'glyrepr') %in% rownames(ap)))
+          stopifnot(ap['glyrepr', 'Version'] == '1.1.0')
+          stopifnot(all(vapply(names(required), function(p) {
+            package_version(ap[p, 'Version']) >= package_version(required[[p]])
+          }, logical(1))))
+          write.csv(ap[c('glyrepr', expected), , drop = FALSE],
+            file.path(Sys.getenv('RUNNER_TEMP'), 'revdep-candidate', 'official-source-versions.csv'), row.names = FALSE)
+          actual <- revdepcheck::cran_revdeps('glyrepr')
+          writeLines(actual, file.path(Sys.getenv('RUNNER_TEMP'), 'revdep-candidate', 'discovered-cran-revdeps.txt'))
+          stopifnot(all(expected %in% actual))
+          revdepcheck::revdep_check(pkg = pkg, num_workers = 4)
+          revdepcheck::revdep_report(pkg = pkg)
+          revdepcheck::revdep_report_summary(pkg = pkg, all = TRUE,
+            file = file.path(Sys.getenv('RUNNER_TEMP'), 'revdep-candidate', 'summary.md'))
+          saveRDS(revdepcheck::revdep_summary(pkg = pkg),
+            file.path(Sys.getenv('RUNNER_TEMP'), 'revdep-candidate', 'summary.rds'))
+          writeLines(capture.output(sessioninfo::session_info()),
+            file.path(Sys.getenv('RUNNER_TEMP'), 'revdep-candidate', 'session-info.txt'))
+          # The saved old/new reports are a mandatory human/agent release gate.
+          # Job success alone does NOT assert no new failures or full completion.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: glyrepr-1.2.0-revdeps-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/revdep-candidate
+            !${{ runner.temp }}/revdep-candidate/glyrepr/revdep/library/**
+            ${{ runner.temp }}/release-input/SHA256SUMS
+            ${{ runner.temp }}/release-input/candidate-commit.txt
+          retention-days: 30
+          if-no-files-found: error
