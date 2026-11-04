@@ -22,9 +22,10 @@ test_that("mapping keys preserve types and missingness", {
     c(TRUE, FALSE)
   )
   names(structures) <- c(NA_character_, "NA", "NA")
+  # vctrs normalizes vector names before simap receives them.
   expect_identical(
-    unname(simap_lgl(structures, function(graph, name) is.na(name))),
-    c(TRUE, FALSE, FALSE)
+    unname(simap_chr(structures, function(graph, name) name)),
+    names(structures)
   )
 })
 
