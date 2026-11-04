@@ -426,15 +426,6 @@ NULL
   return(result)
 }
 
-# Helper function to generate a hash-based key for complex objects
-# Used for deduplication when dealing with nested lists and other complex structures
-.generate_object_hash <- function(obj) {
-  serialized_data <- serialize(obj, connection = NULL)
-  hash_input <- sum(as.integer(serialized_data))
-  hex_hash <- as.hexmode(hash_input)
-  format(hex_hash, width = 8)
-}
-
 # Helper function to extract values from tibble list-columns
 # Tibble stores single-element lists as list(data) in list-columns, requiring unwrapping
 .extract_from_list_column <- function(value) {
@@ -445,14 +436,10 @@ NULL
   }
 }
 
-# Helper function to generate deduplication keys for arbitrary values
-# Handles both simple values (convert to character) and complex objects (hash-based keys)
-.generate_value_key <- function(value, prefix = "list_") {
-  if (is.list(value)) {
-    paste0(prefix, .generate_object_hash(value))
-  } else {
-    as.character(value)
-  }
+# Preserve value type, attributes, order and missingness without a lossy hash.
+# Hexadecimal bytes cannot contain the combination-key separator "|||".
+.generate_value_key <- function(value) {
+  paste0(as.character(serialize(value, connection = NULL, version = 2)), collapse = "")
 }
 
 #' @rdname smap
