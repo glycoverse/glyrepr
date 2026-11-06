@@ -341,7 +341,7 @@ Next steps:
 ``` r
 
 sessionInfo()
-#> R version 4.6.1 (2026-06-24)
+#> R version 4.6.2 (2026-10-29)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.5 LTS
 #> 
@@ -365,7 +365,7 @@ sessionInfo()
 #> [1] glyrepr_1.2.0.9000
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.1    tidyselect_1.2.1 
+#>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.2    tidyselect_1.2.1 
 #>  [5] Rcpp_1.1.2        stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2
 #>  [9] textshaping_1.0.5 yaml_2.3.12       fastmap_1.2.0     R6_2.6.1         
 #> [13] generics_0.1.4    igraph_2.3.4      knitr_1.52        backports_1.5.1  
@@ -375,5 +375,5 @@ sessionInfo()
 #> [29] otel_0.2.0        cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5   
 #> [33] digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.3       evaluate_1.0.5   
 #> [37] glue_1.8.1        ragg_1.5.2        rmarkdown_2.32    purrr_1.2.2      
-#> [41] tools_4.6.1       pkgconfig_2.0.3   htmltools_0.5.9
+#> [41] tools_4.6.2       pkgconfig_2.0.3   htmltools_0.5.9
 ```

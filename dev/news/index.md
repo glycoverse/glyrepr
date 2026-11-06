@@ -2,7 +2,17 @@
 
 ## glyrepr (development version)
 
+- [`smap2()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md),
+  [`spmap()`](https://glycoverse.github.io/glyrepr/dev/reference/spmap.md),
+  [`simap()`](https://glycoverse.github.io/glyrepr/dev/reference/simap.md),
+  and their typed variants no longer reuse results for distinct argument
+  values whose old deduplication keys collided, including reordered
+  nested data, missing versus literal `"NA"` values, and
+  separator-containing strings.
+
 ## glyrepr 1.2.0
+
+CRAN release: 2026-10-22
 
 ### New features
 

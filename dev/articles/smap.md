@@ -266,14 +266,14 @@ library(tictoc)
 tic("smap_int (optimized)")
 vertex_counts_optimized <- smap_int(huge_struc, igraph::vcount)
 toc()
-#> smap_int (optimized): 0.034 sec elapsed
+#> smap_int (optimized): 0.03 sec elapsed
 
 # Naive approach: extract all graphs and process each one
 tic("Naive approach (all graphs)")
 all_graphs <- get_structure_graphs(huge_struc)  # Extracts all 25,000 graphs
 vertex_counts_naive <- purrr::map_int(all_graphs, igraph::vcount)
 toc()
-#> Naive approach (all graphs): 0.26 sec elapsed
+#> Naive approach (all graphs): 0.252 sec elapsed
 
 # Verify results are equivalent (though data types may differ)
 all.equal(vertex_counts_optimized, vertex_counts_naive)
@@ -420,7 +420,7 @@ Key takeaways:
 ``` r
 
 sessionInfo()
-#> R version 4.6.1 (2026-06-24)
+#> R version 4.6.2 (2026-10-29)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.5 LTS
 #> 
@@ -444,7 +444,7 @@ sessionInfo()
 #> [1] tictoc_1.2.1       lobstr_1.2.2       glyrepr_1.2.0.9000
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.1    tidyselect_1.2.1 
+#>  [1] jsonlite_2.0.0    dplyr_1.2.1       compiler_4.6.2    tidyselect_1.2.1 
 #>  [5] Rcpp_1.1.2        stringr_1.6.0     jquerylib_0.1.4   systemfonts_1.3.2
 #>  [9] textshaping_1.0.5 yaml_2.3.12       fastmap_1.2.0     R6_2.6.1         
 #> [13] generics_0.1.4    igraph_2.3.4      knitr_1.52        backports_1.5.1  
@@ -454,5 +454,5 @@ sessionInfo()
 #> [29] cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5    digest_0.6.39    
 #> [33] lifecycle_1.0.5   prettyunits_1.2.0 vctrs_0.7.3       evaluate_1.0.5   
 #> [37] glue_1.8.1        ragg_1.5.2        rmarkdown_2.32    purrr_1.2.2      
-#> [41] tools_4.6.1       pkgconfig_2.0.3   htmltools_0.5.9
+#> [41] tools_4.6.2       pkgconfig_2.0.3   htmltools_0.5.9
 ```
