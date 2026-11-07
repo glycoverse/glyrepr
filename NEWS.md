@@ -1,5 +1,6 @@
 # glyrepr (development version)
 
+* glyrepr now requires igraph 2.0.0 or later.
 * `smap2()`, `spmap()`, `simap()`, and their typed variants no longer reuse results for distinct argument values whose old deduplication keys collided, including reordered nested data, missing versus literal `"NA"` values, and separator-containing strings.
 
 # glyrepr 1.2.0
