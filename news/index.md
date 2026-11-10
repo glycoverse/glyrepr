@@ -1,6 +1,24 @@
 # Changelog
 
+## glyrepr 1.2.1
+
+### Minor improvements and bug fixes
+
+- Loading glyrepr on Windows no longer stalls under Chinese collation
+  settings. Native structure parsing preserves the session locale while
+  validating substituents and floating-parent indices.
+- glyrepr now requires igraph 2.0.0 or later.
+- [`smap2()`](https://glycoverse.github.io/glyrepr/reference/smap2.md),
+  [`spmap()`](https://glycoverse.github.io/glyrepr/reference/spmap.md),
+  [`simap()`](https://glycoverse.github.io/glyrepr/reference/simap.md),
+  and their typed variants no longer reuse results for distinct argument
+  values whose old deduplication keys collided, including reordered
+  nested data, missing versus literal `"NA"` values, and
+  separator-containing strings.
+
 ## glyrepr 1.2.0
+
+CRAN release: 2026-10-22
 
 ### New features
 
