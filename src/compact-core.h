@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <regex>
+#include "compact-syntax.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <numeric>
@@ -65,7 +65,6 @@ inline std::string int_join(const std::vector<int>& x) {
   for (int i : x) strings.push_back(std::to_string(i));
   return join(strings, ",");
 }
-const std::regex sub_regex("([1-9](/[1-9])*|\\?)(PPEtn|PEtn|NAc|NGc|Pyr|Me|Ac|PC|Gc|P|S|N)");
 inline std::vector<int> positions(const std::string& s) {
   if (s.empty() || s[0] == '?') return {};
   std::vector<int> out;
@@ -75,7 +74,7 @@ inline std::vector<int> positions(const std::string& s) {
   return out;
 }
 inline std::string normalize_sub(std::string s) {
-  if (!std::regex_match(s, sub_regex)) throw std::runtime_error("invalid substituent");
+  if (!is_substituent(s)) throw std::runtime_error("invalid substituent");
   if (s[0] == '?') return s;
   size_t k = s.find_first_not_of("123456789/");
   auto pos = positions(s); std::vector<std::string> p;
@@ -148,7 +147,15 @@ inline std::pair<std::string,std::string> extract_basic(std::string mono) {
     mono.erase(ac!=std::string::npos ? ac : gc, 3);
   }
   std::vector<std::string> subs;
-  for (std::sregex_iterator it(mono.begin(),mono.end(),sub_regex), end; it!=end; ++it) subs.push_back(it->str());
+  for (size_t begin = 0; begin < mono.size();) {
+    size_t end = substituent_end(mono, begin);
+    if (end == begin) {
+      ++begin;
+    } else {
+      subs.push_back(mono.substr(begin, end - begin));
+      begin = end;
+    }
+  }
   std::string cleaned = mono;
   for (const auto& token : subs) {
     size_t p = cleaned.find(token); if (p!=std::string::npos) cleaned.erase(p,token.size());

@@ -273,67 +273,21 @@ We have redesigned the internal implementation of `glyrepr_composition` and `gly
 ## Breaking changes
 
 * Remove the "alditol" attribute from `glycan_structure()` objects. This information is rarely used in glycomics and glycoproteomics data analysis. It is removed according to the razor principle.
-* `as_glycan_structure()` now doesn't allow the input IUPAC-condensed strings to omit the anomer information. Previously, something like "Glc(a1-3)GlcNAc" is valid. `as_glycan_structure()` assumed that the core "GlcNAc" has a "?1-" anomer and added it automatically. The problem is that this behavior was not easily awared by…6354 tokens truncated… < kids.size(); ++i)
-      for (size_t j = i + 1; j < kids.size(); ++j)
-        if (t.sig[kids[i]] == t.sig[kids[j]] && rank_link(t.link[kids[i]]) == rank_link(t.link[kids[j]]))
-          needs_symmetry = true;
-  }
-  std::vector<int> labels;
-  if (needs_symmetry) labels = symmetry_labels(f,bliss);
-  else {
-    labels.resize(t.mono.size() + f.edge_order.size() + f.parts.size() + f.subs.size());
-    std::iota(labels.begin(), labels.end(), 0);
-  }
-  int n=t.mono.size(), part_offset=n+f.edge_order.size(), sub_offset=part_offset+f.parts.size();
-  t.symmetry.assign(labels.begin(),labels.begin()+n);
-  auto key_candidates=[&](const std::vector<int>& candidates) {
-    std::vector<int> lab;for(int v:candidates) lab.push_back(labels[v]);std::sort(lab.begin(),lab.end());return int_join(lab);
-  };
-  std::vector<std::string> keys;
-  std::vector<std::vector<int>> part_vertices,part_edges;
-  std::vector<std::string> sequences;
-  for(const auto& p:f.parts) {
-    t.vertices.clear();t.edge_nodes.clear();
-    std::string seq=emit(t,p.root,order,byte_order);
-    part_vertices.push_back(t.vertices);part_edges.push_back(t.edge_nodes);sequences.push_back(seq);
-    keys.push_back(seq+"\r"+p.linkage+"\r"+(p.parents.empty()?"all":"explicit")+"\r"+key_candidates(candidates(p,n)));
-  }
-  auto sorted_constraints=[&](const std::vector<std::string>& keys,int offset) {
-    auto ids=lexical_order(keys,order,byte_order,t.order_cache);
-    // R orders by key then BLISS label; exact equal keys are the relevant ties.
-    size_t begin=0;
-    while(begin<ids.size()) {size_t end=begin+1;while(end<ids.size() && keys[ids[begin]]==keys[ids[end]]) ++end;
-      std::stable_sort(ids.begin()+begin,ids.begin()+end,[&](int a,int b){return labels[offset+a]<labels[offset+b];});begin=end;}
-    return ids;
-  };
-  auto part_ids=sorted_constraints(keys,part_offset);
-  keys.clear();for(const auto& s:f.subs) keys.push_back(s.token+"\r"+(s.parents.empty()?"all":"explicit")+"\r"+key_candidates(candidates(s,n)));
-  auto sub_ids=sorted_constraints(keys,sub_offset);
-  t.vertices.clear();t.edge_nodes.clear();
-  for(int id:part_ids) {t.vertices.insert(t.vertices.end(),part_vertices[id].begin(),part_vertices[id].end());t.edge_nodes.insert(t.edge_nodes.end(),part_edges[id].begin(),part_edges[id].end());}
-  std::string main=emit(t,f.root,order,byte_order)+(t.alditol?"-ol":"")+"("+t.anomer+"-";
-  std::vector<int> inverse(n);for(int i=0;i<n;++i) inverse[t.vertices[i]]=i+1;
-  auto remap=[&](const std::vector<int>& parents) {std::vector<int> out;for(int p:parents) out.push_back(inverse[p]);std::sort(out.begin(),out.end());return out;};
-  List parts(part_ids.size()),subs(sub_ids.size());std::string sequence;
-  for(int j=0;j<(int)sub_ids.size();++j) {
-    const auto& s=f.subs[sub_ids[j]];auto parents=remap(s.parents);
-    subs[j]=List::create(_["substituent"]=s.token,_["parents"]=parents);
-    sequence+="{"+s.token+(parents.empty()?"":"|"+int_join(parents))+"}";
-  }
-  for(int j=0;j<(int)part_ids.size();++j) {
-    int id=part_ids[j];const auto& p=f.parts[id];auto parents=remap(p.parents);
-    std::vector<int> nodes;for(int v:part_vertices[id]) nodes.push_back(inverse[v]);
-    parts[j]=List::create(_["root"]=inverse[p.root],_["nodes"]=nodes,_["linkage"]=p.linkage,_["parents"]=parents);
-    sequence+="{"+sequences[id]+"("+p.linkage+")"+(parents.empty()?"":"|"+int_join(parents))+"}";
-  }
-  t.sequence=sequence+main;
-  List result = arrays ? serialize_tree(t) : List::create();
-  if(parts.size()) result.push_back(parts, "floating_parts");
-  if(subs.size()) result.push_back(subs, "floating_substituents");
-  return result;
-}
+* `as_glycan_structure()` now doesn't allow the input IUPAC-condensed strings to omit the anomer information. Previously, something like "Glc(a1-3)GlcNAc" is valid. `as_glycan_structure()` assumed that the core "GlcNAc" has a "?1-" anomer and added it automatically. The problem is that this behavior was not easily awared by users and might cause confusion. Again, less is more, so we remove it.
 
+# glyrepr 0.5.2
 
-} // namespace glyrepr_compact
+## Minor improvements and bug fixes
 
-#endif
+* Fix some error message format errors.
+* Update the abbreviated type name of `glyrepr_structure` from `structure` to `struct`.
+
+# glyrepr 0.5.0
+
+## Major changes
+
+* Glycan structures now support multiple substituents on a single monosaccharide.
+  Substituents are stored as comma-separated strings internally and concatenated
+  in IUPAC format for display.
+* Glycan compositions now support substituents. The `glycan_composition` class
+  can now represent and count substituents alongside monosaccharides.
