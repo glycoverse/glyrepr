@@ -2,5 +2,5 @@ CXX_STD = CXX17
 
 all: $(SHLIB)
 
-compact-iupac.o compact-arrays.o: compact-core.h compact-progress.h
-compact-igraph.o: compact-core.h compact-progress.h
+compact-iupac.o compact-arrays.o: compact-core.h compact-syntax.h compact-progress.h
+compact-igraph.o: compact-core.h compact-syntax.h compact-progress.h

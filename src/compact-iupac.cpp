@@ -101,8 +101,7 @@ Tree parse_tree(std::string s, const std::unordered_map<std::string, int>& known
 }
 
 std::vector<int> parse_parents(const std::string& text) {
-  static const std::regex pattern("^[1-9][0-9]*(,[1-9][0-9]*)*$");
-  if(!std::regex_match(text,pattern)) throw std::runtime_error("invalid parent indices");
+  if(!parent_indices_syntax(text)) throw std::runtime_error("invalid parent indices");
   std::vector<int> out;
   for(auto token:split(text,',')) {long long p=std::stoll(token);if(p>INT_MAX) throw std::runtime_error("parent index overflow");out.push_back((int)p-1);}
   std::set<int> unique(out.begin(),out.end());if(unique.size()!=out.size()) throw std::runtime_error("duplicate parent indices");
@@ -146,7 +145,7 @@ List parse_complete(std::string s,const std::unordered_map<std::string,int>& kno
     if(content.find('{')!=std::string::npos) throw std::runtime_error("nested floating block");
     auto fields=split(content,'|');if(fields.empty() || fields.size()>2 || fields[0].empty()) throw std::runtime_error("invalid floating block");
     std::vector<int> parents=fields.size()==2?parse_parents(fields[1]):std::vector<int>();
-    if(std::regex_match(fields[0],sub_regex)) {f.subs.push_back({normalize_sub(fields[0]),parents});continue;}
+    if(is_substituent(fields[0])) {f.subs.push_back({normalize_sub(fields[0]),parents});continue;}
     auto sequence=fields[0];size_t start=sequence.rfind('(');
     if(start==std::string::npos || sequence.back()!=')') throw std::runtime_error("floating part requires linkage");
     std::string linkage=normalize_linkage(sequence.substr(start+1,sequence.size()-start-2));
