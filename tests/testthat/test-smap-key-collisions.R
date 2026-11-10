@@ -14,11 +14,15 @@ test_that("nested argument permutations stay distinct within one mapping", {
 test_that("mapping keys preserve types and missingness", {
   structures <- rep(as_glycan_structure("Gal(b1-"), 3)
   expect_identical(
-    smap2_chr(structures, list(1L, 1, "1"), function(graph, value) typeof(value)),
+    smap2_chr(structures, list(1L, 1, "1"), function(graph, value) {
+      typeof(value)
+    }),
     c("integer", "double", "character")
   )
   expect_identical(
-    smap2_lgl(structures[1:2], c(NA_character_, "NA"), function(graph, value) is.na(value)),
+    smap2_lgl(structures[1:2], c(NA_character_, "NA"), function(graph, value) {
+      is.na(value)
+    }),
     c(TRUE, FALSE)
   )
   names(structures) <- c(NA_character_, "NA", "NA")
@@ -42,7 +46,11 @@ test_that("structure-returning maps keep distinct nested argument results", {
   structures <- rep(as_glycan_structure("Gal(b1-"), 2)
   values <- list(list(c(1L, 2L)), list(c(2L, 1L)))
   transform <- function(graph, data) {
-    igraph::set_vertex_attr(graph, "mono", value = c("Glc", "Man")[data[[1]][1]])
+    igraph::set_vertex_attr(
+      graph,
+      "mono",
+      value = c("Glc", "Man")[data[[1]][1]]
+    )
   }
   expect_identical(
     as.character(smap2_structure(structures, values, transform)),

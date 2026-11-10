@@ -439,7 +439,10 @@ NULL
 # Preserve value type, attributes, order and missingness without a lossy hash.
 # Hexadecimal bytes cannot contain the combination-key separator "|||".
 .generate_value_key <- function(value) {
-  paste0(as.character(serialize(value, connection = NULL, version = 2)), collapse = "")
+  paste0(
+    as.character(serialize(value, connection = NULL, version = 2)),
+    collapse = ""
+  )
 }
 
 #' @rdname smap
