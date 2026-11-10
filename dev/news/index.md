@@ -2,6 +2,11 @@
 
 ## glyrepr (development version)
 
+### Minor improvements and bug fixes
+
+- Loading glyrepr on Windows no longer stalls under Chinese collation
+  settings. Native structure parsing preserves the session locale while
+  validating substituents and floating-parent indices.
 - glyrepr now requires igraph 2.0.0 or later.
 - [`smap2()`](https://glycoverse.github.io/glyrepr/dev/reference/smap2.md),
   [`spmap()`](https://glycoverse.github.io/glyrepr/dev/reference/spmap.md),

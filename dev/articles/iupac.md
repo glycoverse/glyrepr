@@ -372,7 +372,7 @@ sessionInfo()
 #> [17] checkmate_2.3.4   tibble_3.3.1      desc_1.4.3        bslib_0.12.0     
 #> [21] pillar_1.11.1     rlang_1.3.0       utf8_1.2.6        cachem_1.1.0     
 #> [25] stringi_1.8.9     xfun_0.62         fs_2.1.0          sass_0.4.10      
-#> [29] otel_0.2.0        cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5   
+#> [29] otel_0.3.0        cli_3.6.6         pkgdown_2.2.1     magrittr_2.0.5   
 #> [33] digest_0.6.39     lifecycle_1.0.5   vctrs_0.7.3       evaluate_1.0.5   
 #> [37] glue_1.8.1        ragg_1.5.2        rmarkdown_2.32    purrr_1.2.2      
 #> [41] tools_4.6.2       pkgconfig_2.0.3   htmltools_0.5.9
