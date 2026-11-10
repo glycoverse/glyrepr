@@ -40,32 +40,32 @@ parameter).
 structures <- c(o_glycan_core_1(), n_glycan_core())
 get_structure_graphs(structures)
 #> [[1]]
-#> IGRAPH 2453a70 DN-- 2 1 -- 
+#> IGRAPH fd2bc2c DN-- 2 1 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edge from 2453a70 (vertex names):
+#> + edge from fd2bc2c (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 29a34fc DN-- 5 4 -- 
+#> IGRAPH 395a77d DN-- 5 4 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from 29a34fc (vertex names):
+#> + edges from 395a77d (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 #> 
 get_structure_graphs(structures)
 #> [[1]]
-#> IGRAPH 2453a70 DN-- 2 1 -- 
+#> IGRAPH fd2bc2c DN-- 2 1 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edge from 2453a70 (vertex names):
+#> + edge from fd2bc2c (vertex names):
 #> [1] 2->1
 #> 
 #> [[2]]
-#> IGRAPH 29a34fc DN-- 5 4 -- 
+#> IGRAPH 395a77d DN-- 5 4 -- 
 #> + attr: anomer (g/c), alditol (g/l), name (v/c), mono (v/c), sub (v/c),
 #> | linkage (e/c)
-#> + edges from 29a34fc (vertex names):
+#> + edges from 395a77d (vertex names):
 #> [1] 3->1 3->2 4->3 5->4
 #> 
 ```
