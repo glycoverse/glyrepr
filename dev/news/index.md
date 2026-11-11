@@ -2,6 +2,8 @@
 
 ## glyrepr (development version)
 
+## glyrepr 1.2.1
+
 ### Minor improvements and bug fixes
 
 - Loading glyrepr on Windows no longer stalls under Chinese collation
